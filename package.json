@@ -20,6 +20,7 @@
     "compose:down": "docker compose -f compose.yaml down --remove-orphans",
     "cleanup": "pnpm dlx del-cli .{nitro,output,tanstack} dist bun.lock node_modules",
     "update-deps": "npm-check-updates --configFileName .ncurc.json",
+    "prepare": "dotenv -e .env.local -- sh ./scripts/prepare.sh",
     "garage:cmd": "dotenv -e .env.local -- sh ./scripts/garage.sh",
     "garage": "docker-compose exec garage /garage",
     "check": "oxfmt --check && oxlint",
