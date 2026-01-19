@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
 import { fetcher } from '~/app/fetcher'
-import type { ForgotPasswordResponse } from '~/app/types/api'
 
 // Zod schema for form validation
 const forgotPasswordSchema = z.object({
@@ -29,7 +28,15 @@ function RouteComponent() {
     defaultValues: { email: '' },
     onSubmit: async ({ value }) => {
       try {
-        const response = await fetcher<ForgotPasswordResponse>('/auth/forgot-password', {
+        const response = await fetcher<{
+          success: boolean
+          message: string
+          data: {
+            token?: string
+            reset_link?: string
+            expires_at?: number
+          } | null
+        }>('/auth/forgot-password', {
           method: 'POST',
           body: { email: value.email }
         })

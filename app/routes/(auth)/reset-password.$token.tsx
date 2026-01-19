@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
 import { PasswordInput } from '~/app/components/ui/PasswordInput'
-import { PasswordStrength } from '~/app/components/ui/PasswordStrength'
 import { fetcher } from '~/app/fetcher'
-import type { ResetPasswordResponse } from '~/app/types/api'
 
 interface ResetPasswordLoaderData {
   isValidToken: boolean
@@ -24,10 +22,18 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
 
     try {
       // Validate token by calling the validation endpoint
-      await fetcher('/auth/validate-token?token=' + token, {
+      const response = await fetcher<{
+        success: boolean
+        message: string
+        data: {
+          is_token_valid: boolean
+        }
+      }>('/auth/validate-token?token=' + token, {
         method: 'GET'
       })
-      return { isValidToken: true }
+
+      // Check if token is valid from the response
+      return { isValidToken: response.success && response.data?.is_token_valid }
     } catch (error) {
       console.error(error)
       // If we get an error, the token is invalid/expired
@@ -39,13 +45,7 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
 // Zod schema for form validation
 const resetPasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number')
-      .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string()
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -71,13 +71,14 @@ function RouteComponent() {
     defaultValues: { password: '', confirmPassword: '' },
     onSubmit: async ({ value }) => {
       try {
-        const response = await fetcher<ResetPasswordResponse>(
-          `/auth/reset-password?token=${token}`,
-          {
-            method: 'POST',
-            body: { password: value.password }
-          }
-        )
+        const response = await fetcher<{
+          success: boolean
+          message: string
+          data: null
+        }>(`/auth/reset-password?token=${token}`, {
+          method: 'POST',
+          body: { password: value.password }
+        })
 
         if (response.success) {
           setIsSuccess(true)
@@ -205,7 +206,6 @@ function RouteComponent() {
                       label='New Password'
                       required
                     />
-                    <PasswordStrength password={field.state.value} className='mt-2' />
                   </div>
                 )}
               />

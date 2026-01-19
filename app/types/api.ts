@@ -3,26 +3,47 @@
  * Type definitions for authentication API responses
  */
 
-export interface SigninResponse {
+// Generic API response wrapper
+export interface ApiResponse<T = any> {
   success: boolean
-  user: {
-    id: string
-    email: string
-    name: string
-  }
+  message: string | null
+  data: T
 }
 
-export interface ForgotPasswordResponse {
-  success: boolean
+// Error response structure
+export interface ApiErrorResponse {
+  status: 'error'
   message: string
+  errors?: any
+}
+
+export interface SigninResponseData {
+  user_id: string
+  email: string
+  name: string
+  access_token: string
+  refresh_token: string
+  access_token_expiry: number | null
+  refresh_token_expiry: number | null
+}
+
+export interface SigninResponse extends ApiResponse<SigninResponseData> {}
+
+export interface ForgotPasswordData {
   token?: string
-  resetLink?: string
+  reset_link?: string
+  expires_at?: number
 }
 
-export interface ResetPasswordResponse {
-  success: boolean
-  message: string
+export interface ForgotPasswordResponse extends ApiResponse<ForgotPasswordData | null> {}
+
+export interface ValidateTokenData {
+  is_token_valid: boolean
 }
+
+export interface ValidateTokenResponse extends ApiResponse<ValidateTokenData> {}
+
+export interface ResetPasswordResponse extends ApiResponse<null> {}
 
 export interface ApiError {
   statusCode: number

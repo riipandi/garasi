@@ -7,14 +7,14 @@ authentication: {}
 authenticationType: null
 description: ''
 headers:
-- enabled: true
-  name: User-Agent
-  value: yaak_api_client
-  id: jBeqVvD47p
-- enabled: true
-  name: Accept
-  value: application/json
-  id: k5chSI2fyB
+  - enabled: true
+    name: User-Agent
+    value: yaak_api_client
+    id: jBeqVvD47p
+  - enabled: true
+    name: Accept
+    value: application/json
+    id: k5chSI2fyB
 name: Garasi
 encryptionKeyChallenge: null
 settingValidateCertificates: true

@@ -36,33 +36,43 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       // Call the signin API endpoint
-      const response = await fetcher<{ success: boolean; user: User }>('/auth/signin', {
+      const response = await fetcher<{
+        success: boolean
+        message: string | null
+        data: {
+          user_id: string
+          email: string
+          name: string
+          access_token: string
+          refresh_token: string
+          access_token_expiry: number | null
+          refresh_token_expiry: number | null
+        }
+      }>('/auth/signin', {
         method: 'POST',
         body: { email, password }
       })
 
-      if (!response.success || !response.user) {
+      if (!response.success || !response.data) {
         return { success: false, error: 'Invalid email or password' }
       }
 
-      // Generate session and tokens (in a real app, these would come from the backend)
-      const sessionId = String(response.user.id)
-      const accessToken = `access_token_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-      const refreshToken = `refresh_token_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+      // Use session ID from user_id
+      const sessionId = String(response.data.user_id)
 
       // Set expiry times (access token: 1 hour, refresh token: 7 days)
       const now = Date.now()
-      const accessTokenExpiry = now + 60 * 60 * 1000 // 1 hour
-      const refreshTokenExpiry = now + 7 * 24 * 60 * 60 * 1000 // 7 days
+      const accessTokenExpiry = response.data.access_token_expiry || now + 60 * 60 * 1000 // 1 hour
+      const refreshTokenExpiry = response.data.refresh_token_expiry || now + 7 * 24 * 60 * 60 * 1000 // 7 days
 
-      // Update auth store with user data and tokens
+      // Update auth store with user data and tokens from backend
       authStore.setKey('sessionId', sessionId)
-      authStore.setKey('userId', response.user.id)
-      authStore.setKey('userEmail', response.user.email)
-      authStore.setKey('userName', response.user.name)
-      authStore.setKey('accessToken', accessToken)
+      authStore.setKey('userId', response.data.user_id)
+      authStore.setKey('userEmail', response.data.email)
+      authStore.setKey('userName', response.data.name)
+      authStore.setKey('accessToken', response.data.access_token)
       authStore.setKey('accessTokenExpiry', accessTokenExpiry)
-      authStore.setKey('refreshToken', refreshToken)
+      authStore.setKey('refreshToken', response.data.refresh_token)
       authStore.setKey('refreshTokenExpiry', refreshTokenExpiry)
 
       return { success: true }

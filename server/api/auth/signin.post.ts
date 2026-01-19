@@ -1,14 +1,12 @@
 import { defineHandler, HTTPError, readBody } from 'nitro/h3'
+import { generateTokenPair } from '~/server/platform/jwt'
 
 export default defineHandler(async (event) => {
   const { db } = event.context
 
   try {
     // Parse request body
-    const body = await readBody<{
-      email: string
-      password: string
-    }>(event)
+    const body = await readBody<{ email: string; password: string }>(event)
 
     // Validate required fields
     if (!body?.email || !body?.password) {
@@ -34,18 +32,24 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Invalid credentials' })
     }
 
-    // Return user data (excluding password_hash)
+    // Get user agent from request headers
+    const userAgent = event.req.headers.get('user-agent') || 'unknown'
+
+    // Generate JWT tokens with user agent hash
+    const tokens = await generateTokenPair({ userId: String(user.id) }, userAgent)
+
+    // Return user data with JWT tokens
     return {
       success: true,
       message: null,
       data: {
-        user_id: user.id,
+        user_id: String(user.id),
         email: user.email,
         name: user.name,
-        access_token: 'dummy_access_token',
-        refresh_token: 'refresh_token',
-        access_token_expiry: null,
-        refresh_token_expiry: null
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+        access_token_expiry: tokens.accessTokenExpiry,
+        refresh_token_expiry: tokens.refreshTokenExpiry
       }
     }
   } catch (error) {
