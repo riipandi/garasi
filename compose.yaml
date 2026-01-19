@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
+
+name: garasi
+
+services:
+  garage:
+    image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
+    restart: unless-stopped
+    hostname: garage-node1
+    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data:/var/lib/garage:rw']
+    ports: ['3900:3900', '3901:3901', '3902:3902', '3903:3903', '3904:3904']
+    env_file: '.env.local'
+    environment:
+      RUST_LOG: garage=info # error, warn, info (default), debug, trace.
+    extra_hosts: ['host.docker.internal:host-gateway']
+    networks: ['garasi_network']
+
+  mailpit:
+    image: axllent/mailpit:${MAILPIT_VERSION:-latest}
+    restart: unless-stopped
+    hostname: mailpit
+    volumes: ['mailpit_data:/data:rw']
+    ports: ['1025:1025', '8025:8025']
+    environment:
+      TZ: Asia/Jakarta
+      MP_TAGS_USERNAME: true
+      MP_DISABLE_VERSION_CHECK: true
+      MP_ALLOW_UNTRUSTED_TLS: true
+      MP_UI_BIND_ADDR: 0.0.0.0:8025
+      MP_SMTP_BIND_ADDR: 0.0.0.0:1025
+      MP_SMTP_AUTH_ALLOW_INSECURE: true
+      MP_SMTP_AUTH: 'maileruser1:mailerpass1 maileruser2:mailerpass2'
+    extra_hosts: ['host.docker.internal:host-gateway']
+    networks: ['garasi_network']
+
+volumes:
+  garage_data:
+    driver: local
+  mailpit_data:
+    driver: local
+
+networks:
+  garasi_network:
+    name: garasi_network
+    driver: bridge

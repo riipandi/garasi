@@ -1,0 +1,49 @@
+##
+# Garage S3 configuration file. Read more the documentation:
+#  - https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration
+#  - https://garagehq.deuxfleurs.fr/documentation/reference-manual/admin-api
+#  - https://garagehq.deuxfleurs.fr/api/garage-admin-v0.html
+#
+# Use LMDB in development and SQLite in production. LMDB is fast but can
+# corrupt after unclean shutdowns (e.g., killed process or power loss).
+##
+
+data_dir = "/var/lib/garage/data"
+metadata_dir = "/var/lib/garage/meta"
+metadata_snapshots_dir = "/var/lib/garage/snapshots"
+metadata_auto_snapshot_interval = "24h"
+
+allow_world_readable_secrets = false
+block_ram_buffer_max = "128MiB"
+block_size = "10M"
+compression_level = 4
+consistency_mode = "consistent"
+data_fsync = false
+db_engine = "lmdb"
+disable_scrub = false
+metadata_fsync = false
+replication_factor = 1
+use_local_tz = false
+
+rpc_bind_addr = "0.0.0.0:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_bind_outgoing = false
+
+[s3_api]
+api_bind_addr = "0.0.0.0:3900"
+root_domain = ".s3.localhost"
+s3_region = "auto"
+
+[s3_web]
+bind_addr = "0.0.0.0:3902"
+root_domain = ".localhost"
+index = "index.html"
+add_host_to_metrics = true
+
+[k2v_api]
+api_bind_addr = "0.0.0.0:3904"
+
+[admin]
+api_bind_addr = "0.0.0.0:3903"
+metrics_require_token = false
+# trace_sink = "http://otel-lgtm:4317"

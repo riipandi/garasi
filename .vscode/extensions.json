@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "oven.bun-vscode",
+    "bradlc.vscode-tailwindcss",
+    "darkriszty.markdown-table-prettify",
+    "EditorConfig.EditorConfig",
+    "foxundermoon.shell-format",
+    "ms-playwright.playwright",
+    "oxc.oxc-vscode",
+    "Shellomo.enhanced-toml"
+  ]
+}
