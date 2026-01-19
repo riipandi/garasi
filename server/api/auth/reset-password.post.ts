@@ -67,7 +67,8 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      message: 'Password has been reset successfully'
+      message: 'Password has been reset successfully',
+      data: null
     }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500

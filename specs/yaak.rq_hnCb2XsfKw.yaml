@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_hnCb2XsfKw
+createdAt: 2026-01-19T20:20:23.649064
+updatedAt: 2026-01-19T20:21:06.877516
+workspaceId: wk_YrPa97TLKc
+folderId: fl_7Ew2sdp7wt
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: POST
+name: Cleanup Incomplete Uploads
+sortPriority: 2000.001
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

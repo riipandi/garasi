@@ -1,0 +1,23 @@
+type: workspace
+model: workspace
+id: wk_YrPa97TLKc
+createdAt: 2026-01-19T18:46:56.626243
+updatedAt: 2026-01-19T20:12:07.476462
+authentication: {}
+authenticationType: null
+description: ''
+headers:
+- enabled: true
+  name: User-Agent
+  value: yaak_api_client
+  id: jBeqVvD47p
+- enabled: true
+  name: Accept
+  value: application/json
+  id: k5chSI2fyB
+name: Garasi
+encryptionKeyChallenge: null
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0
+settingDnsOverrides: []

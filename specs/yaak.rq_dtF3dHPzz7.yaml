@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_dtF3dHPzz7
+createdAt: 2026-01-19T20:17:31.941330
+updatedAt: 2026-01-19T20:18:15.827105
+workspaceId: wk_YrPa97TLKc
+folderId: fl_rwLq2CSxWU
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: DELETE
+name: Purge Blocks
+sortPriority: 0.003
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

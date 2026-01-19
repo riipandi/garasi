@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_2Nk5p8yRPn
+createdAt: 2026-01-19T20:16:52.344334
+updatedAt: 2026-01-19T20:25:26.730953
+workspaceId: wk_YrPa97TLKc
+folderId: fl_bowiCjD6Ui
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Key Info
+sortPriority: 0.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

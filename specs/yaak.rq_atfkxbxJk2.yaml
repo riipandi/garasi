@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_atfkxbxJk2
+createdAt: 2026-01-19T20:22:30.275031
+updatedAt: 2026-01-19T20:23:11.101901
+workspaceId: wk_YrPa97TLKc
+folderId: fl_9Rjwumb9ff
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Update Cluster Layout
+sortPriority: 2000.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

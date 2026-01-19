@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_xz8vbx3DR9
+createdAt: 2026-01-19T20:23:40.661723
+updatedAt: 2026-01-19T20:23:57.986432
+workspaceId: wk_YrPa97TLKc
+folderId: fl_8Fc9gwrsGC
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Cluster Status
+sortPriority: 1000.003
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

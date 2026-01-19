@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_sB7LfExMVs
+createdAt: 2026-01-19T20:20:51.568269
+updatedAt: 2026-01-19T20:21:40.381089
+workspaceId: wk_YrPa97TLKc
+folderId: fl_7Ew2sdp7wt
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Inspect Object
+sortPriority: 3000.005000000001
+url: ${[ baseURL ]}/api/check-domain?domain=example.com
+urlParameters: []

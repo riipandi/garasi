@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_8pY8KDcEB9
+createdAt: 2026-01-19T20:16:47.705755
+updatedAt: 2026-01-19T20:19:05.029389
+workspaceId: wk_YrPa97TLKc
+folderId: fl_SVGNWxfTR6
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: List Admin Tokens
+sortPriority: 0.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

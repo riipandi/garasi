@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_S4B4kZapPd
+createdAt: 2026-01-19T20:25:46.302021
+updatedAt: 2026-01-19T20:26:09.629707
+workspaceId: wk_YrPa97TLKc
+folderId: fl_kpCLEVgs4R
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Node Statistics
+sortPriority: 0.004
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

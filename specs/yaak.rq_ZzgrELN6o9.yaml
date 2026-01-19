@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_ZzgrELN6o9
+createdAt: 2026-01-19T20:22:30.558637
+updatedAt: 2026-01-19T20:23:11.104334
+workspaceId: wk_YrPa97TLKc
+folderId: fl_9Rjwumb9ff
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Preview Layout Changes
+sortPriority: 4000.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

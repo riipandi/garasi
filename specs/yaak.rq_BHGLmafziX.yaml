@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_BHGLmafziX
+createdAt: 2026-01-19T20:15:25.853255
+updatedAt: 2026-01-19T20:16:05.203414
+workspaceId: wk_YrPa97TLKc
+folderId: fl_rD5yxf6qLQ
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Check Cluster Health
+sortPriority: 1000.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

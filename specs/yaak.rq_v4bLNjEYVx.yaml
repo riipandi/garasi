@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_v4bLNjEYVx
+createdAt: 2026-01-19T20:20:50.780394
+updatedAt: 2026-01-19T20:21:24.106712
+workspaceId: wk_YrPa97TLKc
+folderId: fl_7Ew2sdp7wt
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Create Bucket
+sortPriority: 3000.0020000000004
+url: ${[ baseURL ]}/api/check-domain?domain=example.com
+urlParameters: []

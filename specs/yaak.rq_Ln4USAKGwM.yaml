@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_Ln4USAKGwM
+createdAt: 2026-01-19T20:23:40.468778
+updatedAt: 2026-01-19T20:23:53.017035
+workspaceId: wk_YrPa97TLKc
+folderId: fl_8Fc9gwrsGC
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Cluster Statistics
+sortPriority: 1000.002
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

@@ -1,0 +1,22 @@
+type: environment
+model: environment
+id: ev_xAC7NtfRhk
+workspaceId: wk_YrPa97TLKc
+createdAt: 2026-01-19T18:46:56.675238
+updatedAt: 2026-01-19T20:10:46.720055
+name: Global Variables
+public: true
+base: true
+parentModel: workspace
+parentId: null
+variables:
+- enabled: true
+  name: baseURL
+  value: http://localhost:3000
+  id: d9ZFZE0c3Q
+- enabled: true
+  name: defaultPassword
+  value: P@ssw0rd!
+  id: uEcujYiDIr
+color: null
+sortPriority: 0.0

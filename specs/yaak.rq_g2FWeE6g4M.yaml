@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_g2FWeE6g4M
+createdAt: 2026-01-19T20:24:49.077892
+updatedAt: 2026-01-19T20:25:26.739525
+workspaceId: wk_YrPa97TLKc
+folderId: fl_bowiCjD6Ui
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Update Access Key
+sortPriority: 3000.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

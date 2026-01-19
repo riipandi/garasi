@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_U5aJzWkd7h
+createdAt: 2026-01-19T19:42:46.422055
+updatedAt: 2026-01-19T20:21:13.214453
+workspaceId: wk_YrPa97TLKc
+folderId: fl_7Ew2sdp7wt
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Delete Bucket
+sortPriority: 3000.0
+url: ${[ baseURL ]}/api/check-domain?domain=example.com
+urlParameters: []

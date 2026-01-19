@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_qT58ZTeJTh
+createdAt: 2026-01-19T20:17:03.304309
+updatedAt: 2026-01-19T20:23:11.096120
+workspaceId: wk_YrPa97TLKc
+folderId: fl_9Rjwumb9ff
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Apply Cluster Layout
+sortPriority: 0.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

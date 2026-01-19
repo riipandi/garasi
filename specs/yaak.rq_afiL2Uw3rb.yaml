@@ -1,0 +1,27 @@
+type: http_request
+model: http_request
+id: rq_afiL2Uw3rb
+createdAt: 2026-01-19T18:47:05.009940
+updatedAt: 2026-01-19T20:16:33.880103
+workspaceId: wk_YrPa97TLKc
+folderId: fl_ougj9dmJYS
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "admin@example.com",
+      "password": "${[ defaultPassword ]}"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: tXdCB587eF
+method: POST
+name: Signin with Email
+sortPriority: 0.0
+url: ${[ baseURL ]}/api/auth/signin
+urlParameters: []

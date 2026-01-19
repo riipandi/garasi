@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_T39ogTMUkU
+createdAt: 2026-01-19T20:25:45.327578
+updatedAt: 2026-01-19T20:25:57.914423
+workspaceId: wk_YrPa97TLKc
+folderId: fl_kpCLEVgs4R
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Create Metadata Snapshot
+sortPriority: 0.002
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

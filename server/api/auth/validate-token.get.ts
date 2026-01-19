@@ -36,10 +36,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Token is valid
-    return {
-      success: true,
-      valid: true
-    }
+    return { success: true, message: 'Token valid', data: { is_token_valid: true } }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'

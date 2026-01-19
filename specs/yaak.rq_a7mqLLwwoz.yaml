@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_a7mqLLwwoz
+createdAt: 2026-01-19T20:20:30.340412
+updatedAt: 2026-01-19T20:21:53.682773
+workspaceId: wk_YrPa97TLKc
+folderId: fl_98sqdmcD3J
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Add Bucket Alias
+sortPriority: 0.001
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

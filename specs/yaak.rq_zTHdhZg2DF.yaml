@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_zTHdhZg2DF
+createdAt: 2026-01-19T18:49:03.845903
+updatedAt: 2026-01-19T18:49:33.699808
+workspaceId: wk_YrPa97TLKc
+folderId: fl_ougj9dmJYS
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "admin@example.com"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: tXdCB587eF
+method: POST
+name: Forgot Password
+sortPriority: 0.001
+url: ${[ baseURL ]}/api/auth/forgot-password
+urlParameters: []

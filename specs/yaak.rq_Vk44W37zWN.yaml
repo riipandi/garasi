@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_Vk44W37zWN
+createdAt: 2026-01-19T20:22:30.854851
+updatedAt: 2026-01-19T20:23:16.824729
+workspaceId: wk_YrPa97TLKc
+folderId: fl_9Rjwumb9ff
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Revert Cluster Layout
+sortPriority: 5000.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

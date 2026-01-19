@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_g8B6r8Rdvq
+createdAt: 2026-01-19T18:51:40.322852
+updatedAt: 2026-01-19T20:21:48.492846
+workspaceId: wk_YrPa97TLKc
+folderId: fl_98sqdmcD3J
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Remove Bucket Alias
+sortPriority: 0.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

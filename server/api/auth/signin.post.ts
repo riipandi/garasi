@@ -35,7 +35,19 @@ export default defineHandler(async (event) => {
     }
 
     // Return user data (excluding password_hash)
-    return { success: true, user }
+    return {
+      success: true,
+      message: null,
+      data: {
+        user_id: user.id,
+        email: user.email,
+        name: user.name,
+        access_token: 'dummy_access_token',
+        refresh_token: 'refresh_token',
+        access_token_expiry: null,
+        refresh_token_expiry: null
+      }
+    }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'

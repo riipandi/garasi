@@ -1,5 +1,6 @@
 import { defineEventHandler, readBody, HTTPError } from 'h3'
 import { sendMail } from '~/server/platform/mailer'
+import { protectedEnv } from '~/shared/envars'
 
 interface ForgotPasswordBody {
   email: string
@@ -33,11 +34,9 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Generate a secure random token
+    // Generate a secure token and set expiry to 1 hour from now (in seconds)
     const token = crypto.randomUUID()
-
-    // Set token expiry to 1 hour from now
-    const expiresAt = Math.floor(Date.now() / 1000) + 3600 // 1 hour in seconds
+    const expiresAt = Math.floor(Date.now() / 1000) + 3600
 
     // Store the reset token
     await db
@@ -50,7 +49,8 @@ export default defineEventHandler(async (event) => {
       })
       .execute()
 
-    const passwordResetLink = `${baseURL}/reset-password/${token}`
+    const isDev = protectedEnv.APP_MODE === 'development'
+    const resetLink = `${baseURL}/reset-password/${token}`
 
     await sendMail({
       to: user.email,
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
       html: `
         <p>Password reset token for ${user.email}: ${token}</p>
         <p>
-          Password reset link: <a href="${passwordResetLink}">${passwordResetLink}</a>
+          Password reset link: <a href="${resetLink}">${resetLink}</a>
         </p>
       `
     })
@@ -66,8 +66,7 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       message: 'If an account exists with this email, a password reset link has been sent.',
-      // Only include token in development
-      ...(import.meta.env.DEV && { token, resetLink: `/reset-password?token=${token}` })
+      data: isDev ? { token, reset_link: resetLink, expires_at: expiresAt } : null
     }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500

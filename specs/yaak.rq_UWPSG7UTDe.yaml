@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_UWPSG7UTDe
+createdAt: 2026-01-19T20:26:19.479285
+updatedAt: 2026-01-19T20:26:34.312751
+workspaceId: wk_YrPa97TLKc
+folderId: fl_khnnuz8ccL
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Worker Variable
+sortPriority: 0.002
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_U5hxfp9sK2
+createdAt: 2026-01-19T20:22:29.653453
+updatedAt: 2026-01-19T20:23:11.103109
+workspaceId: wk_YrPa97TLKc
+folderId: fl_9Rjwumb9ff
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Layout History
+sortPriority: 3000.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

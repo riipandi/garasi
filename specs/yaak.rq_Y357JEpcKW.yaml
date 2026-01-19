@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_Y357JEpcKW
+createdAt: 2026-01-19T20:17:31.719724
+updatedAt: 2026-01-19T20:17:44.100282
+workspaceId: wk_YrPa97TLKc
+folderId: fl_rwLq2CSxWU
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Block Info
+sortPriority: 0.002
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

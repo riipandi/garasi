@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_7mwEYXWhSA
+createdAt: 2026-01-19T20:22:31.129248
+updatedAt: 2026-01-19T20:23:24.967912
+workspaceId: wk_YrPa97TLKc
+folderId: fl_9Rjwumb9ff
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Skip Dead Nodes
+sortPriority: 6000.0
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

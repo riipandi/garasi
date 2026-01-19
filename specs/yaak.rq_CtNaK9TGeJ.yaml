@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_CtNaK9TGeJ
+createdAt: 2026-01-19T20:20:32.099041
+updatedAt: 2026-01-19T20:22:05.518576
+workspaceId: wk_YrPa97TLKc
+folderId: fl_QEMJCxv2ZS
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Deny Bucket Key
+sortPriority: 0.002
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

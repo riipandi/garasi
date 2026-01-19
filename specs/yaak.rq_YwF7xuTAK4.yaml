@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_YwF7xuTAK4
+createdAt: 2026-01-19T20:25:45.892063
+updatedAt: 2026-01-19T20:26:03.520721
+workspaceId: wk_YrPa97TLKc
+folderId: fl_kpCLEVgs4R
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Launch Repair Operation
+sortPriority: 0.003
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []

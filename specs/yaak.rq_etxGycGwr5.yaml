@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_etxGycGwr5
+createdAt: 2026-01-19T20:42:44.449075
+updatedAt: 2026-01-19T20:43:09.581784
+workspaceId: wk_YrPa97TLKc
+folderId: fl_ougj9dmJYS
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Validate Token
+sortPriority: 0.003
+url: ${[ baseURL ]}/api/auth/validate-token?token=${[ response.body.path(request='rq_zTHdhZg2DF', behavior='smart', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLnRva2Vu') ]}
+urlParameters: []

@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_KQi42bUMu4
+createdAt: 2026-01-19T20:20:51.336304
+updatedAt: 2026-01-19T20:21:35.633827
+workspaceId: wk_YrPa97TLKc
+folderId: fl_7Ew2sdp7wt
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Bucket Info
+sortPriority: 3000.004000000001
+url: ${[ baseURL ]}/api/check-domain?domain=example.com
+urlParameters: []

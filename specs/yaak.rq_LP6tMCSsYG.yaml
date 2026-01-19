@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_LP6tMCSsYG
+createdAt: 2026-01-19T20:17:07.732388
+updatedAt: 2026-01-19T20:17:39.057996
+workspaceId: wk_YrPa97TLKc
+folderId: fl_rwLq2CSxWU
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: List Block Errors
+sortPriority: 0.001
+url: ${[ baseURL ]}/api/bucket
+urlParameters: []
