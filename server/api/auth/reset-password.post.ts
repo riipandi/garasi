@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, createError, getQuery } from 'h3'
+import { defineEventHandler, readBody, getQuery, HTTPError } from 'h3'
 
 interface ResetPasswordBody {
   token: string
@@ -17,18 +17,12 @@ export default defineEventHandler(async (event) => {
 
     // Validate required fields
     if (!token || !body || !body.password) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Token and password are required'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Token and password are required' })
     }
 
     // Validate password strength
     if (body.password.length < 6) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Password must be at least 6 characters'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Password must be at least 6 characters' })
     }
 
     // Find the reset token
@@ -40,27 +34,18 @@ export default defineEventHandler(async (event) => {
 
     // Check if token exists
     if (!resetToken) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid or expired reset token'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is expired
     const now = Math.floor(Date.now() / 1000)
     if (resetToken.expires_at < now) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid or expired reset token'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is already used
     if (resetToken.used !== 0) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Reset token has already been used'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Token has already been used' })
     }
 
     // Hash the new password
@@ -84,16 +69,10 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Password has been reset successfully'
     }
-  } catch (error: any) {
-    // Re-throw if it's already an H3 error
-    if (error.statusCode) {
-      throw error
-    }
-
-    // Handle unexpected errors
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal server error'
-    })
+  } catch (error) {
+    event.res.status = error instanceof HTTPError ? error.status : 500
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    const errors = error instanceof Error ? error.cause : null
+    return { status: 'error', message, errors }
   }
 })

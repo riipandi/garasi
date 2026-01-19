@@ -1,4 +1,4 @@
-import { defineEventHandler, createError, getQuery } from 'h3'
+import { defineEventHandler, getQuery, HTTPError } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const { db } = event.context
@@ -9,10 +9,7 @@ export default defineEventHandler(async (event) => {
 
     // Validate token exists
     if (!token || token.trim() === '') {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Token is required'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Token is required' })
     }
 
     // Find the reset token
@@ -24,27 +21,18 @@ export default defineEventHandler(async (event) => {
 
     // Check if token exists
     if (!resetToken) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid or expired reset token'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is expired
     const now = Math.floor(Date.now() / 1000)
     if (resetToken.expires_at < now) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid or expired reset token'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is already used
     if (resetToken.used !== 0) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Reset token has already been used'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Token has already been used' })
     }
 
     // Token is valid
@@ -52,16 +40,10 @@ export default defineEventHandler(async (event) => {
       success: true,
       valid: true
     }
-  } catch (error: any) {
-    // Re-throw if it's already an H3 error
-    if (error.statusCode) {
-      throw error
-    }
-
-    // Handle unexpected errors
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal server error'
-    })
+  } catch (error) {
+    event.res.status = error instanceof HTTPError ? error.status : 500
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    const errors = error instanceof Error ? error.cause : null
+    return { status: 'error', message, errors }
   }
 })

@@ -7,7 +7,7 @@
     <a href="https://github.com/riipandi/garasi">
         <img src="https://img.shields.io/github/repo-size/riipandi/garasi?color=teal" alt="Repo Size">
     </a>
-    <a href="https://github.com/riipandi/garasi/graphs/contributors">
+    <a href="https://github.com/riipandi/garasi/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/riipandi/garasi?color=green" alt="License">
     </a>
     <a href="https://github.com/riipandi/garasi/graphs/contributors">

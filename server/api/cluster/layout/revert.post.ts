@@ -4,5 +4,5 @@ export default defineHandler(async (event) => {
   const { gfetch } = event.context
   const data = await gfetch('/v2/ListBuckets')
 
-  return { message: 'Revert Cluster Layout', data }
+  return { status: 'success', message: 'Revert Cluster Layout', data }
 })

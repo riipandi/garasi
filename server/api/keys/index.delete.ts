@@ -4,5 +4,5 @@ export default defineHandler(async (event) => {
   const { gfetch } = event.context
   const data = await gfetch('/v2/ListBuckets')
 
-  return { message: 'Delete Access Key', data }
+  return { status: 'success', message: 'Delete Access Key', data }
 })

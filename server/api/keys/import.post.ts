@@ -4,5 +4,5 @@ export default defineHandler(async (event) => {
   const { gfetch } = event.context
   const data = await gfetch('/v2/ListBuckets')
 
-  return { message: 'Import Key', data }
+  return { status: 'success', message: 'Import Key', data }
 })

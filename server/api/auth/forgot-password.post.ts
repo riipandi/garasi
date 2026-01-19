@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, createError } from 'h3'
+import { defineEventHandler, readBody, HTTPError } from 'h3'
 import { sendMail } from '~/server/platform/mailer'
 
 interface ForgotPasswordBody {
@@ -14,10 +14,7 @@ export default defineEventHandler(async (event) => {
 
     // Validate required fields
     if (!body || !body.email) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Email is required'
-      })
+      throw new HTTPError({ status: 400, statusText: 'Email is required' })
     }
 
     // Find user by email
@@ -72,16 +69,10 @@ export default defineEventHandler(async (event) => {
       // Only include token in development
       ...(import.meta.env.DEV && { token, resetLink: `/reset-password?token=${token}` })
     }
-  } catch (error: any) {
-    // Re-throw if it's already a H3 error
-    if (error.statusCode) {
-      throw error
-    }
-
-    // Handle unexpected errors
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal server error'
-    })
+  } catch (error) {
+    event.res.status = error instanceof HTTPError ? error.status : 500
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    const errors = error instanceof Error ? error.cause : null
+    return { status: 'error', message, errors }
   }
 })
