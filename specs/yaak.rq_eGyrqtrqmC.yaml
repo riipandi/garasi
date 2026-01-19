@@ -1,0 +1,20 @@
+type: http_request
+model: http_request
+id: rq_eGyrqtrqmC
+createdAt: 2026-01-19T20:45:39.039648
+updatedAt: 2026-01-19T20:48:57.177745
+workspaceId: wk_YrPa97TLKc
+folderId: fl_ougj9dmJYS
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get Current User
+sortPriority: 0.004
+url: ${[ baseURL ]}/api/auth/whoami
+urlParameters: []
