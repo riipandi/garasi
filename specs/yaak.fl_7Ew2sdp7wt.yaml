@@ -2,7 +2,7 @@ type: folder
 model: folder
 id: fl_7Ew2sdp7wt
 createdAt: 2026-01-19T18:51:12.224183
-updatedAt: 2026-01-19T20:16:14.412847
+updatedAt: 2026-01-20T04:32:41.921934
 workspaceId: wk_YrPa97TLKc
 folderId: null
 authentication: {}
@@ -10,4 +10,4 @@ authenticationType: null
 description: ''
 headers: []
 name: Bucket
-sortPriority: 3000.0
+sortPriority: 4000.0

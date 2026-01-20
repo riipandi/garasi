@@ -2,9 +2,9 @@ type: http_request
 model: http_request
 id: rq_etxGycGwr5
 createdAt: 2026-01-19T20:42:44.449075
-updatedAt: 2026-01-20T03:50:09.032761
+updatedAt: 2026-01-20T04:40:00.892131
 workspaceId: wk_YrPa97TLKc
-folderId: fl_ougj9dmJYS
+folderId: fl_fehQvvbEXQ
 authentication: {}
 authenticationType: null
 body:
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: Validate Token
-sortPriority: 1000.0
+sortPriority: 3000.0
 url: ${[ baseURL ]}/api/auth/validate-token?token=${[ response.body.path(request='rq_zTHdhZg2DF', behavior='smart', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLnRva2Vu') ]}
 urlParameters: []

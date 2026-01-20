@@ -1,17 +1,16 @@
 type: http_request
 model: http_request
-id: rq_afiL2Uw3rb
-createdAt: 2026-01-19T18:47:05.009940
-updatedAt: 2026-01-20T04:40:20.159107
+id: rq_yN3vaiLiu7
+createdAt: 2026-01-20T04:33:06.333955
+updatedAt: 2026-01-20T04:37:22.486631
 workspaceId: wk_YrPa97TLKc
-folderId: fl_ougj9dmJYS
+folderId: fl_WpJjgZXdWN
 authentication: {}
 authenticationType: null
 body:
   text: |-
     {
-      "email": "admin@example.com",
-      "password": "${[ defaultPassword ]}"
+      "name": "Admin Sistem"
     }
 bodyType: application/json
 description: ''
@@ -19,9 +18,9 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: tXdCB587eF
-method: POST
-name: Signin with Email
+  id: gVNpVAEGwQ
+method: PUT
+name: Update Profile
 sortPriority: 0.0
-url: ${[ baseURL ]}/api/auth/signin
+url: ${[ baseURL ]}/api/user/profile
 urlParameters: []

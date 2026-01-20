@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_zTHdhZg2DF
 createdAt: 2026-01-19T18:49:03.845903
-updatedAt: 2026-01-20T04:00:15.628746
+updatedAt: 2026-01-20T04:40:00.886808
 workspaceId: wk_YrPa97TLKc
 folderId: fl_fehQvvbEXQ
 authentication: {}
@@ -15,10 +15,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: tXdCB587eF
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: tXdCB587eF
 method: POST
 name: Forgot Password
 sortPriority: 0.0

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_k54vECRwEY
 createdAt: 2026-01-19T18:49:36.681863
-updatedAt: 2026-01-20T04:00:30.472824
+updatedAt: 2026-01-20T04:40:00.888984
 workspaceId: wk_YrPa97TLKc
 folderId: fl_fehQvvbEXQ
 authentication: {}
@@ -15,10 +15,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: tXdCB587eF
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: tXdCB587eF
 method: POST
 name: Reset Password
 sortPriority: 1000.0

@@ -1,0 +1,14 @@
+type: folder
+model: folder
+id: fl_WpJjgZXdWN
+createdAt: 2026-01-20T04:32:39.009339
+updatedAt: 2026-01-20T04:32:54.515313
+workspaceId: wk_YrPa97TLKc
+folderId: null
+authentication:
+  token: ${[ response.body.path(request='rq_afiL2Uw3rb', behavior='smart', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
+description: ''
+headers: []
+name: User Account
+sortPriority: 1000.0

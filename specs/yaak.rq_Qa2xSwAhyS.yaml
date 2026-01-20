@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_Qa2xSwAhyS
 createdAt: 2026-01-20T03:49:34.626051
-updatedAt: 2026-01-20T04:00:02.985580
+updatedAt: 2026-01-20T04:40:00.890622
 workspaceId: wk_YrPa97TLKc
 folderId: fl_fehQvvbEXQ
 authentication:
@@ -17,10 +17,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: IBWGB7acJG
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: IBWGB7acJG
 method: POST
 name: Change Password
 sortPriority: 2000.0

@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_UPn876h3io
+createdAt: 2026-01-20T04:33:55.262305
+updatedAt: 2026-01-20T04:38:58.549782
+workspaceId: wk_YrPa97TLKc
+folderId: fl_WpJjgZXdWN
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: POST
+name: Confirm Email
+sortPriority: 0.002
+url: ${[ baseURL ]}/api/user/email/confirm?token=${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_raiWvUuRBN', path=b64'JC5kYXRhLnRva2Vu') ]}
+urlParameters: []

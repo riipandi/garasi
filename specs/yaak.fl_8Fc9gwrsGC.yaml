@@ -2,7 +2,7 @@ type: folder
 model: folder
 id: fl_8Fc9gwrsGC
 createdAt: 2026-01-19T20:14:04.662336
-updatedAt: 2026-01-19T20:16:14.413911
+updatedAt: 2026-01-20T04:32:41.922437
 workspaceId: wk_YrPa97TLKc
 folderId: null
 authentication: {}
@@ -10,4 +10,4 @@ authenticationType: null
 description: ''
 headers: []
 name: Cluster
-sortPriority: 4000.0
+sortPriority: 5000.0
