@@ -17,7 +17,7 @@ export const Route = createFileRoute('/(app)')({
 })
 
 function RouteComponent() {
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
   const router = useRouter()
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 
@@ -96,34 +96,29 @@ function RouteComponent() {
                 </div>
 
                 <nav className='space-y-0.5'>
-                  {/* Dashboard */}
                   <NavLink to='/' icon={Lucide.LayoutDashboard} label='Dashboard' exact />
-
-                  {/* Resources */}
-                  <NavSection title='Resources' />
+                  <NavLink to='/metrics' icon={Lucide.GanttChartSquare} label='Metrics' />
+                  <NavLink to='/cluster' icon={Lucide.Server} label='Cluster' />
                   <NavLink to='/buckets' icon={Lucide.Database} label='Buckets' />
                   <NavLink to='/keys' icon={Lucide.KeyRound} label='Access Keys' />
-
-                  {/* System */}
                   <NavDivider />
-                  <NavLink to='/cluster' icon={Lucide.Server} label='Cluster' />
-                  <NavLink to='/metrics' icon={Lucide.GanttChartSquare} label='Metrics' />
-
-                  {/* Account */}
-                  <NavDivider />
-                  <NavSection title='Account' />
-                  <NavLink to='/profile' icon={Lucide.User} label='Profile' exact />
+                  <NavSection title='Quick Access' />
                 </nav>
               </div>
 
               <div className='flex items-center justify-between gap-2 border-t border-gray-200 pt-2.5'>
+                <NavLink
+                  to='/profile'
+                  icon={Lucide.UserCircle}
+                  label={user?.name || 'Account'}
+                  exact
+                />
                 <button
                   type='button'
+                  className='flex h-full w-10 items-center justify-center rounded-lg text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900'
                   onClick={handleLogout}
-                  className='flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900'
                 >
-                  <Lucide.LogOut className='size-4' />
-                  <span>Logout</span>
+                  <Lucide.LogOut className='size-4' strokeWidth={2.0} />
                 </button>
               </div>
             </div>
@@ -187,7 +182,7 @@ function NavLink({
 // Navbar section header
 function NavSection({ title }: { title: string }) {
   return (
-    <div className='mt-6 mb-2 px-3'>
+    <div className='mt-5 mb-2 px-3'>
       <h3 className='text-xs font-semibold tracking-wider text-gray-500 uppercase'>{title}</h3>
     </div>
   )

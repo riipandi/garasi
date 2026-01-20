@@ -15,10 +15,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: gVNpVAEGwQ
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: gVNpVAEGwQ
 method: PUT
 name: Update Profile
 sortPriority: 2000.0

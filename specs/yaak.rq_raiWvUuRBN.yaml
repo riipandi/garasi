@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: Be7IxxqpbN
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: Be7IxxqpbN
 method: POST
 name: Change Email
 sortPriority: 3000.0
