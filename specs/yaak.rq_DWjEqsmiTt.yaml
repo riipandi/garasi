@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_DWjEqsmiTt
 createdAt: 2026-01-20T00:49:22.810920
-updatedAt: 2026-01-20T00:56:35.974147
+updatedAt: 2026-01-20T03:50:09.034957
 workspaceId: wk_YrPa97TLKc
 folderId: fl_ougj9dmJYS
 authentication:
@@ -23,6 +23,6 @@ headers:
     id: IBWGB7acJG
 method: POST
 name: Signout User
-sortPriority: 5000.0
+sortPriority: 3000.0
 url: ${[ baseURL ]}/api/auth/logout
 urlParameters: []

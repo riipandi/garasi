@@ -51,7 +51,7 @@ export async function authenticateRequest(
 
   // Optionally validate session
   if (options.requireSession) {
-    const sessionId = event.req.headers.get('x-session-id')
+    const sessionId = payload.sid
 
     if (!sessionId) {
       throw new HTTPError({

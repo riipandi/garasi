@@ -1,0 +1,28 @@
+type: http_request
+model: http_request
+id: rq_Qa2xSwAhyS
+createdAt: 2026-01-20T03:49:34.626051
+updatedAt: 2026-01-20T03:50:57.868062
+workspaceId: wk_YrPa97TLKc
+folderId: fl_fehQvvbEXQ
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
+body:
+  text: |-
+    {
+      "current_password": "${[ defaultPassword ]}",
+      "new_password": "${[ defaultPassword ]}"
+    }
+bodyType: application/json
+description: ''
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: IBWGB7acJG
+method: POST
+name: Change Password
+sortPriority: 2000.0
+url: ${[ baseURL ]}/api/auth/change-password
+urlParameters: []

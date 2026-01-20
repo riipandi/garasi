@@ -1,6 +1,9 @@
 import { defineHandler, HTTPError } from 'nitro/h3'
 import { verifyAccessToken } from '~/server/platform/jwt'
-import { updateSessionActivity } from '~/server/services/session.service'
+import {
+  deactivateOtherSessions,
+  revokeSessionRefreshTokens
+} from '~/server/services/session.service'
 
 export default defineHandler(async (event) => {
   const { db } = event.context
@@ -30,44 +33,42 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 401, statusText: 'Unauthorized: Invalid token payload' })
     }
 
-    // Get session ID from token payload (aud claim contains session ID)
-    // For now, we'll extract it from the token's jti claim if available
-    // or we can add it to the token payload during generation
-    const sessionId = payload.sid
+    // Get current session ID from headers
+    const currentSessionId = payload.sid
 
-    // Update session activity if session ID is provided
-    if (sessionId) {
-      updateSessionActivity(db, sessionId).catch((err) => {
-        console.error('Error updating session activity:', err)
-      })
+    if (!currentSessionId) {
+      throw new HTTPError({ status: 400, statusText: 'Session ID is required' })
     }
 
-    // Fetch user from database
-    const user = await db
-      .selectFrom('users')
-      .select(['id', 'email', 'name'])
-      .where('id', '=', userId)
-      .executeTakeFirst()
+    // Deactivate all other sessions for the user
+    const deactivatedCount = await deactivateOtherSessions(db, userId, currentSessionId)
 
-    // Check if user exists
-    if (!user) {
-      throw new HTTPError({ status: 404, statusText: 'User not found' })
+    // Get all sessions for the user to find the ones we just deactivated
+    const allSessions = await db
+      .selectFrom('sessions')
+      .select(['id'])
+      .where('user_id', '=', userId)
+      .where('id', '!=', currentSessionId)
+      .where('is_active', '=', 0)
+      .execute()
+
+    // Revoke refresh tokens for all deactivated sessions
+    for (const session of allSessions) {
+      await revokeSessionRefreshTokens(db, session.id)
     }
 
-    // Return user information
+    // Return success message
     return {
       success: true,
-      message: 'User information retrieved',
+      message: `Signed out from ${deactivatedCount} other device(s)`,
       data: {
-        user_id: user.id,
-        email: user.email,
-        name: user.name
+        deactivated_count: deactivatedCount
       }
     }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'
     const errors = error instanceof Error ? error.cause : null
-    return { status: 'error', message, errors }
+    return { success: false, message, data: null, errors }
   }
 })

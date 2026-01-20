@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_v2Lie29hym
-createdAt: 2026-01-20T00:53:01.518752
-updatedAt: 2026-01-20T03:51:14.300811
+id: rq_4H2qvD3n28
+createdAt: 2026-01-20T03:52:13.236380
+updatedAt: 2026-01-20T03:54:06.107513
 workspaceId: wk_YrPa97TLKc
 folderId: fl_TWrjdyGLWr
 authentication: {}
@@ -12,8 +12,8 @@ body:
 bodyType: null
 description: ''
 headers: []
-method: GET
-name: List All Sessions
-sortPriority: 0.0
-url: ${[ baseURL ]}/api/auth/sessions
+method: DELETE
+name: Delete Other Sessions
+sortPriority: 1000.001
+url: ${[ baseURL ]}/api/auth/sessions/others
 urlParameters: []

@@ -30,15 +30,6 @@ export function generateSessionId(): string {
 }
 
 /**
- * Generate a unique user ID using typeid-js
- *
- * @returns Unique user ID
- */
-export function generateUserId(): string {
-  return typeid('user').toString()
-}
-
-/**
  * Generate a unique refresh token ID using typeid-js
  *
  * @returns Unique refresh token ID

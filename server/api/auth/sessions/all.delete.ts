@@ -1,6 +1,6 @@
 import { defineHandler, HTTPError } from 'nitro/h3'
 import { verifyAccessToken } from '~/server/platform/jwt'
-import { updateSessionActivity } from '~/server/services/session.service'
+import { deactivateAllSessions, revokeUserRefreshTokens } from '~/server/services/session.service'
 
 export default defineHandler(async (event) => {
   const { db } = event.context
@@ -30,44 +30,25 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 401, statusText: 'Unauthorized: Invalid token payload' })
     }
 
-    // Get session ID from token payload (aud claim contains session ID)
-    // For now, we'll extract it from the token's jti claim if available
-    // or we can add it to the token payload during generation
-    const sessionId = payload.sid
+    // Deactivate all sessions for the user
+    const deactivatedCount = await deactivateAllSessions(db, userId)
 
-    // Update session activity if session ID is provided
-    if (sessionId) {
-      updateSessionActivity(db, sessionId).catch((err) => {
-        console.error('Error updating session activity:', err)
-      })
-    }
+    // Revoke all refresh tokens for the user
+    const revokedCount = await revokeUserRefreshTokens(db, userId)
 
-    // Fetch user from database
-    const user = await db
-      .selectFrom('users')
-      .select(['id', 'email', 'name'])
-      .where('id', '=', userId)
-      .executeTakeFirst()
-
-    // Check if user exists
-    if (!user) {
-      throw new HTTPError({ status: 404, statusText: 'User not found' })
-    }
-
-    // Return user information
+    // Return success message
     return {
       success: true,
-      message: 'User information retrieved',
+      message: `Signed out from all devices (${deactivatedCount} session(s) deactivated, ${revokedCount} token(s) revoked)`,
       data: {
-        user_id: user.id,
-        email: user.email,
-        name: user.name
+        deactivated_sessions: deactivatedCount,
+        revoked_tokens: revokedCount
       }
     }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'
     const errors = error instanceof Error ? error.cause : null
-    return { status: 'error', message, errors }
+    return { success: false, message, data: null, errors }
   }
 })

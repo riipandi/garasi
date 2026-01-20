@@ -2,12 +2,11 @@ type: http_request
 model: http_request
 id: rq_4yfETj5WF9
 createdAt: 2026-01-20T00:52:36.204646
-updatedAt: 2026-01-20T00:56:37.884148
+updatedAt: 2026-01-20T03:51:39.134400
 workspaceId: wk_YrPa97TLKc
-folderId: fl_ougj9dmJYS
-authentication:
-  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
-authenticationType: bearer
+folderId: fl_TWrjdyGLWr
+authentication: {}
+authenticationType: null
 body:
   text: |-
     {
@@ -21,7 +20,7 @@ headers:
     value: application/json
     id: IBWGB7acJG
 method: DELETE
-name: Delete Sessions
-sortPriority: 6333.333333333333
+name: Delete a Session
+sortPriority: 1000.0
 url: ${[ baseURL ]}/api/auth/sessions
 urlParameters: []

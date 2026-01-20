@@ -1,4 +1,5 @@
 import { defineEventHandler, readBody, getQuery, HTTPError } from 'h3'
+import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
 interface ResetPasswordBody {
   token: string
@@ -65,9 +66,16 @@ export default defineEventHandler(async (event) => {
       .where('id', '=', resetToken.id)
       .execute()
 
+    // Revoke all refresh tokens for security
+    await revokeUserRefreshTokens(db, resetToken.user_id)
+
+    // Deactivate all sessions for security
+    await deactivateAllSessions(db, resetToken.user_id)
+
     return {
       success: true,
-      message: 'Password has been reset successfully',
+      message:
+        'Password has been reset successfully. All sessions have been terminated for security.',
       data: null
     }
   } catch (error) {

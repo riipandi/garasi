@@ -101,9 +101,9 @@ let refreshPromise: Promise<any> | null = null
 /**
  * Create a fetcher instance with Bearer token interceptor and automatic token refresh
  *
- * This wrapper automatically adds Authorization header with Bearer token
- * and x-session-id header from auth store to all requests.
- * It also handles automatic token refresh when access token expires.
+ * This wrapper automatically adds Authorization header with Bearer token header
+ * from auth store to all requests. It also handles automatic token refresh when
+ * access token expires.
  *
  * @param baseUrl - The base URL for all requests
  * @param options - Additional fetch options
@@ -156,18 +156,6 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
           // Add Bearer token if access token exists and is valid
           options.headers = new Headers(options.headers)
           options.headers.set('Authorization', `Bearer ${authState.atoken}`)
-        }
-
-        // Add session ID header if access token exists and contains session ID
-        if (authState.atoken) {
-          const sessionId = extractSessionIdFromToken(authState.atoken)
-          if (sessionId) {
-            options.headers = options.headers || new Headers()
-            if (!(options.headers instanceof Headers)) {
-              options.headers = new Headers(options.headers)
-            }
-            options.headers.set('x-session-id', sessionId)
-          }
         }
       }
     },
@@ -275,8 +263,6 @@ export async function getUserSessions(): Promise<
     created_at: number
   }>
 > {
-  const authState = authStore.get()
-  const sessionId = authState.atoken ? extractSessionIdFromToken(authState.atoken) : null
   const response = await fetcher<{
     success: boolean
     data: {
@@ -289,9 +275,7 @@ export async function getUserSessions(): Promise<
         created_at: number
       }>
     }
-  }>('/auth/sessions', {
-    headers: sessionId ? new Headers({ 'x-session-id': sessionId }) : undefined
-  })
+  }>('/auth/sessions')
 
   if (response.success && response.data) {
     return response.data.sessions
