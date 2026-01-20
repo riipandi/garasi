@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetcher } from '~/app/fetcher'
+import { fetcher, logout as logoutApi } from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'
@@ -81,6 +81,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
           user_id: string
           email: string
           name: string
+          session_id: string
           access_token: string
           refresh_token: string
           access_token_expiry: number | null
@@ -95,8 +96,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
         return { success: false, error: 'Invalid email or password' }
       }
 
-      // Update auth store with tokens from backend (user info will be fetched from whoami)
-      authStore.setKey('sessid', String(response.data.user_id))
+      // Update auth store with session ID and tokens from backend (user info will be fetched from whoami)
+      authStore.setKey('sessid', response.data.session_id)
       authStore.setKey('atoken', response.data.access_token)
       authStore.setKey('atokenexp', response.data.access_token_expiry)
       authStore.setKey('rtoken', response.data.refresh_token)
@@ -111,21 +112,11 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   }
 
   /**
-   * Logout function that clears authentication state
+   * Logout function that clears authentication state and calls logout API
    */
   const logout = async (): Promise<void> => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 200))
-
-    // Clear auth store
-    authStore.set({
-      sessid: null,
-      atoken: null,
-      atokenexp: null,
-      rtoken: null,
-      rtokenexp: null,
-      remember: false
-    })
+    // Call logout API to revoke refresh token and deactivate session
+    await logoutApi()
 
     // Clear user state
     setUser(null)

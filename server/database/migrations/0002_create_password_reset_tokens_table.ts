@@ -1,3 +1,4 @@
+import { sql } from 'kysely'
 import { UNIX_TIMESTAMP } from '../db.migrator'
 import type { DBContext } from '../db.schema'
 
@@ -10,6 +11,8 @@ export async function up(db: DBContext): Promise<void> {
     .addColumn('expires_at', 'integer', (col) => col.notNull())
     .addColumn('used', 'integer', (col) => col.notNull().defaultTo(0))
     .addColumn('created_at', 'integer', (col) => col.notNull().defaultTo(UNIX_TIMESTAMP))
+    .modifyEnd(sql`STRICT`)
+    .ifNotExists()
     .execute()
 }
 

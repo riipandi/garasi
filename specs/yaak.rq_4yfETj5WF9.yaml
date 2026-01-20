@@ -1,0 +1,27 @@
+type: http_request
+model: http_request
+id: rq_4yfETj5WF9
+createdAt: 2026-01-20T00:52:36.204646
+updatedAt: 2026-01-20T00:56:37.884148
+workspaceId: wk_YrPa97TLKc
+folderId: fl_ougj9dmJYS
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
+body:
+  text: |-
+    {
+      "session_id": "${[ response.body.path(request='rq_v2Lie29hym', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLnNlc3Npb25zWzBdLnNlc3Npb25faWQ') ]}"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: IBWGB7acJG
+method: DELETE
+name: Delete Sessions
+sortPriority: 6333.333333333333
+url: ${[ baseURL ]}/api/auth/sessions
+urlParameters: []

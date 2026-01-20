@@ -1,5 +1,11 @@
 import { defineHandler, HTTPError, readBody } from 'nitro/h3'
 import { generateTokenPair } from '~/server/platform/jwt'
+import {
+  createSession,
+  storeRefreshToken,
+  cleanupExpiredSessions,
+  cleanupExpiredRefreshTokens
+} from '~/server/services/session.service'
 
 export default defineHandler(async (event) => {
   const { db } = event.context
@@ -32,13 +38,33 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
-    // Get user agent from request headers
+    // Get user agent and IP address from request
     const userAgent = event.req.headers.get('user-agent') || 'unknown'
+    const ipAddress =
+      event.req.headers.get('x-forwarded-for') || event.req.headers.get('x-real-ip') || 'unknown'
 
     // Generate JWT tokens with user agent hash
     const tokens = await generateTokenPair({ userId: String(user.id) }, userAgent)
 
-    // Return user data with JWT tokens
+    // Create a new session in the database
+    const { sessionId, sessionRecord } = await createSession(db, user.id, ipAddress, userAgent)
+
+    // Store the refresh token in the database
+    await storeRefreshToken(
+      db,
+      user.id,
+      sessionRecord.id,
+      tokens.refreshToken,
+      tokens.refreshTokenExpiry
+    )
+
+    // Clean up expired sessions and refresh tokens (background task)
+    cleanupExpiredSessions(db).catch((err) => console.error('Error cleaning up sessions:', err))
+    cleanupExpiredRefreshTokens(db).catch((err) =>
+      console.error('Error cleaning up refresh tokens:', err)
+    )
+
+    // Return user data with JWT tokens and session info
     return {
       success: true,
       message: null,
@@ -46,6 +72,7 @@ export default defineHandler(async (event) => {
         user_id: String(user.id),
         email: user.email,
         name: user.name,
+        session_id: sessionId,
         access_token: tokens.accessToken,
         refresh_token: tokens.refreshToken,
         access_token_expiry: tokens.accessTokenExpiry,

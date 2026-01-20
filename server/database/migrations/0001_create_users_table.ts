@@ -1,3 +1,4 @@
+import { sql } from 'kysely'
 import { UNIX_TIMESTAMP } from '../db.migrator'
 import type { DBContext } from '../db.schema'
 
@@ -10,6 +11,8 @@ export async function up(db: DBContext): Promise<void> {
     .addColumn('password_hash', 'text', (col) => col.notNull())
     .addColumn('created_at', 'integer', (col) => col.notNull().defaultTo(UNIX_TIMESTAMP))
     .addColumn('updated_at', 'integer')
+    .modifyEnd(sql`STRICT`)
+    .ifNotExists()
     .execute()
 
   const passwordHash = await Bun.password.hash('P@ssw0rd!')
@@ -17,6 +20,7 @@ export async function up(db: DBContext): Promise<void> {
   await db
     .insertInto('users')
     .values([{ name: 'Admin Sistem', email: 'admin@example.com', password_hash: passwordHash }])
+    .onConflict((oc) => oc.column('email').doNothing())
     .execute()
 }
 

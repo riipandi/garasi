@@ -1,6 +1,6 @@
-import { defineHandler, HTTPError } from 'nitro/h3'
+import { defineHandler, HTTPError, readBody } from 'nitro/h3'
 import { verifyAccessToken } from '~/server/platform/jwt'
-import { updateSessionActivity } from '~/server/services/session.service'
+import { deactivateSession, revokeSessionRefreshTokens } from '~/server/services/session.service'
 
 export default defineHandler(async (event) => {
   const { db } = event.context
@@ -30,44 +30,34 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 401, statusText: 'Unauthorized: Invalid token payload' })
     }
 
-    // Get session ID from token payload (aud claim contains session ID)
-    // For now, we'll extract it from the token's jti claim if available
-    // or we can add it to the token payload during generation
-    const sessionId = event.req.headers.get('x-session-id')
+    // Parse request body
+    const body = await readBody<{ session_id: string }>(event)
 
-    // Update session activity if session ID is provided
-    if (sessionId) {
-      updateSessionActivity(db, sessionId).catch((err) => {
-        console.error('Error updating session activity:', err)
-      })
+    // Validate required fields
+    if (!body?.session_id) {
+      throw new HTTPError({ status: 400, statusText: 'Session ID is required' })
     }
 
-    // Fetch user from database (convert userId to number)
-    const user = await db
-      .selectFrom('users')
-      .select(['id', 'email', 'name'])
-      .where('id', '=', Number(userId))
-      .executeTakeFirst()
+    // Deactivate the session
+    const deactivatedCount = await deactivateSession(db, body.session_id)
 
-    // Check if user exists
-    if (!user) {
-      throw new HTTPError({ status: 404, statusText: 'User not found' })
+    if (deactivatedCount === 0) {
+      throw new HTTPError({ status: 404, statusText: 'Session not found' })
     }
 
-    // Return user information
+    // Revoke all refresh tokens for this session
+    await revokeSessionRefreshTokens(db, Number(userId))
+
+    // Return success message
     return {
       success: true,
-      message: 'User information retrieved',
-      data: {
-        user_id: user.id,
-        email: user.email,
-        name: user.name
-      }
+      message: 'Session revoked successfully',
+      data: null
     }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'
     const errors = error instanceof Error ? error.cause : null
-    return { status: 'error', message, errors }
+    return { success: false, message, data: null, errors }
   }
 })
