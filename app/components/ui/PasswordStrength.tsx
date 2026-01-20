@@ -1,3 +1,5 @@
+import { cn as clx } from 'tailwind-variants'
+
 interface PasswordStrengthProps {
   password: string
   className?: string
@@ -94,7 +96,7 @@ export function PasswordStrength({ password, className = '' }: PasswordStrengthP
       </div>
       <div className='h-1.5 w-full overflow-hidden rounded-full bg-gray-200'>
         <div
-          className={`h-full transition-all duration-300 ${color}`}
+          className={clx('h-full transition-all duration-300', color)}
           style={{ width: `${(score / maxScore) * 100}%` }}
         />
       </div>

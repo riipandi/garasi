@@ -1,6 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
+import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
 import { fetcher } from '~/app/fetcher'
@@ -85,7 +86,7 @@ function RouteComponent() {
               <div className='space-y-3'>
                 <Link
                   to='/signin'
-                  className='flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none'
+                  className='flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
                 >
                   Back to Sign in
                 </Link>
@@ -97,7 +98,7 @@ function RouteComponent() {
                     Form.reset()
                     emailInputRef.current?.focus()
                   }}
-                  className='flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none'
+                  className='flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
                 >
                   Try another email
                 </button>
@@ -141,9 +142,10 @@ function RouteComponent() {
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      className={`block w-full rounded-md border px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none ${
+                      className={clx(
+                        'block w-full rounded-md border px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none',
                         field.state.meta.errors.length > 0 ? 'border-red-300' : 'border-gray-300'
-                      }`}
+                      )}
                       placeholder='you@example.com'
                     />
                     {field.state.meta.errors.length > 0 && (
@@ -162,7 +164,7 @@ function RouteComponent() {
                     <button
                       type='submit'
                       disabled={!canSubmit || isSubmitting}
-                      className='flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                      className='flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
                     >
                       {isSubmitting ? (
                         <span className='flex items-center gap-2'>
@@ -194,7 +196,7 @@ function RouteComponent() {
               <div className='text-center'>
                 <Link
                   to='/signin'
-                  className='text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-500'
+                  className='text-sm font-medium text-gray-700 transition-colors hover:text-gray-900'
                 >
                   Back to Sign in
                 </Link>

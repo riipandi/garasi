@@ -3,3 +3,9 @@
 
 /* Include pages from the server routes */
 @source '../../server/routes/**/*.{ts,mts}';
+
+@utility debug {
+  border-width: 1px;
+  border-style: dashed;
+  border-color: #f87171;
+}

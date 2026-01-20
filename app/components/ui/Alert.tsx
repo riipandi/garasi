@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { cn as clx } from 'tailwind-variants'
 
 interface AlertProps {
   type?: 'success' | 'error' | 'info' | 'warning'
@@ -15,6 +16,6 @@ const alertStyles = {
 
 export function Alert({ type = 'info', children, className = '' }: AlertProps) {
   return (
-    <div className={`rounded border px-4 py-3 ${alertStyles[type]} ${className}`}>{children}</div>
+    <div className={clx('rounded border px-4 py-3', alertStyles[type], className)}>{children}</div>
   )
 }

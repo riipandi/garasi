@@ -1,4 +1,5 @@
 import { forwardRef, useState } from 'react'
+import { cn as clx } from 'tailwind-variants'
 
 interface PasswordInputProps {
   id: string
@@ -56,9 +57,10 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             onBlur={onBlur}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className={`block w-full rounded-md border px-3 py-2 pr-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none ${
+            className={clx(
+              'block w-full rounded-md border px-3 py-2 pr-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none',
               error ? 'border-red-300' : 'border-gray-300'
-            }`}
+            )}
           />
           <button
             type='button'

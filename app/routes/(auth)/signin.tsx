@@ -1,6 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
+import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
 import { PasswordInput } from '~/app/components/ui/PasswordInput'
@@ -110,9 +111,10 @@ function RouteComponent() {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className={`block w-full rounded-md border px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none ${
+                    className={clx(
+                      'block w-full rounded-md border px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none',
                       field.state.meta.errors.length > 0 ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    )}
                     placeholder='somebody@example.com'
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -163,7 +165,7 @@ function RouteComponent() {
                     type='checkbox'
                     checked={field.state.value}
                     onChange={(e) => field.handleChange(e.target.checked as any)}
-                    className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+                    className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
                   />
                   <label htmlFor='remember' className='ml-2 block text-sm text-gray-700'>
                     Remember me
@@ -179,7 +181,7 @@ function RouteComponent() {
                   <button
                     type='submit'
                     disabled={!canSubmit || isSubmitting}
-                    className='flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                    className='flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
                   >
                     {isSubmitting ? (
                       <span className='flex items-center gap-2'>
@@ -211,7 +213,7 @@ function RouteComponent() {
             <div className='flex w-full items-center justify-center text-center text-sm'>
               <Link
                 to='/forgot-password'
-                className='font-medium text-indigo-600 transition-colors hover:text-indigo-500'
+                className='font-medium text-gray-700 transition-colors hover:text-gray-900'
               >
                 Forgot your password?
               </Link>

@@ -12,7 +12,7 @@ interface ResetPasswordLoaderData {
 
 export const Route = createFileRoute('/(auth)/reset-password/$token')({
   component: RouteComponent,
-  beforeLoad: async ({ params }) => {
+  loader: async ({ params }) => {
     const { token } = params
 
     // Check if token is empty
@@ -25,10 +25,8 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
       const response = await fetcher<{
         success: boolean
         message: string
-        data: {
-          is_token_valid: boolean
-        }
-      }>('/auth/validate-token?token=' + token, {
+        data: { is_token_valid: boolean }
+      }>(`/auth/validate-token?token=${token}`, {
         method: 'GET'
       })
 

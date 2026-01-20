@@ -1,7 +1,10 @@
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { Outlet } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, redirect, useRouter } from '@tanstack/react-router'
+import * as Lucide from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { cn as clx } from 'tailwind-variants'
 import { NotFound } from '~/app/errors'
 import { useAuth } from '~/app/guards'
+import { uiStore } from '~/app/stores'
 
 export const Route = createFileRoute('/(app)')({
   component: RouteComponent,
@@ -14,8 +17,14 @@ export const Route = createFileRoute('/(app)')({
 })
 
 function RouteComponent() {
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const router = useRouter()
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    const ui = uiStore.get()
+    setIsMobileSidebarOpen(ui.sidebar === 'show')
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -23,50 +32,163 @@ function RouteComponent() {
       .catch((error) => console.error('Logout failed', error))
   }
 
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen((prev) => {
+      const newState = !prev
+      uiStore.set({ ...uiStore.get(), sidebar: newState ? 'show' : 'hide' })
+      return newState
+    })
+  }
+
   return (
-    <div className='p-4'>
-      <div className='mx-auto max-w-4xl'>
-        <h1 className='mb-6 text-3xl font-bold'>Welcome!</h1>
-
-        {/* Auth Status */}
-        <div className='mb-6 rounded-lg bg-white p-6 shadow-md'>
-          <h2 className='mb-4 text-xl font-semibold'>Authentication Status</h2>
-          <div>
-            <p className='mb-2 text-green-600'>✓ You are logged in</p>
-            <p className='mb-4 text-gray-600'>Welcome, {user?.name}!</p>
-            <button
-              type='button'
-              className='rounded bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600'
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </div>
+    <div className='flex h-screen flex-col bg-gray-50 text-gray-900'>
+      {/* Mobile Header */}
+      <header className='border-b border-gray-200 bg-white px-4 py-3 lg:hidden'>
+        <div className='flex items-center justify-between'>
+          <button
+            type='button'
+            onClick={toggleMobileSidebar}
+            className='rounded-lg p-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+            aria-label='Toggle sidebar'
+          >
+            <Lucide.Menu className='size-6' />
+          </button>
+          <h1 className='text-lg font-semibold text-gray-900'>Garasi Console</h1>
+          <div className='size-6' /> {/* Spacer for center alignment */}
         </div>
+      </header>
 
-        {/* Auth Info */}
-        {user && (
-          <div className='mb-6 rounded-lg bg-white p-6 shadow-md'>
-            <h2 className='mb-4 text-xl font-semibold'>User Information</h2>
-            <div className='space-y-2'>
+      <div className='flex-1 overflow-hidden bg-gray-50'>
+        <div className='flex h-full'>
+          {/* Mobile Sidebar Overlay */}
+          {isMobileSidebarOpen && (
+            <div
+              className='fixed inset-0 z-40 bg-black/50 lg:hidden'
+              onClick={toggleMobileSidebar}
+              aria-hidden='true'
+            />
+          )}
+
+          {/* Sidebar Navigation */}
+          <aside
+            className={clx(
+              'fixed inset-y-0 left-0 z-50 w-64 transform border-r border-gray-200 bg-white transition-transform duration-300 ease-in-out lg:static lg:translate-x-0',
+              isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            )}
+          >
+            <div className='flex h-full flex-col justify-between overflow-y-auto px-4 pt-5 pb-3'>
               <div>
-                <span className='font-medium'>ID:</span>
-                <span className='ml-2 text-gray-600'>{user.id}</span>
+                <div className='mb-6 flex items-center justify-between p-1'>
+                  <div className='flex flex-col items-start justify-center'>
+                    <h2 className='text-lg font-semibold text-gray-900'>Garasi Console</h2>
+                    <p className='mt-0.5 text-xs font-medium text-gray-500'>
+                      Manage your S3 storage
+                    </p>
+                  </div>
+                  <button
+                    type='button'
+                    onClick={toggleMobileSidebar}
+                    className='rounded-lg p-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 lg:hidden'
+                    aria-label='Close sidebar'
+                  >
+                    <Lucide.X className='size-5' />
+                  </button>
+                </div>
+
+                <nav className='space-y-0.5'>
+                  {/* Dashboard */}
+                  <NavLink to='/' icon={Lucide.LayoutDashboard} label='Dashboard' exact />
+
+                  {/* Resources */}
+                  <NavSection title='Resources' />
+                  <NavLink to='/buckets' icon={Lucide.Database} label='Buckets' />
+                  <NavLink to='/keys' icon={Lucide.KeyRound} label='Access Keys' />
+
+                  {/* System */}
+                  <NavDivider />
+                  <NavLink to='/cluster' icon={Lucide.Server} label='Cluster' />
+                  <NavLink to='/metrics' icon={Lucide.GanttChartSquare} label='Metrics' />
+                </nav>
               </div>
-              <div>
-                <span className='font-medium'>Email:</span>
-                <span className='ml-2 text-gray-600'>{user.email}</span>
-              </div>
-              <div>
-                <span className='font-medium'>Name:</span>
-                <span className='ml-2 text-gray-600'>{user.name}</span>
+
+              <div className='flex items-center justify-between gap-2 border-t border-gray-200 pt-2.5'>
+                <button
+                  type='button'
+                  onClick={handleLogout}
+                  className='flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900'
+                >
+                  <Lucide.LogOut className='size-4' />
+                  <span>Logout</span>
+                </button>
               </div>
             </div>
-          </div>
-        )}
+          </aside>
 
-        <Outlet />
+          {/* Main Content */}
+          <main className='flex-1 overflow-auto bg-gray-50'>
+            <div className='h-auto px-4 py-8 lg:px-8 lg:pb-10'>
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   )
+}
+
+// Reusable navlink component
+function NavLink({
+  to,
+  icon: Icon,
+  label,
+  exact = false,
+  onClick
+}: {
+  to: string
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  exact?: boolean
+  onClick?: () => void
+}) {
+  return (
+    <Link
+      to={to}
+      className={clx(
+        'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900'
+      )}
+      activeProps={{
+        className: clx(
+          'bg-gray-200 font-medium text-gray-900 hover:bg-gray-200 hover:text-gray-900'
+        )
+      }}
+      activeOptions={{ exact }}
+      onClick={() => {
+        onClick?.()
+        // Close mobile sidebar on navigation
+        if (window.innerWidth < 1024) {
+          const ui = uiStore.get()
+          if (ui.sidebar === 'show') {
+            uiStore.set({ ...ui, sidebar: 'hide' })
+          }
+        }
+      }}
+    >
+      <Icon className='size-4' />
+      <span>{label}</span>
+    </Link>
+  )
+}
+
+// Navbar section header
+function NavSection({ title }: { title: string }) {
+  return (
+    <div className='mt-6 mb-2 px-3'>
+      <h3 className='text-xs font-semibold tracking-wider text-gray-500 uppercase'>{title}</h3>
+    </div>
+  )
+}
+
+// Reusable navbar divider
+function NavDivider() {
+  return <div className='my-3 border-t border-gray-200' />
 }
