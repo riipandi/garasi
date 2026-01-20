@@ -80,7 +80,7 @@ function RouteComponent() {
           success: boolean
           message: string
           data: null
-        }>(`/auth/reset-password?token=${token}`, {
+        }>(`/auth/password/reset?token=${token}`, {
           method: 'POST',
           body: { password: value.password }
         })

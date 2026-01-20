@@ -37,7 +37,7 @@ function RouteComponent() {
             reset_link?: string
             expires_at?: number
           } | null
-        }>('/auth/forgot-password', {
+        }>('/auth/password/forgot', {
           method: 'POST',
           body: { email: value.email }
         })

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_zTHdhZg2DF
 createdAt: 2026-01-19T18:49:03.845903
-updatedAt: 2026-01-20T03:50:04.080180
+updatedAt: 2026-01-20T04:00:15.628746
 workspaceId: wk_YrPa97TLKc
 folderId: fl_fehQvvbEXQ
 authentication: {}
@@ -22,5 +22,5 @@ headers:
 method: POST
 name: Forgot Password
 sortPriority: 0.0
-url: ${[ baseURL ]}/api/auth/forgot-password
+url: ${[ baseURL ]}/api/auth/password/forgot
 urlParameters: []

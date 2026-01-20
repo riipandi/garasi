@@ -1,35 +1,11 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
-import { verifyAccessToken } from '~/server/platform/jwt'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 import { deactivateSession, revokeSessionRefreshTokens } from '~/server/services/session.service'
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { db } = event.context
 
   try {
-    // Get Authorization header
-    const authHeader = event.req.headers.get('authorization')
-
-    // Validate Authorization header exists
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new HTTPError({
-        status: 401,
-        statusText: 'Unauthorized: Missing or invalid Authorization header'
-      })
-    }
-
-    // Extract token from Authorization header
-    const token = authHeader.substring(7) // Remove 'Bearer ' prefix
-
-    // Verify the access token
-    const payload = await verifyAccessToken(token)
-
-    // Get user ID from token payload (sub claim)
-    const userId = payload.sub
-
-    if (!userId) {
-      throw new HTTPError({ status: 401, statusText: 'Unauthorized: Invalid token payload' })
-    }
-
     // Parse request body
     const body = await readBody<{ session_id: string }>(event)
 

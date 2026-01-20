@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
-import { verifyAccessToken } from '~/server/platform/jwt'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
 interface ChangePasswordBody {
@@ -7,34 +7,10 @@ interface ChangePasswordBody {
   new_password: string
 }
 
-export default defineHandler(async (event) => {
-  const { db } = event.context
+export default defineProtectedHandler(async (event) => {
+  const { db, auth } = event.context
 
   try {
-    // Get Authorization header
-    const authHeader = event.req.headers.get('authorization')
-
-    // Validate Authorization header exists
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new HTTPError({
-        status: 401,
-        statusText: 'Unauthorized: Missing or invalid Authorization header'
-      })
-    }
-
-    // Extract token from Authorization header
-    const token = authHeader.substring(7) // Remove 'Bearer ' prefix
-
-    // Verify the access token
-    const payload = await verifyAccessToken(token)
-
-    // Get user ID from token payload (sub claim)
-    const userId = payload.sub
-
-    if (!userId) {
-      throw new HTTPError({ status: 401, statusText: 'Unauthorized: Invalid token payload' })
-    }
-
     // Parse request body
     const body = await readBody<ChangePasswordBody>(event)
 
@@ -63,7 +39,7 @@ export default defineHandler(async (event) => {
     const user = await db
       .selectFrom('users')
       .select(['id', 'password_hash'])
-      .where('id', '=', userId)
+      .where('id', '=', String(auth.userId))
       .executeTakeFirst()
 
     // Check if user exists
@@ -85,14 +61,14 @@ export default defineHandler(async (event) => {
     await db
       .updateTable('users')
       .set({ password_hash: newPasswordHash })
-      .where('id', '=', userId)
+      .where('id', '=', String(auth.userId))
       .execute()
 
     // Revoke all refresh tokens for security
-    const revokedCount = await revokeUserRefreshTokens(db, userId)
+    const revokedCount = await revokeUserRefreshTokens(db, String(auth.userId))
 
     // Deactivate all sessions for security
-    const deactivatedCount = await deactivateAllSessions(db, userId)
+    const deactivatedCount = await deactivateAllSessions(db, String(auth.userId))
 
     // Return success message
     return {
