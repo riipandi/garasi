@@ -40,8 +40,11 @@ export default defineHandler(async (event) => {
     // Get user agent from request
     const userAgent = event.req.headers.get('user-agent') || 'unknown'
 
-    // Generate new token pair
-    const tokens = await generateTokenPair({ userId: payload.sub }, userAgent)
+    // Generate new token pair with session ID
+    const tokens = await generateTokenPair(
+      { userId: payload.sub, sessionId: body.session_id },
+      userAgent
+    )
 
     // Revoke the old refresh token
     await revokeRefreshToken(db, body.refresh_token)
@@ -58,11 +61,12 @@ export default defineHandler(async (event) => {
     // Update session activity
     await updateSessionActivity(db, body.session_id)
 
-    // Return new tokens
+    // Return new tokens with session ID
     return {
       success: true,
       message: 'Tokens refreshed successfully',
       data: {
+        session_id: body.session_id,
         access_token: tokens.accessToken,
         refresh_token: tokens.refreshToken,
         access_token_expiry: tokens.accessTokenExpiry,

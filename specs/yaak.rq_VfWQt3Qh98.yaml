@@ -17,10 +17,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: IBWGB7acJG
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: IBWGB7acJG
 method: POST
 name: Refresh Token
 sortPriority: 6000.0

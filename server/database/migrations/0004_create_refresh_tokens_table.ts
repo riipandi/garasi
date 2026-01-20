@@ -5,9 +5,9 @@ import type { DBContext } from '../db.schema'
 export async function up(db: DBContext): Promise<void> {
   await db.schema
     .createTable('refresh_tokens')
-    .addColumn('id', 'integer', (col) => col.primaryKey().autoIncrement())
-    .addColumn('user_id', 'integer', (col) => col.notNull())
-    .addColumn('session_id', 'integer', (col) => col.notNull())
+    .addColumn('id', 'text', (col) => col.primaryKey())
+    .addColumn('user_id', 'text', (col) => col.notNull())
+    .addColumn('session_id', 'text', (col) => col.notNull())
     .addColumn('token_hash', 'text', (col) => col.notNull().unique())
     .addColumn('expires_at', 'integer', (col) => col.notNull())
     .addColumn('is_revoked', 'integer', (col) => col.notNull().defaultTo(0))
@@ -48,6 +48,30 @@ export async function up(db: DBContext): Promise<void> {
     .createIndex('idx_refresh_tokens_token_hash')
     .on('refresh_tokens')
     .column('token_hash')
+    .ifNotExists()
+    .execute()
+
+  // Create composite index for faster lookups by user_id and is_revoked
+  await db.schema
+    .createIndex('idx_refresh_tokens_user_revoked')
+    .on('refresh_tokens')
+    .columns(['user_id', 'is_revoked'])
+    .ifNotExists()
+    .execute()
+
+  // Create composite index for faster lookups by session_id and is_revoked
+  await db.schema
+    .createIndex('idx_refresh_tokens_session_revoked')
+    .on('refresh_tokens')
+    .columns(['session_id', 'is_revoked'])
+    .ifNotExists()
+    .execute()
+
+  // Create composite index for faster lookups by is_revoked and expires_at
+  await db.schema
+    .createIndex('idx_refresh_tokens_revoked_expires')
+    .on('refresh_tokens')
+    .columns(['is_revoked', 'expires_at'])
     .ifNotExists()
     .execute()
 }

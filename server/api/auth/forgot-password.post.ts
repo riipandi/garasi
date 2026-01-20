@@ -1,4 +1,5 @@
 import { defineEventHandler, readBody, HTTPError } from 'h3'
+import { typeid } from 'typeid-js'
 import { sendMail } from '~/server/platform/mailer'
 import { protectedEnv } from '~/shared/envars'
 
@@ -42,6 +43,7 @@ export default defineEventHandler(async (event) => {
     await db
       .insertInto('password_reset_tokens')
       .values({
+        id: typeid('password_reset_token').toString(),
         user_id: user.id,
         token,
         expires_at: expiresAt,

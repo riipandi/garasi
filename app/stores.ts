@@ -10,7 +10,6 @@ import pkg from '~/package.json' with { type: 'json' }
 
 // Auth store type definition
 export interface AuthStore {
-  sessid: string | null
   atoken: string | null
   atokenexp: number | null
   rtoken: string | null
@@ -22,7 +21,6 @@ export interface AuthStore {
 export const authStore = persistentMap<AuthStore>(
   `${pkg.name}_auth:`,
   {
-    sessid: null,
     atoken: null,
     atokenexp: null,
     rtoken: null,

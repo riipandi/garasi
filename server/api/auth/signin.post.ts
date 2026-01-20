@@ -43,11 +43,11 @@ export default defineHandler(async (event) => {
     const ipAddress =
       event.req.headers.get('x-forwarded-for') || event.req.headers.get('x-real-ip') || 'unknown'
 
-    // Generate JWT tokens with user agent hash
-    const tokens = await generateTokenPair({ userId: String(user.id) }, userAgent)
-
-    // Create a new session in the database
+    // Create a new session in the database first
     const { sessionId, sessionRecord } = await createSession(db, user.id, ipAddress, userAgent)
+
+    // Generate JWT tokens with user agent hash and session ID
+    const tokens = await generateTokenPair({ userId: String(user.id), sessionId }, userAgent)
 
     // Store the refresh token in the database
     await storeRefreshToken(

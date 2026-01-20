@@ -31,7 +31,7 @@ export default defineHandler(async (event) => {
     }
 
     // Get all active sessions for the user
-    const sessions = await getUserSessions(db, Number(userId))
+    const sessions = await getUserSessions(db, userId)
 
     // Return sessions
     return {
@@ -39,7 +39,7 @@ export default defineHandler(async (event) => {
       message: 'Sessions retrieved successfully',
       data: {
         sessions: sessions.map((session) => ({
-          session_id: session.session_id,
+          session_id: session.id,
           ip_address: session.ip_address,
           device_info: session.device_info,
           last_activity_at: session.last_activity_at,

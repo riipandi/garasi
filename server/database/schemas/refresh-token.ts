@@ -1,9 +1,9 @@
 import type { Generated } from 'kysely'
 
 export interface RefreshTokenTable {
-  id: Generated<number>
-  user_id: number
-  session_id: number
+  id: Generated<string>
+  user_id: string
+  session_id: string
   token_hash: string
   expires_at: number
   is_revoked: number

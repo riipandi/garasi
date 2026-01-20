@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: IBWGB7acJG
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: IBWGB7acJG
 method: DELETE
 name: Delete Sessions
 sortPriority: 6333.333333333333

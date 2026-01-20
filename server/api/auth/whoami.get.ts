@@ -42,11 +42,11 @@ export default defineHandler(async (event) => {
       })
     }
 
-    // Fetch user from database (convert userId to number)
+    // Fetch user from database
     const user = await db
       .selectFrom('users')
       .select(['id', 'email', 'name'])
-      .where('id', '=', Number(userId))
+      .where('id', '=', userId)
       .executeTakeFirst()
 
     // Check if user exists

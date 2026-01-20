@@ -1,3 +1,4 @@
+import { typeid } from 'typeid-js'
 import { UAParser } from 'ua-parser-js'
 import { protectedEnv } from '~/shared/envars'
 import type { DBContext } from '../database/db.schema'
@@ -20,12 +21,30 @@ export function parseDeviceInfo(userAgent: string): string {
 }
 
 /**
- * Generate a unique session ID using crypto
+ * Generate a unique session ID using typeid-js
  *
  * @returns Unique session ID
  */
 export function generateSessionId(): string {
-  return crypto.randomUUID()
+  return typeid('sess').toString()
+}
+
+/**
+ * Generate a unique user ID using typeid-js
+ *
+ * @returns Unique user ID
+ */
+export function generateUserId(): string {
+  return typeid('user').toString()
+}
+
+/**
+ * Generate a unique refresh token ID using typeid-js
+ *
+ * @returns Unique refresh token ID
+ */
+export function generateRefreshTokenId(): string {
+  return typeid('rtoken').toString()
 }
 
 /**
@@ -55,7 +74,7 @@ export async function hashRefreshToken(token: string): Promise<string> {
  */
 export async function createSession(
   db: DBContext,
-  userId: number,
+  userId: string,
   ipAddress: string,
   userAgent: string
 ): Promise<{ sessionId: string; sessionRecord: any }> {
@@ -67,8 +86,8 @@ export async function createSession(
   const sessionRecord = await db
     .insertInto('sessions')
     .values({
+      id: sessionId,
       user_id: userId,
-      session_id: sessionId,
       ip_address: ipAddress,
       user_agent: userAgent,
       device_info: deviceInfo,
@@ -95,7 +114,7 @@ export async function updateSessionActivity(db: DBContext, sessionId: string): P
   const updatedSession = await db
     .updateTable('sessions')
     .set({ last_activity_at: now, updated_at: now })
-    .where('session_id', '=', sessionId)
+    .where('id', '=', sessionId)
     .where('is_active', '=', 1)
     .returningAll()
     .executeTakeFirst()
@@ -116,7 +135,7 @@ export async function getSessionById(db: DBContext, sessionId: string): Promise<
   const session = await db
     .selectFrom('sessions')
     .selectAll()
-    .where('session_id', '=', sessionId)
+    .where('id', '=', sessionId)
     .where('is_active', '=', 1)
     .where('expires_at', '>', now)
     .executeTakeFirst()
@@ -137,7 +156,7 @@ export async function deactivateSession(db: DBContext, sessionId: string): Promi
   const result = await db
     .updateTable('sessions')
     .set({ is_active: 0, updated_at: now })
-    .where('session_id', '=', sessionId)
+    .where('id', '=', sessionId)
     .executeTakeFirst()
 
   return Number(result.numUpdatedRows)
@@ -153,7 +172,7 @@ export async function deactivateSession(db: DBContext, sessionId: string): Promi
  */
 export async function deactivateOtherSessions(
   db: DBContext,
-  userId: number,
+  userId: string,
   currentSessionId: string
 ): Promise<number> {
   const now = Math.floor(Date.now() / 1000)
@@ -162,7 +181,7 @@ export async function deactivateOtherSessions(
     .updateTable('sessions')
     .set({ is_active: 0, updated_at: now })
     .where('user_id', '=', userId)
-    .where('session_id', '!=', currentSessionId)
+    .where('id', '!=', currentSessionId)
     .where('is_active', '=', 1)
     .executeTakeFirst()
 
@@ -176,7 +195,7 @@ export async function deactivateOtherSessions(
  * @param userId - User ID
  * @returns Number of affected rows
  */
-export async function deactivateAllSessions(db: DBContext, userId: number): Promise<number> {
+export async function deactivateAllSessions(db: DBContext, userId: string): Promise<number> {
   const now = Math.floor(Date.now() / 1000)
 
   const result = await db
@@ -196,7 +215,7 @@ export async function deactivateAllSessions(db: DBContext, userId: number): Prom
  * @param userId - User ID
  * @returns Array of active sessions
  */
-export async function getUserSessions(db: DBContext, userId: number): Promise<any[]> {
+export async function getUserSessions(db: DBContext, userId: string): Promise<any[]> {
   const now = Math.floor(Date.now() / 1000)
 
   const sessions = await db
@@ -255,16 +274,18 @@ export async function cleanupExpiredRefreshTokens(db: DBContext): Promise<number
  */
 export async function storeRefreshToken(
   db: DBContext,
-  userId: number,
-  sessionId: number,
+  userId: string,
+  sessionId: string,
   refreshToken: string,
   expiresAt: number
 ): Promise<any> {
   const tokenHash = await hashRefreshToken(refreshToken)
+  const refreshTokenId = generateRefreshTokenId()
 
   const refreshTokenRecord = await db
     .insertInto('refresh_tokens')
     .values({
+      id: refreshTokenId,
       user_id: userId,
       session_id: sessionId,
       token_hash: tokenHash,
@@ -331,7 +352,7 @@ export async function revokeRefreshToken(db: DBContext, refreshToken: string): P
  */
 export async function revokeSessionRefreshTokens(
   db: DBContext,
-  sessionId: number
+  sessionId: string
 ): Promise<number> {
   const now = Math.floor(Date.now() / 1000)
 
@@ -352,7 +373,7 @@ export async function revokeSessionRefreshTokens(
  * @param userId - User ID
  * @returns Number of affected rows
  */
-export async function revokeUserRefreshTokens(db: DBContext, userId: number): Promise<number> {
+export async function revokeUserRefreshTokens(db: DBContext, userId: string): Promise<number> {
   const now = Math.floor(Date.now() / 1000)
 
   const result = await db

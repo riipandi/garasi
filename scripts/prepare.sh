@@ -17,7 +17,7 @@ set -eu # Exit on error, treat unset variables as an error.
 #   - GARAGE_ADMIN_TOKEN    : Base64 encoded 32-byte random string
 #   - GARAGE_METRICS_TOKEN  : Base64 encoded 32-byte random string
 #   - GARAGE_RPC_SECRET     : Hex encoded 32-byte random string
-#   - SECRET_KEY            : Base64 encoded 20-byte random string
+#   - SECRET_KEY            : Base64 encoded 48-byte random string
 #
 # Requirements:
 #   - OpenSSL must be installed and available in PATH
@@ -85,8 +85,8 @@ for arg in "$@"; do
             printf "  ./scripts/prepare.sh          - Generate and display secrets\n"
             printf "  ./scripts/prepare.sh --apply  - Generate and apply to .env.local\n\n"
             printf "Options:\n"
-            printf "  --apply    Update .env.local file with new secrets\n"
-            printf "  --help, -h Show this help message\n"
+            printf "  --apply     Update .env.local file with new secrets\n"
+            printf "  --help, -h  Show this help message\n"
             exit 0
             ;;
         *)
@@ -103,7 +103,7 @@ done
 garage_admin_token=$(openssl rand -base64 32)   # 32 bytes → 44 chars base64
 garage_metrics_token=$(openssl rand -base64 32) # 32 bytes → 44 chars base64
 garage_rpc_secret=$(openssl rand -hex 32)       # 32 bytes → 64 chars hex
-secret_key=$(openssl rand -hex 20)              # 20 bytes → 40 chars hex
+secret_key=$(openssl rand -base64 48)           # 48 bytes → 64 chars base64
 
 #------------------------------------------------------------------------------
 # Helper Functions
@@ -116,19 +116,24 @@ secret_key=$(openssl rand -hex 20)              # 20 bytes → 40 chars hex
 # Returns:
 #   0 on success, non-zero on failure
 update_env_file() {
-    local key="$1"
-    local value="$2"
-
-    if [ "$APPLY_CHANGES" = true ]; then
-        # Use OS-appropriate sed command (macOS requires empty string for -i)
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS sed syntax
-            sed -i '' "s|^${key}=.*|${key}=${value}|" "$ENV_FILE"
-        else
-            # Linux/GNU sed syntax
-            sed -i "s|^${key}=.*|${key}=${value}|" "$ENV_FILE"
-        fi
+    key="$1"
+    value="$2"
+    tmp="$(mktemp)"
+    # If key exists, replace the whole line; otherwise append at end.
+    if grep -qE "^${key}=" "$ENV_FILE"; then
+        # Use awk to safely replace without interpreting value
+        awk -v k="$key" -v v="$value" '
+            BEGIN{FS=OFS="="}
+            $1==k{$0=k"="v; seen=1}
+            {print}
+            END{if(!seen) print k"="v}
+        ' "$ENV_FILE" > "$tmp"
+    else
+        # append
+        cp "$ENV_FILE" "$tmp"
+        printf "%s=%s\n" "$key" "$value" >> "$tmp"
     fi
+    mv "$tmp" "$ENV_FILE"
 }
 
 # Apply changes or output environment variables

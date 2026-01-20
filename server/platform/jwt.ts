@@ -1,17 +1,19 @@
-import { SignJWT, jwtVerify, type JWTPayload as BaseClaims } from 'jose'
+import { SignJWT, jwtVerify, type JWTPayload } from 'jose'
 import { UAParser } from 'ua-parser-js'
 import { protectedEnv } from '~/shared/envars'
 
 /**
  * JWT Token payload structure using standard JWT claims
  * - sub (subject): User ID
+ * - sid (session ID): Session ID
  * - aud (audience): Hashed user agent string
  * - iss (issuer): Token issuer
  * - typ: Token type (access/refresh)
  * - nbf (not before): Token is valid from this time
  */
-export interface JWTPayload extends BaseClaims {
+export interface JWTClaims extends JWTPayload {
   typ: 'access' | 'refresh' // Type - Token type (standard JWT claim)
+  sid?: string // Session ID
 }
 
 /**
@@ -57,7 +59,7 @@ export async function generateAudienceFromUserAgent(userAgent: string): Promise<
  * @param expiresIn - Token expiry in seconds
  * @returns The signed JWT token
  */
-export async function generateToken(payload: JWTPayload, expiresIn: number): Promise<string> {
+export async function generateToken(payload: JWTClaims, expiresIn: number): Promise<string> {
   const secretKey = protectedEnv.SECRET_KEY
 
   if (!secretKey) {
@@ -69,6 +71,7 @@ export async function generateToken(payload: JWTPayload, expiresIn: number): Pro
 
   return await new SignJWT({
     sub: payload.sub, // Subject (User ID) - standard claim
+    sid: payload.sid, // Session ID
     aud: payload.aud, // Audience - Hashed user agent (standard JWT claim)
     iss: payload.iss, // Issuer - standard claim
     nbf: payload.nbf, // Not Before - Token is valid from this time (standard JWT claim)
@@ -89,7 +92,7 @@ export async function generateToken(payload: JWTPayload, expiresIn: number): Pro
  * @returns Object containing access and refresh tokens with expiry times
  */
 export async function generateTokenPair(
-  user: { userId: string },
+  user: { userId: string; sessionId?: string },
   userAgent: string
 ): Promise<{
   accessToken: string
@@ -106,6 +109,7 @@ export async function generateTokenPair(
   const accessToken = await generateToken(
     {
       sub: user.userId, // Subject (User ID)
+      sid: user.sessionId, // Session ID
       aud: audience, // Audience - Hashed user agent
       iss: issuer, // Issuer
       nbf: now, // Not Before - Token is valid from now
@@ -117,6 +121,7 @@ export async function generateTokenPair(
   const refreshToken = await generateToken(
     {
       sub: user.userId, // Subject (User ID)
+      sid: user.sessionId, // Session ID
       aud: audience, // Audience - Hashed user agent
       iss: issuer, // Issuer
       nbf: now, // Not Before - Token is valid from now
@@ -140,7 +145,7 @@ export async function generateTokenPair(
  * @returns The decoded payload if valid
  * @throws Error if token is invalid or expired
  */
-export async function verifyToken(token: string): Promise<JWTPayload> {
+export async function verifyToken(token: string): Promise<JWTClaims> {
   const secretKey = protectedEnv.SECRET_KEY
 
   if (!secretKey) {
@@ -151,7 +156,7 @@ export async function verifyToken(token: string): Promise<JWTPayload> {
 
   try {
     const { payload } = await jwtVerify(token, secret)
-    return payload as unknown as JWTPayload
+    return payload as unknown as JWTClaims
   } catch (error) {
     console.error('Invalid or expired token', error)
     throw new Error('Invalid or expired token')
@@ -165,7 +170,7 @@ export async function verifyToken(token: string): Promise<JWTPayload> {
  * @returns The decoded payload if valid
  * @throws Error if token is invalid, expired, or not an access token
  */
-export async function verifyAccessToken(token: string): Promise<JWTPayload> {
+export async function verifyAccessToken(token: string): Promise<JWTClaims> {
   const payload = await verifyToken(token)
 
   if (payload.typ !== 'access') {
@@ -182,7 +187,7 @@ export async function verifyAccessToken(token: string): Promise<JWTPayload> {
  * @returns The decoded payload if valid
  * @throws Error if token is invalid, expired, or not a refresh token
  */
-export async function verifyRefreshToken(token: string): Promise<JWTPayload> {
+export async function verifyRefreshToken(token: string): Promise<JWTClaims> {
   const payload = await verifyToken(token)
 
   if (payload.typ !== 'refresh') {

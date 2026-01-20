@@ -1,22 +1,44 @@
+import { decodeJwt, type JWTPayload } from 'jose'
 import type { $Fetch, FetchOptions } from 'ofetch'
 import { ofetch } from 'ofetch'
 import { authStore } from '~/app/stores'
 
 /**
+ * JWT payload interface for decoding access tokens
+ */
+export interface JWTClaims extends JWTPayload {
+  typ: 'access' | 'refresh' // Type - Token type (standard JWT claim)
+  sid?: string // Session ID
+}
+
+/**
+ * Extract session ID from access token using jose library
+ *
+ * @param token - The access token
+ * @returns The session ID or null if not found
+ */
+function extractSessionIdFromToken(token: string): string | null {
+  try {
+    const payload = decodeJwt<JWTClaims>(token)
+    return payload?.sid || null
+  } catch (error) {
+    console.error('Failed to decode JWT:', error)
+    return null
+  }
+}
+
+/**
  * Refresh access token using refresh token
  *
  * @param refreshToken - The refresh token to use
- * @param sessionId - The session ID to update
  * @returns New tokens or null if refresh failed
  */
-async function refreshAccessToken(
-  refreshToken: string,
-  sessionId: string
-): Promise<{
+async function refreshAccessToken(refreshToken: string): Promise<{
   access_token: string
   refresh_token: string
   access_token_expiry: number
   refresh_token_expiry: number
+  sid: string
 } | null> {
   try {
     const response = await ofetch<{
@@ -26,12 +48,13 @@ async function refreshAccessToken(
         refresh_token: string
         access_token_expiry: number
         refresh_token_expiry: number
+        sid: string
       }
     }>('/api/auth/refresh', {
       method: 'POST',
       body: {
         refresh_token: refreshToken,
-        session_id: sessionId
+        session_id: extractSessionIdFromToken(refreshToken) || ''
       }
     })
 
@@ -39,7 +62,6 @@ async function refreshAccessToken(
       // Update auth store with new tokens
       const currentAuth = authStore.get()
       authStore.set({
-        sessid: currentAuth.sessid,
         atoken: response.data.access_token,
         atokenexp: response.data.access_token_expiry,
         rtoken: response.data.refresh_token,
@@ -110,7 +132,7 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
       const authState = authStore.get()
 
       // Check if access token is expired or will expire soon
-      if (authState?.atoken && authState?.rtoken && authState?.sessid) {
+      if (authState?.atoken && authState?.rtoken) {
         if (isTokenExpired(authState.atokenexp)) {
           // If already refreshing, wait for existing refresh to complete
           if (isRefreshing && refreshPromise) {
@@ -118,7 +140,7 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
           } else {
             // Start a new refresh
             isRefreshing = true
-            refreshPromise = refreshAccessToken(authState.rtoken, authState.sessid)
+            refreshPromise = refreshAccessToken(authState.rtoken)
             await refreshPromise
             isRefreshing = false
             refreshPromise = null
@@ -136,13 +158,16 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
           options.headers.set('Authorization', `Bearer ${authState.atoken}`)
         }
 
-        // Add session ID header if session ID exists
-        if (authState.sessid) {
-          options.headers = options.headers || new Headers()
-          if (!(options.headers instanceof Headers)) {
-            options.headers = new Headers(options.headers)
+        // Add session ID header if access token exists and contains session ID
+        if (authState.atoken) {
+          const sessionId = extractSessionIdFromToken(authState.atoken)
+          if (sessionId) {
+            options.headers = options.headers || new Headers()
+            if (!(options.headers instanceof Headers)) {
+              options.headers = new Headers(options.headers)
+            }
+            options.headers.set('x-session-id', sessionId)
           }
-          options.headers.set('x-session-id', authState.sessid)
         }
       }
     },
@@ -151,7 +176,6 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
       if (response.status === 401) {
         // Clear auth store on 401 error
         authStore.set({
-          sessid: null,
           atoken: null,
           atokenexp: null,
           rtoken: null,
@@ -208,24 +232,26 @@ export default fetcher
 export async function logout(): Promise<void> {
   const authState = authStore.get()
 
-  if (authState?.rtoken && authState?.sessid) {
-    try {
-      // Call logout endpoint to revoke refresh token and deactivate session
-      await ofetch('/api/auth/logout', {
-        method: 'POST',
-        body: {
-          refresh_token: authState.rtoken,
-          session_id: authState.sessid
-        }
-      })
-    } catch (error) {
-      console.error('Logout API call failed:', error)
+  if (authState?.rtoken && authState?.atoken) {
+    const sessionId = extractSessionIdFromToken(authState.atoken)
+    if (sessionId) {
+      try {
+        // Call logout endpoint to revoke refresh token and deactivate session
+        await ofetch('/api/auth/logout', {
+          method: 'POST',
+          body: {
+            refresh_token: authState.rtoken,
+            session_id: sessionId
+          }
+        })
+      } catch (error) {
+        console.error('Logout API call failed:', error)
+      }
     }
   }
 
   // Clear auth store
   authStore.set({
-    sessid: null,
     atoken: null,
     atokenexp: null,
     rtoken: null,
@@ -241,7 +267,7 @@ export async function logout(): Promise<void> {
  */
 export async function getUserSessions(): Promise<
   Array<{
-    session_id: string
+    id: string
     ip_address: string
     device_info: string
     last_activity_at: number
@@ -249,11 +275,13 @@ export async function getUserSessions(): Promise<
     created_at: number
   }>
 > {
+  const authState = authStore.get()
+  const sessionId = authState.atoken ? extractSessionIdFromToken(authState.atoken) : null
   const response = await fetcher<{
     success: boolean
     data: {
       sessions: Array<{
-        session_id: string
+        id: string
         ip_address: string
         device_info: string
         last_activity_at: number
@@ -261,7 +289,9 @@ export async function getUserSessions(): Promise<
         created_at: number
       }>
     }
-  }>('/auth/sessions')
+  }>('/auth/sessions', {
+    headers: sessionId ? new Headers({ 'x-session-id': sessionId }) : undefined
+  })
 
   if (response.success && response.data) {
     return response.data.sessions

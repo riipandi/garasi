@@ -23,7 +23,7 @@ export default definePlugin(async (_nitro) => {
 
     results.forEach((it) => {
       if (it.status === 'Success') {
-        console.log(`- Migration "${it.migrationName}" executed successfully`)
+        console.info(`- Migration "${it.migrationName}" executed successfully`)
         executedCount++
       } else if (it.status === 'Error') {
         console.error(`- Failed to execute migration "${it.migrationName}"`)

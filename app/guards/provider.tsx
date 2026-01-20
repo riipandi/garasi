@@ -97,7 +97,6 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       }
 
       // Update auth store with session ID and tokens from backend (user info will be fetched from whoami)
-      authStore.setKey('sessid', response.data.session_id)
       authStore.setKey('atoken', response.data.access_token)
       authStore.setKey('atokenexp', response.data.access_token_expiry)
       authStore.setKey('rtoken', response.data.refresh_token)
@@ -105,7 +104,6 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
       return { success: true }
     } catch (error: any) {
-      // Handle API errors
       const errorMessage = error?.data?.message || error?.message || 'Login failed'
       return { success: false, error: errorMessage }
     }
@@ -115,11 +113,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
    * Logout function that clears authentication state and calls logout API
    */
   const logout = async (): Promise<void> => {
-    // Call logout API to revoke refresh token and deactivate session
-    await logoutApi()
-
-    // Clear user state
-    setUser(null)
+    await logoutApi() // Call logout API to revoke refresh token and deactivate session
+    setUser(null) // Clear user state
   }
 
   const contextValue: AuthContextType = {

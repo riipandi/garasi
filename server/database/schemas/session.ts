@@ -1,9 +1,8 @@
 import type { Generated } from 'kysely'
 
 export interface SessionTable {
-  id: Generated<number>
-  user_id: number
-  session_id: string
+  id: Generated<string>
+  user_id: string
   ip_address: string
   user_agent: string
   device_info: string

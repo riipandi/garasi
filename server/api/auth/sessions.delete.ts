@@ -46,7 +46,7 @@ export default defineHandler(async (event) => {
     }
 
     // Revoke all refresh tokens for this session
-    await revokeSessionRefreshTokens(db, Number(userId))
+    await revokeSessionRefreshTokens(db, body.session_id)
 
     // Return success message
     return {
