@@ -70,7 +70,7 @@ function RouteComponent() {
   })
 
   return (
-    <div className='mx-auto w-full max-w-2xl'>
+    <div className='mx-auto w-full max-w-3xl space-y-6'>
       <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'>
         <div className='mb-6'>
           <h2 className='text-lg font-semibold text-gray-900 sm:text-xl'>Change Password</h2>

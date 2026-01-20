@@ -136,7 +136,7 @@ function RouteComponent() {
 
   if (isLoading) {
     return (
-      <div className='flex min-h-[400px] items-center justify-center'>
+      <div className='flex min-h-100 items-center justify-center'>
         <div className='flex items-center gap-2 text-gray-500'>
           <svg className='h-5 w-5 animate-spin' fill='none' viewBox='0 0 24 24'>
             <circle
@@ -170,7 +170,7 @@ function RouteComponent() {
   const sessions = sessionsData?.data?.sessions || []
 
   return (
-    <div className='mx-auto w-full max-w-4xl space-y-6'>
+    <div className='mx-auto w-full max-w-3xl space-y-6'>
       <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'>
         <div className='mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>

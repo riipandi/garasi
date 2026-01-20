@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
@@ -11,6 +11,11 @@ const profileSchema = z.object({
   name: z.string().min(1, 'Name is required').min(2, 'Name must be at least 2 characters')
 })
 
+const whoamiQuery = queryOptions({
+  queryKey: ['whoami'],
+  queryFn: () => fetcher<UserProfileResponse>('/auth/whoami')
+})
+
 export const Route = createFileRoute('/(app)/profile/')({
   component: RouteComponent
 })
@@ -20,14 +25,7 @@ function RouteComponent() {
   const router = useRouter()
 
   // Fetch user profile data from /auth/whoami endpoint
-  const {
-    data: profileData,
-    isLoading,
-    error
-  } = useQuery({
-    queryKey: ['whoami'],
-    queryFn: () => fetcher<UserProfileResponse>('/auth/whoami')
-  })
+  const { data: profileData, isLoading, error } = useSuspenseQuery(whoamiQuery)
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
@@ -68,7 +66,7 @@ function RouteComponent() {
 
   if (isLoading) {
     return (
-      <div className='flex min-h-[400px] items-center justify-center'>
+      <div className='flex min-h-100 items-center justify-center'>
         <div className='flex items-center gap-2 text-gray-500'>
           <svg className='h-5 w-5 animate-spin' fill='none' viewBox='0 0 24 24'>
             <circle
@@ -96,7 +94,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-2xl'>
+    <div className='mx-auto w-full max-w-3xl space-y-6'>
       <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'>
         <div className='mb-6'>
           <h2 className='text-lg font-semibold text-gray-900 sm:text-xl'>Profile Information</h2>
@@ -177,12 +175,12 @@ function RouteComponent() {
               className='block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none'
               placeholder='john@example.com'
             />
-            <p className='mt-1 text-xs text-gray-500'>
+            <p className='mt-1.5 px-0.5 text-xs text-gray-500'>
               To change your email, go to{' '}
               <button
                 type='button'
                 onClick={() => router.navigate({ to: '/profile/change-email' })}
-                className='font-medium text-blue-600 hover:text-blue-700'
+                className='font-medium text-blue-600 hover:cursor-pointer hover:text-blue-700'
               >
                 Change Email
               </button>{' '}
