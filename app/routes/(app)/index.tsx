@@ -6,19 +6,18 @@ export const Route = createFileRoute('/(app)/')({
   component: RouteComponent
 })
 
-interface HelloResponse {
-  baseURL: string
-  result: Array<{
-    id: number
+interface WhoamiResponse {
+  success: boolean
+  message: string | null
+  data: {
+    user_id: string
     email: string
     name: string
-    created_at: number
-    updated_at: number | null
-  }> | null
+  } | null
 }
 
 function RouteComponent() {
-  const [data, setData] = useState<HelloResponse | null>(null)
+  const [data, setData] = useState<WhoamiResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -28,10 +27,10 @@ function RouteComponent() {
       setError(null)
 
       try {
-        const response = await fetcher<HelloResponse>('/hello')
+        const response = await fetcher<WhoamiResponse>('/auth/whoami')
         setData(response)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch data')
+        setError(err instanceof Error ? err.message : 'Failed to fetch user data')
       } finally {
         setLoading(false)
       }
@@ -44,7 +43,7 @@ function RouteComponent() {
     <div className='mx-auto max-w-4xl'>
       {/* API Response */}
       <div className='rounded-lg bg-white p-6 shadow-md'>
-        <h2 className='mb-4 text-xl font-semibold'>API Response</h2>
+        <h2 className='mb-4 text-xl font-semibold'>User Information</h2>
 
         {loading && <div className='text-gray-500'>Loading...</div>}
 
@@ -56,12 +55,29 @@ function RouteComponent() {
 
         {data && !loading && (
           <div className='space-y-2'>
-            <pre className='rounded border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700'>
-              <code>{data.baseURL}</code>
-            </pre>
-            <pre className='rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700'>
-              <code>{data.result ? data.result[0]?.name : 'No data'}</code>
-            </pre>
+            {data.success && data.data ? (
+              <>
+                <div className='rounded border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700'>
+                  <p>
+                    <strong>User ID:</strong> {data.data.user_id}
+                  </p>
+                </div>
+                <div className='rounded border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700'>
+                  <p>
+                    <strong>Email:</strong> {data.data.email}
+                  </p>
+                </div>
+                <div className='rounded border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-700'>
+                  <p>
+                    <strong>Name:</strong> {data.data.name}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className='rounded border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700'>
+                <p>No user data available</p>
+              </div>
+            )}
           </div>
         )}
       </div>

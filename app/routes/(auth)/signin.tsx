@@ -9,7 +9,7 @@ import type { SigninRequest } from '~/app/types/api'
 
 // Zod schema for form validation
 const signinSchema = z.object({
-  email: z.email({ error: 'Invalid email address' }),
+  email: z.email({ error: 'Please enter a valid email address' }),
   password: z.string().min(1, { error: 'Password is required' }),
   remember: z.boolean().optional()
 })
@@ -48,7 +48,7 @@ function RouteComponent() {
         if (firstError) {
           throw new Error(firstError.message)
         }
-        throw new Error('Validation failed')
+        throw new Error('Please check your input and try again')
       }
 
       const loginResult = await login(value.email, value.password)
@@ -56,7 +56,7 @@ function RouteComponent() {
       if (loginResult.success) {
         navigate({ to: '/' })
       } else {
-        throw new Error(loginResult.error || 'Login failed')
+        throw new Error(loginResult.error || 'Invalid email or password. Please try again.')
       }
     }
   })

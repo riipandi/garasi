@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { fetcher } from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 import type { User } from '~/shared/schemas/user.schema'
@@ -6,23 +7,60 @@ import { AuthContext, type AuthContextType } from './context'
 /**
  * AuthProvider component that provides authentication state and methods
  * to all child components using the existing authStore for persistence.
+ * User information is fetched from /auth/whoami endpoint.
  */
 export function AuthProvider({ children }: React.PropsWithChildren) {
   // Get current auth state from store
   const authState = authStore.get()
 
   // Check if user is authenticated based on access token
-  const isAuthenticated = !!authState?.accessToken
+  const isAuthenticated = !!authState?.atoken
 
-  // Create user object from auth state
-  const user: User | null =
-    isAuthenticated && authState?.userId
-      ? {
-          id: authState.userId,
-          email: authState.userEmail || '',
-          name: authState.userName || ''
+  // Store user data fetched from /auth/whoami endpoint
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  /**
+   * Fetch user information from /auth/whoami endpoint
+   */
+  const fetchUser = async (): Promise<User | null> => {
+    try {
+      const response = await fetcher<{
+        success: boolean
+        message: string | null
+        data: {
+          user_id: string
+          email: string
+          name: string
+        } | null
+      }>('/auth/whoami')
+
+      if (response.success && response.data) {
+        return {
+          id: response.data.user_id,
+          email: response.data.email,
+          name: response.data.name
         }
-      : null
+      }
+      return null
+    } catch (error) {
+      console.error('Failed to fetch user info:', error)
+      return null
+    }
+  }
+
+  // Fetch user data when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      setIsLoading(true)
+      fetchUser().then((userData) => {
+        setUser(userData)
+        setIsLoading(false)
+      })
+    } else {
+      setUser(null)
+    }
+  }, [isAuthenticated])
 
   /**
    * Login function with API authentication
@@ -57,23 +95,12 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
         return { success: false, error: 'Invalid email or password' }
       }
 
-      // Use session ID from user_id
-      const sessionId = String(response.data.user_id)
-
-      // Set expiry times (access token: 1 hour, refresh token: 7 days)
-      const now = Date.now()
-      const accessTokenExpiry = response.data.access_token_expiry || now + 60 * 60 * 1000 // 1 hour
-      const refreshTokenExpiry = response.data.refresh_token_expiry || now + 7 * 24 * 60 * 60 * 1000 // 7 days
-
-      // Update auth store with user data and tokens from backend
-      authStore.setKey('sessionId', sessionId)
-      authStore.setKey('userId', response.data.user_id)
-      authStore.setKey('userEmail', response.data.email)
-      authStore.setKey('userName', response.data.name)
-      authStore.setKey('accessToken', response.data.access_token)
-      authStore.setKey('accessTokenExpiry', accessTokenExpiry)
-      authStore.setKey('refreshToken', response.data.refresh_token)
-      authStore.setKey('refreshTokenExpiry', refreshTokenExpiry)
+      // Update auth store with tokens from backend (user info will be fetched from whoami)
+      authStore.setKey('sessid', String(response.data.user_id))
+      authStore.setKey('atoken', response.data.access_token)
+      authStore.setKey('atokenexp', response.data.access_token_expiry)
+      authStore.setKey('rtoken', response.data.refresh_token)
+      authStore.setKey('rtokenexp', response.data.refresh_token_expiry)
 
       return { success: true }
     } catch (error: any) {
@@ -92,22 +119,22 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
     // Clear auth store
     authStore.set({
-      sessionId: null,
-      accessToken: null,
-      accessTokenExpiry: null,
-      refreshToken: null,
-      refreshTokenExpiry: null,
-      remember: false,
-      userId: null,
-      userEmail: null,
-      userName: null
+      sessid: null,
+      atoken: null,
+      atokenexp: null,
+      rtoken: null,
+      rtokenexp: null,
+      remember: false
     })
+
+    // Clear user state
+    setUser(null)
   }
 
   const contextValue: AuthContextType = {
     user,
     isAuthenticated,
-    isLoading: false,
+    isLoading,
     login,
     logout
   }

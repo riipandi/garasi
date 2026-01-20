@@ -7,7 +7,7 @@ export const Route = createFileRoute('/(app)')({
   component: RouteComponent,
   notFoundComponent: NotFound,
   beforeLoad: ({ location, context }) => {
-    if (!context.auth.accessToken) {
+    if (!context.auth.atoken) {
       throw redirect({ to: '/signin', search: { redirect: location.href } })
     }
   }

@@ -35,9 +35,9 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
       const authState = authStore.get()
 
       // Add Bearer token if access token exists
-      if (authState?.accessToken) {
+      if (authState?.atoken) {
         options.headers = new Headers(options.headers)
-        options.headers.set('Authorization', `Bearer ${authState.accessToken}`)
+        options.headers.set('Authorization', `Bearer ${authState.atoken}`)
       }
     },
     onResponseError({ response }) {
@@ -45,15 +45,12 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
       if (response.status === 401) {
         // Clear auth store on 401 error
         authStore.set({
-          sessionId: null,
-          accessToken: null,
-          accessTokenExpiry: null,
-          refreshToken: null,
-          refreshTokenExpiry: null,
-          remember: false,
-          userId: null,
-          userEmail: null,
-          userName: null
+          sessid: null,
+          atoken: null,
+          atokenexp: null,
+          rtoken: null,
+          rtokenexp: null,
+          remember: false
         })
       }
     }

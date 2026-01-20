@@ -12,7 +12,7 @@ export const Route = createFileRoute('/(auth)')({
   component: AuthLayoutComponent,
   notFoundComponent: NotFound,
   beforeLoad: ({ search, context }: BeforeLoadParams) => {
-    if (context.auth.accessToken) {
+    if (context.auth.atoken) {
       const redirectTo = search?.redirect || '/'
       throw redirect({ href: redirectTo })
     }

@@ -17,10 +17,34 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
  * Custom hook to use the AuthContext
  * @throws Error if used outside of AuthProvider
  */
-export function useAuthContext(): AuthContextType {
+function useAuthContext(): AuthContextType {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error('useAuthContext must be used within an AuthProvider')
   }
   return context
+}
+
+/**
+ * Custom hook to access authentication state and methods.
+ * Provides reactive access to auth state using nanostores.
+ *
+ * @returns AuthContextType object containing user, isAuthenticated, isLoading, login, and logout
+ *
+ * @example
+ * ```tsx
+ * function MyComponent() {
+ *   const { user, isAuthenticated, login, logout } = useAuth()
+ *
+ *   if (isAuthenticated) {
+ *     return <div>Welcome, {user?.name}! <button onClick={logout}>Logout</button></div>
+ *   }
+ *
+ *   return <button onClick={() => login('user@example.com', 'password')}>Login</button>
+ * }
+ * ```
+ */
+export function useAuth() {
+  // Get auth context (includes user, isAuthenticated, isLoading, login, logout)
+  return useAuthContext()
 }

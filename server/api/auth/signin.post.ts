@@ -22,14 +22,14 @@ export default defineHandler(async (event) => {
 
     // Check if user exists
     if (!user) {
-      throw new HTTPError({ status: 400, statusText: 'Invalid credentials' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
     // Verify password using Bun's password.verify
     const isPasswordValid = await Bun.password.verify(body.password, user.password_hash)
 
     if (!isPasswordValid) {
-      throw new HTTPError({ status: 400, statusText: 'Invalid credentials' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
     // Get user agent from request headers
@@ -56,6 +56,6 @@ export default defineHandler(async (event) => {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'
     const errors = error instanceof Error ? error.cause : null
-    return { status: 'error', message, errors }
+    return { success: false, message, data: null, errors }
   }
 })

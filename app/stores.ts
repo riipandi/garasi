@@ -10,30 +10,24 @@ import pkg from '~/package.json' with { type: 'json' }
 
 // Auth store type definition
 export interface AuthStore {
-  sessionId: string | null
-  accessToken: string | null
-  accessTokenExpiry: number | null
-  refreshToken: string | null
-  refreshTokenExpiry: number | null
+  sessid: string | null
+  atoken: string | null
+  atokenexp: number | null
+  rtoken: string | null
+  rtokenexp: number | null
   remember: boolean
-  userId: string | null
-  userEmail: string | null
-  userName: string | null
 }
 
 // Persistent authentication state store
 export const authStore = persistentMap<AuthStore>(
   `${pkg.name}_auth:`,
   {
-    sessionId: null,
-    accessToken: null,
-    accessTokenExpiry: null,
-    refreshToken: null,
-    refreshTokenExpiry: null,
-    remember: false,
-    userId: null,
-    userEmail: null,
-    userName: null
+    sessid: null,
+    atoken: null,
+    atokenexp: null,
+    rtoken: null,
+    rtokenexp: null,
+    remember: false
   },
   {
     encode: encodeValue,
