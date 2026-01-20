@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
@@ -27,6 +27,7 @@ function RouteComponent() {
     type?: 'success' | 'error'
   }
   const emailInputRef = useRef<HTMLInputElement>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Auto-focus email input on mount
   useEffect(() => {
@@ -42,14 +43,18 @@ function RouteComponent() {
   const Form = useForm({
     defaultValues: { email: '', password: '', remember: false } satisfies SigninRequest,
     onSubmit: async ({ value }) => {
+      setSubmitError(null)
+
       // Validate with Zod before submitting
       const result = signinSchema.safeParse(value)
       if (!result.success) {
         const firstError = result.error.issues[0]
         if (firstError) {
-          throw new Error(firstError.message)
+          setSubmitError(firstError.message)
+        } else {
+          setSubmitError('Please check your input and try again')
         }
-        throw new Error('Please check your input and try again')
+        return
       }
 
       const loginResult = await login(value.email, value.password)
@@ -57,7 +62,7 @@ function RouteComponent() {
       if (loginResult.success) {
         navigate({ to: '/' })
       } else {
-        throw new Error(loginResult.error || 'Invalid email or password. Please try again.')
+        setSubmitError(loginResult.error || 'Invalid email or password. Please try again.')
       }
     }
   })
@@ -83,7 +88,7 @@ function RouteComponent() {
           >
             {search.message && <Alert type={search.type || 'success'}>{search.message}</Alert>}
 
-            {Form.state.errors.length > 0 && <Alert type='error'>{Form.state.errors[0]}</Alert>}
+            {submitError && <Alert type='error'>{submitError}</Alert>}
 
             <Form.Field
               name='email'

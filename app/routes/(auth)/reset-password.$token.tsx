@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
 import { PasswordInput } from '~/app/components/ui/PasswordInput'
+import { PasswordStrength } from '~/app/components/ui/PasswordStrength'
 import { fetcher } from '~/app/fetcher'
 
 interface ResetPasswordLoaderData {
@@ -43,7 +44,13 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
 // Zod schema for form validation
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number')
+      .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
     confirmPassword: z.string()
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -185,6 +192,14 @@ function RouteComponent() {
                       return firstError ? firstError.message : undefined
                     }
                     return undefined
+                  },
+                  onChangeAsync: async ({ value, fieldApi }) => {
+                    // If confirmPassword has a value, re-validate it when password changes
+                    const confirmPasswordValue = fieldApi.form.getFieldValue('confirmPassword')
+                    if (confirmPasswordValue && confirmPasswordValue !== value) {
+                      // Trigger re-validation of confirmPassword field
+                      fieldApi.form.setFieldValue('confirmPassword', confirmPasswordValue)
+                    }
                   }
                 }}
                 children={(field) => (
@@ -204,6 +219,7 @@ function RouteComponent() {
                       label='New Password'
                       required
                     />
+                    <PasswordStrength password={field.state.value} className='mt-2' />
                   </div>
                 )}
               />
@@ -211,12 +227,20 @@ function RouteComponent() {
               <Form.Field
                 name='confirmPassword'
                 validators={{
-                  onChange: ({ value }) => {
-                    const result = resetPasswordSchema.shape.confirmPassword.safeParse(value)
-                    if (!result.success) {
-                      const firstError = result.error.issues[0]
-                      return firstError ? firstError.message : undefined
+                  onChange: ({ value, fieldApi }) => {
+                    // Check if confirmPassword is not empty
+                    if (!value || value.trim() === '') {
+                      return 'Please confirm your password'
                     }
+
+                    // Get the password field value
+                    const passwordValue = fieldApi.form.getFieldValue('password')
+
+                    // Check if passwords match
+                    if (value !== passwordValue) {
+                      return 'Passwords do not match'
+                    }
+
                     return undefined
                   }
                 }}

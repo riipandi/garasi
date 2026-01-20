@@ -93,7 +93,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       })
 
       if (!response.success || !response.data) {
-        return { success: false, error: 'Invalid email or password' }
+        return { success: false, error: response.message || 'Invalid email or password' }
       }
 
       // Update auth store with session ID and tokens from backend (user info will be fetched from whoami)
