@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_raiWvUuRBN
 createdAt: 2026-01-20T04:33:41.395841
-updatedAt: 2026-01-20T04:39:42.693614
+updatedAt: 2026-01-20T05:12:12.951972
 workspaceId: wk_YrPa97TLKc
 folderId: fl_WpJjgZXdWN
 authentication: {}
@@ -22,6 +22,6 @@ headers:
   id: Be7IxxqpbN
 method: POST
 name: Change Email
-sortPriority: 0.001
+sortPriority: 3000.0
 url: ${[ baseURL ]}/api/user/email/change
 urlParameters: []

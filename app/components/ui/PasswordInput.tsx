@@ -13,6 +13,7 @@ interface PasswordInputProps {
   className?: string
   label?: string
   required?: boolean
+  disabled?: boolean
 }
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
@@ -28,7 +29,8 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
       error,
       className = '',
       label,
-      required = false
+      required = false,
+      disabled = false
     },
     ref
   ) => {
@@ -57,8 +59,9 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             onBlur={onBlur}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
+            disabled={disabled}
             className={clx(
-              'block w-full rounded-md border px-3 py-2 pr-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none',
+              'block w-full rounded-md border px-3 py-2 pr-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100 disabled:text-gray-500',
               error ? 'border-red-300' : 'border-gray-300'
             )}
           />

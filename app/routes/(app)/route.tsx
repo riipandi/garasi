@@ -108,6 +108,11 @@ function RouteComponent() {
                   <NavDivider />
                   <NavLink to='/cluster' icon={Lucide.Server} label='Cluster' />
                   <NavLink to='/metrics' icon={Lucide.GanttChartSquare} label='Metrics' />
+
+                  {/* Account */}
+                  <NavDivider />
+                  <NavSection title='Account' />
+                  <NavLink to='/profile' icon={Lucide.User} label='Profile' exact />
                 </nav>
               </div>
 

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_yN3vaiLiu7
 createdAt: 2026-01-20T04:33:06.333955
-updatedAt: 2026-01-20T04:37:22.486631
+updatedAt: 2026-01-20T05:12:12.951358
 workspaceId: wk_YrPa97TLKc
 folderId: fl_WpJjgZXdWN
 authentication: {}
@@ -21,6 +21,6 @@ headers:
   id: gVNpVAEGwQ
 method: PUT
 name: Update Profile
-sortPriority: 0.0
+sortPriority: 2000.0
 url: ${[ baseURL ]}/api/user/profile
 urlParameters: []

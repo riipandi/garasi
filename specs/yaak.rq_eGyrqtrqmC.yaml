@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_eGyrqtrqmC
 createdAt: 2026-01-19T20:45:39.039648
-updatedAt: 2026-01-20T04:40:11.259333
+updatedAt: 2026-01-20T05:12:43.457208
 workspaceId: wk_YrPa97TLKc
 folderId: fl_ougj9dmJYS
 authentication:
@@ -14,7 +14,7 @@ bodyType: null
 description: ''
 headers: []
 method: GET
-name: Get Current User
-sortPriority: 1444.4444444444443
+name: Get User Info
+sortPriority: 3666.6666666666665
 url: ${[ baseURL ]}/api/auth/whoami
 urlParameters: []

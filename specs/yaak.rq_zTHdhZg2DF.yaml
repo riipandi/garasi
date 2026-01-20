@@ -15,10 +15,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: tXdCB587eF
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: tXdCB587eF
 method: POST
 name: Forgot Password
 sortPriority: 0.0
