@@ -74,7 +74,7 @@ function RouteComponent() {
       <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'>
         <div className='mb-6'>
           <h2 className='text-lg font-semibold text-gray-900 sm:text-xl'>Change Password</h2>
-          <p className='mt-1 text-sm text-gray-500'>
+          <p className='text-normal mt-2 text-gray-500'>
             Ensure your account is using a long, random password to stay secure
           </p>
         </div>

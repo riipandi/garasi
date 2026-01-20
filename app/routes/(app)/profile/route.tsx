@@ -9,11 +9,13 @@ export const Route = createFileRoute('/(app)/profile')({
 
 function RouteComponent() {
   return (
-    <div className='mx-auto max-w-6xl space-y-6'>
+    <div className='mx-auto max-w-screen-2xl space-y-6'>
       {/* Page Header */}
       <div className='pb-4'>
         <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>Profile</h1>
-        <p className='mt-1 text-sm text-gray-500'>Manage your account settings and preferences</p>
+        <p className='text-normal mt-2 text-gray-500'>
+          Manage your account settings and preferences
+        </p>
       </div>
 
       {/* Profile Layout with Sidebar */}

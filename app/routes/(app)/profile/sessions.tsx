@@ -175,7 +175,9 @@ function RouteComponent() {
         <div className='mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <h2 className='text-lg font-semibold text-gray-900 sm:text-xl'>Active Sessions</h2>
-            <p className='mt-1 text-sm text-gray-500'>Manage your active sessions across devices</p>
+            <p className='text-normal mt-2 text-gray-500'>
+              Manage your active sessions across devices
+            </p>
           </div>
           <div className='flex gap-2'>
             <button
@@ -213,7 +215,7 @@ function RouteComponent() {
           <div className='flex flex-col items-center justify-center py-12 text-center'>
             <Lucide.Smartphone className='mb-4 h-12 w-12 text-gray-400' />
             <h3 className='text-lg font-medium text-gray-900'>No active sessions</h3>
-            <p className='mt-1 text-sm text-gray-500'>
+            <p className='text-normal mt-2 text-gray-500'>
               You don't have any active sessions at the moment.
             </p>
           </div>
