@@ -65,7 +65,7 @@ RUN chmod -R 0775 /srv/public && chmod +x /srv/server/index.mjs
 FROM --platform=${PLATFORM} dhi.io/bun:${BUN_VERSION} AS runner
 
 # Read application environment variables
-ARG APP_BASE_URL=http://localhost:3000
+ARG APP_BASE_URL=http://localhost:3980
 ARG APP_LOG_LEVEL=info
 ARG APP_MODE=production
 ARG GARAGE_ADMIN_API
@@ -80,6 +80,8 @@ ARG MAILER_SMTP_USERNAME
 ARG MAILER_SMTP_PASSWORD
 ARG MAILER_SMTP_SECURE
 ARG SECRET_KEY
+ARG PUBLIC_JWT_ACCESS_TOKEN_EXPIRY
+ARG PUBLIC_JWT_REFRESH_TOKEN_EXPIRY
 
 # Copy the build output files and some necessary system utilities from previous stage.
 # To enhance security, consider avoiding the copying of sysutils.
@@ -87,7 +89,7 @@ COPY --chown=nonroot:nonroot --from=pruner /srv /srv
 COPY --from=base /usr/bin/tini /usr/bin/tini
 
 # Define the host and port to listen on.
-ARG HOST=0.0.0.0 PORT=3000 APP_LOG_TIMESTAMP=true
+ARG HOST=0.0.0.0 PORT=3980 APP_LOG_TIMESTAMP=true
 ARG APP_LOG_TO_CONSOLE=true APP_LOG_TO_FILE=false
 ENV PATH="/usr/bin:/usr/local/bin:$PATH" TINI_SUBREAPER=true
 ENV DO_NOT_TRACK=1 HOST=$HOST PORT=$PORT

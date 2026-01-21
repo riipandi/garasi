@@ -1,5 +1,5 @@
 const HOST = Bun.env.HOST || 'localhost'
-const PORT = Bun.env.PORT || 3000
+const PORT = Bun.env.PORT || 3980
 
 try {
   const response = await fetch(`http://${HOST}:${PORT}/api/healthz`)

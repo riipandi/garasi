@@ -35,5 +35,12 @@ export default defineConfig({
     tsconfigPaths({ ignoreConfigErrors: true }),
     devtoolsJson()
   ],
-  nitro: nitroConfig
+  nitro: nitroConfig,
+  server: {
+    port: 3980,
+    strictPort: true,
+    watch: {
+      ignored: ['**/docs/**', '**/specs/**']
+    }
+  }
 })

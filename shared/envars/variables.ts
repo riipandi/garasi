@@ -11,7 +11,7 @@ type AppMode = 'development' | 'production' | 'test'
 export const publicEnv = {
   APP_MODE: setEnv<AppMode>(env.APP_MODE, 'production'),
   APP_LOG_LEVEL: setEnv<LogLevelType>(env.APP_LOG_LEVEL, 'info'),
-  PUBLIC_BASE_URL: setEnv(env.PUBLIC_BASE_URL, 'http://localhost:3000'),
+  PUBLIC_BASE_URL: setEnv(env.PUBLIC_BASE_URL, 'http://localhost:3980'),
   PUBLIC_CORS_ORIGINS: setEnvArray(env.PUBLIC_CORS_ORIGINS, ['*']),
   PUBLIC_JWT_ACCESS_TOKEN_EXPIRY: setEnv(env.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY, 900), // default: 15 minutes
   PUBLIC_JWT_REFRESH_TOKEN_EXPIRY: setEnv(env.PUBLIC_JWT_REFRESH_TOKEN_EXPIRY, 7200) // default: 2 hours
