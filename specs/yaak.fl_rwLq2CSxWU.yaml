@@ -2,11 +2,12 @@ type: folder
 model: folder
 id: fl_rwLq2CSxWU
 createdAt: 2026-01-19T20:13:11.607905
-updatedAt: 2026-01-20T04:32:41.921386
+updatedAt: 2026-01-21T12:55:03.889274
 workspaceId: wk_YrPa97TLKc
 folderId: null
-authentication: {}
-authenticationType: null
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
 description: ''
 headers: []
 name: Block

@@ -1,5 +1,5 @@
-import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getRouterParam, HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface ApiBucketQuotas {
   maxObjects: number | null // Maximum number of objects allowed in the bucket
@@ -52,31 +52,27 @@ interface GetBucketInfoResponse {
   }
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Bucket ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
-    }
-
-    const body = await readBody<UpdateBucketRequestBody>(event)
-    if (!body?.websiteAccess && !body?.quotas) {
-      logger.debug('Either websiteAccess or quotas is required')
-      throw new HTTPError({ status: 400, statusText: 'Either websiteAccess or quotas is required' })
-    }
-
-    logger.withMetadata({ id }).info('Updating bucket')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/UpdateBucket', {
-      method: 'POST',
-      params: { id },
-      body
-    })
-
-    return { status: 'success', message: 'Update Bucket', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Bucket ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
+
+  const body = await readBody<UpdateBucketRequestBody>(event)
+  if (!body?.websiteAccess && !body?.quotas) {
+    logger.debug('Either websiteAccess or quotas is required')
+    throw new HTTPError({ status: 400, statusText: 'Either websiteAccess or quotas is required' })
+  }
+
+  logger.withMetadata({ id }).info('Updating bucket')
+  const data = await gfetch<GetBucketInfoResponse>('/v2/UpdateBucket', {
+    method: 'POST',
+    params: { id },
+    body
+  })
+
+  return { status: 'success', message: 'Update Bucket', data }
 })

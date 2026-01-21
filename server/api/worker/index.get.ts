@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, getQuery, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { HTTPError, getQuery, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface ListWorkersParams {
   node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
@@ -29,26 +29,22 @@ interface ListWorkersResp {
   error: Record<string, string>
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const { node } = getQuery<ListWorkersParams>(event)
+  const { node } = getQuery<ListWorkersParams>(event)
 
-    if (!node) {
-      logger.debug('Node parameter is required')
-      throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
-    }
-
-    const body = await readBody<ListWorkersRequestBody>(event)
-    const data = await gfetch<ListWorkersResp>('/v2/ListWorkers', {
-      method: 'POST',
-      params: { node },
-      body
-    })
-
-    return { status: 'success', message: 'List Workers', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  if (!node) {
+    logger.debug('Node parameter is required')
+    throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
+
+  const body = await readBody<ListWorkersRequestBody>(event)
+  const data = await gfetch<ListWorkersResp>('/v2/ListWorkers', {
+    method: 'POST',
+    params: { node },
+    body
+  })
+
+  return { status: 'success', message: 'List Workers', data }
 })

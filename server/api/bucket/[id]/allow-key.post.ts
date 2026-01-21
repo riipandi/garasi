@@ -1,5 +1,5 @@
-import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getRouterParam, HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface ApiBucketKeyPerm {
   owner?: boolean // Allow owner permissions
@@ -47,34 +47,30 @@ interface GetBucketInfoResponse {
   }
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Bucket ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
-    }
-
-    const body = await readBody<AllowBucketKeyRequestBody>(event)
-    if (!body?.accessKeyId) {
-      logger.debug('Access Key ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Access Key ID is required' })
-    }
-    if (!body?.permissions) {
-      logger.debug('Permissions are required')
-      throw new HTTPError({ status: 400, statusText: 'Permissions are required' })
-    }
-
-    logger.withMetadata({ bucketId: id, accessKeyId: body.accessKeyId }).info('Allowing bucket key')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/AllowBucketKey', {
-      method: 'POST',
-      body: { ...body, bucketId: id }
-    })
-
-    return { status: 'success', message: 'Allow Bucket Key', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Bucket ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
+
+  const body = await readBody<AllowBucketKeyRequestBody>(event)
+  if (!body?.accessKeyId) {
+    logger.debug('Access Key ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Access Key ID is required' })
+  }
+  if (!body?.permissions) {
+    logger.debug('Permissions are required')
+    throw new HTTPError({ status: 400, statusText: 'Permissions are required' })
+  }
+
+  logger.withMetadata({ bucketId: id, accessKeyId: body.accessKeyId }).info('Allowing bucket key')
+  const data = await gfetch<GetBucketInfoResponse>('/v2/AllowBucketKey', {
+    method: 'POST',
+    body: { ...body, bucketId: id }
+  })
+
+  return { status: 'success', message: 'Allow Bucket Key', data }
 })

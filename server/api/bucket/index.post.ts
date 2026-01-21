@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface CreateBucketLocalAlias {
   accessKeyId: string // ID of the access key to which the local alias is attached
@@ -51,29 +51,23 @@ interface GetBucketInfoResponse {
   }
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const body = await readBody<CreateBucketRequestBody>(event)
-    if (!body?.globalAlias && !body?.localAlias) {
-      logger.debug('Either globalAlias or localAlias is required')
-      throw new HTTPError({
-        status: 400,
-        statusText: 'Either globalAlias or localAlias is required'
-      })
-    }
-
-    logger
-      .withMetadata({ globalAlias: body.globalAlias, localAlias: body.localAlias?.alias })
-      .info('Creating bucket')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/CreateBucket', {
-      method: 'POST',
-      body
+  const body = await readBody<CreateBucketRequestBody>(event)
+  if (!body?.globalAlias && !body?.localAlias) {
+    logger.debug('Either globalAlias or localAlias is required')
+    throw new HTTPError({
+      status: 400,
+      statusText: 'Either globalAlias or localAlias is required'
     })
-
-    return { status: 'success', message: 'Create Bucket', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
   }
+
+  logger.withMetadata({ body }).info('Creating bucket')
+  const data = await gfetch<GetBucketInfoResponse>('/v2/CreateBucket', {
+    method: 'POST',
+    body
+  })
+
+  return { status: 'success', message: 'Create Bucket', data }
 })

@@ -1,5 +1,4 @@
-import { defineHandler } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface FreeSpaceResp {
   total: number
@@ -24,15 +23,10 @@ interface GetClusterStatusResp {
   nodes: NodeResp[]
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    logger.info('Getting cluster status')
-    const data = await gfetch<GetClusterStatusResp>('/v2/GetClusterStatus')
-
-    return { status: 'success', message: 'Get Cluster Status', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  logger.info('Getting cluster status')
+  const data = await gfetch<GetClusterStatusResp>('/v2/GetClusterStatus')
+  return { status: 'success', message: 'Get Cluster Status', data }
 })

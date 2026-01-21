@@ -2,11 +2,12 @@ type: folder
 model: folder
 id: fl_8Fc9gwrsGC
 createdAt: 2026-01-19T20:14:04.662336
-updatedAt: 2026-01-21T10:47:14.320836
+updatedAt: 2026-01-21T12:55:18.991409
 workspaceId: wk_YrPa97TLKc
 folderId: null
-authentication: {}
-authenticationType: null
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
 description: ''
 headers: []
 name: Cluster

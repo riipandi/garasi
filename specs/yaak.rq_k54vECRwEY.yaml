@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_k54vECRwEY
 createdAt: 2026-01-19T18:49:36.681863
-updatedAt: 2026-01-20T04:40:00.888984
+updatedAt: 2026-01-21T12:54:41.967014
 workspaceId: wk_YrPa97TLKc
 folderId: fl_fehQvvbEXQ
 authentication: {}
@@ -21,6 +21,6 @@ headers:
     id: tXdCB587eF
 method: POST
 name: Reset Password
-sortPriority: 1000.0
+sortPriority: 2000.0
 url: ${[ baseURL ]}/api/auth/password/reset?token=${[ response.body.path(request='rq_zTHdhZg2DF', behavior='smart', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLnRva2Vu') ]}
 urlParameters: []

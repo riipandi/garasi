@@ -1,5 +1,5 @@
-import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getRouterParam, HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface RemoveBucketAliasRequestBody {
   globalAlias?: string // Global alias to remove
@@ -44,40 +44,36 @@ interface GetBucketInfoResponse {
   }
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Bucket ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
-    }
-
-    const body = await readBody<RemoveBucketAliasRequestBody>(event)
-
-    if (!body?.globalAlias && !body?.localAlias) {
-      logger.debug('Either globalAlias or localAlias is required')
-      throw new HTTPError({
-        status: 400,
-        statusText: 'Either globalAlias or localAlias is required'
-      })
-    }
-
-    logger
-      .withMetadata({
-        bucketId: id,
-        globalAlias: body.globalAlias,
-        localAlias: body.localAlias?.alias
-      })
-      .info('Removing bucket alias')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/RemoveBucketAlias', {
-      method: 'POST',
-      body: { ...body, bucketId: id }
-    })
-
-    return { status: 'success', message: 'Remove Bucket Alias', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Bucket ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
+
+  const body = await readBody<RemoveBucketAliasRequestBody>(event)
+
+  if (!body?.globalAlias && !body?.localAlias) {
+    logger.debug('Either globalAlias or localAlias is required')
+    throw new HTTPError({
+      status: 400,
+      statusText: 'Either globalAlias or localAlias is required'
+    })
+  }
+
+  logger
+    .withMetadata({
+      bucketId: id,
+      globalAlias: body.globalAlias,
+      localAlias: body.localAlias?.alias
+    })
+    .info('Removing bucket alias')
+  const data = await gfetch<GetBucketInfoResponse>('/v2/RemoveBucketAlias', {
+    method: 'POST',
+    body: { ...body, bucketId: id }
+  })
+
+  return { status: 'success', message: 'Remove Bucket Alias', data }
 })

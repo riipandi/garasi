@@ -1,5 +1,4 @@
-import { defineHandler } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface NodeUpdateTrackers {
   ack: number
@@ -23,15 +22,11 @@ interface GetClusterLayoutHistoryResp {
   updateTrackers: Record<string, NodeUpdateTrackers> | null
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    logger.info('Getting cluster layout history')
-    const data = await gfetch<GetClusterLayoutHistoryResp>('/v2/GetClusterLayoutHistory')
+  logger.info('Getting cluster layout history')
+  const data = await gfetch<GetClusterLayoutHistoryResp>('/v2/GetClusterLayoutHistory')
 
-    return { status: 'success', message: 'Get Cluster Layout History', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  return { status: 'success', message: 'Get Cluster Layout History', data }
 })

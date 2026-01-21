@@ -1,5 +1,5 @@
-import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getRouterParam, HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface KeyPerm {
   allow: object
@@ -18,27 +18,23 @@ interface KeyInfoBucketResponse {
   permissions: KeyPerm
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Key ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
-    }
-
-    const body = await readBody<UpdateKeyRequest>(event)
-
-    logger.withMetadata({ id, body }).info('Updating access key')
-    const data = await gfetch<KeyInfoBucketResponse>('/v2/UpdateKey', {
-      method: 'POST',
-      params: { id },
-      body
-    })
-
-    return { status: 'success', message: 'Update Access Key', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Key ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
   }
+
+  const body = await readBody<UpdateKeyRequest>(event)
+
+  logger.withMetadata({ id, body }).info('Updating access key')
+  const data = await gfetch<KeyInfoBucketResponse>('/v2/UpdateKey', {
+    method: 'POST',
+    params: { id },
+    body
+  })
+
+  return { status: 'success', message: 'Update Access Key', data }
 })

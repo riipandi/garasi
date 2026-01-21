@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface CreateKeyRequest {
   name: string
@@ -23,25 +23,21 @@ interface CreateKeyResponse {
   deleted: boolean
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const body = await readBody<CreateKeyRequest>(event)
+  const body = await readBody<CreateKeyRequest>(event)
 
-    if (!body?.name) {
-      logger.debug('Name is required')
-      throw new HTTPError({ status: 400, statusText: 'Name is required' })
-    }
-
-    logger.withMetadata({ name: body.name }).info('Creating access key')
-    const data = await gfetch<CreateKeyResponse>('/v2/CreateKey', {
-      method: 'POST',
-      body
-    })
-
-    return { status: 'success', message: 'Create Access Key', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  if (!body?.name) {
+    logger.debug('Name is required')
+    throw new HTTPError({ status: 400, statusText: 'Name is required' })
   }
+
+  logger.withMetadata({ body }).info('Creating access key')
+  const data = await gfetch<CreateKeyResponse>('/v2/CreateKey', {
+    method: 'POST',
+    body
+  })
+
+  return { status: 'success', message: 'Create Access Key', data }
 })

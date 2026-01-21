@@ -1,5 +1,4 @@
-import { defineHandler } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface GetClusterHealthResp {
   status: string // One of: 'healthy', 'degraded', 'unavailable'
@@ -12,15 +11,11 @@ interface GetClusterHealthResp {
   partitionsAllOk: number
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    logger.info('Getting cluster health')
-    const data = await gfetch<GetClusterHealthResp>('/v2/GetClusterHealth')
+  logger.info('Getting cluster health')
+  const data = await gfetch<GetClusterHealthResp>('/v2/GetClusterHealth')
 
-    return { status: 'success', message: 'Get Cluster Health', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  return { status: 'success', message: 'Get Cluster Health', data }
 })

@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface ZoneRedundancy {
   atLeast?: number | null
@@ -45,25 +45,21 @@ interface ApplyClusterLayoutResp {
   layout: GetClusterLayoutResp
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const body = await readBody<ApplyClusterLayoutRequestBody>(event)
+  const body = await readBody<ApplyClusterLayoutRequestBody>(event)
 
-    if (body?.version === undefined || body?.version === null) {
-      logger.debug('Version is required')
-      throw new HTTPError({ status: 400, statusText: 'Version is required' })
-    }
-
-    logger.withMetadata({ version: body.version }).info('Applying cluster layout')
-    const data = await gfetch<ApplyClusterLayoutResp>('/v2/ApplyClusterLayout', {
-      method: 'POST',
-      body
-    })
-
-    return { status: 'success', message: 'Apply Cluster Layout', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  if (body?.version === undefined || body?.version === null) {
+    logger.debug('Version is required')
+    throw new HTTPError({ status: 400, statusText: 'Version is required' })
   }
+
+  logger.withMetadata({ version: body.version }).info('Applying cluster layout')
+  const data = await gfetch<ApplyClusterLayoutResp>('/v2/ApplyClusterLayout', {
+    method: 'POST',
+    body
+  })
+
+  return { status: 'success', message: 'Apply Cluster Layout', data }
 })

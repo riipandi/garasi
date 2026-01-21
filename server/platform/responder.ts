@@ -44,12 +44,13 @@ export function parseError(err: any | unknown) {
     } else {
       message = err.message || 'Unknown error'
     }
+    const { message: reason, ...respWithoutMessage } = responseData
     error = {
       type: err.name,
       statusCode: err.statusCode,
-      reason: err.message,
+      reason: reason,
       ...formatStack(err),
-      ...responseData
+      ...respWithoutMessage
     }
   } else if (err instanceof NoResultError) {
     statusCode = 404

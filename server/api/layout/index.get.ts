@@ -1,5 +1,4 @@
-import { defineHandler } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface ZoneRedundancy {
   atLeast?: number | null
@@ -36,15 +35,11 @@ interface GetClusterLayoutResp {
   stagedParameters: LayoutParameters | null
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    logger.info('Getting cluster layout')
-    const data = await gfetch<GetClusterLayoutResp>('/v2/GetClusterLayout')
+  logger.info('Getting cluster layout')
+  const data = await gfetch<GetClusterLayoutResp>('/v2/GetClusterLayout')
 
-    return { status: 'success', message: 'Get Cluster Layout', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  return { status: 'success', message: 'Get Cluster Layout', data }
 })

@@ -1,5 +1,5 @@
-import { defineHandler, getQuery } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getQuery } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 import { parseBoolean } from '~/server/utils/parser'
 
 interface GetClusterStatisticsResp {
@@ -32,21 +32,17 @@ interface ClusterStatistics {
   }
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const { raw } = getQuery<{ raw: string | null }>(event)
-    const printRaw = parseBoolean(raw ?? null) || false
+  const { raw } = getQuery<{ raw: string | null }>(event)
+  const printRaw = parseBoolean(raw ?? null) || false
 
-    logger.info('Getting cluster statistics')
-    const resp = await gfetch<GetClusterStatisticsResp>('/v2/GetClusterStatistics')
-    const data = !printRaw ? parseClusterStatistics(resp.freeform) : resp
+  logger.info('Getting cluster statistics')
+  const resp = await gfetch<GetClusterStatisticsResp>('/v2/GetClusterStatistics')
+  const data = !printRaw ? parseClusterStatistics(resp.freeform) : resp
 
-    return { status: 'success', message: 'Get Cluster Statistics', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  return { status: 'success', message: 'Get Cluster Statistics', data }
 })
 
 function parseStorageCapacity(capacityStr: string): {

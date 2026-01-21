@@ -1,5 +1,4 @@
-import { defineHandler } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface ZoneRedundancy {
   atLeast?: number | null
@@ -49,17 +48,13 @@ type PreviewClusterLayoutChangesResp =
   | PreviewClusterLayoutChangesRespSuccess
   | PreviewClusterLayoutChangesRespError
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    logger.info('Previewing cluster layout changes')
-    const data = await gfetch<PreviewClusterLayoutChangesResp>('/v2/PreviewClusterLayoutChanges', {
-      method: 'POST'
-    })
+  logger.info('Previewing cluster layout changes')
+  const data = await gfetch<PreviewClusterLayoutChangesResp>('/v2/PreviewClusterLayoutChanges', {
+    method: 'POST'
+  })
 
-    return { status: 'success', message: 'Preview Cluster Layout Changes', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  return { status: 'success', message: 'Preview Cluster Layout Changes', data }
 })

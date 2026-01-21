@@ -2,11 +2,12 @@ type: folder
 model: folder
 id: fl_9Rjwumb9ff
 createdAt: 2026-01-19T20:14:09.541686
-updatedAt: 2026-01-21T10:47:12.312573
+updatedAt: 2026-01-21T12:55:25.355948
 workspaceId: wk_YrPa97TLKc
 folderId: null
-authentication: {}
-authenticationType: null
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
 description: ''
 headers: []
 name: Layout

@@ -1,5 +1,5 @@
-import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getRouterParam, HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface AddBucketAliasRequestBody {
   globalAlias?: string // Global alias for the bucket
@@ -44,39 +44,29 @@ interface GetBucketInfoResponse {
   }
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Bucket ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
-    }
-
-    const body = await readBody<AddBucketAliasRequestBody>(event)
-    if (!body?.globalAlias && !body?.localAlias) {
-      logger.debug('Either globalAlias or localAlias is required')
-      throw new HTTPError({
-        status: 400,
-        statusText: 'Either globalAlias or localAlias is required'
-      })
-    }
-
-    logger
-      .withMetadata({
-        bucketId: id,
-        globalAlias: body.globalAlias,
-        localAlias: body.localAlias?.alias
-      })
-      .info('Adding bucket alias')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/AddBucketAlias', {
-      method: 'POST',
-      body: { ...body, bucketId: id }
-    })
-
-    return { status: 'success', message: 'Add Bucket Alias', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Bucket ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
+
+  const body = await readBody<AddBucketAliasRequestBody>(event)
+  if (!body?.globalAlias && !body?.localAlias) {
+    logger.debug('Either globalAlias or localAlias is required')
+    throw new HTTPError({
+      status: 400,
+      statusText: 'Either globalAlias or localAlias is required'
+    })
+  }
+
+  logger.withMetadata({ bucketId: id, body }).info('Adding bucket alias')
+  const data = await gfetch<GetBucketInfoResponse>('/v2/AddBucketAlias', {
+    method: 'POST',
+    body: { ...body, bucketId: id }
+  })
+
+  return { status: 'success', message: 'Add Bucket Alias', data }
 })

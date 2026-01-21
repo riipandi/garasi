@@ -1,5 +1,5 @@
-import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getRouterParam, HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface UpdateAdminTokenRequestBody {
   name: string | null // Name of the admin API token
@@ -17,25 +17,21 @@ interface GetAdminTokenInfoResp {
   scope: string[]
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Token ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
-    }
-
-    const body = await readBody<UpdateAdminTokenRequestBody>(event)
-    const resp = await gfetch<GetAdminTokenInfoResp>('/v2/UpdateAdminToken', {
-      method: 'POST',
-      params: { id },
-      body
-    })
-
-    return { status: 'success', message: 'Update Admin Token', data: resp }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Token ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
   }
+
+  const body = await readBody<UpdateAdminTokenRequestBody>(event)
+  const resp = await gfetch<GetAdminTokenInfoResp>('/v2/UpdateAdminToken', {
+    method: 'POST',
+    params: { id },
+    body
+  })
+
+  return { status: 'success', message: 'Update Admin Token', data: resp }
 })

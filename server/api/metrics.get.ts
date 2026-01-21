@@ -1,7 +1,7 @@
-import { defineHandler, getQuery } from 'nitro/h3'
+import { getQuery } from 'nitro/h3'
 import { parseBoolean } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
-import { createErrorResonse } from '../platform/responder'
+import { defineProtectedHandler } from '../platform/guards'
 
 interface MetricValue {
   labels: Record<string, string>
@@ -16,22 +16,18 @@ interface ParsedMetric {
 
 type ParsedMetrics = Record<string, ParsedMetric>
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch } = event.context
 
-  try {
-    const { raw } = getQuery<{ raw: string | null }>(event)
-    const printRaw = parseBoolean(raw ?? null) || false
+  const { raw } = getQuery<{ raw: string | null }>(event)
+  const printRaw = parseBoolean(raw ?? null) || false
 
-    const metricsToken = `Bearer ${protectedEnv.GARAGE_METRICS_TOKEN}`
-    const resp = await gfetch<string>('/metrics', { headers: { Authorization: metricsToken } })
-    const data = parsePrometheusMetrics(resp)
-    const response = { status: 'success', message: 'Garage Prometheus Metrics', data }
+  const metricsToken = `Bearer ${protectedEnv.GARAGE_METRICS_TOKEN}`
+  const resp = await gfetch<string>('/metrics', { headers: { Authorization: metricsToken } })
+  const data = parsePrometheusMetrics(resp)
+  const response = { status: 'success', message: 'Garage Prometheus Metrics', data }
 
-    return !printRaw ? response : data
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  return !printRaw ? response : data
 })
 
 function parsePrometheusMetrics(rawMetrics: string): ParsedMetrics {

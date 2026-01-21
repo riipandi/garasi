@@ -2,11 +2,12 @@ type: folder
 model: folder
 id: fl_khnnuz8ccL
 createdAt: 2026-01-19T20:14:41.437267
-updatedAt: 2026-01-20T04:32:41.923688
+updatedAt: 2026-01-21T12:55:53.236650
 workspaceId: wk_YrPa97TLKc
 folderId: null
-authentication: {}
-authenticationType: null
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
 description: ''
 headers: []
 name: Worker

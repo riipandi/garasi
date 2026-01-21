@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface UpdateAdminTokenRequestBody {
   name: string | null // Name of the admin API token
@@ -21,24 +21,20 @@ interface CreateAdminTokenResp extends GetAdminTokenInfoResp {
   secretToken: string
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    // Parse and validate request body
-    const body = await readBody<UpdateAdminTokenRequestBody>(event)
-    if (!body?.name) {
-      logger.debug('Name of the admin API token is required')
-      throw new HTTPError({ status: 400, statusText: 'Name of the admin API token is required' })
-    }
-
-    const resp = await gfetch<CreateAdminTokenResp>('/v2/CreateAdminToken', {
-      method: 'POST',
-      body
-    })
-
-    return { status: 'success', message: 'Create Admin Token', data: resp }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  // Parse and validate request body
+  const body = await readBody<UpdateAdminTokenRequestBody>(event)
+  if (!body?.name) {
+    logger.debug('Name of the admin API token is required')
+    throw new HTTPError({ status: 400, statusText: 'Name of the admin API token is required' })
   }
+
+  const resp = await gfetch<CreateAdminTokenResp>('/v2/CreateAdminToken', {
+    method: 'POST',
+    body
+  })
+
+  return { status: 'success', message: 'Create Admin Token', data: resp }
 })

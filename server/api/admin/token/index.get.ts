@@ -1,5 +1,4 @@
-import { defineHandler } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface GetAdminTokenInfoResp {
   id: string | null
@@ -10,14 +9,9 @@ interface GetAdminTokenInfoResp {
   scope: string[]
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
-
-  try {
-    logger.info('Listing admin tokens')
-    const data = await gfetch<GetAdminTokenInfoResp[]>('/v2/ListAdminTokens')
-    return { status: 'success', message: 'List Admin Tokens', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
-  }
+  logger.info('Listing admin tokens')
+  const data = await gfetch<GetAdminTokenInfoResp[]>('/v2/ListAdminTokens')
+  return { status: 'success', message: 'List Admin Tokens', data }
 })

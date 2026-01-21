@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_Qa2xSwAhyS
 createdAt: 2026-01-20T03:49:34.626051
-updatedAt: 2026-01-20T04:40:00.890622
+updatedAt: 2026-01-21T12:54:41.968498
 workspaceId: wk_YrPa97TLKc
 folderId: fl_fehQvvbEXQ
 authentication:
@@ -23,6 +23,6 @@ headers:
     id: IBWGB7acJG
 method: POST
 name: Change Password
-sortPriority: 2000.0
+sortPriority: 3000.0
 url: ${[ baseURL ]}/api/auth/password/change
 urlParameters: []

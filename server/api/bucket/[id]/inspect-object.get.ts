@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, getQuery, getRouterParam } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { HTTPError, getQuery, getRouterParam } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface InspectObjectParams {
   key: string // Key of the object to inspect
@@ -32,34 +32,30 @@ interface InspectObjectResponse {
   versions: InspectObjectVersion[] // List of versions currently stored for this object
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Bucket ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
-    }
-
-    const { key } = getQuery<InspectObjectParams>(event)
-
-    if (!key) {
-      logger.debug('Object key is required')
-      throw new HTTPError({ status: 400, statusText: 'Object key is required' })
-    }
-
-    logger.withMetadata({ bucketId: id, key }).info('Inspecting object')
-    const data = await gfetch<InspectObjectResponse>('/v2/InspectObject', {
-      params: { bucketId: id, key }
-    })
-
-    if (!data) {
-      return { success: false, message: 'Object not found', data: null }
-    }
-
-    return { status: 'success', message: 'Inspect Object', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Bucket ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
+
+  const { key } = getQuery<InspectObjectParams>(event)
+
+  if (!key) {
+    logger.debug('Object key is required')
+    throw new HTTPError({ status: 400, statusText: 'Object key is required' })
+  }
+
+  logger.withMetadata({ bucketId: id, key }).info('Inspecting object')
+  const data = await gfetch<InspectObjectResponse>('/v2/InspectObject', {
+    params: { bucketId: id, key }
+  })
+
+  if (!data) {
+    return { success: false, message: 'Object not found', data: null }
+  }
+
+  return { status: 'success', message: 'Inspect Object', data }
 })

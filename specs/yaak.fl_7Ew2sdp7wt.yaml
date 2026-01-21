@@ -2,11 +2,12 @@ type: folder
 model: folder
 id: fl_7Ew2sdp7wt
 createdAt: 2026-01-19T18:51:12.224183
-updatedAt: 2026-01-20T04:32:41.921934
+updatedAt: 2026-01-21T12:55:10.507659
 workspaceId: wk_YrPa97TLKc
 folderId: null
-authentication: {}
-authenticationType: null
+authentication:
+  token: ${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLmFjY2Vzc190b2tlbg') ]}
+authenticationType: bearer
 description: ''
 headers: []
 name: Bucket

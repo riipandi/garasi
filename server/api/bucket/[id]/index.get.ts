@@ -1,5 +1,5 @@
-import { defineHandler, HTTPError, getQuery, getRouterParam } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { HTTPError, getQuery, getRouterParam } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface GetBucketInfoParams {
   id?: string // Exact bucket ID to look up
@@ -42,29 +42,25 @@ interface GetBucketInfoResponse {
   }
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
-    if (!id) {
-      logger.debug('Bucket ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
-    }
-
-    const { globalAlias, search } = getQuery<GetBucketInfoParams>(event)
-
-    logger.withMetadata({ id, globalAlias, search }).info('Getting bucket information')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/GetBucketInfo', {
-      params: { id, globalAlias, search }
-    })
-
-    if (!data) {
-      return { success: false, message: 'Bucket not found', data: null }
-    }
-
-    return { status: 'success', message: 'Get Bucket Info', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  const id = getRouterParam(event, 'id')
+  if (!id) {
+    logger.debug('Bucket ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
+
+  const { globalAlias, search } = getQuery<GetBucketInfoParams>(event)
+
+  logger.withMetadata({ id, globalAlias, search }).info('Getting bucket information')
+  const data = await gfetch<GetBucketInfoResponse>('/v2/GetBucketInfo', {
+    params: { id, globalAlias, search }
+  })
+
+  if (!data) {
+    return { success: false, message: 'Bucket not found', data: null }
+  }
+
+  return { status: 'success', message: 'Get Bucket Info', data }
 })

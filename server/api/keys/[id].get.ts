@@ -1,5 +1,5 @@
-import { defineHandler, getRouterParam, HTTPError, getQuery } from 'nitro/h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { getRouterParam, HTTPError, getQuery } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface GetKeyInfoParams {
   search?: string
@@ -13,28 +13,24 @@ interface KeyInfoBucketResponse {
   deleted: boolean
 }
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  try {
-    const id = getRouterParam(event, 'id')
+  const id = getRouterParam(event, 'id')
 
-    if (!id) {
-      logger.debug('Key ID is required')
-      throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
-    }
-
-    const { search } = getQuery<GetKeyInfoParams>(event)
-
-    logger.withMetadata({ id, search }).info('Getting key information')
-    const data = await gfetch<KeyInfoBucketResponse>('/v2/GetKeyInfo', { params: { id, search } })
-
-    if (!data) {
-      return { success: false, message: 'Access key not found', data: null }
-    }
-
-    return { status: 'success', message: 'Get Key Information', data }
-  } catch (error) {
-    return createErrorResonse(event, error)
+  if (!id) {
+    logger.debug('Key ID is required')
+    throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
   }
+
+  const { search } = getQuery<GetKeyInfoParams>(event)
+
+  logger.withMetadata({ id, search }).info('Getting key information')
+  const data = await gfetch<KeyInfoBucketResponse>('/v2/GetKeyInfo', { params: { id, search } })
+
+  if (!data) {
+    return { success: false, message: 'Access key not found', data: null }
+  }
+
+  return { status: 'success', message: 'Get Key Information', data }
 })
