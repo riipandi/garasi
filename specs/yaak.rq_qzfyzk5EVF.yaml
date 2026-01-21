@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_qzfyzk5EVF
 createdAt: 2026-01-19T20:24:48.797342
-updatedAt: 2026-01-19T20:25:26.737674
+updatedAt: 2026-01-21T08:35:25.835759
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: 2FDZTUEMgV
+method: POST
 name: Create Access Key
 sortPriority: 2000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/keys
 urlParameters: []

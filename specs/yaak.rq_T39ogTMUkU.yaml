@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_T39ogTMUkU
 createdAt: 2026-01-19T20:25:45.327578
-updatedAt: 2026-01-19T20:25:57.914423
+updatedAt: 2026-01-21T08:39:11.183558
 workspaceId: wk_YrPa97TLKc
 folderId: fl_kpCLEVgs4R
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: cXTp8E3ViK
+method: POST
 name: Create Metadata Snapshot
-sortPriority: 0.002
-url: ${[ baseURL ]}/api/bucket
+sortPriority: 2000.0
+url: ${[ baseURL ]}/api/node/metadata-snapshot
 urlParameters: []

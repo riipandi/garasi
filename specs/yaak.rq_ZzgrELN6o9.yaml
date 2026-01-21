@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_ZzgrELN6o9
 createdAt: 2026-01-19T20:22:30.558637
-updatedAt: 2026-01-19T20:23:11.104334
+updatedAt: 2026-01-21T08:44:54.099041
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: WkNjSznXHH
+method: POST
 name: Preview Layout Changes
 sortPriority: 4000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/cluster/layout/preview
 urlParameters: []

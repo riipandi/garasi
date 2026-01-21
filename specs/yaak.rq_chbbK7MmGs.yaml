@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_chbbK7MmGs
 createdAt: 2026-01-19T20:22:30.026877
-updatedAt: 2026-01-19T20:23:11.099923
+updatedAt: 2026-01-21T08:44:22.516149
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: Get Cluster Layout
 sortPriority: 1000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/cluster/layout
 urlParameters: []

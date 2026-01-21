@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_v3pNLeFwR2
 createdAt: 2026-01-19T20:16:51.043553
-updatedAt: 2026-01-19T20:25:51.717594
+updatedAt: 2026-01-21T08:39:11.181825
 workspaceId: wk_YrPa97TLKc
 folderId: fl_kpCLEVgs4R
 authentication: {}
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: Get Node Info
-sortPriority: 0.001
-url: ${[ baseURL ]}/api/bucket
+sortPriority: 0.0
+url: ${[ baseURL ]}/api/node/info
 urlParameters: []

@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_YwF7xuTAK4
 createdAt: 2026-01-19T20:25:45.892063
-updatedAt: 2026-01-19T20:26:03.520721
+updatedAt: 2026-01-21T08:39:11.185242
 workspaceId: wk_YrPa97TLKc
 folderId: fl_kpCLEVgs4R
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: I7ZJEzXDCY
+method: POST
 name: Launch Repair Operation
-sortPriority: 0.003
-url: ${[ baseURL ]}/api/bucket
+sortPriority: 3000.0
+url: ${[ baseURL ]}/api/node/repair
 urlParameters: []

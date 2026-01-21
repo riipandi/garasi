@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_WQjqcbkMzA
 createdAt: 2026-01-19T20:24:48.222193
-updatedAt: 2026-01-19T20:25:26.741305
+updatedAt: 2026-01-21T08:35:57.779289
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -12,8 +12,8 @@ body:
 bodyType: null
 description: ''
 headers: []
-method: GET
+method: DELETE
 name: Delete Access Key
 sortPriority: 4000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/keys/:id
 urlParameters: []

@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_7mwEYXWhSA
 createdAt: 2026-01-19T20:22:31.129248
-updatedAt: 2026-01-19T20:23:24.967912
+updatedAt: 2026-01-21T08:45:22.068670
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: In8GpFtChM
+method: POST
 name: Skip Dead Nodes
 sortPriority: 6000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/cluster/layout/skip-dead-nodes
 urlParameters: []

@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_Wn2QQdBbKr
 createdAt: 2026-01-19T20:16:56.726601
-updatedAt: 2026-01-19T20:23:42.610896
+updatedAt: 2026-01-21T08:46:55.729556
 workspaceId: wk_YrPa97TLKc
 folderId: fl_8Fc9gwrsGC
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: a4KCCfeuwc
+method: POST
 name: Connect Cluster Nodes
 sortPriority: 1000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/cluster/connect-nodes
 urlParameters: []

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_7qjXNfxmnC
 createdAt: 2026-01-19T20:24:48.514893
-updatedAt: 2026-01-19T20:25:26.734725
+updatedAt: 2026-01-21T08:35:02.716309
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: List Access Keys
 sortPriority: 1000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/keys
 urlParameters: []
