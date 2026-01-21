@@ -4,16 +4,19 @@ import { getSimplePrettyTerminal, moonlight } from '@loglayer/transport-simple-p
 import { ConsoleTransport, LogLayer } from 'loglayer'
 import path from 'node:path'
 import { serializeError } from 'serialize-error'
-import { isDevelopment, isProduction } from 'std-env'
 import { protectedEnv } from '~/shared/envars'
 
 // Define the directory and file name for log storage
 const LOG_DIR = path.join(process.cwd(), 'storage/logs')
 const LOG_FILE_NAME = `app-${protectedEnv.APP_MODE}-%DATE%.log`
 
+// Define the application mode based on envar values
+const isDevelopment = protectedEnv.APP_MODE === 'development'
+const isProduction = protectedEnv.APP_MODE === 'production'
+
 const logger = new LogLayer({
   errorSerializer: serializeError,
-  consoleDebug: protectedEnv.APP_LOG_LEVEL === 'debug',
+  consoleDebug: protectedEnv.APP_LOG_TO_CONSOLE,
   contextFieldName: 'context',
   metadataFieldName: 'metadata',
   muteContext: false,
@@ -46,7 +49,7 @@ const logger = new LogLayer({
       logger: console
     })
   ],
-  plugins: [redactionPlugin({ paths: ['password'] })]
+  plugins: [redactionPlugin({ paths: ['password', 'token'] })]
 })
 
 export { logger, logger as default }

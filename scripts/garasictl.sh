@@ -101,7 +101,7 @@ start() {
   garage_admin_api="$(get_env_from "$ENV_FILE" GARAGE_ADMIN_API)"
 
   [ -n "$garage_admin_api" ] || garage_admin_api="http://localhost:3903"
-  [ -n "$app_log_to_console" ] || app_log_to_console="false"
+  [ -n "$app_log_to_console" ] || app_log_to_console="true"
 
   remove_existing
   mkdir -p "$ROOT_DIR/storage"
