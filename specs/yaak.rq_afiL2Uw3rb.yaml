@@ -2,13 +2,13 @@ type: http_request
 model: http_request
 id: rq_afiL2Uw3rb
 createdAt: 2026-01-19T18:47:05.009940
-updatedAt: 2026-01-21T05:55:08.636911
+updatedAt: 2026-01-21T14:29:36.029243
 workspaceId: wk_YrPa97TLKc
 folderId: fl_ougj9dmJYS
 authentication: {}
 authenticationType: null
 body:
-  text: |
+  text: |-
     {
       "email": "admin@example.com",
       "password": "${[ defaultPassword ]}"
@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: tXdCB587eF
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: tXdCB587eF
 method: POST
 name: Signin with Email
 sortPriority: 0.0

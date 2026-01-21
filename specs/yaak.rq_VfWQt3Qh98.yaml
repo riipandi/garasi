@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_VfWQt3Qh98
 createdAt: 2026-01-20T00:52:00.404870
-updatedAt: 2026-01-20T04:40:14.930360
+updatedAt: 2026-01-21T14:30:06.613455
 workspaceId: wk_YrPa97TLKc
 folderId: fl_ougj9dmJYS
 authentication:
@@ -11,16 +11,16 @@ authenticationType: bearer
 body:
   text: |-
     {
-      "refresh_token": "${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLnJlZnJlc2hfdG9rZW4') ]}",
-      "session_id": "${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLnNlc3Npb25faWQ') ]}"
+      "refresh_token": "${[ cookie.value(name='garasi_rtoken') ]}",
+      "session_id": "${[ cookie.value(name='garasi_sessid') ]}"
     }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: IBWGB7acJG
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: IBWGB7acJG
 method: POST
 name: Refresh Token
 sortPriority: 1962.962962962963

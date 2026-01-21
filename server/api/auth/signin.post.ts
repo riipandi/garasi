@@ -1,4 +1,6 @@
-import { defineHandler, getRequestIP, HTTPError, readBody } from 'nitro/h3'
+import { defineHandler, getRequestIP, HTTPError } from 'nitro/h3'
+import { readBody, setCookie } from 'nitro/h3'
+import pkg from '~/package.json' with { type: 'json' }
 import { generateTokenPair } from '~/server/platform/jwt'
 import { createErrorResonse } from '~/server/platform/responder'
 import { createSession, storeRefreshToken } from '~/server/services/session.service'
@@ -46,6 +48,7 @@ export default defineHandler(async (event) => {
 
     if (!sessionId || !sessionRecord) {
       logger.withMetadata({ sessionId, sessionRecord }).debug('Failed to create session')
+      throw new HTTPError({ status: 500, statusText: 'Failed to create session' })
     }
 
     // Generate JWT tokens with user agent hash and session ID
@@ -69,6 +72,11 @@ export default defineHandler(async (event) => {
     cleanupExpiredRefreshTokens(db).catch((error) =>
       logger.withError(error).error('Error cleaning up refresh tokens')
     )
+
+    // Store accessToken, refreshToken, and sessionId on cookie
+    setCookie(event, `${pkg.name}_atoken`, tokens.accessToken)
+    setCookie(event, `${pkg.name}_rtoken`, tokens.refreshToken)
+    setCookie(event, `${pkg.name}_sessid`, sessionId)
 
     // Return user data with JWT tokens and session info
     return {
