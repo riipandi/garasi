@@ -1,10 +1,15 @@
 import { NoResultError } from 'kysely'
-import { H3Event, HTTPError } from 'nitro/h3'
+import { H3Event, HTTPError, type EventHandlerResponse } from 'nitro/h3'
 import { FetchError } from 'ofetch'
+import { protectedEnv } from '~/shared/envars'
 
-export function createErrorResonse(event: H3Event, error: any | unknown, logMessage?: string) {
+export function createErrorResonse<R = EventHandlerResponse>(
+  event: H3Event,
+  payload: any | unknown,
+  logMessage?: string
+) {
   const { logger } = event.context
-  const { statusCode, message, errors } = parseError(error)
+  const { statusCode, message, error } = parseError(payload)
   event.res.status = statusCode // Set response HTTP status code
 
   logger
@@ -12,65 +17,53 @@ export function createErrorResonse(event: H3Event, error: any | unknown, logMess
     .withError(error)
     .error(logMessage ?? message)
 
-  return {
-    success: false,
-    message,
-    data: null,
-    errors
-  }
+  return { success: false, message, data: null, error } as R
 }
 
-export function parseError(error: any | unknown) {
+export function parseError(err: any | unknown) {
   let statusCode = 500
   let message = 'Unknown error'
-  let errors: any = null
+  let error: any = null
 
-  if (error instanceof HTTPError) {
-    statusCode = error.status
-    message = error.statusText || error.message || 'Unknown error'
-    errors = {
-      type: 'HTTPError',
-      status: error.status,
-      statusText: error.statusText,
-      reason: error.message,
-      stack: error.stack ? error.stack.split('\n') : []
+  if (err instanceof HTTPError) {
+    statusCode = err.status
+    message = err.statusText || err.message || 'Unknown error'
+    error = {
+      type: err.name,
+      status: err.status,
+      statusText: err.statusText,
+      reason: err.message,
+      ...formatStack(err)
     }
-  } else if (error instanceof FetchError) {
-    statusCode = error.statusCode || 500
+  } else if (err instanceof FetchError) {
+    statusCode = err.statusCode || 500
     // Extract error details from response._data if available
-    const responseData = error.response?._data
+    const responseData = err.response?._data
     if (responseData && responseData.message) {
       message = responseData.message
     } else {
-      message = error.message || 'Unknown error'
+      message = err.message || 'Unknown error'
     }
-    errors = {
-      type: 'FetchError',
-      statusCode: error.statusCode,
-      reason: error.message,
-      stack: error.stack ? error.stack.split('\n') : [],
-      ...(responseData && {
-        code: responseData.code,
-        region: responseData.region,
-        path: responseData.path
-      })
+    error = {
+      type: err.name,
+      statusCode: err.statusCode,
+      reason: err.message,
+      ...formatStack(err),
+      ...responseData
     }
-  } else if (error instanceof NoResultError) {
+  } else if (err instanceof NoResultError) {
     statusCode = 404
-    message = error.message || 'Resource not found'
-    errors = {
-      type: 'NoResultError',
-      reason: error.message,
-      stack: error.stack ? error.stack.split('\n') : []
-    }
-  } else if (error instanceof Error) {
-    message = error.message || 'Unknown error'
-    errors = {
-      type: 'Error',
-      reason: error.message,
-      stack: error.stack ? error.stack.split('\n') : []
-    }
+    message = err.message || 'Resource not found'
+    error = { type: err.name, reason: err.message, ...formatStack(err) }
+  } else if (err instanceof Error) {
+    message = err.message || 'Unknown error'
+    error = { type: err.name, reason: err.message, ...formatStack(err) }
   }
 
-  return { statusCode, message, errors }
+  return { statusCode, message, error }
+}
+
+function formatStack(err: any | unknown) {
+  const includeStack = protectedEnv.APP_LOG_LEVEL === 'debug'
+  return includeStack && { stack: err.stack ? err.stack.split('\n') : [] }
 }

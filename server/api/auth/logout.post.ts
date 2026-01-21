@@ -1,9 +1,10 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler } from '~/server/platform/guards'
 import { verifyRefreshToken } from '~/server/platform/jwt'
 import { createErrorResonse } from '~/server/platform/responder'
 import { deactivateSession, revokeRefreshToken } from '~/server/services/session.service'
 
-export default defineHandler(async (event) => {
+export default defineProtectedHandler(async (event) => {
   const { db } = event.context
 
   try {
@@ -33,11 +34,7 @@ export default defineHandler(async (event) => {
     await deactivateSession(db, body.session_id)
 
     // Return success message
-    return {
-      success: true,
-      message: 'Logged out successfully',
-      data: null
-    }
+    return { success: true, message: 'Logged out successfully', data: null }
   } catch (error) {
     return createErrorResonse(event, error)
   }

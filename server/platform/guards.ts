@@ -1,6 +1,8 @@
-import { defineHandler, type H3Event, HTTPError } from 'nitro/h3'
+import { defineHandler, HTTPError } from 'nitro/h3'
+import type { EventHandlerRequest, EventHandlerResponse, H3Event } from 'nitro/h3'
 import { verifyAccessToken } from '~/server/platform/jwt'
 import { getSessionById, updateSessionActivity } from '~/server/services/session.service'
+import { createErrorResonse } from './responder'
 
 interface AuthenticatedEvent {
   userId: string
@@ -44,28 +46,19 @@ export async function authenticateRequest(event: H3Event): Promise<Authenticated
   const sessionId = payload.sid
 
   if (!sessionId) {
-    throw new HTTPError({
-      status: 401,
-      statusText: 'Unauthorized: Session ID is required'
-    })
+    throw new HTTPError({ status: 401, statusText: 'Unauthorized: Session ID is required' })
   }
 
   // Get session from database
   const session = await getSessionById(db, sessionId)
 
   if (!session) {
-    throw new HTTPError({
-      status: 401,
-      statusText: 'Unauthorized: Invalid or expired session'
-    })
+    throw new HTTPError({ status: 401, statusText: 'Unauthorized: Invalid or expired session' })
   }
 
   // Verify session belongs to the user
   if (session.user_id !== userId) {
-    throw new HTTPError({
-      status: 403,
-      statusText: 'Forbidden: Session does not belong to user'
-    })
+    throw new HTTPError({ status: 403, statusText: 'Forbidden: Session does not belong to user' })
   }
 
   // Update session activity
@@ -98,17 +91,20 @@ export function authMiddleware() {
  * @param handler - The route handler to protect
  * @returns Protected route handler
  */
-export function defineProtectedHandler<T>(handler: (event: H3Event) => Promise<T>) {
-  return defineHandler(async (event) => {
-    // Authenticate request
-    const auth = await authenticateRequest(event)
-
-    // Attach authenticated user data to event context
-    event.context.auth = auth
-
-    // Execute the protected handler
-    return handler(event)
-  })
+export function defineProtectedHandler<
+  T extends EventHandlerRequest = EventHandlerRequest,
+  R = EventHandlerResponse
+>(handler: (event: H3Event<T>) => Promise<R> | R): (event: H3Event<T>) => Promise<R> {
+  return async (event: H3Event<T>) => {
+    try {
+      // Attach authenticated user data to event context
+      const auth = await authenticateRequest(event)
+      event.context.auth = auth
+      return await handler(event)
+    } catch (error) {
+      return createErrorResonse<R>(event, error)
+    }
+  }
 }
 
 // Extend H3EventContext to include auth data
