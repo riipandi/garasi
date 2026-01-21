@@ -4,7 +4,7 @@ interface GetWorkerInfoParams {
   node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
 }
 
-interface GetWorkerInfoReq {
+interface GetWorkerInfoRequestBody {
   id: number // Worker ID
 }
 
@@ -38,7 +38,7 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
     }
 
-    const body = await readBody<GetWorkerInfoReq>(event)
+    const body = await readBody<GetWorkerInfoRequestBody>(event)
 
     if (!body || body.id === undefined || body.id === null) {
       logger.debug('Worker ID is required')

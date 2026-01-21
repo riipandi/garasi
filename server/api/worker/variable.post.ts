@@ -4,7 +4,7 @@ interface SetWorkerVariableParams {
   node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
 }
 
-interface SetWorkerVariableReq {
+interface SetWorkerVariableRequestBody {
   variable: string // Variable name
   value: string // Variable value
 }
@@ -25,7 +25,7 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
     }
 
-    const body = await readBody<SetWorkerVariableReq>(event)
+    const body = await readBody<SetWorkerVariableRequestBody>(event)
 
     if (!body?.variable || !body?.value) {
       logger.debug('Variable name and value are required')

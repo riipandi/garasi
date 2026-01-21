@@ -1,7 +1,7 @@
 import { defineHandler, HTTPError, getRouterParam, getQuery } from 'nitro/h3'
 
 interface GetAdminTokenInfoParams {
-  search: string
+  search?: string // Partial token ID or name to search for
 }
 
 export default defineHandler(async (event) => {
@@ -10,14 +10,15 @@ export default defineHandler(async (event) => {
   try {
     // Get information from router and query params
     const id = getRouterParam(event, 'id')
-    const { search } = getQuery<GetAdminTokenInfoParams>(event)
 
     if (!id) {
       logger.debug('Token ID is required')
       throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
     }
 
-    logger.withMetadata({ id, search }).info('Getting admin token information')
+    const { search } = getQuery<GetAdminTokenInfoParams>(event)
+
+    logger.withMetadata({ id }).info('Getting admin token information')
     const data = await gfetch('/v2/GetAdminTokenInfo', { params: { id, search } })
 
     if (!data) {

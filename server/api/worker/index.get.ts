@@ -4,7 +4,7 @@ interface ListWorkersParams {
   node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
 }
 
-interface ListWorkersReq {
+interface ListWorkersRequestBody {
   busyOnly?: boolean | null
   errorOnly?: boolean | null
 }
@@ -39,7 +39,7 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
     }
 
-    const body = await readBody<ListWorkersReq>(event)
+    const body = await readBody<ListWorkersRequestBody>(event)
     const data = await gfetch<ListWorkersResp>('/v2/ListWorkers', {
       method: 'POST',
       params: { node },

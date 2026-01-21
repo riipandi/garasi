@@ -1,8 +1,4 @@
-import { defineHandler, getQuery, getRouterParam, HTTPError } from 'nitro/h3'
-
-interface DeleteAdminTokenParams {
-  search: string
-}
+import { defineHandler, getRouterParam, HTTPError } from 'nitro/h3'
 
 export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
@@ -14,8 +10,7 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
     }
 
-    const { search } = getQuery<DeleteAdminTokenParams>(event)
-    const resp = await gfetch('/v2/DeleteAdminToken', { method: 'POST', params: { id, search } })
+    const resp = await gfetch('/v2/DeleteAdminToken', { method: 'POST', params: { id } })
 
     return { status: 'success', message: 'Delete Admin Token', data: { id, ...resp } }
   } catch (error) {

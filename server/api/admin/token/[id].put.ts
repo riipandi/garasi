@@ -1,13 +1,13 @@
 import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
 
-interface UpdateAdminTokenReq {
+interface UpdateAdminTokenRequestBody {
   name: string | null // Name of the admin API token
   expiration: string | null // Expiration time and date (RFC3339)
   neverExpires: boolean | null // Set the admin token to never expire
-  scope: string[] // Scope of the admin API token, a list of admin endpoint names
+  scope: string[] | null // Scope of the admin API token, a list of admin endpoint names
 }
 
-interface UpdateAdminTokenResp {
+interface GetAdminTokenInfoResp {
   id: string | null
   created: string | null
   name: string | null
@@ -26,8 +26,8 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
     }
 
-    const body = await readBody<UpdateAdminTokenReq>(event)
-    const resp = await gfetch<UpdateAdminTokenResp>('/v2/UpdateAdminToken', {
+    const body = await readBody<UpdateAdminTokenRequestBody>(event)
+    const resp = await gfetch<GetAdminTokenInfoResp>('/v2/UpdateAdminToken', {
       method: 'POST',
       params: { id },
       body

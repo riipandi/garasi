@@ -16,7 +16,7 @@ type RepairType =
   | 'aliases'
   | 'clearResyncQueue'
 
-interface LaunchRepairOperationReq {
+interface LaunchRepairOperationRequestBody {
   repairType: RepairType
 }
 
@@ -36,7 +36,7 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
     }
 
-    const body = await readBody<LaunchRepairOperationReq>(event)
+    const body = await readBody<LaunchRepairOperationRequestBody>(event)
 
     if (!body || !body.repairType) {
       logger.debug('Repair type is required')

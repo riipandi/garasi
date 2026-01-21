@@ -23,7 +23,7 @@ interface NodeRoleChange {
   capacity?: number | null
 }
 
-interface UpdateClusterLayoutReq {
+interface UpdateClusterLayoutRequestBody {
   roles: NodeRoleChange[]
   parameters: LayoutParameters | null
 }
@@ -50,7 +50,7 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    const body = await readBody<UpdateClusterLayoutReq>(event)
+    const body = await readBody<UpdateClusterLayoutRequestBody>(event)
 
     if (!body?.roles || !Array.isArray(body.roles)) {
       logger.debug('Roles array is required')

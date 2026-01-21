@@ -4,7 +4,7 @@ interface GetWorkerVariableParams {
   node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
 }
 
-interface GetWorkerVariableReq {
+interface GetWorkerVariableRequestBody {
   variable?: string | null // Optional variable name
 }
 
@@ -24,7 +24,7 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
     }
 
-    const body = await readBody<GetWorkerVariableReq>(event)
+    const body = await readBody<GetWorkerVariableRequestBody>(event)
     logger.withMetadata({ node, variable: body?.variable }).info('Getting worker variable')
 
     const data = await gfetch<GetWorkerVariableResp>('/v2/GetWorkerVariable', {

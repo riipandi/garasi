@@ -35,7 +35,7 @@ interface GetClusterLayoutResp {
   stagedParameters: LayoutParameters | null
 }
 
-interface ApplyClusterLayoutReq {
+interface ApplyClusterLayoutRequestBody {
   version: number
 }
 
@@ -48,7 +48,7 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    const body = await readBody<ApplyClusterLayoutReq>(event)
+    const body = await readBody<ApplyClusterLayoutRequestBody>(event)
 
     if (body?.version === undefined || body?.version === null) {
       logger.debug('Version is required')

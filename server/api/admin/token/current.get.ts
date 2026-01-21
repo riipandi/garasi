@@ -1,6 +1,6 @@
 import { defineHandler, HTTPError } from 'nitro/h3'
 
-interface GetCurrentAdminTokenInfoResp {
+interface GetAdminTokenInfoResp {
   id: string | null
   created: string | null
   name: string | null
@@ -13,8 +13,8 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    logger.info('Getting admin token information')
-    const data = await gfetch<GetCurrentAdminTokenInfoResp>('/v2/GetCurrentAdminTokenInfo')
+    logger.info('Getting current admin token information')
+    const data = await gfetch<GetAdminTokenInfoResp>('/v2/GetCurrentAdminTokenInfo')
 
     if (!data) {
       return { success: false, message: 'Admin token not found', data: null }

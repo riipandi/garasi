@@ -1,6 +1,6 @@
 import { defineHandler, HTTPError, readBody } from 'nitro/h3'
 
-interface ClusterLayoutSkipDeadNodesReq {
+interface ClusterLayoutSkipDeadNodesRequestBody {
   version: number
   allowMissingData: boolean
 }
@@ -14,7 +14,7 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    const body = await readBody<ClusterLayoutSkipDeadNodesReq>(event)
+    const body = await readBody<ClusterLayoutSkipDeadNodesRequestBody>(event)
 
     if (body?.version === undefined || body?.version === null) {
       logger.debug('Version is required')

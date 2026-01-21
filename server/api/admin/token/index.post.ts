@@ -1,14 +1,13 @@
 import { defineHandler, HTTPError, readBody } from 'nitro/h3'
 
-interface CreateAdminTokenReq {
-  name: string // Name of the admin API token
+interface UpdateAdminTokenRequestBody {
+  name: string | null // Name of the admin API token
   expiration: string | null // Expiration time and date (RFC3339)
   neverExpires: boolean | null // Set the admin token to never expire
-  scope: string[] // Scope of the admin API token, a list of admin endpoint names
+  scope: string[] | null // Scope of the admin API token, a list of admin endpoint names
 }
 
-interface CreateAdminTokenResp {
-  secretToken: string
+interface GetAdminTokenInfoResp {
   id: string | null
   created: string | null
   name: string | null
@@ -17,12 +16,16 @@ interface CreateAdminTokenResp {
   scope: string[]
 }
 
+interface CreateAdminTokenResp extends GetAdminTokenInfoResp {
+  secretToken: string
+}
+
 export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
     // Parse and validate request body
-    const body = await readBody<CreateAdminTokenReq>(event)
+    const body = await readBody<UpdateAdminTokenRequestBody>(event)
     if (!body?.name) {
       logger.debug('Name of the admin API token is required')
       throw new HTTPError({ status: 400, statusText: 'Name of the admin API token is required' })

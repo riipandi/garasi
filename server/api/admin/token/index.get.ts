@@ -1,6 +1,6 @@
 import { defineHandler, HTTPError } from 'nitro/h3'
 
-interface ListAdminTokensResp {
+interface GetAdminTokenInfoResp {
   id: string | null
   created: string | null
   name: string | null
@@ -13,7 +13,8 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    const data = await gfetch<ListAdminTokensResp>('/v2/ListAdminTokens')
+    logger.info('Listing admin tokens')
+    const data = await gfetch<GetAdminTokenInfoResp[]>('/v2/ListAdminTokens')
     return { status: 'success', message: 'List Admin Tokens', data }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
