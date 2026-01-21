@@ -1,5 +1,5 @@
 import { definePlugin } from 'nitro'
-import { getRequestIP, type H3Event } from 'nitro/h3'
+import { getRequestIP, getRequestURL, type H3Event } from 'nitro/h3'
 import { typeid } from 'typeid-js'
 import logger from '~/server/platform/logger'
 import { parseUserAgent, parseUserAgentHash } from '~/server/utils/parser'
@@ -16,10 +16,10 @@ export default definePlugin(({ hooks }) => {
   const buildWideEvent = (event: H3Event): Record<string, unknown> => {
     return {
       request_id: requestId, // Unique request ID
-      ua_hash: parseUserAgentHash(parseUserAgent(event), 'short'),
-      user_agent: parseUserAgent(event, { format: 'short' }),
+      ua_hash: parseUserAgentHash(parseUserAgent(event), 'long'),
+      ua_name: parseUserAgent(event, { format: 'short' }),
       ip_address: getRequestIP(event, { xForwardedFor: true }) || 'unknown-ip',
-      pathname: event.req._url?.pathname,
+      pathname: getRequestURL(event).pathname,
       method: event.req.method
 
       // Additional service metadata (uncomment and set env variables as needed)
@@ -35,13 +35,13 @@ export default definePlugin(({ hooks }) => {
     event.context.requestStartTime = Date.now()
 
     // Skip logging for JWKS requests to reduce noise
-    const pathname = event.req._url?.pathname || ''
+    const { pathname } = getRequestURL(event)
     if (ignoredPaths.includes(pathname) || pathname.startsWith('/.well-known')) {
       return
     }
 
     // Send the request log with wide event context
-    logger.withPrefix('REQ').withContext(buildWideEvent(event)).info('Incoming request')
+    logger.withPrefix('REQ').withContext(buildWideEvent(event)).info('Incoming request', pathname)
   })
 
   hooks.hook('response', (res: Response, event: H3Event) => {
@@ -50,7 +50,7 @@ export default definePlugin(({ hooks }) => {
     const responseTime = requestStartTime ? Date.now() - requestStartTime : null
 
     // Skip logging for JWKS requests to reduce noise
-    const pathname = event.req._url?.pathname || ''
+    const { pathname } = getRequestURL(event)
     if (ignoredPaths.includes(pathname) || pathname.startsWith('/.well-known')) {
       return
     }
@@ -63,7 +63,7 @@ export default definePlugin(({ hooks }) => {
       .withPrefix('RES')
       .withContext(buildWideEvent(event))
       .withMetadata({ status_code, response_time })
-      .info('Outgoing response')
+      .info('Outgoing response', pathname)
   })
 })
 

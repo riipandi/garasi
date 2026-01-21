@@ -90,7 +90,7 @@ COPY --from=base /usr/bin/tini /usr/bin/tini
 
 # Define the host and port to listen on.
 ARG HOST=0.0.0.0 PORT=3980 APP_LOG_TIMESTAMP=true
-ARG APP_LOG_TO_CONSOLE=true APP_LOG_TO_FILE=true
+ARG APP_LOG_TO_CONSOLE=true APP_LOG_TO_FILE=true APP_LOG_EXPANDED=false
 ENV PATH="/usr/bin:/usr/local/bin:$PATH" TINI_SUBREAPER=true
 ENV DO_NOT_TRACK=1 HOST=$HOST PORT=$PORT
 

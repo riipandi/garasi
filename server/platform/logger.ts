@@ -2,13 +2,14 @@ import { redactionPlugin } from '@loglayer/plugin-redaction'
 import { LogFileRotationTransport } from '@loglayer/transport-log-file-rotation'
 import { getSimplePrettyTerminal, moonlight } from '@loglayer/transport-simple-pretty-terminal'
 import { ConsoleTransport, LogLayer } from 'loglayer'
-import path from 'node:path'
+import { join } from 'path'
 import { serializeError } from 'serialize-error'
+import pkg from '~/package.json' with { type: 'json' }
 import { protectedEnv } from '~/shared/envars'
 
 // Define the directory and file name for log storage
-const LOG_DIR = path.join(process.cwd(), 'storage/logs')
-const LOG_FILE_NAME = `app-${protectedEnv.APP_MODE}-%DATE%.log`
+const LOG_FILE_NAME = `${pkg.name}-${protectedEnv.APP_MODE}-%DATE%.log`
+const LOG_DIRECTORY = join(process.cwd(), `storage/logs`)
 
 // Define the application mode based on envar values
 const isDevelopment = protectedEnv.APP_MODE === 'development'
@@ -27,7 +28,7 @@ const logger = new LogLayer({
     new LogFileRotationTransport({
       level: protectedEnv.APP_LOG_LEVEL,
       enabled: protectedEnv.APP_LOG_TO_FILE,
-      filename: path.join(LOG_DIR, LOG_FILE_NAME),
+      filename: join(LOG_DIRECTORY, LOG_FILE_NAME),
       dateFormat: 'YMD',
       frequency: 'daily'
     }),
@@ -36,7 +37,7 @@ const logger = new LogLayer({
     getSimplePrettyTerminal({
       level: protectedEnv.APP_LOG_LEVEL,
       enabled: isDevelopment && protectedEnv.APP_LOG_TO_CONSOLE,
-      viewMode: isDevelopment ? 'expanded' : 'inline',
+      viewMode: protectedEnv.APP_LOG_EXPANDED ? 'expanded' : 'inline',
       theme: moonlight,
       runtime: 'node'
     }),

@@ -23,6 +23,7 @@ export const publicEnv = {
  */
 export const protectedEnv = {
   ...publicEnv,
+  APP_LOG_EXPANDED: setEnv(Bun.env.APP_LOG_EXPANDED, false),
   APP_LOG_TIMESTAMP: setEnv(Bun.env.APP_LOG_TIMESTAMP, true),
   APP_LOG_TO_CONSOLE: setEnv(Bun.env.APP_LOG_TO_CONSOLE, true),
   APP_LOG_TO_FILE: setEnv(Bun.env.APP_LOG_TO_FILE, true),

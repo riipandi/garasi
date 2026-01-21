@@ -22,12 +22,12 @@ export function createErrorResonse<R = EventHandlerResponse>(
 
 export function parseError(err: any | unknown) {
   let statusCode = 500
-  let message = 'Unknown error'
+  let message = 'Unknown error occurred'
   let error: any = null
 
   if (err instanceof HTTPError) {
     statusCode = err.status
-    message = err.statusText || err.message || 'Unknown error'
+    message = err.statusText || err.message || 'Unknown error occurred'
     error = {
       type: err.name,
       status: err.status,
@@ -42,7 +42,7 @@ export function parseError(err: any | unknown) {
     if (responseData && responseData.message) {
       message = responseData.message
     } else {
-      message = err.message || 'Unknown error'
+      message = err.message || 'Unknown error occurred'
     }
     const { message: reason, ...respWithoutMessage } = responseData
     error = {
@@ -57,7 +57,7 @@ export function parseError(err: any | unknown) {
     message = err.message || 'Resource not found'
     error = { type: err.name, reason: err.message, ...formatStack(err) }
   } else if (err instanceof Error) {
-    message = err.message || 'Unknown error'
+    message = err.message || 'Unknown error occurred'
     error = { type: err.name, reason: err.message, ...formatStack(err) }
   }
 

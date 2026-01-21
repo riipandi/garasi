@@ -1,5 +1,7 @@
+import { mkdir } from 'fs/promises'
 import { definePlugin } from 'nitro'
 import { ofetch } from 'ofetch'
+import { join } from 'path'
 import logger from '~/server/platform/logger'
 import { protectedEnv } from '~/shared/envars'
 
@@ -77,6 +79,13 @@ export default definePlugin(async (_nitro) => {
   })
 
   try {
+    // Creating required directories
+    const logDirectory = join(process.cwd(), `storage/logs`)
+    logger.info('Creating log directory', logDirectory)
+    await mkdir(logDirectory, { recursive: true, mode: 0o755 }).catch((err) => {
+      logger.withError(err).error('Failed to create log directory', logDirectory)
+    })
+
     // Step 1: Check cluster status
     const clusterStatus = await gfetch<GarageClusterStatusResp>('/v2/GetClusterStatus')
     const garageVersion = clusterStatus.nodes[0]?.garageVersion
