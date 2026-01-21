@@ -14,7 +14,7 @@
     "docker:prune": "docker image rm --force $(docker image list --filter reference=$npm_package_config_image:* -q)",
     "docker:images": "docker image list --filter reference=$npm_package_config_image:*",
     "docker:migrate": "pnpm --silent run dockerx --entrypoint goose $npm_package_config_image:$npm_package_version-dev",
-    "dockerx": "docker run --platform=linux/amd64 --network=host --rm -it --env-file=.env.local -v $(pwd)/storage:/srv/storage",
+    "dockerx": "docker run --platform=linux/amd64 --network=host --rm -it --env-file=.env.local -v $(pwd)/storage:/srv/storage:rw",
     "compose:cleanup": "docker compose -f compose.yaml down --remove-orphans --volumes",
     "compose:up": "docker compose -f compose.yaml up --detach --remove-orphans",
     "compose:down": "docker compose -f compose.yaml down --remove-orphans",
