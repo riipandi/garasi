@@ -1,4 +1,5 @@
 import { defineEventHandler, getQuery, HTTPError } from 'h3'
+import { createErrorResonse } from '~/server/platform/responder'
 
 export default defineEventHandler(async (event) => {
   const { db } = event.context
@@ -38,9 +39,6 @@ export default defineEventHandler(async (event) => {
     // Token is valid
     return { success: true, message: 'Token valid', data: { is_token_valid: true } }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    return { status: 'error', message, errors }
+    return createErrorResonse(event, error)
   }
 })

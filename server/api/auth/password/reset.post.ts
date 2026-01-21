@@ -1,4 +1,5 @@
 import { defineEventHandler, readBody, getQuery, HTTPError } from 'h3'
+import { createErrorResonse } from '~/server/platform/responder'
 import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
 interface ResetPasswordBody {
@@ -79,9 +80,6 @@ export default defineEventHandler(async (event) => {
       data: null
     }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    return { status: 'error', message, errors }
+    return createErrorResonse(event, error)
   }
 })

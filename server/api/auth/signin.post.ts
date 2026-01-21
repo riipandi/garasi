@@ -1,11 +1,9 @@
 import { defineHandler, getRequestIP, HTTPError, readBody } from 'nitro/h3'
 import { generateTokenPair } from '~/server/platform/jwt'
-import {
-  createSession,
-  storeRefreshToken,
-  cleanupExpiredSessions,
-  cleanupExpiredRefreshTokens
-} from '~/server/services/session.service'
+import { createErrorResonse } from '~/server/platform/responder'
+import { createSession, storeRefreshToken } from '~/server/services/session.service'
+import { cleanupExpiredSessions } from '~/server/services/session.service'
+import { cleanupExpiredRefreshTokens } from '~/server/services/session.service'
 import { parseUserAgent } from '~/server/utils/parser'
 
 export default defineHandler(async (event) => {
@@ -88,9 +86,6 @@ export default defineHandler(async (event) => {
       }
     }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    return { success: false, message, data: null, errors }
+    return createErrorResonse(event, error)
   }
 })

@@ -1,6 +1,7 @@
-import { defineHandler, getQuery, HTTPError } from 'nitro/h3'
+import { defineHandler, getQuery } from 'nitro/h3'
 import { parseBoolean } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
+import { createErrorResonse } from '../platform/responder'
 
 interface MetricValue {
   labels: Record<string, string>
@@ -16,7 +17,7 @@ interface ParsedMetric {
 type ParsedMetrics = Record<string, ParsedMetric>
 
 export default defineHandler(async (event) => {
-  const { gfetch, logger } = event.context
+  const { gfetch } = event.context
 
   try {
     const { raw } = getQuery<{ raw: string | null }>(event)
@@ -29,11 +30,7 @@ export default defineHandler(async (event) => {
 
     return !printRaw ? response : data
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    logger.withMetadata({ status: event.res.status }).withError(error).error(message)
-    return { success: false, message, data: null, errors }
+    return createErrorResonse(event, error)
   }
 })
 

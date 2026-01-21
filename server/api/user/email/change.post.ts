@@ -2,6 +2,7 @@ import { HTTPError, readBody } from 'nitro/h3'
 import { typeid } from 'typeid-js'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { sendMail } from '~/server/platform/mailer'
+import { createErrorResonse } from '~/server/platform/responder'
 import { protectedEnv } from '~/shared/envars'
 
 interface ChangeEmailBody {
@@ -129,9 +130,6 @@ export default defineProtectedHandler(async (event) => {
       data: isDev ? { token, confirm_link: confirmLink, expires_at: expiresAt } : null
     }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    return { success: false, message, data: null, errors }
+    return createErrorResonse(event, error)
   }
 })

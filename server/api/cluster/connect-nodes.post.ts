@@ -1,4 +1,5 @@
 import { defineHandler, HTTPError, readBody } from 'nitro/h3'
+import { createErrorResonse } from '~/server/platform/responder'
 
 interface ConnectClusterNodesRequestBody {
   nodes: string[] // Array of node addresses in format "node_id@net_address"
@@ -31,10 +32,6 @@ export default defineHandler(async (event) => {
 
     return { status: 'success', message: 'Connect Cluster Nodes', data }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    logger.withMetadata({ status: event.res.status }).withError(error).error(message)
-    return { success: false, message, data: null, errors }
+    return createErrorResonse(event, error)
   }
 })

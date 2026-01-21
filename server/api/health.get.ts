@@ -1,16 +1,13 @@
-import { defineHandler, HTTPError } from 'nitro/h3'
+import { defineHandler } from 'nitro/h3'
+import { createErrorResonse } from '../platform/responder'
 
 export default defineHandler(async (event) => {
-  const { gfetch, logger } = event.context
+  const { gfetch } = event.context
   try {
     const data = await gfetch<string>('/health')
     const message = data.substring(0, data.indexOf('\n'))
     return { status: 'success', message }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    logger.withMetadata({ status: event.res.status }).withError(error).error(message)
-    return { success: false, message, data: null, errors }
+    return createErrorResonse(event, error)
   }
 })

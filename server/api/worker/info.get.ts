@@ -1,4 +1,5 @@
 import { defineHandler, HTTPError, getQuery, readBody } from 'nitro/h3'
+import { createErrorResonse } from '~/server/platform/responder'
 
 interface GetWorkerInfoParams {
   node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
@@ -54,10 +55,6 @@ export default defineHandler(async (event) => {
 
     return { status: 'success', message: 'Get Worker Info', data }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    logger.withMetadata({ status: event.res.status }).withError(error).error(message)
-    return { success: false, message, data: null, errors }
+    return createErrorResonse(event, error)
   }
 })

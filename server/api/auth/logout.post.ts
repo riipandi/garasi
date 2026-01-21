@@ -1,5 +1,6 @@
 import { defineHandler, HTTPError, readBody } from 'nitro/h3'
 import { verifyRefreshToken } from '~/server/platform/jwt'
+import { createErrorResonse } from '~/server/platform/responder'
 import { deactivateSession, revokeRefreshToken } from '~/server/services/session.service'
 
 export default defineHandler(async (event) => {
@@ -38,9 +39,6 @@ export default defineHandler(async (event) => {
       data: null
     }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    return { success: false, message, data: null, errors }
+    return createErrorResonse(event, error)
   }
 })

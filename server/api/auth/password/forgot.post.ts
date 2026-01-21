@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody, HTTPError } from 'h3'
 import { typeid } from 'typeid-js'
 import { sendMail } from '~/server/platform/mailer'
+import { createErrorResonse } from '~/server/platform/responder'
 import { protectedEnv } from '~/shared/envars'
 
 interface ForgotPasswordBody {
@@ -71,9 +72,6 @@ export default defineEventHandler(async (event) => {
       data: isDev ? { token, reset_link: resetLink, expires_at: expiresAt } : null
     }
   } catch (error) {
-    event.res.status = error instanceof HTTPError ? error.status : 500
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.stack : null
-    return { status: 'error', message, errors }
+    return createErrorResonse(event, error)
   }
 })
