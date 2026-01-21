@@ -1,18 +1,14 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
+import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
 
-interface CreateBucketLocalAlias {
-  accessKeyId: string // ID of the access key to which the local alias is attached
-  alias: string // Local alias for the bucket
-  allow?: {
-    owner?: boolean // Allow owner permissions
-    read?: boolean // Allow read permissions
-    write?: boolean // Allow write permissions
-  }
+interface ApiBucketKeyPerm {
+  owner?: boolean // Deny owner permissions
+  read?: boolean // Deny read permissions
+  write?: boolean // Deny write permissions
 }
 
-interface CreateBucketRequestBody {
-  globalAlias?: string | null // Global alias for the bucket
-  localAlias?: CreateBucketLocalAlias | null // Local alias for the bucket
+interface DenyBucketKeyRequestBody {
+  accessKeyId: string // ID of access key
+  permissions: ApiBucketKeyPerm // Permissions to deny
 }
 
 interface GetBucketInfoResponse {
@@ -54,24 +50,29 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    const body = await readBody<CreateBucketRequestBody>(event)
-    if (!body?.globalAlias && !body?.localAlias) {
-      logger.debug('Either globalAlias or localAlias is required')
-      throw new HTTPError({
-        status: 400,
-        statusText: 'Either globalAlias or localAlias is required'
-      })
+    const id = getRouterParam(event, 'id')
+    if (!id) {
+      logger.debug('Bucket ID is required')
+      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
     }
 
-    logger
-      .withMetadata({ globalAlias: body.globalAlias, localAlias: body.localAlias?.alias })
-      .info('Creating bucket')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/CreateBucket', {
+    const body = await readBody<DenyBucketKeyRequestBody>(event)
+    if (!body?.accessKeyId) {
+      logger.debug('Access Key ID is required')
+      throw new HTTPError({ status: 400, statusText: 'Access Key ID is required' })
+    }
+    if (!body?.permissions) {
+      logger.debug('Permissions are required')
+      throw new HTTPError({ status: 400, statusText: 'Permissions are required' })
+    }
+
+    logger.withMetadata({ bucketId: id, accessKeyId: body.accessKeyId }).info('Denying bucket key')
+    const data = await gfetch<GetBucketInfoResponse>('/v2/DenyBucketKey', {
       method: 'POST',
-      body
+      body: { ...body, bucketId: id }
     })
 
-    return { status: 'success', message: 'Create Bucket', data }
+    return { status: 'success', message: 'Deny Bucket Key', data }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'

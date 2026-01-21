@@ -1,18 +1,9 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
+import { defineHandler, HTTPError, getQuery, getRouterParam } from 'nitro/h3'
 
-interface CreateBucketLocalAlias {
-  accessKeyId: string // ID of the access key to which the local alias is attached
-  alias: string // Local alias for the bucket
-  allow?: {
-    owner?: boolean // Allow owner permissions
-    read?: boolean // Allow read permissions
-    write?: boolean // Allow write permissions
-  }
-}
-
-interface CreateBucketRequestBody {
-  globalAlias?: string | null // Global alias for the bucket
-  localAlias?: CreateBucketLocalAlias | null // Local alias for the bucket
+interface GetBucketInfoParams {
+  id?: string // Exact bucket ID to look up
+  globalAlias?: string // Global alias of bucket to look up
+  search?: string // Partial ID or alias to search for
 }
 
 interface GetBucketInfoResponse {
@@ -54,24 +45,24 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    const body = await readBody<CreateBucketRequestBody>(event)
-    if (!body?.globalAlias && !body?.localAlias) {
-      logger.debug('Either globalAlias or localAlias is required')
-      throw new HTTPError({
-        status: 400,
-        statusText: 'Either globalAlias or localAlias is required'
-      })
+    const id = getRouterParam(event, 'id')
+    if (!id) {
+      logger.debug('Bucket ID is required')
+      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
     }
 
-    logger
-      .withMetadata({ globalAlias: body.globalAlias, localAlias: body.localAlias?.alias })
-      .info('Creating bucket')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/CreateBucket', {
-      method: 'POST',
-      body
+    const { globalAlias, search } = getQuery<GetBucketInfoParams>(event)
+
+    logger.withMetadata({ id, globalAlias, search }).info('Getting bucket information')
+    const data = await gfetch<GetBucketInfoResponse>('/v2/GetBucketInfo', {
+      params: { id, globalAlias, search }
     })
 
-    return { status: 'success', message: 'Create Bucket', data }
+    if (!data) {
+      return { success: false, message: 'Bucket not found', data: null }
+    }
+
+    return { status: 'success', message: 'Get Bucket Info', data }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'

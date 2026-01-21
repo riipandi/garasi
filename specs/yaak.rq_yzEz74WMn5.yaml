@@ -2,13 +2,24 @@ type: http_request
 model: http_request
 id: rq_yzEz74WMn5
 createdAt: 2026-01-19T20:20:51.035958
-updatedAt: 2026-01-21T09:12:51.157748
+updatedAt: 2026-01-21T10:21:32.904392
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
 authenticationType: null
 body:
-  text: '{}'
+  text: |-
+    {
+      "websiteAccess": {
+        "enabled": false,
+        "indexDocument": "index.html",
+        "errorDocument": "error.html"
+      },
+      "quotas": {
+        "maxObjects": null,
+        "maxSize": null
+      }
+    }
 bodyType: application/json
 description: ''
 headers:
@@ -18,6 +29,10 @@ headers:
     id: Ufn3DVFbIC
 method: PUT
 name: Update Bucket
-sortPriority: 3000.0030000000006
-url: ${[ baseURL ]}/api/bucket
-urlParameters: []
+sortPriority: 7000.0
+url: ${[ baseURL ]}/api/bucket/:id
+urlParameters:
+  - enabled: true
+    name: :id
+    value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_CbPTEnV8Er', path=b64'JC5kYXRhWzBdLmlk') ]}
+    id: 5nYpQGDYst

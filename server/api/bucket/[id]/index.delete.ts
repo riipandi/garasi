@@ -1,22 +1,19 @@
-import { defineHandler, HTTPError } from 'nitro/h3'
-
-interface ListBucketsResponseItem {
-  id: string
-  created: string
-  globalAliases: string[]
-  localAliases: Array<{
-    accessKeyId: string
-    alias: string
-  }>
-}
+import { defineHandler, getRouterParam, HTTPError } from 'nitro/h3'
 
 export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    logger.info('Listing buckets')
-    const data = await gfetch<ListBucketsResponseItem[]>('/v2/ListBuckets')
-    return { status: 'success', message: 'List Buckets', data }
+    const id = getRouterParam(event, 'id')
+    if (!id) {
+      logger.debug('Bucket ID is required')
+      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
+    }
+
+    logger.withMetadata({ id }).info('Deleting bucket')
+    await gfetch('/v2/DeleteBucket', { method: 'POST', params: { id } })
+
+    return { status: 'success', message: 'Delete Bucket', data: { id } }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'

@@ -2,18 +2,34 @@ type: http_request
 model: http_request
 id: rq_BHB3xiRh2Q
 createdAt: 2026-01-19T20:20:26.586459
-updatedAt: 2026-01-19T20:22:00.544576
+updatedAt: 2026-01-21T10:21:32.906665
 workspaceId: wk_YrPa97TLKc
-folderId: fl_QEMJCxv2ZS
+folderId: fl_7Ew2sdp7wt
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: |-
+    {
+      "accessKeyId": "",
+      "permissions": {
+        "owner": true,
+        "read": true,
+        "write": true
+      }
+    }
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: xEk4B32Ki8
+method: POST
 name: Allow Bucket Key
-sortPriority: 0.001
-url: ${[ baseURL ]}/api/bucket
-urlParameters: []
+sortPriority: 11000.0
+url: ${[ baseURL ]}/api/bucket/:id/allow-key
+urlParameters:
+  - enabled: true
+    name: :id
+    value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_CbPTEnV8Er', path=b64'JC5kYXRhWzBdLmlk') ]}
+    id: r7X27ubuY9

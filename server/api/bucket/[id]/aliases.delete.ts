@@ -1,18 +1,11 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
+import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
 
-interface CreateBucketLocalAlias {
-  accessKeyId: string // ID of the access key to which the local alias is attached
-  alias: string // Local alias for the bucket
-  allow?: {
-    owner?: boolean // Allow owner permissions
-    read?: boolean // Allow read permissions
-    write?: boolean // Allow write permissions
+interface RemoveBucketAliasRequestBody {
+  globalAlias?: string // Global alias to remove
+  localAlias?: {
+    accessKeyId: string // ID of access key to which local alias is attached
+    alias: string // Local alias to remove
   }
-}
-
-interface CreateBucketRequestBody {
-  globalAlias?: string | null // Global alias for the bucket
-  localAlias?: CreateBucketLocalAlias | null // Local alias for the bucket
 }
 
 interface GetBucketInfoResponse {
@@ -54,7 +47,14 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
 
   try {
-    const body = await readBody<CreateBucketRequestBody>(event)
+    const id = getRouterParam(event, 'id')
+    if (!id) {
+      logger.debug('Bucket ID is required')
+      throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
+    }
+
+    const body = await readBody<RemoveBucketAliasRequestBody>(event)
+
     if (!body?.globalAlias && !body?.localAlias) {
       logger.debug('Either globalAlias or localAlias is required')
       throw new HTTPError({
@@ -64,14 +64,18 @@ export default defineHandler(async (event) => {
     }
 
     logger
-      .withMetadata({ globalAlias: body.globalAlias, localAlias: body.localAlias?.alias })
-      .info('Creating bucket')
-    const data = await gfetch<GetBucketInfoResponse>('/v2/CreateBucket', {
+      .withMetadata({
+        bucketId: id,
+        globalAlias: body.globalAlias,
+        localAlias: body.localAlias?.alias
+      })
+      .info('Removing bucket alias')
+    const data = await gfetch<GetBucketInfoResponse>('/v2/RemoveBucketAlias', {
       method: 'POST',
-      body
+      body: { ...body, bucketId: id }
     })
 
-    return { status: 'success', message: 'Create Bucket', data }
+    return { status: 'success', message: 'Remove Bucket Alias', data }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'
