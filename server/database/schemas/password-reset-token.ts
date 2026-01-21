@@ -2,9 +2,9 @@ import type { Generated } from 'kysely'
 
 export interface PasswordResetTokenTable {
   id: Generated<string>
-  user_id: string
+  userId: string
   token: string
-  expires_at: number
+  expiresAt: number
   used: number
-  created_at?: number
+  createdAt?: number
 }

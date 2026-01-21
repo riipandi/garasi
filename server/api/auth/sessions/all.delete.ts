@@ -7,10 +7,10 @@ export default defineProtectedHandler(async (event) => {
 
   try {
     // Deactivate all sessions for the user
-    const deactivatedCount = await deactivateAllSessions(db, String(auth.userId))
+    const deactivatedCount = await deactivateAllSessions(db, auth.userId)
 
     // Revoke all refresh tokens for the user
-    const revokedCount = await revokeUserRefreshTokens(db, String(auth.userId))
+    const revokedCount = await revokeUserRefreshTokens(db, auth.userId)
 
     // Return success message
     return {

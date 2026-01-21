@@ -10,15 +10,15 @@ export default defineProtectedHandler(async (event) => {
 
   try {
     // Deactivate all other sessions for the user
-    const deactivatedCount = await deactivateOtherSessions(db, String(auth.userId), auth.sessionId)
+    const deactivatedCount = await deactivateOtherSessions(db, auth.userId, auth.sessionId)
 
     // Get all sessions for the user to find the ones we just deactivated
     const allSessions = await db
       .selectFrom('sessions')
       .select(['id'])
-      .where('user_id', '=', String(auth.userId))
+      .where('userId', '=', auth.userId)
       .where('id', '!=', auth.sessionId)
-      .where('is_active', '=', 0)
+      .where('isActive', '=', 0)
       .execute()
 
     // Revoke refresh tokens for all deactivated sessions

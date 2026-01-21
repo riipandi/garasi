@@ -30,7 +30,7 @@ export default defineProtectedHandler(async (event) => {
     const user = await db
       .selectFrom('users')
       .select(['id', 'name', 'email'])
-      .where('id', '=', String(auth.userId))
+      .where('id', '=', auth.userId)
       .executeTakeFirst()
 
     // Check if user exists
@@ -43,9 +43,9 @@ export default defineProtectedHandler(async (event) => {
       .updateTable('users')
       .set({
         name: body.name.trim(),
-        updated_at: Math.floor(Date.now() / 1000)
+        updatedAt: Math.floor(Date.now() / 1000)
       })
-      .where('id', '=', String(auth.userId))
+      .where('id', '=', auth.userId)
       .returning(['id', 'email', 'name'])
       .executeTakeFirstOrThrow()
 

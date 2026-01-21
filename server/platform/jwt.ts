@@ -1,6 +1,8 @@
 import { SignJWT, jwtVerify, type JWTPayload } from 'jose'
-import { UAParser } from 'ua-parser-js'
+import { UAParser, type IResult } from 'ua-parser-js'
+import logger from '~/server/platform/logger'
 import { protectedEnv } from '~/shared/envars'
+import { parseUserAgentHash } from '../utils/parser'
 
 /**
  * JWT Token payload structure using standard JWT claims
@@ -40,9 +42,14 @@ export async function hashUserAgent(userAgent: string): Promise<string> {
  * @param userAgent - User agent string from request headers
  * @returns Hashed user agent string for JWT audience
  */
-export async function generateAudienceFromUserAgent(userAgent: string): Promise<string> {
+export async function generateAudienceFromUserAgent(
+  userAgent: string | IResult | null
+): Promise<string> {
+  // Convert userAgent to string (handle IResult and null cases)
+  const uaStringInput = typeof userAgent === 'string' ? userAgent : userAgent?.ua || 'unknown'
+
   // Parse user agent to get consistent format
-  const parser = new UAParser(userAgent)
+  const parser = new UAParser(uaStringInput)
   const ua = parser.getResult()
 
   // Create a consistent string from user agent components
@@ -93,7 +100,7 @@ export async function generateToken(payload: JWTClaims, expiresIn: number): Prom
  */
 export async function generateTokenPair(
   user: { userId: string; sessionId?: string },
-  userAgent: string
+  userAgent: string | IResult | null
 ): Promise<{
   accessToken: string
   refreshToken: string
@@ -103,7 +110,7 @@ export async function generateTokenPair(
   const accessTokenExpiry = protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY
   const refreshTokenExpiry = protectedEnv.PUBLIC_JWT_REFRESH_TOKEN_EXPIRY
   const issuer = protectedEnv.PUBLIC_BASE_URL
-  const audience = await generateAudienceFromUserAgent(userAgent)
+  const audience = parseUserAgentHash(userAgent, 'long')
   const now = Math.floor(Date.now() / 1000)
 
   const accessToken = await generateToken(
@@ -158,7 +165,7 @@ export async function verifyToken(token: string): Promise<JWTClaims> {
     const { payload } = await jwtVerify(token, secret)
     return payload as unknown as JWTClaims
   } catch (error) {
-    console.error('Invalid or expired token', error)
+    logger.withError(error).error('Invalid or expired token')
     throw new Error('Invalid or expired token')
   }
 }

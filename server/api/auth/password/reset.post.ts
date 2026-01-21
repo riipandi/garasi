@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if token is expired
     const now = Math.floor(Date.now() / 1000)
-    if (resetToken.expires_at < now) {
+    if (resetToken.expiresAt < now) {
       throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 
@@ -55,8 +55,8 @@ export default defineEventHandler(async (event) => {
     // Update user password
     await db
       .updateTable('users')
-      .set({ password_hash: passwordHash })
-      .where('id', '=', resetToken.user_id)
+      .set({ passwordHash })
+      .where('id', '=', resetToken.userId)
       .execute()
 
     // Mark token as used
@@ -67,10 +67,10 @@ export default defineEventHandler(async (event) => {
       .execute()
 
     // Revoke all refresh tokens for security
-    await revokeUserRefreshTokens(db, resetToken.user_id)
+    await revokeUserRefreshTokens(db, resetToken.userId)
 
     // Deactivate all sessions for security
-    await deactivateAllSessions(db, resetToken.user_id)
+    await deactivateAllSessions(db, resetToken.userId)
 
     return {
       success: true,

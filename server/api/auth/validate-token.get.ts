@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if token is expired
     const now = Math.floor(Date.now() / 1000)
-    if (resetToken.expires_at < now) {
+    if (resetToken.expiresAt < now) {
       throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 

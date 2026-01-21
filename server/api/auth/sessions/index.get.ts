@@ -7,7 +7,7 @@ export default defineProtectedHandler(async (event) => {
 
   try {
     // Get all active sessions for the user
-    const sessions = await getUserSessions(db, String(auth.userId))
+    const sessions = await getUserSessions(db, auth.userId)
 
     // Return sessions
     return {

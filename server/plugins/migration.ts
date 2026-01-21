@@ -2,10 +2,11 @@ import { Migrator } from 'kysely'
 import { definePlugin } from 'nitro'
 import { dbClient } from '~/server/database/db.client'
 import { createMigrationProvider } from '~/server/database/db.migrator'
+import logger from '~/server/platform/logger'
 
 export default definePlugin(async (_nitro) => {
   // Run database migration once during server startup
-  console.info('Starting database migration...')
+  logger.info('Starting database migration...')
 
   // Use the in-memory migration provider instead of FileMigrationProvider.
   // This allows migrations to be bundled with the code and run in production
@@ -13,7 +14,7 @@ export default definePlugin(async (_nitro) => {
   const migrationProvider = createMigrationProvider()
   const migrator = new Migrator({ db: dbClient, provider: migrationProvider })
 
-  console.info('Running migrations to latest version...')
+  logger.info('Running migrations to latest version...')
 
   const { error, results } = await migrator.migrateToLatest()
 
@@ -23,10 +24,10 @@ export default definePlugin(async (_nitro) => {
 
     results.forEach((it) => {
       if (it.status === 'Success') {
-        console.info(`- Migration "${it.migrationName}" executed successfully`)
+        logger.info(`- Migration "${it.migrationName}" executed successfully`)
         executedCount++
       } else if (it.status === 'Error') {
-        console.error(`- Failed to execute migration "${it.migrationName}"`)
+        logger.error(`- Failed to execute migration "${it.migrationName}"`)
       }
     })
 
@@ -36,18 +37,17 @@ export default definePlugin(async (_nitro) => {
     )
     skippedCount = filteredResult.length - executedCount
 
-    console.info('Migration summary:')
-    console.info(`  - Executed: ${executedCount}`)
-    console.info(`  - Already up to date: ${skippedCount}`)
+    logger.info('Migration summary:')
+    logger.info(`  - Executed: ${executedCount}`)
+    logger.info(`  - Already up to date: ${skippedCount}`)
   } else {
-    console.info('No migrations to run (database is up to date)')
+    logger.info('No migrations to run (database is up to date)')
   }
 
   if (error) {
-    console.error('Migration failed')
-    console.error(error)
+    logger.withError(error).error('Migration failed')
     process.exit(1)
   }
 
-  console.info('Database migration completed successfully')
+  logger.info('Database migration completed successfully')
 })

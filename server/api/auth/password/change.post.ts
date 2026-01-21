@@ -38,8 +38,8 @@ export default defineProtectedHandler(async (event) => {
     // Find user by ID
     const user = await db
       .selectFrom('users')
-      .select(['id', 'password_hash'])
-      .where('id', '=', String(auth.userId))
+      .select(['id', 'passwordHash'])
+      .where('id', '=', auth.userId)
       .executeTakeFirst()
 
     // Check if user exists
@@ -48,7 +48,7 @@ export default defineProtectedHandler(async (event) => {
     }
 
     // Verify current password
-    const isPasswordValid = await Bun.password.verify(body.current_password, user.password_hash)
+    const isPasswordValid = await Bun.password.verify(body.current_password, user.passwordHash)
 
     if (!isPasswordValid) {
       throw new HTTPError({ status: 401, statusText: 'Current password is incorrect' })
@@ -60,15 +60,15 @@ export default defineProtectedHandler(async (event) => {
     // Update user password
     await db
       .updateTable('users')
-      .set({ password_hash: newPasswordHash })
-      .where('id', '=', String(auth.userId))
+      .set({ passwordHash: newPasswordHash })
+      .where('id', '=', auth.userId)
       .execute()
 
     // Revoke all refresh tokens for security
-    const revokedCount = await revokeUserRefreshTokens(db, String(auth.userId))
+    const revokedCount = await revokeUserRefreshTokens(db, auth.userId)
 
     // Deactivate all sessions for security
-    const deactivatedCount = await deactivateAllSessions(db, String(auth.userId))
+    const deactivatedCount = await deactivateAllSessions(db, auth.userId)
 
     // Return success message
     return {

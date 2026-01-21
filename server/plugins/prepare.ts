@@ -1,5 +1,6 @@
 import { definePlugin } from 'nitro'
 import { ofetch } from 'ofetch'
+import logger from '~/server/platform/logger'
 import { protectedEnv } from '~/shared/envars'
 
 interface GarageClusterStatusResp {
@@ -67,6 +68,8 @@ interface ApplyClusterLayoutResp {
 
 // Run Garage S3 initial setup (cluster layout)
 export default definePlugin(async (_nitro) => {
+  logger.info('Preparing Garage S3 cluster layout...')
+
   // Create fetcher instance for Garage S3
   const gfetch = ofetch.create({
     baseURL: protectedEnv.GARAGE_ADMIN_API,
@@ -81,10 +84,13 @@ export default definePlugin(async (_nitro) => {
     const nodeId = clusterStatus.nodes[0]?.id
 
     // Skip if current layout version >= 1
-    if (layoutVersion >= 1) return
+    if (layoutVersion >= 1) {
+      logger.info('Garage S3 cluster layout setup skipped, current version:', layoutVersion)
+      return
+    }
 
     // Step 2: Prepare new cluster layout (default: 10GB)
-    console.info(`Preparing cluster layout for Garage ${garageVersion}`)
+    logger.info(`Preparing cluster layout for Garage ${garageVersion}`)
     const defaultCapacity = protectedEnv.GARAGE_DEFAULT_CAPACITY
     const defaultZoneRedudancy = protectedEnv.GARAGE_DEFAULT_ZONE_REDUNDANCY
     await gfetch<UpdateClusterLayoutResp>('/v2/UpdateClusterLayout', {
@@ -101,11 +107,11 @@ export default definePlugin(async (_nitro) => {
       body: { version: layoutVersion + 1 }
     })
     const newLayoutVersion = applyClusterLayout.layout.version
-    console.info('\n', applyClusterLayout.message.join('\n'))
+    logger.info(applyClusterLayout.message.join('\n'))
 
-    console.info(`Garage S3 cluster layout ready with version ${newLayoutVersion}`)
+    logger.info(`Garage S3 cluster layout ready with version ${newLayoutVersion}`)
   } catch (error) {
-    console.error('Garage S3 cluster layout setup failed', error)
+    logger.withError(error).error('Garage S3 cluster layout setup failed')
     process.exit(1)
   }
 })

@@ -52,7 +52,7 @@ export function parseUserAgent(
   return uaParser.getResult()
 }
 
-function isIResult(v: any): v is IResult {
+export function isIResult(v: any): v is IResult {
   return (
     v != null &&
     typeof v === 'object' &&
@@ -68,8 +68,8 @@ function isIResult(v: any): v is IResult {
 export function parseUserAgentHash(
   userAgent: string | IResult | null,
   format: 'short' | 'long' = 'short'
-): string | null {
-  if (userAgent == null) return null
+): string {
+  // if (userAgent == null) return null
   const uaString = isIResult(userAgent) ? userAgent.ua : userAgent
   const uaBytes = new TextEncoder().encode(String(uaString))
   return format === 'short' ? hashBlake(uaBytes, 8) : hashBlake(uaBytes, 16)

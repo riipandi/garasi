@@ -1,4 +1,4 @@
-import { defineHandler, HTTPError, readBody } from 'nitro/h3'
+import { defineHandler, getRequestIP, HTTPError, readBody } from 'nitro/h3'
 import { generateTokenPair } from '~/server/platform/jwt'
 import {
   createSession,
@@ -6,9 +6,10 @@ import {
   cleanupExpiredSessions,
   cleanupExpiredRefreshTokens
 } from '~/server/services/session.service'
+import { parseUserAgent } from '~/server/utils/parser'
 
 export default defineHandler(async (event) => {
-  const { db } = event.context
+  const { db, logger } = event.context
 
   try {
     // Parse request body
@@ -16,38 +17,43 @@ export default defineHandler(async (event) => {
 
     // Validate required fields
     if (!body?.email || !body?.password) {
+      logger.debug('Email and password are required')
       throw new HTTPError({ status: 400, statusText: 'Email and password are required' })
     }
 
     // Find user by email
     const user = await db
       .selectFrom('users')
-      .select(['id', 'email', 'name', 'password_hash'])
+      .select(['id', 'email', 'name', 'passwordHash'])
       .where('email', '=', body.email)
       .executeTakeFirst()
 
     // Check if user exists
     if (!user) {
+      logger.withMetadata({ email: body.email }).debug('User not found')
       throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
     // Verify password using Bun's password.verify
-    const isPasswordValid = await Bun.password.verify(body.password, user.password_hash)
-
+    const isPasswordValid = await Bun.password.verify(body.password, user.passwordHash)
     if (!isPasswordValid) {
+      logger.withMetadata({ email: body.email }).debug('Password validation failed')
       throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
     // Get user agent and IP address from request
-    const userAgent = event.req.headers.get('user-agent') || 'unknown'
-    const ipAddress =
-      event.req.headers.get('x-forwarded-for') || event.req.headers.get('x-real-ip') || 'unknown'
+    const userAgent = parseUserAgent(event, { format: 'raw' })
+    const ipAddress = getRequestIP(event, { xForwardedFor: true }) || 'unknown-ip'
 
     // Create a new session in the database first
     const { sessionId, sessionRecord } = await createSession(db, user.id, ipAddress, userAgent)
 
+    if (!sessionId || !sessionRecord) {
+      logger.withMetadata({ sessionId, sessionRecord }).debug('Failed to create session')
+    }
+
     // Generate JWT tokens with user agent hash and session ID
-    const tokens = await generateTokenPair({ userId: String(user.id), sessionId }, userAgent)
+    const tokens = await generateTokenPair({ userId: user.id, sessionId }, userAgent)
 
     // Store the refresh token in the database
     await storeRefreshToken(
@@ -58,10 +64,14 @@ export default defineHandler(async (event) => {
       tokens.refreshTokenExpiry
     )
 
-    // Clean up expired sessions and refresh tokens (background task)
-    cleanupExpiredSessions(db).catch((err) => console.error('Error cleaning up sessions:', err))
-    cleanupExpiredRefreshTokens(db).catch((err) =>
-      console.error('Error cleaning up refresh tokens:', err)
+    // Clean up expired sessions
+    cleanupExpiredSessions(db).catch((error) =>
+      logger.withError(error).error('Error cleaning up sessions')
+    )
+
+    // Cleanup expired refresh tokens
+    cleanupExpiredRefreshTokens(db).catch((error) =>
+      logger.withError(error).error('Error cleaning up refresh tokens')
     )
 
     // Return user data with JWT tokens and session info
@@ -69,7 +79,7 @@ export default defineHandler(async (event) => {
       success: true,
       message: null,
       data: {
-        user_id: String(user.id),
+        user_id: user.id,
         email: user.email,
         name: user.name,
         session_id: sessionId,

@@ -25,9 +25,7 @@ export async function up(db: DBContext): Promise<void> {
 
   await db
     .insertInto('users')
-    .values([
-      { id: userId, name: 'Admin Sistem', email: 'admin@example.com', password_hash: passwordHash }
-    ])
+    .values([{ id: userId, name: 'Admin Sistem', email: 'admin@example.com', passwordHash }])
     .onConflict((oc) => oc.column('email').doNothing())
     .execute()
 }

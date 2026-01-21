@@ -44,9 +44,9 @@ export default defineEventHandler(async (event) => {
       .insertInto('password_reset_tokens')
       .values({
         id: typeid('password_reset_token').toString(),
-        user_id: user.id,
+        userId: user.id,
         token,
-        expires_at: expiresAt,
+        expiresAt: expiresAt,
         used: 0
       })
       .execute()

@@ -33,8 +33,8 @@ export default defineProtectedHandler(async (event) => {
     // Find current user
     const user = await db
       .selectFrom('users')
-      .select(['id', 'email', 'name', 'password_hash'])
-      .where('id', '=', String(auth.userId))
+      .select(['id', 'email', 'name', 'passwordHash'])
+      .where('id', '=', auth.userId)
       .executeTakeFirst()
 
     // Check if user exists
@@ -43,7 +43,7 @@ export default defineProtectedHandler(async (event) => {
     }
 
     // Verify password
-    const isPasswordValid = await Bun.password.verify(body.password, user.password_hash)
+    const isPasswordValid = await Bun.password.verify(body.password, user.passwordHash)
 
     if (!isPasswordValid) {
       throw new HTTPError({ status: 401, statusText: 'Incorrect password' })
@@ -71,10 +71,10 @@ export default defineProtectedHandler(async (event) => {
     // Check if there's already a pending email change request for this user
     const pendingRequest = await db
       .selectFrom('email_change_tokens')
-      .select(['id', 'expires_at'])
-      .where('user_id', '=', user.id)
+      .select(['id', 'expiresAt'])
+      .where('userId', '=', user.id)
       .where('used', '=', 0)
-      .where('expires_at', '>', Math.floor(Date.now() / 1000))
+      .where('expiresAt', '>', Math.floor(Date.now() / 1000))
       .executeTakeFirst()
 
     if (pendingRequest) {
@@ -94,11 +94,11 @@ export default defineProtectedHandler(async (event) => {
       .insertInto('email_change_tokens')
       .values({
         id: typeid('email_change_token').toString(),
-        user_id: user.id,
-        old_email: user.email,
-        new_email: normalizedNewEmail,
+        userId: user.id,
+        oldEmail: user.email,
+        newEmail: normalizedNewEmail,
         token,
-        expires_at: expiresAt,
+        expiresAt: expiresAt,
         used: 0
       })
       .execute()

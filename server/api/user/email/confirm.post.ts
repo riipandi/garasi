@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     // Find the email change token
     const emailChangeToken = await db
       .selectFrom('email_change_tokens')
-      .select(['id', 'user_id', 'old_email', 'new_email', 'expires_at', 'used'])
+      .select(['id', 'userId', 'oldEmail', 'newEmail', 'expiresAt', 'used'])
       .where('token', '=', token)
       .executeTakeFirst()
 
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if token is expired
     const currentTime = Math.floor(Date.now() / 1000)
-    if (emailChangeToken.expires_at < currentTime) {
+    if (emailChangeToken.expiresAt < currentTime) {
       throw new HTTPError({ status: 400, statusText: 'Token has expired' })
     }
 
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     const user = await db
       .selectFrom('users')
       .select(['id', 'email', 'name'])
-      .where('id', '=', emailChangeToken.user_id)
+      .where('id', '=', emailChangeToken.userId)
       .executeTakeFirst()
 
     if (!user) {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check if the old email in the token matches the current user email
-    if (emailChangeToken.old_email !== user.email) {
+    if (emailChangeToken.oldEmail !== user.email) {
       throw new HTTPError({
         status: 400,
         statusText:
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
     const existingUser = await db
       .selectFrom('users')
       .select(['id'])
-      .where('email', '=', emailChangeToken.new_email)
+      .where('email', '=', emailChangeToken.newEmail)
       .executeTakeFirst()
 
     if (existingUser && existingUser.id !== user.id) {
@@ -75,8 +75,8 @@ export default defineEventHandler(async (event) => {
     await db
       .updateTable('users')
       .set({
-        email: emailChangeToken.new_email,
-        updated_at: currentTime
+        email: emailChangeToken.newEmail,
+        updatedAt: currentTime
       })
       .where('id', '=', user.id)
       .execute()
@@ -96,12 +96,12 @@ export default defineEventHandler(async (event) => {
 
     // Send notification email to old email address
     await sendMail({
-      to: emailChangeToken.old_email,
+      to: emailChangeToken.oldEmail,
       subject: 'Your email has been changed',
       html: `
         <h2>Email Change Confirmation</h2>
         <p>Hello ${user.name},</p>
-        <p>This is to confirm that your email address has been changed from <strong>${emailChangeToken.old_email}</strong> to <strong>${emailChangeToken.new_email}</strong>.</p>
+        <p>This is to confirm that your email address has been changed from <strong>${emailChangeToken.oldEmail}</strong> to <strong>${emailChangeToken.newEmail}</strong>.</p>
         <p>If you did not make this change, please contact support immediately.</p>
         <p><strong>Security Notice:</strong> All your sessions have been terminated for security. Please sign in again with your new email address.</p>
       `
@@ -109,12 +109,12 @@ export default defineEventHandler(async (event) => {
 
     // Send confirmation email to new email address
     await sendMail({
-      to: emailChangeToken.new_email,
+      to: emailChangeToken.newEmail,
       subject: 'Email change successful',
       html: `
         <h2>Email Change Successful</h2>
         <p>Hello ${user.name},</p>
-        <p>Your email address has been successfully changed to <strong>${emailChangeToken.new_email}</strong>.</p>
+        <p>Your email address has been successfully changed to <strong>${emailChangeToken.newEmail}</strong>.</p>
         <p><strong>Security Notice:</strong> All your sessions have been terminated for security. Please sign in again with your new email address.</p>
         <p>If you did not make this change, please contact support immediately.</p>
       `
@@ -125,7 +125,7 @@ export default defineEventHandler(async (event) => {
       message:
         'Email changed successfully. All sessions have been terminated for security. Please sign in again with your new email address.',
       data: {
-        new_email: emailChangeToken.new_email,
+        new_email: emailChangeToken.newEmail,
         revoked_tokens: revokedCount,
         deactivated_sessions: deactivatedCount
       }
