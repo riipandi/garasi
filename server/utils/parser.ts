@@ -11,8 +11,8 @@ export function hashBlake(input: string | Uint8Array, len: Blake3OutputLength = 
   const hasher = new Bun.CryptoHasher('blake2b256')
   hasher.update(inputBytes)
   const hashBuffer = hasher.digest()
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(len).padStart(2, '0')).join('')
+  const hashArray = Array.from(new Uint8Array(hashBuffer).slice(0, len))
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 export function parseUserAgent(

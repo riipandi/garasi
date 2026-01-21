@@ -16,7 +16,7 @@ export default definePlugin(({ hooks }) => {
   const buildWideEvent = (event: H3Event): Record<string, unknown> => {
     return {
       request_id: requestId, // Unique request ID
-      ua_hash: parseUserAgentHash(parseUserAgent(event), 'long'),
+      ua_hash: parseUserAgentHash(parseUserAgent(event), 'short'),
       user_agent: parseUserAgent(event, { format: 'short' }),
       ip_address: getRequestIP(event, { xForwardedFor: true }) || 'unknown-ip',
       pathname: event.req._url?.pathname,
