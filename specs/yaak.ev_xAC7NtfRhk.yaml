@@ -10,13 +10,13 @@ base: true
 parentModel: workspace
 parentId: null
 variables:
-- enabled: true
-  name: baseURL
-  value: http://localhost:3980
-  id: T6ET9rAwNY
-- enabled: true
-  name: defaultPassword
-  value: P@ssw0rd!
-  id: s0eXnuxwGZ
+  - enabled: true
+    name: baseURL
+    value: http://localhost:3980
+    id: T6ET9rAwNY
+  - enabled: true
+    name: defaultPassword
+    value: P@ssw0rd!
+    id: s0eXnuxwGZ
 color: null
 sortPriority: 0.0

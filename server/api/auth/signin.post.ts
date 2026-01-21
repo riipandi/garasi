@@ -1,12 +1,12 @@
-import { defineHandler, getRequestIP, HTTPError } from 'nitro/h3'
-import { readBody, setCookie } from 'nitro/h3'
-import pkg from '~/package.json' with { type: 'json' }
+import { readBody, defineHandler, getRequestIP, HTTPError } from 'nitro/h3'
+import { storeCookie } from '~/server/platform/guards'
 import { generateTokenPair } from '~/server/platform/jwt'
 import { createErrorResonse } from '~/server/platform/responder'
 import { createSession, storeRefreshToken } from '~/server/services/session.service'
 import { cleanupExpiredSessions } from '~/server/services/session.service'
 import { cleanupExpiredRefreshTokens } from '~/server/services/session.service'
 import { parseUserAgent } from '~/server/utils/parser'
+import { protectedEnv } from '~/shared/envars'
 
 export default defineHandler(async (event) => {
   const { db, logger } = event.context
@@ -74,9 +74,9 @@ export default defineHandler(async (event) => {
     )
 
     // Store accessToken, refreshToken, and sessionId on cookie
-    setCookie(event, `${pkg.name}_atoken`, tokens.accessToken)
-    setCookie(event, `${pkg.name}_rtoken`, tokens.refreshToken)
-    setCookie(event, `${pkg.name}_sessid`, sessionId)
+    storeCookie(event, 'atoken', tokens.accessToken, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
+    storeCookie(event, 'rtoken', tokens.refreshToken, protectedEnv.PUBLIC_JWT_REFRESH_TOKEN_EXPIRY)
+    storeCookie(event, 'sessid', sessionId, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
 
     // Return user data with JWT tokens and session info
     return {

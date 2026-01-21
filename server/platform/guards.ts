@@ -1,8 +1,23 @@
-import { defineHandler, HTTPError } from 'nitro/h3'
+import { defineHandler, getRequestURL, HTTPError, setCookie } from 'nitro/h3'
 import type { EventHandlerRequest, EventHandlerResponse, H3Event } from 'nitro/h3'
+import pkg from '~/package.json' with { type: 'json' }
 import { verifyAccessToken } from '~/server/platform/jwt'
 import { getSessionById, updateSessionActivity } from '~/server/services/session.service'
+import { protectedEnv } from '~/shared/envars'
 import { createErrorResonse } from './responder'
+
+export function storeCookie(event: H3Event, name: string, value: string, maxAge: number): void {
+  const { hostname, protocol } = getRequestURL(event)
+  const isProduction = protectedEnv.APP_MODE === 'production'
+
+  return setCookie(event, `${pkg.name}_${name}`, value, {
+    httpOnly: isProduction && protocol !== 'https',
+    secure: isProduction && protocol === 'https',
+    domain: hostname,
+    sameSite: 'lax',
+    maxAge
+  })
+}
 
 interface AuthenticatedEvent {
   userId: string

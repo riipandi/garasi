@@ -14,11 +14,11 @@ export default defineProtectedHandler(async (event) => {
     data: {
       sessions: sessions.map((session) => ({
         session_id: session.id,
-        ip_address: session.ip_address,
-        device_info: session.device_info,
-        last_activity_at: session.last_activity_at,
-        expires_at: session.expires_at,
-        created_at: session.created_at
+        ip_address: session.ipAddress,
+        device_info: session.deviceInfo,
+        last_activity_at: session.lastActivityAt,
+        expires_at: session.expiresAt,
+        created_at: session.createdAt
       }))
     }
   }

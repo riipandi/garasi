@@ -1,9 +1,9 @@
-import { HTTPError, readBody, setCookie } from 'nitro/h3'
-import pkg from '~/package.json' with { type: 'json' }
-import { defineProtectedHandler } from '~/server/platform/guards'
+import { HTTPError, readBody } from 'nitro/h3'
+import { defineProtectedHandler, storeCookie } from '~/server/platform/guards'
 import { generateTokenPair, verifyRefreshToken } from '~/server/platform/jwt'
 import { storeRefreshToken, updateSessionActivity } from '~/server/services/session.service'
 import { validateRefreshToken, revokeRefreshToken } from '~/server/services/session.service'
+import { protectedEnv } from '~/shared/envars'
 
 export default defineProtectedHandler(async (event) => {
   const { db } = event.context
@@ -59,9 +59,9 @@ export default defineProtectedHandler(async (event) => {
   await updateSessionActivity(db, body.session_id)
 
   // Store accessToken, refreshToken, and sessionId on cookie
-  setCookie(event, `${pkg.name}_atoken`, tokens.accessToken)
-  setCookie(event, `${pkg.name}_rtoken`, tokens.refreshToken)
-  setCookie(event, `${pkg.name}_sessid`, body.session_id)
+  storeCookie(event, 'atoken', tokens.accessToken, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
+  storeCookie(event, 'rtoken', tokens.refreshToken, protectedEnv.PUBLIC_JWT_REFRESH_TOKEN_EXPIRY)
+  storeCookie(event, 'sessid', body.session_id, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
 
   // Return new tokens with session ID
   return {
