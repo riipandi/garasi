@@ -1,6 +1,7 @@
 import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createS3ClientFromBucket } from '~/server/platform/s3client'
+import { parseBoolean } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
 import { prettyBytes } from '~/shared/utils/humanize'
 
@@ -8,7 +9,7 @@ export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
 
   // Validate required parameter
-  const { bucket } = getQuery<{ bucket: string }>(event)
+  const { bucket, overwrite } = getQuery<{ bucket: string; overwrite: string | null }>(event)
   if (!bucket) {
     logger.debug('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
@@ -57,12 +58,17 @@ export default defineProtectedHandler(async (event) => {
   // Upload the file to bucket
   const s3Client = await createS3ClientFromBucket(event, bucket)
 
-  // TODO: Check file exists before upload (overwrite via `force` query params)
+  const forceUpload = parseBoolean(overwrite ?? null)
+  const fileExists = await s3Client.exists(filename, { bucket })
+  if (!forceUpload && fileExists) {
+    logger.withMetadata({ filename }).debug('File already exists')
+    throw new HTTPError({ status: 401, statusText: `File '${filename}' already exists` })
+  }
 
   const bytesWritten = await s3Client.write(filename, buffer, { bucket, type: contentType })
   logger.withMetadata({ bytesWritten }).debug('Fetch bucket objects')
 
-  const data = { filename, contentType, fileSize: prettyBytes(bytesWritten) }
+  const data = { filename, contentType, fileSize: prettyBytes(bytesWritten), forceUpload }
 
   return { status: 'success', message: 'Upload file to bucket', data }
 })
