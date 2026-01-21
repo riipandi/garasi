@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_k3Whe3eAyU
 createdAt: 2026-01-19T20:19:01.781377
-updatedAt: 2026-01-19T20:19:27.813060
+updatedAt: 2026-01-21T08:18:41.620641
 workspaceId: wk_YrPa97TLKc
 folderId: fl_SVGNWxfTR6
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: DELETE
 name: Delete Admin Token
 sortPriority: 0.002
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/admin/token/${[ response.body.path(request='rq_8pY8KDcEB9', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhWzJdLmlk') ]}
 urlParameters: []

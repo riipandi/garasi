@@ -2,18 +2,28 @@ type: http_request
 model: http_request
 id: rq_8QNQ2CZTpq
 createdAt: 2026-01-19T20:19:03.289811
-updatedAt: 2026-01-19T20:20:00.381133
+updatedAt: 2026-01-21T08:18:07.932124
 workspaceId: wk_YrPa97TLKc
 folderId: fl_SVGNWxfTR6
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: |-
+    {
+      "name": null,
+      "expiration": null,
+      "neverExpires": false,
+      "scope": []
+    }
+bodyType: application/json
 description: ''
-headers: []
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: K7W7scguNJ
 method: PUT
 name: Update Admin Token
 sortPriority: 0.005
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/admin/token/${[ response.body.path(request='rq_8pY8KDcEB9', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhWzJdLmlk') ]}
 urlParameters: []

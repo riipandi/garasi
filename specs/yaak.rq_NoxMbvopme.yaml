@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_NoxMbvopme
 createdAt: 2026-01-19T20:15:41.506783
-updatedAt: 2026-01-19T20:16:05.205421
+updatedAt: 2026-01-21T07:02:23.817297
 workspaceId: wk_YrPa97TLKc
 folderId: fl_rD5yxf6qLQ
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: Prometheus Metrics
 sortPriority: 2000.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/metrics
 urlParameters: []

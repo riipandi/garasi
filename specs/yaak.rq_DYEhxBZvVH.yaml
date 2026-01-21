@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_DYEhxBZvVH
 createdAt: 2026-01-19T20:19:02.181049
-updatedAt: 2026-01-19T20:19:41.606252
+updatedAt: 2026-01-21T08:16:51.503120
 workspaceId: wk_YrPa97TLKc
 folderId: fl_SVGNWxfTR6
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: Get Current Token Info
 sortPriority: 0.003
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/admin/token/current
 urlParameters: []

@@ -12,10 +12,8 @@ export default defineHandler(async (event) => {
   const { db, logger } = event.context
 
   try {
-    // Parse request body
+    // Parse and validate request body
     const body = await readBody<{ email: string; password: string }>(event)
-
-    // Validate required fields
     if (!body?.email || !body?.password) {
       logger.debug('Email and password are required')
       throw new HTTPError({ status: 400, statusText: 'Email and password are required' })
@@ -92,7 +90,7 @@ export default defineHandler(async (event) => {
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.cause : null
+    const errors = error instanceof Error ? error.stack : null
     return { success: false, message, data: null, errors }
   }
 })

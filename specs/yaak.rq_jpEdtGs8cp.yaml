@@ -2,18 +2,28 @@ type: http_request
 model: http_request
 id: rq_jpEdtGs8cp
 createdAt: 2026-01-19T20:18:57.091161
-updatedAt: 2026-01-19T20:19:15.823701
+updatedAt: 2026-01-21T08:17:38.885387
 workspaceId: wk_YrPa97TLKc
 folderId: fl_SVGNWxfTR6
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: |-
+    {
+      "name": "Demo Token",
+      "expiration": null,
+      "neverExpires": false,
+      "scope": []
+    }
+bodyType: application/json
 description: ''
-headers: []
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: KhrAZWpvbj
 method: POST
 name: Create Admin Token
 sortPriority: 0.001
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/admin/token
 urlParameters: []

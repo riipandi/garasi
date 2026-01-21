@@ -19,7 +19,7 @@ export default defineHandler(async (event) => {
     return { status: 'success', message: 'List Buckets', data }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
-    const errors = error instanceof Error ? error.cause : null
+    const errors = error instanceof Error ? error.stack : null
     return { status: 'error', message, errors }
   }
 })

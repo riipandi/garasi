@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_oZAFuYWDAX
 createdAt: 2026-01-19T20:19:02.592575
-updatedAt: 2026-01-19T20:19:52.251962
+updatedAt: 2026-01-21T08:16:56.190955
 workspaceId: wk_YrPa97TLKc
 folderId: fl_SVGNWxfTR6
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: Get Admin Token Info
 sortPriority: 0.004
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/admin/token/${[ response.body.path(request='rq_8pY8KDcEB9', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhWzJdLmlk') ]}?search=
 urlParameters: []
