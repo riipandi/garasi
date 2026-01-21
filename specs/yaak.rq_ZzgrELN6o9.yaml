@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_ZzgrELN6o9
 createdAt: 2026-01-19T20:22:30.558637
-updatedAt: 2026-01-21T08:44:54.099041
+updatedAt: 2026-01-21T10:48:28.671113
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
@@ -19,5 +19,5 @@ headers:
 method: POST
 name: Preview Layout Changes
 sortPriority: 4000.0
-url: ${[ baseURL ]}/api/cluster/layout/preview
+url: ${[ baseURL ]}/api/layout/preview
 urlParameters: []

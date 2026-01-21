@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_ck7CiYjJKS
 createdAt: 2026-01-19T20:23:39.868892
-updatedAt: 2026-01-21T08:46:55.730651
+updatedAt: 2026-01-21T10:47:44.670670
 workspaceId: wk_YrPa97TLKc
 folderId: fl_8Fc9gwrsGC
 authentication: {}
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: Get Cluster Health
-sortPriority: 2000.0
+sortPriority: 1000.0
 url: ${[ baseURL ]}/api/cluster/health
 urlParameters: []

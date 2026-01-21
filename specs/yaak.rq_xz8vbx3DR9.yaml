@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_xz8vbx3DR9
 createdAt: 2026-01-19T20:23:40.661723
-updatedAt: 2026-01-21T08:46:55.731837
+updatedAt: 2026-01-21T10:47:44.668164
 workspaceId: wk_YrPa97TLKc
 folderId: fl_8Fc9gwrsGC
 authentication: {}
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: Get Cluster Status
-sortPriority: 4000.0
+sortPriority: 0.0
 url: ${[ baseURL ]}/api/cluster/status
 urlParameters: []

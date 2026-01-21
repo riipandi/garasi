@@ -20,18 +20,14 @@ export default defineHandler(async (event) => {
 
   try {
     const { raw } = getQuery<{ raw: string | null }>(event)
-
-    const metricsToken = `Bearer ${protectedEnv.GARAGE_METRICS_TOKEN}`
-    const data = await gfetch<string>('/metrics', { headers: { Authorization: metricsToken } })
     const printRaw = parseBoolean(raw ?? null) || false
 
-    return !printRaw
-      ? {
-          status: 'success',
-          message: 'Garage Prometheus Metrics',
-          data: parsePrometheusMetrics(data)
-        }
-      : data
+    const metricsToken = `Bearer ${protectedEnv.GARAGE_METRICS_TOKEN}`
+    const resp = await gfetch<string>('/metrics', { headers: { Authorization: metricsToken } })
+    const data = parsePrometheusMetrics(resp)
+    const response = { status: 'success', message: 'Garage Prometheus Metrics', data }
+
+    return !printRaw ? response : data
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'

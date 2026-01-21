@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_qT58ZTeJTh
 createdAt: 2026-01-19T20:17:03.304309
-updatedAt: 2026-01-21T08:44:06.764055
+updatedAt: 2026-01-21T10:48:12.960873
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
@@ -19,5 +19,5 @@ headers:
 method: POST
 name: Apply Cluster Layout
 sortPriority: 0.0
-url: ${[ baseURL ]}/api/cluster/layout/apply
+url: ${[ baseURL ]}/api/layout/apply
 urlParameters: []

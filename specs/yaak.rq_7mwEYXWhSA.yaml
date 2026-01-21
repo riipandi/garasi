@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_7mwEYXWhSA
 createdAt: 2026-01-19T20:22:31.129248
-updatedAt: 2026-01-21T08:45:22.068670
+updatedAt: 2026-01-21T10:48:35.438346
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
@@ -19,5 +19,5 @@ headers:
 method: POST
 name: Skip Dead Nodes
 sortPriority: 6000.0
-url: ${[ baseURL ]}/api/cluster/layout/skip-dead-nodes
+url: ${[ baseURL ]}/api/layout/skip-dead-nodes
 urlParameters: []

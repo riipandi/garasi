@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_atfkxbxJk2
 createdAt: 2026-01-19T20:22:30.275031
-updatedAt: 2026-01-21T08:44:36.257613
+updatedAt: 2026-01-21T10:48:17.250356
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
@@ -19,5 +19,5 @@ headers:
 method: PUT
 name: Update Cluster Layout
 sortPriority: 2000.0
-url: ${[ baseURL ]}/api/cluster/layout
+url: ${[ baseURL ]}/api/layout
 urlParameters: []
