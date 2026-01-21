@@ -57,7 +57,7 @@ export async function authenticateRequest(event: H3Event): Promise<Authenticated
   }
 
   // Verify session belongs to the user
-  if (session.user_id !== userId) {
+  if (session.userId !== userId) {
     throw new HTTPError({ status: 403, statusText: 'Forbidden: Session does not belong to user' })
   }
 

@@ -48,8 +48,8 @@ export default defineProtectedHandler(async (event) => {
   // Store the new refresh token in the database
   await storeRefreshToken(
     db,
-    tokenRecord.user_id,
-    tokenRecord.session_id,
+    tokenRecord.userId,
+    tokenRecord.sessionId,
     tokens.refreshToken,
     tokens.refreshTokenExpiry
   )

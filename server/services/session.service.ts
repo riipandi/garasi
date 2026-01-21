@@ -1,6 +1,9 @@
+import type { Selectable } from 'kysely'
 import { typeid } from 'typeid-js'
 import { UAParser, type IResult } from 'ua-parser-js'
 import type { DBContext } from '~/server/database/db.schema'
+import type { RefreshTokenTable } from '~/server/database/schemas/refresh-token'
+import type { SessionTable } from '~/server/database/schemas/session'
 import { isIResult } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
 
@@ -81,7 +84,7 @@ export async function createSession(
   userId: string,
   ipAddress: string,
   userAgent: string | IResult | null
-): Promise<{ sessionId: string; sessionRecord: any }> {
+): Promise<{ sessionId: string; sessionRecord: Selectable<SessionTable> | undefined }> {
   const sessionId = generateSessionId()
   const deviceInfo = parseDeviceInfo(userAgent)
   const now = Math.floor(Date.now() / 1000)
@@ -110,9 +113,12 @@ export async function createSession(
  *
  * @param db - Database context
  * @param sessionId - Session ID
- * @returns Updated session record or null
+ * @returns Updated session record or undefined
  */
-export async function updateSessionActivity(db: DBContext, sessionId: string): Promise<any | null> {
+export async function updateSessionActivity(
+  db: DBContext,
+  sessionId: string
+): Promise<Selectable<SessionTable> | undefined> {
   const now = Math.floor(Date.now() / 1000)
 
   const updatedSession = await db
@@ -131,20 +137,19 @@ export async function updateSessionActivity(db: DBContext, sessionId: string): P
  *
  * @param db - Database context
  * @param sessionId - Session ID
- * @returns Session record or null
+ * @returns Session record or undefined
  */
-export async function getSessionById(db: DBContext, sessionId: string): Promise<any | null> {
-  const now = Math.floor(Date.now() / 1000)
-
-  const session = await db
+export async function getSessionById(
+  db: DBContext,
+  sessionId: string
+): Promise<Selectable<SessionTable> | undefined> {
+  return await db
     .selectFrom('sessions')
     .selectAll()
     .where('id', '=', sessionId)
     .where('isActive', '=', 1)
-    .where('expiresAt', '>', now)
+    .where('expiresAt', '>', Math.floor(Date.now() / 1000))
     .executeTakeFirst()
-
-  return session
 }
 
 /**
@@ -219,7 +224,10 @@ export async function deactivateAllSessions(db: DBContext, userId: string): Prom
  * @param userId - User ID
  * @returns Array of active sessions
  */
-export async function getUserSessions(db: DBContext, userId: string): Promise<any[]> {
+export async function getUserSessions(
+  db: DBContext,
+  userId: string
+): Promise<Selectable<SessionTable>[]> {
   const now = Math.floor(Date.now() / 1000)
 
   const sessions = await db
@@ -282,7 +290,7 @@ export async function storeRefreshToken(
   sessionId: string,
   refreshToken: string,
   expiresAt: number
-): Promise<any> {
+): Promise<Selectable<RefreshTokenTable> | undefined> {
   const tokenHash = hashRefreshToken(refreshToken)
   const refreshTokenId = generateRefreshTokenId()
 
@@ -307,12 +315,12 @@ export async function storeRefreshToken(
  *
  * @param db - Database context
  * @param refreshToken - The refresh token to validate
- * @returns Valid refresh token record or null
+ * @returns Valid refresh token record or undefined
  */
 export async function validateRefreshToken(
   db: DBContext,
   refreshToken: string
-): Promise<any | null> {
+): Promise<Selectable<RefreshTokenTable> | undefined> {
   const tokenHash = hashRefreshToken(refreshToken)
   const now = Math.floor(Date.now() / 1000)
 
