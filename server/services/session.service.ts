@@ -44,7 +44,7 @@ export function generateRefreshTokenId(): string {
  * @param token - The refresh token to hash
  * @returns Hashed token
  */
-export async function hashRefreshToken(token: string): Promise<string> {
+export function hashRefreshToken(token: string): string {
   const hasher = new Bun.CryptoHasher('blake2b256')
   const encoder = new TextEncoder()
   const data = encoder.encode(token)
@@ -270,7 +270,7 @@ export async function storeRefreshToken(
   refreshToken: string,
   expiresAt: number
 ): Promise<any> {
-  const tokenHash = await hashRefreshToken(refreshToken)
+  const tokenHash = hashRefreshToken(refreshToken)
   const refreshTokenId = generateRefreshTokenId()
 
   const refreshTokenRecord = await db
@@ -300,7 +300,7 @@ export async function validateRefreshToken(
   db: DBContext,
   refreshToken: string
 ): Promise<any | null> {
-  const tokenHash = await hashRefreshToken(refreshToken)
+  const tokenHash = hashRefreshToken(refreshToken)
   const now = Math.floor(Date.now() / 1000)
 
   const tokenRecord = await db
@@ -322,7 +322,7 @@ export async function validateRefreshToken(
  * @returns Number of affected rows
  */
 export async function revokeRefreshToken(db: DBContext, refreshToken: string): Promise<number> {
-  const tokenHash = await hashRefreshToken(refreshToken)
+  const tokenHash = hashRefreshToken(refreshToken)
   const now = Math.floor(Date.now() / 1000)
 
   const result = await db

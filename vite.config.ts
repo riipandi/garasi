@@ -40,7 +40,7 @@ export default defineConfig({
     port: 3980,
     strictPort: true,
     watch: {
-      ignored: ['**/docs/**', '**/specs/**']
+      ignored: ['**/docs/**', '**/specs/**', '**/scripts/**']
     }
   }
 })

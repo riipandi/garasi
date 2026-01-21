@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_XBsfFGMg3y
 createdAt: 2026-01-19T20:14:54.971663
-updatedAt: 2026-01-19T20:16:05.199501
+updatedAt: 2026-01-21T05:24:14.154496
 workspaceId: wk_YrPa97TLKc
 folderId: fl_rD5yxf6qLQ
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: Check Domain
 sortPriority: 0.0
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/check-domain?domain=example.com
 urlParameters: []
