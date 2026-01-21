@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_CbPTEnV8Er
 createdAt: 2026-01-19T20:20:50.380749
-updatedAt: 2026-01-19T20:21:19.257951
+updatedAt: 2026-01-21T09:12:20.459615
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: List Buckets
-sortPriority: 3000.001
-url: ${[ baseURL ]}/api/check-domain?domain=example.com
+sortPriority: 2333.334
+url: ${[ baseURL ]}/api/bucket
 urlParameters: []

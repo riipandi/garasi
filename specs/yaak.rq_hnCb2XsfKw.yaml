@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_hnCb2XsfKw
 createdAt: 2026-01-19T20:20:23.649064
-updatedAt: 2026-01-19T20:21:06.877516
+updatedAt: 2026-01-21T09:11:59.048493
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: NYCksAUD6S
 method: POST
 name: Cleanup Incomplete Uploads
 sortPriority: 2000.001
-url: ${[ baseURL ]}/api/bucket
+url: ${[ baseURL ]}/api/bucket/cleanup
 urlParameters: []

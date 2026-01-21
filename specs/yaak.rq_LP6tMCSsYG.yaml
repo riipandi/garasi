@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_LP6tMCSsYG
 createdAt: 2026-01-19T20:17:07.732388
-updatedAt: 2026-01-19T20:17:39.057996
+updatedAt: 2026-01-21T09:15:09.246524
 workspaceId: wk_YrPa97TLKc
 folderId: fl_rwLq2CSxWU
 authentication: {}
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: List Block Errors
-sortPriority: 0.001
-url: ${[ baseURL ]}/api/bucket
+sortPriority: 0.0
+url: ${[ baseURL ]}/api/block/errors
 urlParameters: []

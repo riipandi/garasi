@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_v4bLNjEYVx
 createdAt: 2026-01-19T20:20:50.780394
-updatedAt: 2026-01-19T20:21:24.106712
+updatedAt: 2026-01-21T09:12:56.735538
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: HIFGfea2ZZ
+method: POST
 name: Create Bucket
-sortPriority: 3000.0020000000004
-url: ${[ baseURL ]}/api/check-domain?domain=example.com
+sortPriority: 2358.025333333333
+url: ${[ baseURL ]}/api/bucket
 urlParameters: []

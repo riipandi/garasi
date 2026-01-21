@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_WQjqcbkMzA
 createdAt: 2026-01-19T20:24:48.222193
-updatedAt: 2026-01-21T08:35:57.779289
+updatedAt: 2026-01-21T09:29:02.861439
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -16,4 +16,8 @@ method: DELETE
 name: Delete Access Key
 sortPriority: 4000.0
 url: ${[ baseURL ]}/api/keys/:id
-urlParameters: []
+urlParameters:
+  - enabled: true
+    name: :id
+    value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_7qjXNfxmnC', path=b64'JC5kYXRhWzBdLmlk') ]}
+    id: j5guQdu99Q

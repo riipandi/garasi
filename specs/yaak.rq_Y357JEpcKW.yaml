@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_Y357JEpcKW
 createdAt: 2026-01-19T20:17:31.719724
-updatedAt: 2026-01-19T20:17:44.100282
+updatedAt: 2026-01-21T09:15:09.247763
 workspaceId: wk_YrPa97TLKc
 folderId: fl_rwLq2CSxWU
 authentication: {}
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: Get Block Info
-sortPriority: 0.002
-url: ${[ baseURL ]}/api/bucket
+sortPriority: 1000.0
+url: ${[ baseURL ]}/api/block/info?node=${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_xz8vbx3DR9', path=b64'JC5kYXRhLm5vZGVzWzBdLmlk') ]}
 urlParameters: []

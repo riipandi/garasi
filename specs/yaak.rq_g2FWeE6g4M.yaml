@@ -2,13 +2,18 @@ type: http_request
 model: http_request
 id: rq_g2FWeE6g4M
 createdAt: 2026-01-19T20:24:49.077892
-updatedAt: 2026-01-21T08:35:37.070497
+updatedAt: 2026-01-21T09:28:54.159826
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
 authenticationType: null
 body:
-  text: '{}'
+  text: |-
+    {
+      "name": null,
+      "expiration": null,
+      "neverExpires": false
+    }
 bodyType: application/json
 description: ''
 headers:
@@ -19,5 +24,9 @@ headers:
 method: PUT
 name: Update Access Key
 sortPriority: 3000.0
-url: ${[ baseURL ]}/api/keys
-urlParameters: []
+url: ${[ baseURL ]}/api/keys/:id
+urlParameters:
+  - enabled: true
+    name: :id
+    value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_7qjXNfxmnC', path=b64'JC5kYXRhWzBdLmlk') ]}
+    id: WVdnn8qdKQ

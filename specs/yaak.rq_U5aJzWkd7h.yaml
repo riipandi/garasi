@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_U5aJzWkd7h
 createdAt: 2026-01-19T19:42:46.422055
-updatedAt: 2026-01-19T20:21:13.214453
+updatedAt: 2026-01-21T09:12:29.681817
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -12,8 +12,8 @@ body:
 bodyType: null
 description: ''
 headers: []
-method: GET
+method: DELETE
 name: Delete Bucket
 sortPriority: 3000.0
-url: ${[ baseURL ]}/api/check-domain?domain=example.com
+url: ${[ baseURL ]}/api/bucket
 urlParameters: []

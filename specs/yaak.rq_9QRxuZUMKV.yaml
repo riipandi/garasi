@@ -2,13 +2,18 @@ type: http_request
 model: http_request
 id: rq_9QRxuZUMKV
 createdAt: 2026-01-19T20:24:47.969915
-updatedAt: 2026-01-21T08:36:31.542105
+updatedAt: 2026-01-21T09:29:33.042940
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
 authenticationType: null
 body:
-  text: '{}'
+  text: |-
+    {
+      "name": null,
+      "accessKeyId": null,
+      "secretKeyId": null
+    }
 bodyType: application/json
 description: ''
 headers:

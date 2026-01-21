@@ -3,7 +3,7 @@ import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
 interface UpdateAdminTokenRequestBody {
   name: string | null // Name of the admin API token
   expiration: string | null // Expiration time and date (RFC3339)
-  neverExpires: boolean | null // Set the admin token to never expire
+  neverExpires: boolean // Set the admin token to never expire
   scope: string[] | null // Scope of the admin API token, a list of admin endpoint names
 }
 

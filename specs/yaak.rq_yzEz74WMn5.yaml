@@ -2,18 +2,22 @@ type: http_request
 model: http_request
 id: rq_yzEz74WMn5
 createdAt: 2026-01-19T20:20:51.035958
-updatedAt: 2026-01-19T20:21:30.185777
+updatedAt: 2026-01-21T09:12:51.157748
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: '{}'
+bodyType: application/json
 description: ''
-headers: []
-method: GET
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: Ufn3DVFbIC
+method: PUT
 name: Update Bucket
 sortPriority: 3000.0030000000006
-url: ${[ baseURL ]}/api/check-domain?domain=example.com
+url: ${[ baseURL ]}/api/bucket
 urlParameters: []

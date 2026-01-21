@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_2Nk5p8yRPn
 createdAt: 2026-01-19T20:16:52.344334
-updatedAt: 2026-01-21T08:34:56.854138
+updatedAt: 2026-01-21T09:29:49.407634
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -13,11 +13,11 @@ bodyType: null
 description: ''
 headers: []
 method: GET
-name: Get Key Info
-sortPriority: 0.0
+name: Get Key Information
+sortPriority: 1000.0
 url: ${[ baseURL ]}/api/keys/:id
 urlParameters:
   - enabled: true
     name: :id
-    value: ''
-    id: t9ZThYVBx9
+    value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_7qjXNfxmnC', path=b64'JC5kYXRhWzBdLmlk') ]}
+    id: Isenq9C6Pe

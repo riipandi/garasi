@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_KQi42bUMu4
 createdAt: 2026-01-19T20:20:51.336304
-updatedAt: 2026-01-19T20:21:35.633827
+updatedAt: 2026-01-21T09:13:31.336354
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -14,6 +14,6 @@ description: ''
 headers: []
 method: GET
 name: Get Bucket Info
-sortPriority: 3000.004000000001
-url: ${[ baseURL ]}/api/check-domain?domain=example.com
+sortPriority: 2341.564444444444
+url: ${[ baseURL ]}/api/bucket/info
 urlParameters: []

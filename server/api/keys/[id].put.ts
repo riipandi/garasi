@@ -1,15 +1,20 @@
-import { defineHandler, getRouterParam, HTTPError, getQuery } from 'nitro/h3'
+import { defineHandler, getRouterParam, HTTPError, readBody } from 'nitro/h3'
 
-interface GetKeyInfoParams {
-  search?: string
+interface KeyPerm {
+  allow: object
+  deny: object
+}
+
+interface UpdateKeyRequest {
+  name: string | null
+  expiration: string | null
+  neverExpires: boolean
 }
 
 interface KeyInfoBucketResponse {
   id: string
-  name: string | null
-  permissions: object
-  created: string | null
-  deleted: boolean
+  name: string
+  permissions: KeyPerm
 }
 
 export default defineHandler(async (event) => {
@@ -17,22 +22,21 @@ export default defineHandler(async (event) => {
 
   try {
     const id = getRouterParam(event, 'id')
-
     if (!id) {
       logger.debug('Key ID is required')
       throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
     }
 
-    const { search } = getQuery<GetKeyInfoParams>(event)
+    const body = await readBody<UpdateKeyRequest>(event)
 
-    logger.withMetadata({ id, search }).info('Getting key information')
-    const data = await gfetch<KeyInfoBucketResponse>('/v2/GetKeyInfo', { params: { id, search } })
+    logger.withMetadata({ id, body }).info('Updating access key')
+    const data = await gfetch<KeyInfoBucketResponse>('/v2/UpdateKey', {
+      method: 'POST',
+      params: { id },
+      body
+    })
 
-    if (!data) {
-      return { success: false, message: 'Access key not found', data: null }
-    }
-
-    return { status: 'success', message: 'Get Key Information', data }
+    return { status: 'success', message: 'Update Access Key', data }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500
     const message = error instanceof Error ? error.message : 'Unknown error'
