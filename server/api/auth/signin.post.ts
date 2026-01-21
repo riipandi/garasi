@@ -8,6 +8,9 @@ import { cleanupExpiredRefreshTokens } from '~/server/services/session.service'
 import { parseUserAgent } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
 
+// TODO: add optional signin with `accessKeyId` and `secretAccessKey`
+// When enable, this only allow to manage the related bucket (file manager)
+
 export default defineHandler(async (event) => {
   const { db, logger } = event.context
 
