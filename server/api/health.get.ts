@@ -4,7 +4,7 @@ export default defineHandler(async (event) => {
   const { gfetch, logger } = event.context
   try {
     const data = await gfetch<string>('/health')
-    const message = data.replace(/\n/g, ' ')
+    const message = data.substring(0, data.indexOf('\n'))
     return { status: 'success', message }
   } catch (error) {
     event.res.status = error instanceof HTTPError ? error.status : 500

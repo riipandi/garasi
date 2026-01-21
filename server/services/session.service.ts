@@ -1,8 +1,8 @@
 import { typeid } from 'typeid-js'
 import { UAParser, type IResult } from 'ua-parser-js'
+import type { DBContext } from '~/server/database/db.schema'
 import { isIResult } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
-import type { DBContext } from '../database/db.schema'
 
 /**
  * Parse user agent and generate device info string

@@ -1,8 +1,8 @@
 import { SignJWT, jwtVerify, type JWTPayload } from 'jose'
 import { UAParser, type IResult } from 'ua-parser-js'
 import logger from '~/server/platform/logger'
+import { parseUserAgentHash } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
-import { parseUserAgentHash } from '../utils/parser'
 
 /**
  * JWT Token payload structure using standard JWT claims
