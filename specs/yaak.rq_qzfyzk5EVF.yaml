@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_qzfyzk5EVF
 createdAt: 2026-01-19T20:24:48.797342
-updatedAt: 2026-01-21T09:26:24.208761
+updatedAt: 2026-01-21T15:58:10.185188
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -10,7 +10,13 @@ authenticationType: null
 body:
   text: |-
     {
-      "name": "Dummy Key"
+      "name": "Dummy Key",
+      "neverExpires": true,
+      "expiration": null,
+      "allow": {
+        "createBucket": true
+      },
+      "deny": null
     }
 bodyType: application/json
 description: ''

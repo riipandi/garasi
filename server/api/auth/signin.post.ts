@@ -18,26 +18,29 @@ export default defineHandler(async (event) => {
       logger.debug('Email and password are required')
       throw new HTTPError({ status: 400, statusText: 'Email and password are required' })
     }
+    const { email, password } = body
 
     // Find user by email
     const user = await db
       .selectFrom('users')
       .select(['id', 'email', 'name', 'passwordHash'])
-      .where('email', '=', body.email)
+      .where('email', '=', email)
       .executeTakeFirst()
 
     // Check if user exists
     if (!user) {
-      logger.withMetadata({ email: body.email }).debug('User not found')
+      logger.withMetadata({ email, password }).debug('User not found')
       throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
     // Verify password using Bun's password.verify
-    const isPasswordValid = await Bun.password.verify(body.password, user.passwordHash)
+    const isPasswordValid = await Bun.password.verify(password, user.passwordHash)
     if (!isPasswordValid) {
-      logger.withMetadata({ email: body.email }).debug('Password validation failed')
+      logger.withMetadata({ email, password }).debug('Password validation failed')
       throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
+
+    logger.withMetadata({ email, password }).debug('User found, creating session')
 
     // Get user agent and IP address from request
     const userAgent = parseUserAgent(event, { format: 'raw' })

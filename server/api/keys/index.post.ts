@@ -3,6 +3,10 @@ import { defineProtectedHandler } from '~/server/platform/guards'
 
 interface CreateKeyRequest {
   name: string
+  neverExpires: boolean
+  expiration: string | null
+  allow: { createBucket: boolean } | null
+  deny: { createBucket: boolean } | null
 }
 
 interface KeyInfoBucketResponse {

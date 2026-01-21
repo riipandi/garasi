@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_v4bLNjEYVx
 createdAt: 2026-01-19T20:20:50.780394
-updatedAt: 2026-01-21T10:21:32.903174
+updatedAt: 2026-01-21T15:51:56.782005
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "globalAlias": "${[ faker.animal.cat() ]}",
+      "globalAlias": "demo",
       "localAlias": null
     }
 bodyType: application/json

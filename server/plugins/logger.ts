@@ -41,7 +41,8 @@ export default definePlugin(({ hooks }) => {
     }
 
     // Send the request log with wide event context
-    logger.withPrefix('REQ').withContext(buildWideEvent(event)).info('Incoming request', pathname)
+    // Optional detailed log: .withContext(buildWideEvent(event))
+    logger.withPrefix('REQ').info('Incoming request', pathname, requestId)
   })
 
   hooks.hook('response', (res: Response, event: H3Event) => {

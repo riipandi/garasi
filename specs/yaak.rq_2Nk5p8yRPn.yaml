@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_2Nk5p8yRPn
 createdAt: 2026-01-19T20:16:52.344334
-updatedAt: 2026-01-21T09:29:49.407634
+updatedAt: 2026-01-21T16:18:16.716535
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -15,7 +15,7 @@ headers: []
 method: GET
 name: Get Key Information
 sortPriority: 1000.0
-url: ${[ baseURL ]}/api/keys/:id
+url: ${[ baseURL ]}/api/keys/:id?secret=true
 urlParameters:
   - enabled: true
     name: :id

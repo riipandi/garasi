@@ -50,7 +50,11 @@ const logger = new LogLayer({
       logger: console
     })
   ],
-  plugins: [redactionPlugin({ paths: ['password', 'token'] })]
+  plugins: [
+    redactionPlugin({
+      paths: ['password', 'token', 'secretAccessKey', '*.password', '*.token', '*.secretAccessKey']
+    })
+  ]
 })
 
 export { logger, logger as default }
