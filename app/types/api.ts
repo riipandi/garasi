@@ -130,3 +130,81 @@ export interface RevokeSessionResponse extends ApiResponse<null> {}
 export interface RevokeAllOtherSessionsResponse extends ApiResponse<null> {}
 
 export interface RevokeAllSessionsResponse extends ApiResponse<null> {}
+
+// Cluster Types
+export interface FreeSpaceResp {
+  total: number
+  available: number
+}
+
+export interface NodeResp {
+  id: string
+  isUp: boolean
+  draining: boolean
+  addr: string | null
+  hostname: string | null
+  garageVersion: string | null
+  lastSeenSecsAgo: number | null
+  dataPartition: FreeSpaceResp | null
+  metadataPartition: FreeSpaceResp | null
+  role: object | null
+}
+
+export interface ClusterStatusData {
+  layoutVersion: number
+  nodes: NodeResp[]
+}
+
+export interface ClusterStatusResponse extends ApiResponse<ClusterStatusData> {}
+
+export interface ClusterHealthData {
+  status: 'healthy' | 'degraded' | 'unavailable'
+  knownNodes: number
+  connectedNodes: number
+  storageNodes: number
+  storageNodesUp: number
+  partitions: number
+  partitionsQuorum: number
+  partitionsAllOk: number
+}
+
+export interface ClusterHealthResponse extends ApiResponse<ClusterHealthData> {}
+
+export interface StorageNodeData {
+  id: string
+  hostname: string
+  zone: string
+  capacity: string
+  partitions: number
+  dataAvailable: {
+    used: string
+    total: string
+    percentage: number
+  }
+  metaAvailable: {
+    used: string
+    total: string
+    percentage: number
+  }
+}
+
+export interface ClusterStatisticsData {
+  nodes: StorageNodeData[]
+  clusterWide: {
+    data: string
+    metadata: string
+  }
+}
+
+export interface ClusterStatisticsResponse extends ApiResponse<ClusterStatisticsData> {}
+
+export interface ConnectNodesRequest {
+  nodes: string[]
+}
+
+export interface ConnectNodeData {
+  success: boolean
+  error: string | null
+}
+
+export interface ConnectNodesResponse extends ApiResponse<ConnectNodeData[]> {}
