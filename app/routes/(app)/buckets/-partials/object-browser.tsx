@@ -1,5 +1,8 @@
+import { useSuspenseQuery, useMutation, QueryClient } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { createFolder, listObjects } from '~/app/fetcher'
+import type { Bucket } from './types'
 
 // Code split components using React.lazy
 const DropdownMenu = React.lazy(() =>
@@ -15,7 +18,7 @@ const UploadFileDialog = React.lazy(() =>
   import('./upload-file-dialog').then((m) => ({ default: m.UploadFileDialog }))
 )
 
-// Dummy data types
+// File item types
 interface FileItem {
   id: string
   name: string
@@ -24,19 +27,33 @@ interface FileItem {
   modified: string
 }
 
-// Dummy data
-const dummyFiles: FileItem[] = [
-  { id: '1', name: 'documents', type: 'folder', modified: '2024-01-15T10:30:00Z' },
-  { id: '2', name: 'images', type: 'folder', modified: '2024-01-14T14:20:00Z' },
-  { id: '3', name: 'report.pdf', type: 'file', size: 1024000, modified: '2024-01-13T09:15:00Z' },
-  { id: '4', name: 'data.json', type: 'file', size: 51200, modified: '2024-01-12T16:45:00Z' },
-  { id: '5', name: 'backup.zip', type: 'file', size: 10485760, modified: '2024-01-11T11:00:00Z' },
-  { id: '6', name: 'config.xml', type: 'file', size: 2048, modified: '2024-01-10T08:30:00Z' },
-  { id: '7', name: 'videos', type: 'folder', modified: '2024-01-09T13:20:00Z' },
-  { id: '8', name: 'readme.txt', type: 'file', size: 1024, modified: '2024-01-08T10:00:00Z' }
-]
+interface ObjectBrowserProps {
+  queryClient: QueryClient
+  bucket: Bucket
+}
 
-export function ObjectBrowser() {
+export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
+  const bucketParam = bucket.globalAliases[0] || bucket.id
+
+  // Query to fetch bucket objects
+  const objectsQuery = useSuspenseQuery({
+    queryKey: ['objects', bucket.id],
+    queryFn: async () => listObjects(bucketParam)
+  })
+
+  // Create folder mutation
+  const createFolderMutation = useMutation({
+    mutationFn: async (folderName: string) => {
+      return createFolder(bucketParam, folderName)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['objects', bucket.id] })
+    },
+    onError: (error) => {
+      console.error('Failed to create folder:', error)
+    }
+  })
+
   const [filterText, setFilterText] = React.useState('')
   const [showCreateFolderDialog, setShowCreateFolderDialog] = React.useState(false)
   const [showUploadFileDialog, setShowUploadFileDialog] = React.useState(false)
@@ -44,12 +61,53 @@ export function ObjectBrowser() {
   const [isCreatingFolder, setIsCreatingFolder] = React.useState(false)
   const [isUploadingFile, setIsUploadingFile] = React.useState(false)
 
+  // Transform API data to FileItem format
+  // In S3 with delimiter, folders are in commonPrefixes and files are in contents
+  // Empty folders (folder markers) may also appear in contents with trailing slash
+  const fileItems: FileItem[] = React.useMemo(() => {
+    const commonPrefixes = objectsQuery.data?.commonPrefixes || []
+    const contents = objectsQuery.data?.contents || []
+
+    // Get folders from commonPrefixes (folders with content)
+    const folderItemsFromPrefixes = commonPrefixes.map((folder: any) => ({
+      id: folder.prefix,
+      name: folder.prefix.replace(/\/$/, ''), // Remove trailing slash for display
+      type: 'folder' as const,
+      size: 0,
+      modified: new Date().toISOString() // Folders don't have lastModified in S3
+    }))
+
+    // Get empty folders from contents (folder markers with trailing slash)
+    const emptyFolders = contents
+      .filter((obj: any) => obj.key.endsWith('/'))
+      .map((obj: any) => ({
+        id: obj.key,
+        name: obj.key.replace(/\/$/, ''),
+        type: 'folder' as const,
+        size: 0,
+        modified: obj.lastModified || new Date().toISOString()
+      }))
+
+    // Get files (exclude folder markers)
+    const fileItems = contents
+      .filter((obj: any) => !obj.key.endsWith('/'))
+      .map((obj: any) => ({
+        id: obj.key,
+        name: obj.key,
+        type: 'file' as const,
+        size: obj.size,
+        modified: obj.lastModified
+      }))
+
+    return [...folderItemsFromPrefixes, ...emptyFolders, ...fileItems]
+  }, [objectsQuery.data])
+
   // Filter files based on search text
   const filteredFiles = React.useMemo(() => {
-    if (!filterText) return dummyFiles
+    if (!filterText) return fileItems
     const lowerFilter = filterText.toLowerCase()
-    return dummyFiles.filter((file) => file.name.toLowerCase().includes(lowerFilter))
-  }, [filterText])
+    return fileItems.filter((file) => file.name.toLowerCase().includes(lowerFilter))
+  }, [filterText, fileItems])
 
   // Separate folders and files
   const folders = filteredFiles.filter((file) => file.type === 'folder')
@@ -90,11 +148,12 @@ export function ObjectBrowser() {
 
   const handleCreateFolder = async (folderName: string) => {
     setIsCreatingFolder(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsCreatingFolder(false)
-    setShowCreateFolderDialog(false)
-    console.log('Creating folder:', folderName)
+    try {
+      await createFolderMutation.mutateAsync(folderName)
+      setShowCreateFolderDialog(false)
+    } finally {
+      setIsCreatingFolder(false)
+    }
   }
 
   const handleUploadFiles = async (files: File[]) => {

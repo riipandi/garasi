@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_EnU568g9No
 createdAt: 2026-01-22T18:55:44.502862
-updatedAt: 2026-01-22T18:56:50.689254
+updatedAt: 2026-01-22T21:55:54.665428
 workspaceId: wk_YrPa97TLKc
 folderId: fl_36BcPxBP88
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "name": "dummy"
+      "name": "dualupaa"
     }
 bodyType: application/json
 description: ''
@@ -22,5 +22,5 @@ headers:
 method: POST
 name: Create a directory
 sortPriority: 1000.0
-url: ${[ baseURL ]}/api/objects?bucket=demo
+url: ${[ baseURL ]}/api/objects/folder?bucket=demo
 urlParameters: []

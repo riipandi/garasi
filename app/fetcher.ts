@@ -1192,3 +1192,101 @@ export async function denyBucketKey(
     return null
   }
 }
+
+/**
+ * Create a folder in a bucket
+ *
+ * @param bucket - The bucket name or ID
+ * @param folderName - The name of folder to create
+ * @returns Promise that resolves with created folder information
+ */
+export async function createFolder(
+  bucket: string,
+  folderName: string
+): Promise<{
+  folderName: string
+  folderKey: string
+  bucket: string
+} | null> {
+  try {
+    const response = await fetcher<{
+      status: 'success' | 'error'
+      message: string
+      data: {
+        folderName: string
+        folderKey: string
+        bucket: string
+      }
+    }>('/objects/folder', {
+      method: 'POST',
+      params: { bucket },
+      body: { name: folderName }
+    })
+
+    if (response.status === 'success' && response.data) {
+      return response.data
+    }
+
+    return null
+  } catch (error) {
+    console.error('Failed to create folder:', error)
+    return null
+  }
+}
+
+/**
+ * List objects in a bucket
+ *
+ * @param bucket - The bucket name or ID
+ * @returns Promise that resolves with list of objects
+ */
+export async function listObjects(bucket: string): Promise<{
+  contents: Array<{
+    key: string
+    lastModified: string
+    size: number
+    eTag: string
+  }>
+  commonPrefixes: Array<{
+    prefix: string
+  }>
+  isTruncated: boolean
+} | null> {
+  try {
+    const response = await fetcher<{
+      status: 'success' | 'error'
+      message: string
+      data: {
+        name: string
+        isTruncated: boolean
+        keyCount: number
+        maxKeys: number
+        commonPrefixes?: Array<{
+          prefix: string
+        }>
+        contents: Array<{
+          key: string
+          lastModified: string
+          size: number
+          eTag: string
+          storageClass: string
+        }>
+      }
+    }>('/objects', {
+      params: { bucket }
+    })
+
+    if (response.status === 'success' && response.data) {
+      return {
+        contents: response.data.contents,
+        commonPrefixes: response.data.commonPrefixes || [],
+        isTruncated: response.data.isTruncated
+      }
+    }
+
+    return null
+  } catch (error) {
+    console.error('Failed to list objects:', error)
+    return null
+  }
+}

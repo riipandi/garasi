@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
@@ -7,10 +7,10 @@ import type { NodeInfoResponse, RepairOperationResponse, RepairType } from './ty
 
 interface NodeDetailProps {
   nodeId: string
+  queryClient: QueryClient
 }
 
-export function NodeDetail({ nodeId }: NodeDetailProps) {
-  const queryClient = useQueryClient()
+export function NodeDetail({ nodeId, queryClient }: NodeDetailProps) {
   const [showRepairDialog, setShowRepairDialog] = React.useState(false)
   const [selectedRepairType, setSelectedRepairType] = React.useState<RepairType>('tables')
 

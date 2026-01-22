@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { fetcher } from '~/app/fetcher'
@@ -11,10 +11,10 @@ import type {
 
 interface LayoutManagementProps {
   layoutVersion?: number
+  queryClient: QueryClient
 }
 
-export function LayoutManagement({ layoutVersion }: LayoutManagementProps) {
-  const queryClient = useQueryClient()
+export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagementProps) {
   const [showPreview, setShowPreview] = React.useState(false)
   const [showHistory, setShowHistory] = React.useState(false)
   const [showUpdateForm, setShowUpdateForm] = React.useState(false)

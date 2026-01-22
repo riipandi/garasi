@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { QueryClient, useMutation } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { fetcher } from '~/app/fetcher'
@@ -7,10 +7,10 @@ import type { ConnectNodeResponse } from './types'
 interface ConnectNodesDialogProps {
   isOpen: boolean
   onClose: () => void
+  queryClient: QueryClient
 }
 
-export function ConnectNodesDialog({ isOpen, onClose }: ConnectNodesDialogProps) {
-  const queryClient = useQueryClient()
+export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNodesDialogProps) {
   const [nodes, setNodes] = React.useState<string[]>([''])
   const [errors, setErrors] = React.useState<Record<number, string>>({})
 

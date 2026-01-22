@@ -26,6 +26,7 @@ const clusterStatisticsQuery = queryOptions({
 })
 
 function RouteComponent() {
+  const { queryClient } = Route.useRouteContext()
   const { data: statusData } = useSuspenseQuery(clusterStatusQuery)
   const { data: statisticsData } = useSuspenseQuery(clusterStatisticsQuery)
 
@@ -150,7 +151,7 @@ function RouteComponent() {
 
       {/* Layout Management */}
       <div className='rounded-lg border border-gray-200 bg-white p-6'>
-        <LayoutManagement layoutVersion={status?.layoutVersion} />
+        <LayoutManagement queryClient={queryClient} layoutVersion={status?.layoutVersion} />
       </div>
 
       {/* Cluster-Wide Storage */}

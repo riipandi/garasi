@@ -6,10 +6,12 @@ export const Route = createFileRoute('/(app)/cluster/nodes/$id')({
 })
 
 function RouteComponent() {
+  const { queryClient } = Route.useRouteContext()
   const { id } = Route.useParams()
+
   return (
     <div className='mx-auto max-w-screen-2xl space-y-6'>
-      <NodeDetail nodeId={id} />
+      <NodeDetail queryClient={queryClient} nodeId={id} />
     </div>
   )
 }

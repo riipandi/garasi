@@ -37,6 +37,7 @@ const nodeInfoQuery = queryOptions({
 const columnHelper = createColumnHelper<NodeResp>()
 
 function RouteComponent() {
+  const { queryClient } = Route.useRouteContext()
   const { data: statusData, isLoading: isLoadingStatusQuery } = useSuspenseQuery(clusterStatusQuery)
   const { data: nodeInfoData, isLoading: isLoadingNodeInfo } = useSuspenseQuery(nodeInfoQuery)
   const [isConnectDialogOpen, setIsConnectDialogOpen] = React.useState(false)
@@ -299,6 +300,7 @@ function RouteComponent() {
 
       {/* Connect Nodes Dialog */}
       <ConnectNodesDialog
+        queryClient={queryClient}
         isOpen={isConnectDialogOpen}
         onClose={() => setIsConnectDialogOpen(false)}
       />

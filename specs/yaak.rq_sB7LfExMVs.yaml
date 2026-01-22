@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_sB7LfExMVs
 createdAt: 2026-01-19T20:20:51.568269
-updatedAt: 2026-01-22T20:24:58.595826
+updatedAt: 2026-01-22T21:53:26.647961
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -15,7 +15,7 @@ headers: []
 method: GET
 name: Inspect Object
 sortPriority: 4000.0
-url: ${[ baseURL ]}/api/bucket/:id/inspect-object?key=2036cc5854a810064a58294efba99494.webp
+url: ${[ baseURL ]}/api/bucket/:id/inspect-object?key=dualupa
 urlParameters:
   - enabled: true
     name: :id
