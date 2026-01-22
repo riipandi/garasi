@@ -2,13 +2,13 @@ import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Alert } from '~/app/components/ui/Alert'
-import { PasswordInput } from '~/app/components/ui/PasswordInput'
+import { Alert } from '~/app/components/alert'
+import { PasswordInput } from '~/app/components/password-input'
 import { fetcher } from '~/app/fetcher'
 
 // Zod schema for form validation
 const changeEmailSchema = z.object({
-  newEmail: z.string().min(1, 'Email is required').email('Invalid email address'),
+  newEmail: z.email({ error: 'Invalid email address' }),
   password: z.string().min(1, 'Password is required')
 })
 

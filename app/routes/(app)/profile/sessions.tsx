@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { decodeJwt } from 'jose'
 import * as Lucide from 'lucide-react'
-import { Alert } from '~/app/components/ui/Alert'
+import { Alert } from '~/app/components/alert'
 import { fetcher } from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 

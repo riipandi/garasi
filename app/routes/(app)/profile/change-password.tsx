@@ -2,9 +2,9 @@ import { useForm } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Alert } from '~/app/components/ui/Alert'
-import { PasswordInput } from '~/app/components/ui/PasswordInput'
-import { PasswordStrength } from '~/app/components/ui/PasswordStrength'
+import { Alert } from '~/app/components/alert'
+import { PasswordInput } from '~/app/components/password-input'
+import { PasswordStrength } from '~/app/components/password-strength'
 import { fetcher } from '~/app/fetcher'
 
 // Zod schema for form validation

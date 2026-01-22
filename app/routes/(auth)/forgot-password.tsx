@@ -3,12 +3,12 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
-import { Alert } from '~/app/components/ui/Alert'
+import { Alert } from '~/app/components/alert'
 import { fetcher } from '~/app/fetcher'
 
 // Zod schema for form validation
 const forgotPasswordSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email address')
+  email: z.email({ error: 'Invalid email address' })
 })
 
 export const Route = createFileRoute('/(auth)/forgot-password')({

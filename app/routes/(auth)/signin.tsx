@@ -3,8 +3,8 @@ import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-r
 import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
-import { Alert } from '~/app/components/ui/Alert'
-import { PasswordInput } from '~/app/components/ui/PasswordInput'
+import { Alert } from '~/app/components/alert'
+import { PasswordInput } from '~/app/components/password-input'
 import { useAuth } from '~/app/guards'
 import type { SigninRequest } from '~/app/types/api'
 

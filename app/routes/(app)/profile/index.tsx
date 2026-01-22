@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import { queryOptions, useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Alert } from '~/app/components/ui/Alert'
+import { Alert } from '~/app/components/alert'
 import { fetcher } from '~/app/fetcher'
 import type { UserProfileResponse } from '~/app/types/api'
 
