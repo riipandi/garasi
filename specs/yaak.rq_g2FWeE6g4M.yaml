@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_g2FWeE6g4M
 createdAt: 2026-01-19T20:24:49.077892
-updatedAt: 2026-01-22T12:05:29.677360
+updatedAt: 2026-01-22T16:29:47.877164
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -12,7 +12,7 @@ body:
     {
       "name": null,
       "neverExpires": false,
-      "expiration": "RFC3339 or null",
+      "expiration": null,
       "allow": {
         "createBucket": true
       },

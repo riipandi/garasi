@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_a7mqLLwwoz
 createdAt: 2026-01-19T20:20:30.340412
-updatedAt: 2026-01-21T10:21:32.905364
+updatedAt: 2026-01-22T19:37:57.903795
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -10,10 +10,10 @@ authenticationType: null
 body:
   text: |-
     {
-      "globalAlias": "",
+      "globalAlias": "demo",
       "localAlias": {
-        "accessKeyId": "",
-        "alias": ""
+        "accessKeyId": "GK9013a5b8e8ac9c444ecf45e6",
+        "alias": "duaaa"
       }
     }
 bodyType: application/json
@@ -27,4 +27,8 @@ method: POST
 name: Add Bucket Alias
 sortPriority: 9000.0
 url: ${[ baseURL ]}/api/bucket/:id/aliases
-urlParameters: []
+urlParameters:
+  - enabled: true
+    name: :id
+    value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_CbPTEnV8Er', path=b64'JC5kYXRhWzBdLmlk') ]}
+    id: 5u3SMPqZax

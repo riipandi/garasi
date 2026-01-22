@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_yzEz74WMn5
 createdAt: 2026-01-19T20:20:51.035958
-updatedAt: 2026-01-21T10:21:32.904392
+updatedAt: 2026-01-22T16:28:20.006205
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -12,8 +12,8 @@ body:
     {
       "websiteAccess": {
         "enabled": false,
-        "indexDocument": "index.html",
-        "errorDocument": "error.html"
+        "indexDocument": null,
+        "errorDocument": null
       },
       "quotas": {
         "maxObjects": null,

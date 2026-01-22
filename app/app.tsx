@@ -2,8 +2,6 @@ import { TanStackDevtools, type TanStackDevtoolsReactInit } from '@tanstack/reac
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type AnyRouter, RouterProvider } from '@tanstack/react-router'
 import type { LogType } from 'consola'
-import type { Options as NuqsOptions } from 'nuqs'
-import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { Suspense, useEffect, useState } from 'react'
 import { AuthProvider } from '~/app/guards'
 import type { GlobalContext } from '~/app/routes/__root'
@@ -16,9 +14,6 @@ interface AppProps {
   queryClient: QueryClient
   routes: AnyRouter
   devTools?: Partial<TanStackDevtoolsReactInit>
-  nuqsOptions?: Partial<
-    Pick<NuqsOptions, 'shallow' | 'clearOnDefault' | 'scroll' | 'limitUrlUpdates'>
-  >
 }
 
 export default function App(props: AppProps) {
@@ -49,19 +44,13 @@ export default function App(props: AppProps) {
   }, [])
 
   return (
-    <NuqsAdapter defaultOptions={props.nuqsOptions}>
-      <QueryClientProvider client={props.queryClient}>
-        <AuthProvider>
-          <Suspense fallback={<div>Loading...</div>}>
-            <RouterProvider
-              router={props.routes}
-              context={routerContext}
-              basepath={props.basePath}
-            />
-          </Suspense>
-          <TanStackDevtools {...props.devTools} />
-        </AuthProvider>
-      </QueryClientProvider>
-    </NuqsAdapter>
+    <QueryClientProvider client={props.queryClient}>
+      <AuthProvider>
+        <Suspense fallback={<div>Loading...</div>}>
+          <RouterProvider router={props.routes} context={routerContext} basepath={props.basePath} />
+        </Suspense>
+        <TanStackDevtools {...props.devTools} />
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_CtNaK9TGeJ
 createdAt: 2026-01-19T20:20:32.099041
-updatedAt: 2026-01-21T10:21:49.313131
+updatedAt: 2026-01-22T19:13:53.153985
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "accessKeyId": "",
+      "accessKeyId": "${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_7qjXNfxmnC', path=b64'JC5kYXRhLlswXS5pZA') ]}",
       "permissions": {
         "owner": true,
         "read": true,

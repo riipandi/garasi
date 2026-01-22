@@ -37,6 +37,10 @@ export default defineConfig({
   ],
   nitro: nitroConfig,
   resolve: { tsconfigPaths: true },
+  build: {
+    chunkSizeWarningLimit: 1024 * 2,
+    minify: isProduction ? 'oxc' : false
+  },
   server: {
     port: 3980,
     strictPort: true,

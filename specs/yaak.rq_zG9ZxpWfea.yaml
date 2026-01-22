@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_zG9ZxpWfea
 createdAt: 2026-01-21T16:30:38.725741
-updatedAt: 2026-01-21T17:08:13.365086
+updatedAt: 2026-01-22T18:56:47.735744
 workspaceId: wk_YrPa97TLKc
 folderId: fl_36BcPxBP88
 authentication: {}
@@ -26,6 +26,6 @@ headers:
     id: pwvRgvIVN8
 method: POST
 name: Upload file to bucket
-sortPriority: 0.001
+sortPriority: 333.3333333333333
 url: ${[ baseURL ]}/api/objects?bucket=demo&overwrite=false
 urlParameters: []

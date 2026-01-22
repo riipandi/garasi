@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_EnU568g9No
+createdAt: 2026-01-22T18:55:44.502862
+updatedAt: 2026-01-22T18:56:50.689254
+workspaceId: wk_YrPa97TLKc
+folderId: fl_36BcPxBP88
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "name": "dummy"
+    }
+bodyType: application/json
+description: ''
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: vJA7ISaVRe
+method: POST
+name: Create a directory
+sortPriority: 1000.0
+url: ${[ baseURL ]}/api/objects?bucket=demo
+urlParameters: []
