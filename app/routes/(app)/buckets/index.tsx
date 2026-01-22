@@ -4,10 +4,10 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
-import { fetcher, createBucket, deleteBucket } from '~/app/fetcher'
+import { createBucket, deleteBucket, listBuckets } from '~/app/fetcher'
 import { BucketCreate } from './-partials/bucket-create'
 import { BucketTable } from './-partials/bucket-table'
-import type { BucketListItem, CreateBucketRequest } from './-partials/types'
+import type { CreateBucketRequest } from './-partials/types'
 
 export const Route = createFileRoute('/(app)/buckets/')({
   component: RouteComponent,
@@ -18,7 +18,7 @@ export const Route = createFileRoute('/(app)/buckets/')({
 
 const bucketsQuery = queryOptions({
   queryKey: ['buckets'],
-  queryFn: () => fetcher<{ success: boolean; data: BucketListItem[] }>('/bucket')
+  queryFn: listBuckets
 })
 
 function RouteComponent() {
@@ -31,8 +31,7 @@ function RouteComponent() {
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
   // Fetch buckets
-  const { data: bucketsData } = useSuspenseQuery(bucketsQuery)
-  const buckets = bucketsData?.data || []
+  const { data: buckets } = useSuspenseQuery(bucketsQuery)
 
   // Create bucket mutation
   const createBucketMutation = useMutation({

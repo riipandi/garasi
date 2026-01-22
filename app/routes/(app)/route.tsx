@@ -1,9 +1,12 @@
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, Outlet, redirect, useRouter } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { NotFound } from '~/app/errors'
+import { listBuckets } from '~/app/fetcher'
 import { useAuth } from '~/app/guards'
+import type { BucketListItem } from '~/app/routes/(app)/buckets/-partials/types'
 import { uiStore } from '~/app/stores'
 
 export const Route = createFileRoute('/(app)')({
@@ -26,6 +29,19 @@ function RouteComponent() {
     setIsMobileSidebarOpen(ui.sidebar === 'show')
   }, [])
 
+  // Fetch buckets for quick access
+  const { data, isLoading, error } = useQuery<BucketListItem[]>({
+    queryKey: ['buckets'],
+    queryFn: listBuckets,
+    staleTime: 60000 // Cache for 1 minute
+  })
+  const buckets = Array.isArray(data) ? data : []
+
+  // Debug logging
+  if (error) {
+    console.error('Error fetching buckets:', error)
+  }
+  console.log('Buckets data:', { data, buckets, isLoading, error })
   const handleLogout = () => {
     logout()
       .then(() => router.navigate({ to: '/signin', search: { redirect: '/' } }))
@@ -99,10 +115,11 @@ function RouteComponent() {
                   <NavLink to='/' icon={Lucide.LayoutDashboard} label='Dashboard' exact />
                   <NavLink to='/metrics' icon={Lucide.GanttChartSquare} label='Metrics' />
                   <NavLink to='/cluster' icon={Lucide.Server} label='Cluster' />
-                  <NavLink to='/buckets' icon={Lucide.Database} label='Buckets' />
+                  <NavLink to='/buckets' icon={Lucide.Database} label='Buckets' exact />
                   <NavLink to='/keys' icon={Lucide.KeyRound} label='Access Keys' />
                   <NavDivider />
                   <NavSection title='Quick Access' />
+                  <QuickAccessBuckets buckets={buckets} />
                 </nav>
               </div>
 
@@ -191,4 +208,57 @@ function NavSection({ title }: { title: string }) {
 // Reusable navbar divider
 function NavDivider() {
   return <div className='my-3 border-t border-gray-200' />
+}
+
+// Quick access buckets component
+function QuickAccessBuckets({
+  buckets,
+  onBucketClick
+}: {
+  buckets: BucketListItem[]
+  onBucketClick?: () => void
+}) {
+  // Handle loading state
+  if (!Array.isArray(buckets)) {
+    return <div className='px-3 py-2 text-xs text-gray-500'>Loading buckets...</div>
+  }
+
+  if (buckets.length === 0) {
+    return <div className='px-3 py-2 text-xs text-gray-500'>No buckets available</div>
+  }
+
+  return (
+    <div className='space-y-0.5 px-3'>
+      {buckets.map((bucket) => {
+        // Use global alias if available, otherwise use bucket id
+        const displayName = bucket.globalAliases[0] || bucket.id
+        const bucketPath = `/buckets/${bucket.id}`
+
+        return (
+          <Link
+            key={bucket.id}
+            to={bucketPath}
+            className='flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900'
+            activeProps={{
+              className:
+                'bg-gray-200 font-medium text-gray-900 hover:bg-gray-200 hover:text-gray-900'
+            }}
+            onClick={() => {
+              onBucketClick?.()
+              // Close mobile sidebar on navigation
+              if (window.innerWidth < 1024) {
+                const ui = uiStore.get()
+                if (ui.sidebar === 'show') {
+                  uiStore.set({ ...ui, sidebar: 'hide' })
+                }
+              }
+            }}
+          >
+            <Lucide.Database className='size-4' />
+            <span className='truncate'>{displayName}</span>
+          </Link>
+        )
+      })}
+    </div>
+  )
 }

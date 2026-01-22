@@ -3,6 +3,7 @@
 import { decodeJwt, type JWTPayload } from 'jose'
 import type { $Fetch, FetchOptions } from 'ofetch'
 import { ofetch } from 'ofetch'
+import type { BucketListItem } from '~/app/routes/(app)/buckets/-partials/types'
 import { authStore } from '~/app/stores'
 
 /**
@@ -316,31 +317,14 @@ export async function revokeSession(sessionId: string): Promise<boolean> {
  *
  * @returns Promise that resolves with list of buckets
  */
-export async function listBuckets(): Promise<
-  Array<{
-    id: string
-    created: string
-    globalAliases: string[]
-    localAliases: Array<{
-      accessKeyId: string
-      alias: string
-    }>
-  }>
-> {
+export async function listBuckets(): Promise<BucketListItem[]> {
   const response = await fetcher<{
-    success: boolean
-    data: Array<{
-      id: string
-      created: string
-      globalAliases: string[]
-      localAliases: Array<{
-        accessKeyId: string
-        alias: string
-      }>
-    }>
+    status: string
+    message: string
+    data: BucketListItem[]
   }>('/bucket')
 
-  if (response.success && response.data) {
+  if (response.status === 'success' && response.data) {
     return response.data
   }
 
