@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/(app)/profile/change-email')({
 })
 
 function RouteComponent() {
-  const queryClient = useQueryClient()
+  const { queryClient } = Route.useRouteContext()
 
   // Fetch user profile to get current email
   const { data: profileData } = useQuery({

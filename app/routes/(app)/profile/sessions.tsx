@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { decodeJwt } from 'jose'
 import * as Lucide from 'lucide-react'
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/(app)/profile/sessions')({
 })
 
 function RouteComponent() {
-  const queryClient = useQueryClient()
+  const { queryClient } = Route.useRouteContext()
 
   // Get current session ID from access token
   const currentSessionId = (() => {

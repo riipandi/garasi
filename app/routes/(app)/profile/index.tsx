@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { queryOptions, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { queryOptions, useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 import { Alert } from '~/app/components/ui/Alert'
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/(app)/profile/')({
 })
 
 function RouteComponent() {
-  const queryClient = useQueryClient()
+  const { queryClient } = Route.useRouteContext()
   const router = useRouter()
 
   // Fetch user profile data from /auth/whoami endpoint
