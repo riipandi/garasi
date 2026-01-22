@@ -9,7 +9,11 @@ export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
 
   // Validate required parameter
-  const { bucket, overwrite } = getQuery<{ bucket: string; overwrite: string | null }>(event)
+  const { bucket, prefix, overwrite } = getQuery<{
+    bucket: string
+    prefix?: string
+    overwrite?: string | null
+  }>(event)
   if (!bucket) {
     logger.debug('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
@@ -58,14 +62,17 @@ export default defineProtectedHandler(async (event) => {
   // Upload the file to bucket
   const s3Client = await createS3ClientFromBucket(event, bucket)
 
+  // Build the full key with prefix if provided
+  const fullKey = prefix ? `${prefix}${filename}` : filename
+
   const forceUpload = parseBoolean(overwrite ?? null)
-  const fileExists = await s3Client.exists(filename, { bucket })
+  const fileExists = await s3Client.exists(fullKey, { bucket })
   if (!forceUpload && fileExists) {
-    logger.withMetadata({ filename }).debug('File already exists')
-    throw new HTTPError({ status: 401, statusText: `File '${filename}' already exists` })
+    logger.withMetadata({ filename: fullKey }).debug('File already exists')
+    throw new HTTPError({ status: 401, statusText: `File '${fullKey}' already exists` })
   }
 
-  const bytesWritten = await s3Client.write(filename, buffer, { bucket, type: contentType })
+  const bytesWritten = await s3Client.write(fullKey, buffer, { bucket, type: contentType })
   logger.withMetadata({ bytesWritten }).debug('Fetch bucket objects')
 
   const data = { filename, contentType, fileSize: prettyBytes(bytesWritten), forceUpload }

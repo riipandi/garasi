@@ -12,6 +12,10 @@ const ObjectBrowser = React.lazy(() =>
 
 export const Route = createFileRoute('/(app)/buckets/$id/')({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>) => ({
+    prefix: typeof search.prefix === 'string' ? search.prefix : undefined,
+    key: typeof search.key === 'string' ? search.key : undefined
+  }),
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(bucketQuery(params.id))
   }
@@ -48,6 +52,7 @@ function getBucketDisplayName(bucket: Bucket): string {
 function RouteComponent() {
   const { queryClient } = Route.useRouteContext()
   const { id } = Route.useParams()
+  const search = Route.useSearch()
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
   // Fetch bucket info
@@ -209,7 +214,13 @@ function RouteComponent() {
 
       {/* Object Browser */}
       <React.Suspense fallback={<ObjectBrowserFallback />}>
-        <ObjectBrowser queryClient={queryClient} bucket={bucket} />
+        <ObjectBrowser
+          queryClient={queryClient}
+          bucket={bucket}
+          bucketId={id}
+          prefix={search.prefix}
+          key={search.key}
+        />
       </React.Suspense>
     </div>
   )

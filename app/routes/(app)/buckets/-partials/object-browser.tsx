@@ -1,7 +1,8 @@
 import { useSuspenseQuery, useMutation, QueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { createFolder, listObjects } from '~/app/fetcher'
+import { createFolder, listObjects, uploadFile } from '~/app/fetcher'
 import type { Bucket } from './types'
 
 // Code split components using React.lazy
@@ -30,27 +31,45 @@ interface FileItem {
 interface ObjectBrowserProps {
   queryClient: QueryClient
   bucket: Bucket
+  prefix?: string | null
+  key?: string | null
+  bucketId: string
 }
 
-export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
+export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: ObjectBrowserProps) {
   const bucketParam = bucket.globalAliases[0] || bucket.id
 
-  // Query to fetch bucket objects
+  // Query to fetch bucket objects with prefix and key support
   const objectsQuery = useSuspenseQuery({
-    queryKey: ['objects', bucket.id],
-    queryFn: async () => listObjects(bucketParam)
+    queryKey: ['objects', bucket.id, prefix, key],
+    queryFn: async () => listObjects(bucketParam, prefix, key)
   })
 
   // Create folder mutation
   const createFolderMutation = useMutation({
     mutationFn: async (folderName: string) => {
-      return createFolder(bucketParam, folderName)
+      // Prepend prefix to folder name if we're in a subdirectory
+      const fullFolderName = prefix ? `${prefix}${folderName}/` : `${folderName}/`
+      return createFolder(bucketParam, fullFolderName)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['objects', bucket.id] })
+      queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })
     },
     onError: (error) => {
       console.error('Failed to create folder:', error)
+    }
+  })
+
+  // Upload file mutation
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File) => {
+      return uploadFile(bucketParam, file, prefix || undefined)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })
+    },
+    onError: (error) => {
+      console.error('Failed to upload file:', error)
     }
   })
 
@@ -69,20 +88,24 @@ export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
     const contents = objectsQuery.data?.contents || []
 
     // Get folders from commonPrefixes (folders with content)
-    const folderItemsFromPrefixes = commonPrefixes.map((folder: any) => ({
-      id: folder.prefix,
-      name: folder.prefix.replace(/\/$/, ''), // Remove trailing slash for display
-      type: 'folder' as const,
-      size: 0,
-      modified: new Date().toISOString() // Folders don't have lastModified in S3
-    }))
+    // Filter out the current prefix to avoid showing the selected folder itself
+    const folderItemsFromPrefixes = commonPrefixes
+      .filter((folder: any) => folder.prefix !== prefix)
+      .map((folder: any) => ({
+        id: folder.prefix,
+        name: folder.prefix.replace(/\/$/, '').replace(prefix || '', ''), // Remove prefix and trailing slash for display
+        type: 'folder' as const,
+        size: 0,
+        modified: new Date().toISOString() // Folders don't have lastModified in S3
+      }))
 
     // Get empty folders from contents (folder markers with trailing slash)
+    // Filter out the current prefix to avoid showing the selected folder itself
     const emptyFolders = contents
-      .filter((obj: any) => obj.key.endsWith('/'))
+      .filter((obj: any) => obj.key.endsWith('/') && obj.key !== prefix)
       .map((obj: any) => ({
         id: obj.key,
-        name: obj.key.replace(/\/$/, ''),
+        name: obj.key.replace(/\/$/, '').replace(prefix || '', ''),
         type: 'folder' as const,
         size: 0,
         modified: obj.lastModified || new Date().toISOString()
@@ -93,14 +116,14 @@ export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
       .filter((obj: any) => !obj.key.endsWith('/'))
       .map((obj: any) => ({
         id: obj.key,
-        name: obj.key,
+        name: obj.key.replace(prefix || '', ''),
         type: 'file' as const,
         size: obj.size,
         modified: obj.lastModified
       }))
 
     return [...folderItemsFromPrefixes, ...emptyFolders, ...fileItems]
-  }, [objectsQuery.data])
+  }, [objectsQuery.data, prefix])
 
   // Filter files based on search text
   const filteredFiles = React.useMemo(() => {
@@ -158,12 +181,28 @@ export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
 
   const handleUploadFiles = async (files: File[]) => {
     setIsUploadingFile(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsUploadingFile(false)
-    setShowUploadFileDialog(false)
-    console.log('Uploading files:', files)
+    try {
+      // Upload files one by one
+      for (const file of files) {
+        await uploadFileMutation.mutateAsync(file)
+      }
+      setShowUploadFileDialog(false)
+    } catch (error) {
+      console.error('Failed to upload files:', error)
+    } finally {
+      setIsUploadingFile(false)
+    }
   }
+
+  // Generate breadcrumb path segments
+  const breadcrumbSegments = React.useMemo(() => {
+    if (!prefix) return []
+    const segments = prefix.split('/').filter(Boolean)
+    return segments.map((segment, index) => ({
+      name: segment,
+      path: segments.slice(0, index + 1).join('/') + '/'
+    }))
+  }, [prefix])
 
   return (
     <div className='space-y-4'>
@@ -216,10 +255,38 @@ export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
 
       {/* Breadcrumb */}
       <div className='flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2 py-1.5 text-sm shadow-xs'>
-        <button className='flex items-center gap-2 rounded-md px-2 py-1 text-gray-600 transition-all hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'>
+        <Link
+          to='/buckets/$id'
+          params={{ id: bucketId }}
+          search={{ prefix: undefined, key: undefined }}
+          className='flex items-center gap-2 rounded-md px-2 py-1 text-gray-600 transition-all hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+        >
           <Lucide.Home className='size-4' />
           <span className='font-medium'>Root</span>
-        </button>
+        </Link>
+        {breadcrumbSegments.length > 0 && (
+          <>
+            {breadcrumbSegments.map((segment, index) => (
+              <React.Fragment key={segment.path}>
+                <Lucide.ChevronRight className='size-4 text-gray-400' />
+                <Link
+                  to='/buckets/$id'
+                  params={{ id: bucketId }}
+                  search={{ prefix: segment.path, key: undefined }}
+                  className='flex items-center gap-2 rounded-md px-2 py-1 text-gray-600 transition-all hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+                >
+                  <span
+                    className={
+                      index === breadcrumbSegments.length - 1 ? 'font-medium text-gray-900' : ''
+                    }
+                  >
+                    {segment.name}
+                  </span>
+                </Link>
+              </React.Fragment>
+            ))}
+          </>
+        )}
       </div>
 
       {/* File List */}
@@ -235,9 +302,12 @@ export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
         {folders.length > 0 && (
           <div className='divide-y divide-gray-200'>
             {folders.map((folder) => (
-              <div
+              <Link
                 key={folder.id}
-                className='relative grid cursor-pointer grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-gray-50'
+                to='/buckets/$id'
+                params={{ id: bucketId }}
+                search={{ prefix: folder.id, key: undefined }}
+                className='relative grid grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-gray-50'
               >
                 <div className='col-span-6 flex items-center gap-3'>
                   <Lucide.Folder className='size-5 text-blue-500' />
@@ -248,7 +318,10 @@ export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
                   {formatDate(folder.modified)}
                 </div>
                 {/* Action Menu Button */}
-                <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+                <div
+                  className='absolute top-1/2 right-2 -translate-y-1/2'
+                  onClick={(e) => e.preventDefault()}
+                >
                   <button
                     type='button'
                     onClick={(e) => {
@@ -298,7 +371,7 @@ export function ObjectBrowser({ queryClient, bucket }: ObjectBrowserProps) {
                     </DropdownMenu>
                   </React.Suspense>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

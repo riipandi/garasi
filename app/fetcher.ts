@@ -1238,9 +1238,15 @@ export async function createFolder(
  * List objects in a bucket
  *
  * @param bucket - The bucket name or ID
+ * @param prefix - Optional prefix to filter objects (for folder navigation)
+ * @param key - Optional specific key to inspect
  * @returns Promise that resolves with list of objects
  */
-export async function listObjects(bucket: string): Promise<{
+export async function listObjects(
+  bucket: string,
+  prefix?: string | null,
+  key?: string | null
+): Promise<{
   contents: Array<{
     key: string
     lastModified: string
@@ -1253,6 +1259,14 @@ export async function listObjects(bucket: string): Promise<{
   isTruncated: boolean
 } | null> {
   try {
+    const params: Record<string, string> = { bucket }
+    if (prefix) {
+      params.prefix = prefix
+    }
+    if (key) {
+      params.key = key
+    }
+
     const response = await fetcher<{
       status: 'success' | 'error'
       message: string
@@ -1273,7 +1287,7 @@ export async function listObjects(bucket: string): Promise<{
         }>
       }
     }>('/objects', {
-      params: { bucket }
+      params
     })
 
     if (response.status === 'success' && response.data) {
@@ -1287,6 +1301,64 @@ export async function listObjects(bucket: string): Promise<{
     return null
   } catch (error) {
     console.error('Failed to list objects:', error)
+    return null
+  }
+}
+
+/**
+ * Upload a file to a bucket
+ *
+ * @param bucket - The bucket name or ID
+ * @param file - The file to upload
+ * @param prefix - Optional prefix (folder path) to upload the file to
+ * @param overwrite - Whether to overwrite existing file (optional)
+ * @returns Promise that resolves with upload result
+ */
+export async function uploadFile(
+  bucket: string,
+  file: File,
+  prefix?: string,
+  overwrite?: boolean
+): Promise<{
+  filename: string
+  contentType: string
+  fileSize: string
+  forceUpload: boolean
+} | null> {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const params: Record<string, string> = { bucket }
+    if (prefix !== undefined && prefix !== null) {
+      params.prefix = prefix
+    }
+    if (overwrite !== undefined) {
+      params.overwrite = overwrite.toString()
+    }
+
+    const response = await fetcher<{
+      status: 'success' | 'error'
+      message: string
+      data: {
+        filename: string
+        contentType: string
+        fileSize: string
+        forceUpload: boolean
+      }
+    }>('/objects', {
+      method: 'POST',
+      params,
+      body: formData
+    })
+
+    if (response.status === 'success' && response.data) {
+      return response.data
+    }
+
+    return null
+  } catch (error) {
+    console.error('Failed to upload file:', error)
     return null
   }
 }

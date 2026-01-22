@@ -450,6 +450,7 @@ function RouteComponent() {
             <Link
               to='/buckets/$id'
               params={{ id }}
+              search={{ key: undefined, prefix: undefined }}
               className='mb-3 inline-flex items-center text-sm text-gray-500 hover:text-gray-700'
             >
               <Lucide.ArrowLeft className='mr-2 size-4' />

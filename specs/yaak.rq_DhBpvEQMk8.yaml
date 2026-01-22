@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_DhBpvEQMk8
 createdAt: 2026-01-21T15:25:47.802418
-updatedAt: 2026-01-22T21:20:38.963746
+updatedAt: 2026-01-22T22:17:46.235200
 workspaceId: wk_YrPa97TLKc
 folderId: fl_36BcPxBP88
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: List bucket objects
 sortPriority: 0.0
-url: ${[ baseURL ]}/api/objects?bucket=demo
+url: ${[ baseURL ]}/api/objects?bucket=demo&prefix=
 urlParameters: []

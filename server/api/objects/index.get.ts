@@ -6,7 +6,7 @@ export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
 
   // Validate required parameter
-  const { bucket } = getQuery<{ bucket: string }>(event)
+  const { bucket, prefix } = getQuery<{ bucket: string; prefix?: string }>(event)
   if (!bucket) {
     logger.debug('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
@@ -17,12 +17,25 @@ export default defineProtectedHandler(async (event) => {
 
   // Use delimiter to properly separate folders from files
   // This will return folders in commonPrefixes and files in contents
-  const data = await s3Client.list({ maxKeys: 100, fetchOwner: true, delimiter: '/' }, { bucket })
+  // If prefix is provided, list objects under that prefix
+  const listOptions: any = {
+    maxKeys: 100,
+    fetchOwner: true,
+    delimiter: '/'
+  }
+
+  // Add prefix if provided
+  if (prefix) {
+    listOptions.prefix = prefix
+  }
+
+  const data = await s3Client.list(listOptions, { bucket })
 
   // Log detailed information for debugging folder recognition
   logger
     .withMetadata({
       bucket,
+      prefix,
       objectCount: data?.contents?.length || 0,
       folderCount: data?.commonPrefixes?.length || 0,
       folders: data?.commonPrefixes?.map((p: any) => p.prefix) || [],
