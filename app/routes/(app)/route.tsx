@@ -126,7 +126,7 @@ function RouteComponent() {
 
           {/* Main Content */}
           <main className='flex-1 overflow-auto bg-gray-50'>
-            <div className='h-auto px-4 py-8 lg:px-8 lg:pb-10'>
+            <div className='mx-auto h-auto px-4 py-8 lg:px-8 lg:pb-10'>
               <Outlet />
             </div>
           </main>
