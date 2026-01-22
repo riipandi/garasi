@@ -17,7 +17,7 @@ function RouteComponent() {
       <div className='min-w-0 flex-1'>
         <p>
           <Link to='/buckets/$id' params={{ id: 'a1a28c81d925514c8e357ad39fd539f2' }}>
-            Demo Bucket
+            Go to Demo Bucket
           </Link>
         </p>
       </div>

@@ -5,18 +5,18 @@ import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
 import { fetcher } from '~/app/fetcher'
-import { KeyEdit } from './-access-keys/key-edit'
-import type { AccessKey, UpdateKeyRequest } from './-access-keys/types'
+import { KeyEdit } from './-partials/key-edit'
+import type { AccessKey, UpdateKeyRequest } from './-partials/types'
 
 // Lazy load components for code splitting
 const KeyInformationCard = React.lazy(() =>
-  import('./-access-keys/key-information-card').then((m) => ({ default: m.KeyInformationCard }))
+  import('./-partials/key-information-card').then((m) => ({ default: m.KeyInformationCard }))
 )
 const PermissionsSection = React.lazy(() =>
-  import('./-access-keys/permissions').then((m) => ({ default: m.PermissionsSection }))
+  import('./-partials/permissions').then((m) => ({ default: m.PermissionsSection }))
 )
 const BucketAccessSection = React.lazy(() =>
-  import('./-access-keys/bucket-access').then((m) => ({ default: m.BucketAccessSection }))
+  import('./-partials/bucket-access').then((m) => ({ default: m.BucketAccessSection }))
 )
 
 export const Route = createFileRoute('/(app)/keys/$id')({

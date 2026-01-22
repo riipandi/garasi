@@ -186,7 +186,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
           <button
             type='button'
             onClick={() => setFiltering('')}
-            className='absolute top-1/2 right-2 rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+            className='absolute top-1.5 right-2 rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none'
             title='Clear search'
           >
             <Lucide.X className='size-4' />

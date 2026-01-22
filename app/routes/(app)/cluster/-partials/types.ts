@@ -69,40 +69,10 @@ export interface ClusterStatisticsResponse {
   }
 }
 
-// Connect Nodes Request
-export interface ConnectNodesRequest {
-  nodes: string[]
-}
-
 // Connect Node Response
 export interface ConnectNodeResponse {
   success: boolean
   error: string | null
-}
-
-// API Response Wrappers
-export interface ClusterHealthApiResponse {
-  success: boolean
-  message: string | null
-  data: ClusterHealthResponse
-}
-
-export interface ClusterStatusApiResponse {
-  success: boolean
-  message: string | null
-  data: ClusterStatusResponse
-}
-
-export interface ClusterStatisticsApiResponse {
-  success: boolean
-  message: string | null
-  data: ClusterStatisticsResponse
-}
-
-export interface ConnectNodesApiResponse {
-  success: boolean
-  message: string | null
-  data: ConnectNodeResponse[]
 }
 
 // Layout Types
@@ -141,20 +111,6 @@ export interface ClusterLayoutResponse {
   stagedParameters: LayoutParameters | null
 }
 
-export interface ApplyLayoutRequest {
-  version: number
-}
-
-export interface ApplyLayoutResponse {
-  message: string[]
-  layout: ClusterLayoutResponse
-}
-
-export interface UpdateLayoutRequest {
-  roles: NodeRoleChange[]
-  parameters: LayoutParameters | null
-}
-
 export interface PreviewLayoutResponseSuccess {
   message: string[]
   newLayout: ClusterLayoutResponse
@@ -180,11 +136,6 @@ export interface LayoutHistoryResponse {
   updateTrackers: Record<string, { ack: number; sync: number; syncAck: number }> | null
 }
 
-export interface SkipDeadNodesRequest {
-  version: number
-  allowMissingData: boolean
-}
-
 export interface SkipDeadNodesResponse {
   ackUpdated: string[]
   syncUpdated: string[]
@@ -204,11 +155,6 @@ export interface NodeInfoResponse {
   error: Record<string, string>
 }
 
-export interface NodeStatisticsResponse {
-  success: Record<string, { freeform: string }>
-  error: Record<string, string>
-}
-
 export type RepairType =
   | 'tables'
   | 'blocks'
@@ -220,10 +166,6 @@ export type RepairType =
   | { scrub: string }
   | 'aliases'
   | 'clearResyncQueue'
-
-export interface RepairOperationRequest {
-  repairType: RepairType
-}
 
 export interface RepairOperationResponse {
   success: Record<string, null>

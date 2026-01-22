@@ -12,10 +12,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: cXTp8E3ViK
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: cXTp8E3ViK
 method: POST
 name: Create Metadata Snapshot
 sortPriority: 2000.0

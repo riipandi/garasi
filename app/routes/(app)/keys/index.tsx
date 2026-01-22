@@ -5,12 +5,12 @@ import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
 import { fetcher } from '~/app/fetcher'
-import { KeyCreate } from './-access-keys/key-create'
-import { KeyImport } from './-access-keys/key-import'
-import { KeyTable } from './-access-keys/key-table'
-import type { ImportKeyRequest, KeysResponse } from './-access-keys/types'
-import type { AccessKey } from './-access-keys/types'
-import type { CreateKeyRequest, UpdateKeyRequest } from './-access-keys/types'
+import { KeyCreate } from './-partials/key-create'
+import { KeyImport } from './-partials/key-import'
+import { KeyTable } from './-partials/key-table'
+import type { ImportKeyRequest, KeysResponse } from './-partials/types'
+import type { AccessKey } from './-partials/types'
+import type { CreateKeyRequest, UpdateKeyRequest } from './-partials/types'
 
 export const Route = createFileRoute('/(app)/keys/')({
   component: RouteComponent,
