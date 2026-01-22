@@ -82,7 +82,7 @@ function RouteComponent() {
                   <div className='flex flex-col items-start justify-center'>
                     <h2 className='text-lg font-semibold text-gray-900'>Garasi Console</h2>
                     <p className='mt-0.5 text-xs font-medium text-gray-500'>
-                      Manage your S3 storage
+                      Manage your Garage S3
                     </p>
                   </div>
                   <button
@@ -126,7 +126,7 @@ function RouteComponent() {
 
           {/* Main Content */}
           <main className='flex-1 overflow-auto bg-gray-50'>
-            <div className='mx-auto h-auto px-4 py-8 lg:px-8 lg:pb-10'>
+            <div className='mx-auto h-auto max-w-7xl px-4 py-8 lg:px-8 lg:pb-10'>
               <Outlet />
             </div>
           </main>

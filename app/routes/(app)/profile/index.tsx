@@ -68,7 +68,7 @@ function RouteComponent() {
     return (
       <div className='flex min-h-100 items-center justify-center'>
         <div className='flex items-center gap-2 text-gray-500'>
-          <svg className='h-5 w-5 animate-spin' fill='none' viewBox='0 0 24 24'>
+          <svg className='size-5 animate-spin' fill='none' viewBox='0 0 24 24'>
             <circle
               className='opacity-25'
               cx='12'
@@ -220,7 +220,7 @@ function RouteComponent() {
                 >
                   {isSubmitting || updateProfileMutation.isPending ? (
                     <span className='flex items-center gap-2'>
-                      <svg className='h-4 w-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                      <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
                         <circle
                           className='opacity-25'
                           cx='12'

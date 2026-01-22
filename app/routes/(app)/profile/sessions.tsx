@@ -138,7 +138,7 @@ function RouteComponent() {
     return (
       <div className='flex min-h-100 items-center justify-center'>
         <div className='flex items-center gap-2 text-gray-500'>
-          <svg className='h-5 w-5 animate-spin' fill='none' viewBox='0 0 24 24'>
+          <svg className='size-5 animate-spin' fill='none' viewBox='0 0 24 24'>
             <circle
               className='opacity-25'
               cx='12'
@@ -276,7 +276,7 @@ function RouteComponent() {
 
       <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
         <div className='flex gap-3'>
-          <Lucide.Info className='mt-0.5 h-5 w-5 shrink-0 text-blue-600' />
+          <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' />
           <div>
             <h4 className='text-sm font-medium text-blue-900'>About sessions</h4>
             <p className='mt-1 text-xs text-blue-700'>

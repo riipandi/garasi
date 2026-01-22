@@ -7,80 +7,19 @@ import { QuickLinks } from './-dashboard/quick-links'
 import { RecentBuckets } from './-dashboard/recent-buckets'
 import { StatCard } from './-dashboard/stat-card'
 import { StorageNodes } from './-dashboard/storage-nodes'
+import type { BucketResponse, KeyResponse, WhoamiResponse } from './-dashboard/types'
+import type { ClusterHealthResponse, ClusterStatisticsResponse } from './-dashboard/types'
 
 export const Route = createFileRoute('/(app)/')({
+  component: RouteComponent,
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(whoamiQuery)
     context.queryClient.ensureQueryData(clusterHealthQuery)
     context.queryClient.ensureQueryData(clusterStatisticsQuery)
     context.queryClient.ensureQueryData(bucketsQuery)
     context.queryClient.ensureQueryData(keysQuery)
-  },
-  component: RouteComponent
-})
-
-// Types
-interface WhoamiResponse {
-  success: boolean
-  message: string | null
-  data: {
-    user_id: string
-    email: string
-    name: string
-  } | null
-}
-
-interface ClusterHealthResponse {
-  status: string
-  knownNodes: number
-  connectedNodes: number
-  storageNodes: number
-  storageNodesUp: number
-  partitions: number
-  partitionsQuorum: number
-  partitionsAllOk: number
-}
-
-interface ClusterStatisticsResponse {
-  nodes: Array<{
-    id: string
-    hostname: string
-    zone: string
-    capacity: string
-    partitions: number
-    dataAvailable: {
-      used: string
-      total: string
-      percentage: number
-    }
-    metaAvailable: {
-      used: string
-      total: string
-      percentage: number
-    }
-  }>
-  clusterWide: {
-    data: string
-    metadata: string
   }
-}
-
-interface BucketResponse {
-  id: string
-  created: string
-  globalAliases: string[]
-  localAliases: Array<{
-    accessKeyId: string
-    alias: string
-  }>
-}
-
-interface KeyResponse {
-  id: string
-  name: string
-  created: string | null
-  deleted: boolean
-}
+})
 
 // Query options
 const whoamiQuery = queryOptions({

@@ -63,7 +63,7 @@ function ProfileNavLink({
       }}
       activeOptions={{ exact }}
     >
-      <Icon className='h-4 w-4' />
+      <Icon className='size-4' />
       <span>{label}</span>
     </Route.Link>
   )

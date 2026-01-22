@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_g2FWeE6g4M
 createdAt: 2026-01-19T20:24:49.077892
-updatedAt: 2026-01-21T09:28:54.159826
+updatedAt: 2026-01-22T12:05:29.677360
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -11,8 +11,14 @@ body:
   text: |-
     {
       "name": null,
-      "expiration": null,
-      "neverExpires": false
+      "neverExpires": false,
+      "expiration": "RFC3339 or null",
+      "allow": {
+        "createBucket": true
+      },
+      "deny": {
+        "createBucket": false
+      }
     }
 bodyType: application/json
 description: ''

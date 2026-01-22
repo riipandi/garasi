@@ -36,6 +36,7 @@ export default defineConfig({
     devtoolsJson()
   ],
   nitro: nitroConfig,
+  resolve: { tsconfigPaths: true },
   server: {
     port: 3980,
     strictPort: true,

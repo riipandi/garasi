@@ -170,7 +170,7 @@ function RouteComponent() {
                     type='checkbox'
                     checked={field.state.value}
                     onChange={(e) => field.handleChange(e.target.checked as any)}
-                    className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                    className='size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
                   />
                   <label htmlFor='remember' className='ml-2 block text-sm text-gray-700'>
                     Remember me
@@ -190,7 +190,7 @@ function RouteComponent() {
                   >
                     {isSubmitting ? (
                       <span className='flex items-center gap-2'>
-                        <svg className='h-4 w-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                        <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
                           <circle
                             className='opacity-25'
                             cx='12'

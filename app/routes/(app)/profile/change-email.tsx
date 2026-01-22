@@ -198,7 +198,7 @@ function RouteComponent() {
                 >
                   {isSubmitting || changeEmailMutation.isPending ? (
                     <span className='flex items-center gap-2'>
-                      <svg className='h-4 w-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                      <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
                         <circle
                           className='opacity-25'
                           cx='12'
@@ -227,7 +227,7 @@ function RouteComponent() {
         <div className='mt-6 rounded-md border border-blue-200 bg-blue-50 p-4'>
           <div className='flex gap-3'>
             <svg
-              className='mt-0.5 h-5 w-5 shrink-0 text-blue-600'
+              className='mt-0.5 size-5 shrink-0 text-blue-600'
               fill='currentColor'
               viewBox='0 0 20 20'
             >

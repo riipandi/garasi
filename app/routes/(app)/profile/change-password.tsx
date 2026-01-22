@@ -229,7 +229,7 @@ function RouteComponent() {
                 >
                   {isSubmitting || changePasswordMutation.isPending ? (
                     <span className='flex items-center gap-2'>
-                      <svg className='h-4 w-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                      <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
                         <circle
                           className='opacity-25'
                           cx='12'
