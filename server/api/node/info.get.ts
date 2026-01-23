@@ -1,37 +1,20 @@
-import { HTTPError, getQuery } from 'nitro/h3'
+import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface GetNodeInfoParams {
-  node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
-}
-
-interface NodeInfoResp {
-  nodeId: string
-  garageVersion: string
-  rustVersion: string
-  dbEngine: string
-  garageFeatures: string[] | null
-}
-
-interface GetNodeInfoResp {
-  success: Record<string, NodeInfoResp>
-  error: Record<string, string>
-}
+import { createResponse } from '~/server/platform/responder'
+import type { GetNodeInfoRequest } from '~/shared/schemas/node.schema'
+import type { GetNodeInfoResponse } from '~/shared/schemas/node.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<GetNodeInfoParams>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
+  const params = getQuery<GetNodeInfoRequest>(event)
+  if (!params?.node) {
+    logger.withPrefix('GetNodeInfo').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  logger.withMetadata({ node }).info('Getting node information')
-  const data = await gfetch<GetNodeInfoResp>('/v2/GetNodeInfo', {
-    params: { node }
-  })
+  const data = await gfetch<GetNodeInfoResponse>('/v2/GetNodeInfo', { params })
+  logger.withMetadata(data).debug('Getting node information')
 
-  return { status: 'success', message: 'Get Node Info', data }
+  return createResponse<GetNodeInfoResponse>(event, 'Get Node Information', { data })
 })

@@ -1,33 +1,20 @@
-import { HTTPError, getQuery } from 'nitro/h3'
+import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface GetNodeStatisticsParams {
-  node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
-}
-
-interface NodeStatisticsResp {
-  freeform: string
-}
-
-interface GetNodeStatisticsResp {
-  success: Record<string, NodeStatisticsResp>
-  error: Record<string, string>
-}
+import { createResponse } from '~/server/platform/responder'
+import type { GetNodeStatisticsParams } from '~/shared/schemas/node.schema'
+import type { GetNodeStatisticsResponse } from '~/shared/schemas/node.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<GetNodeStatisticsParams>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
+  const params = getQuery<GetNodeStatisticsParams>(event)
+  if (!params?.node) {
+    logger.withPrefix('GetNodeStatistics').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  logger.withMetadata({ node }).info('Getting node statistics')
-  const data = await gfetch<GetNodeStatisticsResp>('/v2/GetNodeStatistics', {
-    params: { node }
-  })
+  const data = await gfetch<GetNodeStatisticsResponse>('/v2/GetNodeStatistics', { params })
+  logger.withMetadata(data).debug('Getting node statistics')
 
-  return { status: 'success', message: 'Get Node Statistics', data }
+  return createResponse<GetNodeStatisticsResponse>(event, 'Get Node Statistics', { data })
 })

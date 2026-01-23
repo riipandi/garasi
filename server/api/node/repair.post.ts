@@ -1,54 +1,32 @@
-import { HTTPError, getQuery, readBody } from 'nitro/h3'
+import { getQuery, HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface LaunchRepairOperationParams {
-  node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
-}
-
-type RepairType =
-  | 'tables'
-  | 'blocks'
-  | 'versions'
-  | 'multipartUploads'
-  | 'blockRefs'
-  | 'blockRc'
-  | 'rebalance'
-  | { scrub: string }
-  | 'aliases'
-  | 'clearResyncQueue'
-
-interface LaunchRepairOperationRequestBody {
-  repairType: RepairType
-}
-
-interface LaunchRepairOperationResp {
-  success: Record<string, null>
-  error: Record<string, string>
-}
+import { createResponse } from '~/server/platform/responder'
+import type { LaunchRepairOperationParams } from '~/shared/schemas/node.schema'
+import type { LaunchRepairOperationRequest } from '~/shared/schemas/node.schema'
+import type { LaunchRepairOperationResponse } from '~/shared/schemas/node.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<LaunchRepairOperationParams>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
+  const params = getQuery<LaunchRepairOperationParams>(event)
+  if (!params?.node) {
+    logger.withPrefix('LaunchRepairOperation').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  const body = await readBody<LaunchRepairOperationRequestBody>(event)
-
-  if (!body || !body.repairType) {
-    logger.debug('Repair type is required')
+  const body = await readBody<LaunchRepairOperationRequest>(event)
+  if (!body?.repairType) {
+    logger.withPrefix('LaunchRepairOperation').debug('Repair type is required')
     throw new HTTPError({ status: 400, statusText: 'Repair type is required' })
   }
 
-  logger.withMetadata({ node, repairType: body.repairType }).info('Launching repair operation')
-  const data = await gfetch<LaunchRepairOperationResp>('/v2/LaunchRepairOperation', {
+  const data = await gfetch<LaunchRepairOperationResponse>('/v2/LaunchRepairOperation', {
     method: 'POST',
-    params: { node },
+    params,
     body
   })
+  logger.withMetadata(data).debug('Launching repair operation')
 
-  return { status: 'success', message: 'Launch Repair Operation', data }
+  const message = `Launch repair for operation ${body.repairType}`
+  return createResponse<LaunchRepairOperationResponse>(event, message, { data })
 })

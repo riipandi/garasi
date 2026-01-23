@@ -1,30 +1,23 @@
-import { HTTPError, getQuery } from 'nitro/h3'
+import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface CreateMetadataSnapshotParams {
-  node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
-}
-
-interface CreateMetadataSnapshotResp {
-  success: Record<string, null>
-  error: Record<string, string>
-}
+import { createResponse } from '~/server/platform/responder'
+import type { CreateMetadataSnapshotParams } from '~/shared/schemas/node.schema'
+import type { CreateMetadataSnapshotResponse } from '~/shared/schemas/node.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<CreateMetadataSnapshotParams>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
+  const params = getQuery<CreateMetadataSnapshotParams>(event)
+  if (!params?.node) {
+    logger.withPrefix('CreateMetadataSnapshot').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  logger.withMetadata({ node }).info('Creating metadata snapshot')
-  const data = await gfetch<CreateMetadataSnapshotResp>('/v2/CreateMetadataSnapshot', {
+  const data = await gfetch<CreateMetadataSnapshotResponse>('/v2/CreateMetadataSnapshot', {
     method: 'POST',
-    params: { node }
+    params
   })
+  logger.withMetadata(data).debug('Creating metadata snapshot')
 
-  return { status: 'success', message: 'Create Metadata Snapshot', data }
+  return createResponse<CreateMetadataSnapshotResponse>(event, 'Create Metadata Snapshot', { data })
 })

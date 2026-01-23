@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_S4B4kZapPd
 createdAt: 2026-01-19T20:25:46.302021
-updatedAt: 2026-01-22T14:18:01.468049
+updatedAt: 2026-01-23T18:04:02.608263
 workspaceId: wk_YrPa97TLKc
 folderId: fl_kpCLEVgs4R
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: Get Node Statistics
 sortPriority: 1000.0
-url: ${[ baseURL ]}/api/node/statistics?node=${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_xz8vbx3DR9', path=b64'JC5kYXRhLm5vZGVzWzBdLmlk') ]}
+url: ${[ baseURL ]}/api/node/statistics?node=self
 urlParameters: []
