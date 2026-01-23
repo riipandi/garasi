@@ -1,56 +1,28 @@
-import { HTTPError, getQuery, readBody } from 'nitro/h3'
+import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
+import type { GetWorkerInfoParams } from '~/shared/schemas/worker.schema'
+import type { GetWorkerInfoRequest } from '~/shared/schemas/worker.schema'
+import type { GetWorkerInfoResponse } from '~/shared/schemas/worker.schema'
 
-interface GetWorkerInfoParams {
-  node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
-}
-
-interface GetWorkerInfoRequestBody {
-  id: number // Worker ID
-}
-
-interface WorkerInfoResp {
-  id: number
-  name: string
-  state: string
-  errors: number
-  consecutiveErrors: number
-  freeform: string[]
-  lastError: object | null
-  persistentErrors: number | null
-  progress: string | null
-  queueLength: number | null
-  tranquility: number | null
-}
-
-interface GetWorkerInfoResp {
-  success: Record<string, WorkerInfoResp>
-  error: Record<string, string>
-}
+// Move request body to params because this is GET endpoint
+type GetWorkerInfoQueryParams = GetWorkerInfoParams & GetWorkerInfoRequest
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<GetWorkerInfoParams>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
-    throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
+  const params = getQuery<GetWorkerInfoQueryParams>(event)
+  if (!params?.node || !params?.id) {
+    logger.withPrefix('GetWorkerInfo').debug('Node and id parameter is required')
+    throw new HTTPError({ status: 400, statusText: 'Node and id parameter is required' })
   }
 
-  const body = await readBody<GetWorkerInfoRequestBody>(event)
-
-  if (!body || body.id === undefined || body.id === null) {
-    logger.debug('Worker ID is required')
-    throw new HTTPError({ status: 400, statusText: 'Worker ID is required' })
-  }
-
-  logger.withMetadata({ node, workerId: body.id }).info('Getting worker information')
-  const data = await gfetch<GetWorkerInfoResp>('/v2/GetWorkerInfo', {
+  const data = await gfetch<GetWorkerInfoResponse>('/v2/GetWorkerInfo', {
     method: 'POST',
-    params: { node },
-    body
+    params: { node: params.node },
+    body: { id: Number(params.id) }
   })
+  logger.withMetadata(data).debug('Getting worker information')
 
-  return { status: 'success', message: 'Get Worker Info', data }
+  return createResponse<GetWorkerInfoResponse>(event, 'Get Worker Information', { data })
 })

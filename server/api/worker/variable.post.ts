@@ -1,45 +1,31 @@
-import { HTTPError, getQuery, readBody } from 'nitro/h3'
+import { getQuery, HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface SetWorkerVariableParams {
-  node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
-}
-
-interface SetWorkerVariableRequestBody {
-  variable: string // Variable name
-  value: string // Variable value
-}
-
-interface SetWorkerVariableResp {
-  success: Record<string, { variable: string; value: string }>
-  error: Record<string, string>
-}
+import { createResponse } from '~/server/platform/responder'
+import type { SetWorkerVariableParams } from '~/shared/schemas/worker.schema'
+import type { SetWorkerVariableRequest } from '~/shared/schemas/worker.schema'
+import type { SetWorkerVariableResponse } from '~/shared/schemas/worker.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<SetWorkerVariableParams>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
+  const params = getQuery<SetWorkerVariableParams>(event)
+  if (!params?.node) {
+    logger.withPrefix('SetWorkerVariable').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  const body = await readBody<SetWorkerVariableRequestBody>(event)
-
+  const body = await readBody<SetWorkerVariableRequest>(event)
   if (!body?.variable || !body?.value) {
-    logger.debug('Variable name and value are required')
+    logger.withPrefix('SetWorkerVariable').debug('Variable name and value are required')
     throw new HTTPError({ status: 400, statusText: 'Variable name and value are required' })
   }
 
-  logger
-    .withMetadata({ node, variable: body.variable, value: body.value })
-    .info('Setting worker variable')
-  const data = await gfetch<SetWorkerVariableResp>('/v2/SetWorkerVariable', {
+  const data = await gfetch<SetWorkerVariableResponse>('/v2/SetWorkerVariable', {
     method: 'POST',
-    params: { node },
+    params,
     body
   })
+  logger.withMetadata(data).debug('Setting worker variable')
 
-  return { status: 'success', message: 'Set Worker Variable', data }
+  return createResponse<SetWorkerVariableResponse>(event, 'Set Worker Variable', { data })
 })

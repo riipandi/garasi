@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_TfHBGcVKG2
 createdAt: 2026-01-19T20:26:18.853802
-updatedAt: 2026-01-21T08:47:48.978525
+updatedAt: 2026-01-23T18:30:03.248868
 workspaceId: wk_YrPa97TLKc
 folderId: fl_khnnuz8ccL
 authentication: {}
@@ -15,5 +15,5 @@ headers: []
 method: GET
 name: Get Worker Info
 sortPriority: 0.001
-url: ${[ baseURL ]}/api/worker/info?node=${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_xz8vbx3DR9', path=b64'JC5kYXRhLm5vZGVzWzBdLmlk') ]}
+url: ${[ baseURL ]}/api/worker/info?node=self&id=1
 urlParameters: []

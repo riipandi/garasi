@@ -2,22 +2,26 @@ type: http_request
 model: http_request
 id: rq_uFoxt7DgDN
 createdAt: 2026-01-19T20:26:19.789083
-updatedAt: 2026-01-21T08:48:12.730878
+updatedAt: 2026-01-23T18:38:09.288434
 workspaceId: wk_YrPa97TLKc
 folderId: fl_khnnuz8ccL
 authentication: {}
 authenticationType: null
 body:
-  text: '{}'
+  text: |-
+    {
+      "variable": "var1",
+      "value": "val1"
+    }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: aWVh0WxkTy
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: aWVh0WxkTy
 method: POST
 name: Set Worker Variable
 sortPriority: 0.003
-url: ${[ baseURL ]}/api/worker/variable?node=${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_xz8vbx3DR9', path=b64'JC5kYXRhLm5vZGVzWzBdLmlk') ]}
+url: ${[ baseURL ]}/api/worker/variable?node=self
 urlParameters: []

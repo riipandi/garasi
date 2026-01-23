@@ -1,50 +1,32 @@
-import { HTTPError, getQuery, readBody } from 'nitro/h3'
+import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface ListWorkersParams {
-  node: string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
-}
-
-interface ListWorkersRequestBody {
-  busyOnly?: boolean | null
-  errorOnly?: boolean | null
-}
-
-interface WorkerInfoResp {
-  id: number
-  name: string
-  state: string
-  errors: number
-  consecutiveErrors: number
-  freeform: string[]
-  lastError: object | null
-  persistentErrors: number | null
-  progress: string | null
-  queueLength: number | null
-  tranquility: number | null
-}
-
-interface ListWorkersResp {
-  success: Record<string, WorkerInfoResp[]>
-  error: Record<string, string>
-}
+import { createResponse } from '~/server/platform/responder'
+import { parseBoolean } from '~/server/utils/parser'
+import type { ListWorkersParams } from '~/shared/schemas/worker.schema'
+import type { ListWorkersRequest } from '~/shared/schemas/worker.schema'
+import type { ListWorkersResponse } from '~/shared/schemas/worker.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<ListWorkersParams>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
+  const queryParams = getQuery(event)
+  if (!queryParams?.node) {
+    logger.withPrefix('ListWorkers').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  const body = await readBody<ListWorkersRequestBody>(event)
-  const data = await gfetch<ListWorkersResp>('/v2/ListWorkers', {
+  const params = { node: queryParams.node as ListWorkersParams['node'] }
+  const body: ListWorkersRequest = {
+    busyOnly: parseBoolean(queryParams?.busyOnly ?? null),
+    errorOnly: parseBoolean(queryParams?.errorOnly ?? null)
+  }
+
+  const data = await gfetch<ListWorkersResponse>('/v2/ListWorkers', {
     method: 'POST',
-    params: { node },
+    params,
     body
   })
+  logger.withMetadata(data).debug('Listing workers')
 
-  return { status: 'success', message: 'List Workers', data }
+  return createResponse<ListWorkersResponse>(event, 'List Workers', { data })
 })
