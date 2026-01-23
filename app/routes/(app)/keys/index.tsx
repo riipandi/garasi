@@ -5,10 +5,11 @@ import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
 import { fetcher } from '~/app/fetcher'
+import { listAccessKeys } from '~/app/services/keys.service'
 import { KeyCreate } from './-partials/key-create'
 import { KeyImport } from './-partials/key-import'
 import { KeyTable } from './-partials/key-table'
-import type { ImportKeyRequest, KeysResponse } from './-partials/types'
+import type { ImportKeyRequest } from './-partials/types'
 import type { AccessKey } from './-partials/types'
 import type { CreateKeyRequest, UpdateKeyRequest } from './-partials/types'
 
@@ -19,10 +20,7 @@ export const Route = createFileRoute('/(app)/keys/')({
   }
 })
 
-const keysQuery = queryOptions({
-  queryKey: ['keys'],
-  queryFn: () => fetcher<KeysResponse>('/keys')
-})
+const keysQuery = queryOptions({ queryKey: ['keys'], queryFn: () => listAccessKeys() })
 
 function RouteComponent() {
   const { queryClient } = Route.useRouteContext()
@@ -41,7 +39,7 @@ function RouteComponent() {
 
   // Fetch access keys
   const { data: keysData } = useSuspenseQuery(keysQuery)
-  const keys = keysData?.data || []
+  const keys = Array.isArray(keysData.data) ? keysData.data : []
 
   // Create key mutation
   const createKeyMutation = useMutation({

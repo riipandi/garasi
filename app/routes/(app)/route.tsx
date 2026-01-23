@@ -41,7 +41,7 @@ function RouteComponent() {
   if (error) {
     console.error('Error fetching buckets:', error)
   }
-  console.log('Buckets data:', { data, buckets, isLoading, error })
+  console.info('BUCKETS_DATA', { data, buckets, isLoading, error })
   const handleLogout = () => {
     logout()
       .then(() => router.navigate({ to: '/signin', search: { redirect: '/' } }))

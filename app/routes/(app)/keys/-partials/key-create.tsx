@@ -147,30 +147,6 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
               </div>
             )}
           />
-
-          <Form.Field
-            name='neverExpires'
-            children={(field) => (
-              <div className='flex items-center gap-2'>
-                <input
-                  id='neverExpires'
-                  name={field.name}
-                  type='checkbox'
-                  checked={field.state.value}
-                  onChange={(e) => {
-                    const newValue = e.target.checked
-                    field.handleChange(newValue)
-                  }}
-                  className='size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                  disabled={isSubmitting}
-                />
-                <label htmlFor='neverExpires' className='text-sm font-medium text-gray-700'>
-                  Never expires
-                </label>
-              </div>
-            )}
-          />
-
           <Form.Subscribe
             selector={(state) => state.values.neverExpires}
             children={(neverExpires) => (
@@ -213,6 +189,28 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
             )}
           />
 
+          <Form.Field
+            name='neverExpires'
+            children={(field) => (
+              <div className='flex items-center gap-2'>
+                <input
+                  id='neverExpires'
+                  name={field.name}
+                  type='checkbox'
+                  checked={field.state.value}
+                  onChange={(e) => {
+                    const newValue = e.target.checked
+                    field.handleChange(newValue)
+                  }}
+                  className='size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                  disabled={isSubmitting}
+                />
+                <label htmlFor='neverExpires' className='text-sm font-medium text-gray-700'>
+                  Never expires
+                </label>
+              </div>
+            )}
+          />
           <div className='rounded-md bg-gray-50 p-4'>
             <h3 className='mb-3 text-sm font-medium text-gray-900'>Permissions</h3>
             <div className='space-y-3'>
@@ -237,7 +235,6 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
               />
             </div>
           </div>
-
           {/* Actions */}
           <Form.Subscribe
             selector={(state) => [state.canSubmit, state.isSubmitting]}

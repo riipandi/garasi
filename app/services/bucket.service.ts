@@ -1,6 +1,10 @@
-export default {}
+import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
+import type { ApiResponse } from '~/shared/schemas/common.schema'
+import fetcher from '../fetcher'
 
-// export async function listBuckets(): Promise<ListBucketsResponse> {}
+export async function listBuckets(): Promise<ApiResponse<ListBucketsResponse>> {
+  return await fetcher<ApiResponse<ListBucketsResponse>>('/bucket')
+}
 
 // export async function getBucketInfo(): Promise<GetBucketInfoResponse> {}
 

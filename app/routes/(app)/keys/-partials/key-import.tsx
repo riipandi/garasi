@@ -57,7 +57,7 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm'>
-      <div className='animate-in fade-in zoom-in-95 w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 shadow-lg duration-200 sm:p-6'>
+      <div className='animate-in fade-in zoom-in-95 w-full max-w-lg rounded-lg border border-gray-200 bg-white p-4 shadow-lg duration-200 sm:p-6'>
         <div className='mb-6'>
           <div className='mb-4 flex items-center justify-between'>
             <h2 className='text-lg font-semibold text-gray-900 sm:text-xl'>Import Access Key</h2>

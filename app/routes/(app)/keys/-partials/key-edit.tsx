@@ -150,29 +150,6 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
             )}
           />
 
-          <Form.Field
-            name='neverExpires'
-            children={(field) => (
-              <div className='flex items-center gap-2'>
-                <input
-                  id='neverExpires'
-                  name={field.name}
-                  type='checkbox'
-                  checked={field.state.value}
-                  onChange={(e) => {
-                    const newValue = e.target.checked
-                    field.handleChange(newValue)
-                  }}
-                  className='size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                  disabled={isSubmitting}
-                />
-                <label htmlFor='neverExpires' className='text-sm font-medium text-gray-700'>
-                  Never expires
-                </label>
-              </div>
-            )}
-          />
-
           <Form.Subscribe
             selector={(state) => state.values.neverExpires}
             children={(neverExpires) => (
@@ -212,6 +189,29 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
                   </div>
                 )}
               />
+            )}
+          />
+
+          <Form.Field
+            name='neverExpires'
+            children={(field) => (
+              <div className='flex items-center gap-2'>
+                <input
+                  id='neverExpires'
+                  name={field.name}
+                  type='checkbox'
+                  checked={field.state.value}
+                  onChange={(e) => {
+                    const newValue = e.target.checked
+                    field.handleChange(newValue)
+                  }}
+                  className='size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                  disabled={isSubmitting}
+                />
+                <label htmlFor='neverExpires' className='text-sm font-medium text-gray-700'>
+                  Never expires
+                </label>
+              </div>
             )}
           />
 

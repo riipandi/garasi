@@ -1,17 +1,12 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface ListKeysResponseItem {
-  id: string
-  name: string
-  created: string | null
-  deleted: boolean
-}
+import { createResponse } from '~/server/platform/responder'
+import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Listing access keys')
-  const data = await gfetch<ListKeysResponseItem[]>('/v2/ListKeys')
+  const data = await gfetch<ListAccessKeysResponse[]>('/v2/ListKeys')
+  logger.withMetadata(data).debug('List Access Keys')
 
-  return { status: 'success', message: 'List Access Keys', data }
+  return createResponse<ListAccessKeysResponse[]>(event, 'List Access Keys', { data })
 })

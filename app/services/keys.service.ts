@@ -1,6 +1,10 @@
-export default {}
+import type { ApiResponse } from '~/shared/schemas/common.schema'
+import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
+import fetcher from '../fetcher'
 
-// export async function listAccessKeys(): Promise<ListAccessKeysResponse> {}
+export async function listAccessKeys(): Promise<ApiResponse<ListAccessKeysResponse>> {
+  return await fetcher<ApiResponse<ListAccessKeysResponse>>('/keys')
+}
 
 // export async function getKeyInformation(): Promise<GetKeyInformationResponse> {}
 
