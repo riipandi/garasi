@@ -1,21 +1,12 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface GetClusterHealthResp {
-  status: string // One of: 'healthy', 'degraded', 'unavailable'
-  knownNodes: number
-  connectedNodes: number
-  storageNodes: number
-  storageNodesUp: number
-  partitions: number
-  partitionsQuorum: number
-  partitionsAllOk: number
-}
+import { createResponse } from '~/server/platform/responder'
+import type { GetClusterHealthResponse } from '~/shared/schemas/cluster.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Getting cluster health')
-  const data = await gfetch<GetClusterHealthResp>('/v2/GetClusterHealth')
+  const data = await gfetch<GetClusterHealthResponse>('/v2/GetClusterHealth')
+  logger.withMetadata(data).info('Getting cluster health')
 
-  return { status: 'success', message: 'Get Cluster Health', data }
+  return createResponse<GetClusterHealthResponse>(event, 'Get Cluster Health', { data })
 })

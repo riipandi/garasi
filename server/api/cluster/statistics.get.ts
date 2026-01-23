@@ -1,10 +1,25 @@
 import { getQuery } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { parseBoolean } from '~/server/utils/parser'
+import type { GetClusterStatisticsResponse } from '~/shared/schemas/cluster.schema'
 
-interface GetClusterStatisticsResp {
-  freeform: string
-}
+export default defineProtectedHandler(async (event) => {
+  const { gfetch, logger } = event.context
+
+  const { raw } = getQuery<{ raw: string | null }>(event)
+  const printRaw = parseBoolean(raw ?? null) || false
+
+  const resp = await gfetch<GetClusterStatisticsResponse>('/v2/GetClusterStatistics')
+  const data = !printRaw ? parseClusterStatistics(resp.freeform) : resp
+  logger.withMetadata(data).info('Getting cluster statistics')
+
+  return createResponse<ClusterStatistics | GetClusterStatisticsResponse>(
+    event,
+    'Get Cluster Statistics',
+    { data }
+  )
+})
 
 interface StorageNode {
   id: string
@@ -31,19 +46,6 @@ interface ClusterStatistics {
     metadata: string
   }
 }
-
-export default defineProtectedHandler(async (event) => {
-  const { gfetch, logger } = event.context
-
-  const { raw } = getQuery<{ raw: string | null }>(event)
-  const printRaw = parseBoolean(raw ?? null) || false
-
-  logger.info('Getting cluster statistics')
-  const resp = await gfetch<GetClusterStatisticsResp>('/v2/GetClusterStatistics')
-  const data = !printRaw ? parseClusterStatistics(resp.freeform) : resp
-
-  return { status: 'success', message: 'Get Cluster Statistics', data }
-})
 
 function parseStorageCapacity(capacityStr: string): {
   used: string

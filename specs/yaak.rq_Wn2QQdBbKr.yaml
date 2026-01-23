@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_Wn2QQdBbKr
 createdAt: 2026-01-19T20:16:56.726601
-updatedAt: 2026-01-21T10:59:37.131354
+updatedAt: 2026-01-23T17:31:35.817412
 workspaceId: wk_YrPa97TLKc
 folderId: fl_8Fc9gwrsGC
 authentication: {}
@@ -10,15 +10,15 @@ authenticationType: null
 body:
   text: |-
     {
-      "nodes": ${[ response.body.path(request='rq_xz8vbx3DR9', behavior='always', ttl='0', result='all', join=b64'LCA', path=b64'JC5kYXRhLm5vZGVzWypdLmlk') ]}
+      "nodes": []
     }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: a4KCCfeuwc
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: a4KCCfeuwc
 method: POST
 name: Connect Cluster Nodes
 sortPriority: 3000.0
