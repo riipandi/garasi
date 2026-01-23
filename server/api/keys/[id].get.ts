@@ -1,38 +1,24 @@
 import { getRouterParam, HTTPError, getQuery } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface GetKeyInfoParams {
-  search?: string
-  secret?: boolean
-}
-
-interface KeyInfoBucketResponse {
-  id: string
-  name: string | null
-  permissions: object
-  created: string | null
-  deleted: boolean
-}
+import { createResponse } from '~/server/platform/responder'
+import type { GetKeyInformationParams } from '~/shared/schemas/keys.schema'
+import type { GetKeyInformationResponse } from '~/shared/schemas/keys.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
+  // Parse router and query parameters
+  const params = getQuery<Omit<GetKeyInformationParams, 'id'>>(event)
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.debug('Key ID is required')
+    logger.withPrefix('GetKeyInfo').debug('Key ID not provided')
     throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
   }
 
-  const { search, secret } = getQuery<GetKeyInfoParams>(event)
-
-  logger.withMetadata({ id, search }).info('Getting key information')
-  const data = await gfetch<KeyInfoBucketResponse>('/v2/GetKeyInfo', {
-    params: { id, search, showSecretKey: secret }
+  const data = await gfetch<GetKeyInformationResponse>('/v2/GetKeyInfo', {
+    params: { id, ...params }
   })
+  logger.withMetadata(data).debug('Getting key information')
 
-  if (!data) {
-    return { success: false, message: 'Access key not found', data: null }
-  }
-
-  return { status: 'success', message: 'Get Key Information', data }
+  return createResponse<GetKeyInformationResponse>(event, 'Get Key Information', { data })
 })

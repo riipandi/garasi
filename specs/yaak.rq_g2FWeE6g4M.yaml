@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_g2FWeE6g4M
 createdAt: 2026-01-19T20:24:49.077892
-updatedAt: 2026-01-22T16:29:47.877164
+updatedAt: 2026-01-23T14:37:30.036471
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -23,16 +23,16 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: TzhrWZdgjb
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: TzhrWZdgjb
 method: PUT
 name: Update Access Key
 sortPriority: 3000.0
 url: ${[ baseURL ]}/api/keys/:id
 urlParameters:
-  - enabled: true
-    name: :id
-    value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_7qjXNfxmnC', path=b64'JC5kYXRhWzBdLmlk') ]}
-    id: WVdnn8qdKQ
+- enabled: true
+  name: :id
+  value: ${[ response.body.path(behavior='always', ttl='0', result='first', join=b64'LCA', request='rq_7qjXNfxmnC', path=b64'JC5kYXRhWzBdLmlk') ]}
+  id: WVdnn8qdKQ

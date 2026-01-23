@@ -1,47 +1,19 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface CreateKeyRequest {
-  name: string
-  neverExpires: boolean
-  expiration: string | null
-  allow: { createBucket: boolean } | null
-  deny: { createBucket: boolean } | null
-}
-
-interface KeyInfoBucketResponse {
-  id: string
-  name: string
-  permissions: object
-  created: string | null
-  deleted: boolean
-}
-
-interface CreateKeyResponse {
-  id: string
-  name: string
-  accessKeyId: string
-  secretKeyId: string
-  permissions: KeyInfoBucketResponse
-  created: string | null
-  deleted: boolean
-}
+import { createResponse } from '~/server/platform/responder'
+import type { CreateAccessKeyRequest, CreateAccessKeyResponse } from '~/shared/schemas/keys.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const body = await readBody<CreateKeyRequest>(event)
-
+  const body = await readBody<CreateAccessKeyRequest>(event)
   if (!body?.name) {
-    logger.debug('Name is required')
+    logger.withMetadata(body).debug('Name is required')
     throw new HTTPError({ status: 400, statusText: 'Name is required' })
   }
 
-  logger.withMetadata({ body }).info('Creating access key')
-  const data = await gfetch<CreateKeyResponse>('/v2/CreateKey', {
-    method: 'POST',
-    body
-  })
+  const data = await gfetch<CreateAccessKeyResponse>('/v2/CreateKey', { method: 'POST', body })
+  logger.withMetadata(data).debug('Creating access key')
 
-  return { status: 'success', message: 'Create Access Key', data }
+  return createResponse(event, 'Create Access Key', { data })
 })

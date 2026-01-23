@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_9QRxuZUMKV
 createdAt: 2026-01-19T20:24:47.969915
-updatedAt: 2026-01-21T09:29:33.042940
+updatedAt: 2026-01-23T14:35:19.558019
 workspaceId: wk_YrPa97TLKc
 folderId: fl_bowiCjD6Ui
 authentication: {}
@@ -11,18 +11,18 @@ body:
   text: |-
     {
       "name": null,
-      "accessKeyId": null,
-      "secretKeyId": null
+      "accessKeyId": "${[ response.body.path(request='rq_2Nk5p8yRPn', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLmFjY2Vzc0tleUlk') ]}",
+      "secretAccessKey": "${[ response.body.path(request='rq_2Nk5p8yRPn', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLnNlY3JldEFjY2Vzc0tleQ') ]}"
     }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: ZDEmKmzh39
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: ZDEmKmzh39
 method: POST
-name: Import Key
+name: Import Access Key
 sortPriority: 5000.0
 url: ${[ baseURL ]}/api/keys/import
 urlParameters: []
