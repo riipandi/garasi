@@ -1,19 +1,12 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface ListBucketsResponseItem {
-  id: string
-  created: string
-  globalAliases: string[]
-  localAliases: Array<{
-    accessKeyId: string
-    alias: string
-  }>
-}
+import { createResponse } from '~/server/platform/responder'
+import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Listing buckets')
-  const data = await gfetch<ListBucketsResponseItem[]>('/v2/ListBuckets')
-  return { status: 'success', message: 'List Buckets', data }
+  const data = await gfetch<ListBucketsResponse[]>('/v2/ListBuckets')
+  logger.withMetadata(data).debug('Listing buckets')
+
+  return createResponse<ListBucketsResponse[]>(event, 'List Buckets', { data })
 })

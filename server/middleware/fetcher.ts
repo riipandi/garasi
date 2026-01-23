@@ -11,16 +11,16 @@ export default defineHandler((event) => {
     headers: { Authorization: adminToken },
     signal: AbortSignal.timeout(10_000),
     onRequest(ctx) {
-      log.withMetadata({ request: ctx.request }).debug('onRequest')
+      log.withMetadata({ request: ctx.request }).trace('onRequest')
     },
     onResponse({ response }) {
-      log.withMetadata({ ...response._data }).debug('onResponse')
+      log.withMetadata({ ...response._data }).trace('onResponse')
     },
     onRequestError({ error }) {
-      log.withError(error).error('onRequestError')
+      log.withError(error).trace('onRequestError')
     },
     onResponseError({ error, response }) {
-      log.withMetadata(response).withError(error).error('onResponseError')
+      log.withMetadata(response).withError(error).trace('onResponseError')
     }
   })
 })

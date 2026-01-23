@@ -36,20 +36,20 @@ export const dbClient = new Kysely<AppDatabase>({
   log: (event: QueryLogEvent | ErrorLogEvent): void => {
     const logLevel = protectedEnv.APP_LOG_LEVEL
     const { queryId } = event.query.queryId
-    const kyselyLogger = logger.withPrefix('KYSELY').withMetadata({ queryId })
+    const klogger = logger.withPrefix('KYSELY').withMetadata({ queryId })
 
     if (event.level === 'query' && logLevel === 'trace') {
-      kyselyLogger
+      klogger
         .withMetadata({
           sql: event.query.sql,
           parameters: JSON.stringify(event.query.parameters),
           duration: prettyMs(event.queryDurationMillis)
         })
-        .debug('Executed SQL Query')
+        .trace('Executed SQL Query')
       return
     }
     if (event.level === 'error' && logLevel === 'debug') {
-      kyselyLogger.withError(event.error).debug('Error SQL Query')
+      klogger.withError(event.error).debug('Error SQL Query')
     }
   }
 })
