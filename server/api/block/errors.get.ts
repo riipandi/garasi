@@ -1,18 +1,20 @@
+import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface BlockError {
-  blockHash: string
-  refcount: number
-  errorCount: number
-  lastTrySecsAgo: number
-  nextTryInSecs: number
-}
+import { createResponse } from '~/server/platform/responder'
+import type { ListBlockErrorsParams } from '~/shared/schemas/block.schema'
+import type { ListBlockErrorsResponse } from '~/shared/schemas/block.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Listing block errors')
-  const data = await gfetch<BlockError>('/v2/ListBlockErrors')
+  const params = getQuery<ListBlockErrorsParams>(event)
+  if (!params?.node) {
+    logger.withPrefix('ListBlockErrors').debug('Node parameter is required')
+    throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
+  }
 
-  return { status: 'success', message: 'List Block Errors', data }
+  const data = await gfetch<ListBlockErrorsResponse>('/v2/ListBlockErrors', { params })
+  logger.withMetadata(data).debug('Listing block errors')
+
+  return createResponse<ListBlockErrorsResponse>(event, 'List Block Errors', { data })
 })

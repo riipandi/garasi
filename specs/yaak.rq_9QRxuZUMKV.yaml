@@ -17,10 +17,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: ZDEmKmzh39
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: ZDEmKmzh39
 method: POST
 name: Import Access Key
 sortPriority: 5000.0

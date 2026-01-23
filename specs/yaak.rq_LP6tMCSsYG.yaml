@@ -2,18 +2,25 @@ type: http_request
 model: http_request
 id: rq_LP6tMCSsYG
 createdAt: 2026-01-19T20:17:07.732388
-updatedAt: 2026-01-21T09:15:09.246524
+updatedAt: 2026-01-23T17:57:21.895654
 workspaceId: wk_YrPa97TLKc
 folderId: fl_rwLq2CSxWU
 authentication: {}
 authenticationType: null
 body:
-  text: ''
-bodyType: null
+  text: |-
+    {
+      "blockHash": null
+    }
+bodyType: application/json
 description: ''
-headers: []
+headers:
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: C2QvxH66qy
 method: GET
 name: List Block Errors
 sortPriority: 0.0
-url: ${[ baseURL ]}/api/block/errors
+url: ${[ baseURL ]}/api/block/errors?node=self
 urlParameters: []

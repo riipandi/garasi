@@ -61,8 +61,12 @@ export interface PurgeBlocksResponse {
  * Instruct Garage node(s) to retry the resynchronization of one
  * or several missing data block(s).
  */
-export interface RetryBlockResyncRequest {
+export interface RetryBlockResyncParams {
   node: '*' | 'self' | string // Node ID to query, or `*` for all nodes, or `self` for the node responding to the request
+}
+
+export interface RetryBlockResyncRequest {
+  all: boolean
 }
 
 export interface RetryBlockResyncResponse {

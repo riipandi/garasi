@@ -15,10 +15,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: a4KCCfeuwc
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: a4KCCfeuwc
 method: POST
 name: Connect Cluster Nodes
 sortPriority: 3000.0

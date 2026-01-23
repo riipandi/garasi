@@ -1,29 +1,30 @@
-import { HTTPError, getQuery, readBody } from 'nitro/h3'
+import { getQuery, HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
+import type { RetryBlockResyncParams, RetryBlockResyncRequest } from '~/shared/schemas/block.schema'
+import type { RetryBlockResyncResponse } from '~/shared/schemas/block.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const { node } = getQuery<{ node: string }>(event)
-
-  if (!node) {
-    logger.debug('Node parameter is required')
+  const params = getQuery<RetryBlockResyncParams>(event)
+  if (!params?.node) {
+    logger.withPrefix('RetryBlockResync').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  const body = await readBody(event)
-
-  if (!body) {
-    logger.debug('Request body is required')
-    throw new HTTPError({ status: 400, statusText: 'Request body is required' })
+  const body = await readBody<RetryBlockResyncRequest>(event)
+  if (!body || typeof body.all !== 'boolean') {
+    logger.withPrefix('RetryBlockResync').debug('All parameter is required')
+    throw new HTTPError({ status: 400, statusText: 'All parameter is required' })
   }
 
-  logger.withMetadata({ node, body }).info('Retrying block resync')
-  const data = await gfetch('/v2/RetryBlockResync', {
+  const data = await gfetch<RetryBlockResyncResponse>('/v2/RetryBlockResync', {
     method: 'POST',
-    params: { node },
+    params,
     body
   })
+  logger.withMetadata(data).debug('Retrying block resynchronization')
 
-  return { status: 'success', message: 'Retry Block Resync', data }
+  return createResponse<RetryBlockResyncResponse>(event, 'Retry Block Resync', { data })
 })
