@@ -10,15 +10,15 @@ export default defineProtectedHandler(async (event) => {
   const body = await readBody<ApplyClusterLayoutRequest>(event)
 
   if (body?.version === undefined || body?.version === null) {
-    logger.withPrefix('ApplyClusterLayout').debug('Version is required')
+    logger.warn('Version is required')
     throw new HTTPError({ status: 400, statusText: 'Version is required' })
   }
 
+  logger.withMetadata({ version: body.version }).debug('Applying cluster layout')
   const data = await gfetch<ApplyClusterLayoutResponse>('/v2/ApplyClusterLayout', {
     method: 'POST',
     body
   })
-  logger.withMetadata(data).debug('Applying cluster layout')
 
   return createResponse<ApplyClusterLayoutResponse>(event, 'Apply Cluster Layout', { data })
 })

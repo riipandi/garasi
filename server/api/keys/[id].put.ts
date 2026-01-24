@@ -7,22 +7,27 @@ import type { UpdateAccessKeyResponse } from '~/shared/schemas/keys.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('UpdateKey')
 
   // Parse router and query parameters
   const params = getQuery<Omit<UpdateAccessKeyParams, 'id'>>(event)
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.withPrefix('UpdateKey').debug('Key ID not provided')
+    log.warn('Key ID is required')
     throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
   }
   const body = await readBody<UpdateAccessKeyRequest>(event)
+  if (!body) {
+    log.warn('Request body is required')
+    throw new HTTPError({ status: 400, statusText: 'Request body is required' })
+  }
 
   const data = await gfetch<UpdateAccessKeyResponse>('/v2/UpdateKey', {
     method: 'POST',
     params: { id, ...params },
     body
   })
-  logger.withMetadata(data).debug('Updating access key')
+  log.withMetadata({ params, body, data }).debug('Updating access key')
 
   return createResponse<UpdateAccessKeyResponse>(event, 'Update Access Key', { data })
 })

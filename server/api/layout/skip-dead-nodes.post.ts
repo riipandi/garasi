@@ -10,20 +10,22 @@ export default defineProtectedHandler(async (event) => {
   const body = await readBody<SkipDeadNodesRequest>(event)
 
   if (body?.version === undefined || body?.version === null) {
-    logger.withPrefix('SkipDeadNodes').debug('Version is required')
+    logger.warn('Version is required')
     throw new HTTPError({ status: 400, statusText: 'Version is required' })
   }
 
   if (body?.allowMissingData === undefined || body?.allowMissingData === null) {
-    logger.withPrefix('SkipDeadNodes').debug('allowMissingData is required')
+    logger.warn('allowMissingData is required')
     throw new HTTPError({ status: 400, statusText: 'allowMissingData is required' })
   }
 
+  logger
+    .withMetadata({ version: body.version, allowMissingData: body.allowMissingData })
+    .debug('Skipping dead nodes in cluster layout')
   const data = await gfetch<SkipDeadNodesResponse>('/v2/ClusterLayoutSkipDeadNodes', {
     method: 'POST',
     body
   })
-  logger.withMetadata(data).debug('Skipping dead nodes in cluster layout')
 
   return createResponse<SkipDeadNodesResponse>(event, 'Cluster Layout Skip Dead Nodes', { data })
 })

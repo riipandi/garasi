@@ -8,9 +8,11 @@ export default defineProtectedHandler(async (event) => {
   // Validate required parameter
   const { bucket, prefix } = getQuery<{ bucket: string; prefix?: string }>(event)
   if (!bucket) {
-    logger.debug('Missing bucket parameter')
+    logger.warn('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
   }
+
+  logger.withMetadata({ bucket, prefix }).debug('Listing bucket objects')
 
   // Retrieve bucket objects
   const s3Client = await createS3ClientFromBucket(event, bucket)
@@ -37,11 +39,9 @@ export default defineProtectedHandler(async (event) => {
       bucket,
       prefix,
       objectCount: data?.contents?.length || 0,
-      folderCount: data?.commonPrefixes?.length || 0,
-      folders: data?.commonPrefixes?.map((p: any) => p.prefix) || [],
-      files: data?.contents?.map((obj: any) => obj.key) || []
+      folderCount: data?.commonPrefixes?.length || 0
     })
-    .debug('Fetch bucket objects')
+    .debug('Bucket objects listed successfully')
 
   return { status: 'success', message: 'List of bucket objects', data }
 })

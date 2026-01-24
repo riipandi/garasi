@@ -11,22 +11,24 @@ export default defineProtectedHandler(async (event) => {
   const params = getQuery<GetBlockInfoParams>(event)
 
   if (!params?.node) {
-    logger.withPrefix('GetBlockInfo').debug('Node parameter is required')
+    logger.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
   const body = await readBody<GetBlockInfoRequest>(event)
   if (!body?.blockHash) {
-    logger.withPrefix('GetBlockInfo').debug('Block hash is required')
+    logger.warn('Block hash is required')
     throw new HTTPError({ status: 400, statusText: 'Block hash is required' })
   }
 
+  logger
+    .withMetadata({ node: params.node, blockHash: body.blockHash })
+    .debug('Getting block information')
   const data = await gfetch<GetBlockInfoResponse>('/v2/GetBlockInfo', {
     method: 'POST',
     params,
     body
   })
-  logger.withMetadata({ body, data }).debug('Getting block information')
 
   return createResponse<GetBlockInfoResponse>(event, 'Get Block Information', { data })
 })

@@ -12,16 +12,17 @@ export default defineProtectedHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
   if (!id) {
-    logger.debug('Token ID is required')
+    logger.warn('Token ID is required')
     throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
   }
 
   const { search } = getQuery<GetAdminTokenInfoParams>(event)
 
-  logger.withMetadata({ id }).info('Getting admin token information')
+  logger.withMetadata({ id, search }).debug('Getting admin token information')
   const data = await gfetch('/v2/GetAdminTokenInfo', { params: { id, search } })
 
   if (!data) {
+    logger.withMetadata({ id }).warn('Admin token not found')
     return { success: false, message: 'Admin token not found', data: null }
   }
 

@@ -3,7 +3,11 @@ import { deactivateOtherSessions } from '~/server/services/session.service'
 import { revokeSessionRefreshTokens } from '~/server/services/session.service'
 
 export default defineProtectedHandler(async (event) => {
-  const { db, auth } = event.context
+  const { db, auth, logger } = event.context
+
+  logger
+    .withMetadata({ userId: auth.userId, currentSessionId: auth.sessionId })
+    .debug('Signing out from other devices')
 
   // Deactivate all other sessions for the user
   const deactivatedCount = await deactivateOtherSessions(db, auth.userId, auth.sessionId)
@@ -21,6 +25,10 @@ export default defineProtectedHandler(async (event) => {
   for (const session of allSessions) {
     await revokeSessionRefreshTokens(db, session.id)
   }
+
+  logger
+    .withMetadata({ userId: auth.userId, deactivatedCount })
+    .info('Signed out from other devices')
 
   // Return success message
   return {

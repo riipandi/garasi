@@ -2,7 +2,7 @@ import { HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 
 export default defineProtectedHandler(async (event) => {
-  const { db, auth } = event.context
+  const { db, auth, logger } = event.context
 
   // Fetch user from database
   const user = await db
@@ -13,8 +13,13 @@ export default defineProtectedHandler(async (event) => {
 
   // Check if user exists
   if (!user) {
+    logger.withMetadata({ userId: auth.userId }).warn('User not found')
     throw new HTTPError({ status: 404, statusText: 'User not found' })
   }
+
+  logger
+    .withMetadata({ userId: auth.userId, email: user.email })
+    .debug('User information retrieved')
 
   // Return user information
   return {

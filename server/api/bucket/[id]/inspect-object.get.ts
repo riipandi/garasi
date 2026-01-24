@@ -9,21 +9,21 @@ export default defineProtectedHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.withPrefix('InspectObject').debug('Bucket ID is required')
+    logger.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const { key } = getQuery<InspectObjectParams>(event)
 
   if (!key) {
-    logger.withPrefix('InspectObject').debug('Object key is required')
+    logger.warn('Object key is required')
     throw new HTTPError({ status: 400, statusText: 'Object key is required' })
   }
 
+  logger.withMetadata({ bucketId: id, objectKey: key }).debug('Inspecting object')
   const data = await gfetch<InspectObjectResponse>('/v2/InspectObject', {
     params: { bucketId: id, key }
   })
-  logger.withMetadata(data).debug('Inspecting object')
 
   return createResponse<InspectObjectResponse>(event, 'Inspect Object', { data })
 })

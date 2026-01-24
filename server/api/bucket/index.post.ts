@@ -13,7 +13,7 @@ export default defineProtectedHandler(async (event) => {
 
   const body = await readBody<CreateBucketRequest>(event)
   if (!body?.globalAlias) {
-    logger.withPrefix('CreateBucket').withMetadata(body).debug('Global alias is required')
+    logger.warn('Global alias is required')
     throw new HTTPError({ status: 400, statusText: 'Global alias is required' })
   }
 
@@ -21,17 +21,11 @@ export default defineProtectedHandler(async (event) => {
   if (body?.localAlias) {
     const localAlias = body.localAlias as CreateBucketLocalAlias
     if (!localAlias?.accessKeyId) {
-      logger
-        .withPrefix('CreateBucket')
-        .withMetadata(body)
-        .debug('Access Key ID is required for local alias')
+      logger.warn('Access Key ID is required for local alias')
       throw new HTTPError({ status: 400, statusText: 'Access Key ID is required for local alias' })
     }
     if (!localAlias?.alias) {
-      logger
-        .withPrefix('CreateBucket')
-        .withMetadata(body)
-        .debug('Alias is required for local alias')
+      logger.warn('Alias is required for local alias')
       throw new HTTPError({ status: 400, statusText: 'Alias is required for local alias' })
     }
   }
@@ -42,11 +36,11 @@ export default defineProtectedHandler(async (event) => {
     : null
   const requestBody: CreateBucketRequest = { globalAlias: body.globalAlias, localAlias }
 
+  logger.withMetadata({ globalAlias: body.globalAlias }).debug('Creating bucket')
   const data = await gfetch<CreateBucketResponse>('/v2/CreateBucket', {
     method: 'POST',
     body: requestBody
   })
-  logger.withMetadata(data).debug('Creating bucket')
 
   return createResponse<CreateBucketResponse>(event, 'Create Bucket', { data })
 })

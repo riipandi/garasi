@@ -9,25 +9,25 @@ export default defineProtectedHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.withPrefix('AllowBucketKey').debug('Bucket ID is required')
+    logger.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const body = await readBody<Omit<AllowBucketKeyRequest, 'bucketId'>>(event)
   if (!body?.accessKeyId) {
-    logger.withPrefix('AllowBucketKey').debug('Access Key ID is required')
+    logger.warn('Access Key ID is required')
     throw new HTTPError({ status: 400, statusText: 'Access Key ID is required' })
   }
   if (!body?.permissions) {
-    logger.withPrefix('AllowBucketKey').debug('Permissions are required')
+    logger.warn('Permissions are required')
     throw new HTTPError({ status: 400, statusText: 'Permissions are required' })
   }
 
+  logger.withMetadata({ bucketId: id, accessKeyId: body.accessKeyId }).debug('Allowing bucket key')
   const data = await gfetch<AllowBucketKeyResponse>('/v2/AllowBucketKey', {
     method: 'POST',
     body: { ...body, bucketId: id }
   })
-  logger.withMetadata(data).debug('Allowing bucket key')
 
   return createResponse<AllowBucketKeyResponse>(event, 'Allow Bucket Key', { data })
 })

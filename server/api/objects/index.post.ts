@@ -15,9 +15,11 @@ export default defineProtectedHandler(async (event) => {
     overwrite?: string | null
   }>(event)
   if (!bucket) {
-    logger.debug('Missing bucket parameter')
+    logger.warn('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
   }
+
+  logger.withMetadata({ bucket, prefix }).debug('Processing file upload')
 
   const form: FormData = await event.req.formData()
 
@@ -30,7 +32,7 @@ export default defineProtectedHandler(async (event) => {
   }
 
   if (files.length === 0) {
-    logger.withMetadata(files).debug('No file uploaded')
+    logger.warn('No file uploaded')
     throw new HTTPError({ status: 401, statusText: 'Expecting form-data with a file field' })
   }
 
@@ -46,13 +48,15 @@ export default defineProtectedHandler(async (event) => {
 
   const buffer = Buffer.from(arrayBuf)
   if (buffer.length === 0) {
-    logger.withMetadata(files).debug('Uploaded file has no content')
+    logger.warn('Uploaded file has no content')
     throw new HTTPError({ status: 401, statusText: 'File part contains no data' })
   }
 
   const maxUploadSize = protectedEnv.S3_MAX_UPLOAD_SIZE
   if (buffer.length > maxUploadSize) {
-    logger.withMetadata(files).debug('Uploaded file size too large')
+    logger
+      .withMetadata({ fileSize: buffer.length, maxSize: maxUploadSize })
+      .warn('Uploaded file size too large')
     throw new HTTPError({ status: 401, statusText: `Max upload size is ${maxUploadSize} bytes` })
   }
 
@@ -68,12 +72,14 @@ export default defineProtectedHandler(async (event) => {
   const forceUpload = parseBoolean(overwrite ?? null)
   const fileExists = await s3Client.exists(fullKey, { bucket })
   if (!forceUpload && fileExists) {
-    logger.withMetadata({ filename: fullKey }).debug('File already exists')
+    logger.withMetadata({ filename: fullKey }).warn('File already exists')
     throw new HTTPError({ status: 401, statusText: `File '${fullKey}' already exists` })
   }
 
   const bytesWritten = await s3Client.write(fullKey, buffer, { bucket, type: contentType })
-  logger.withMetadata({ bytesWritten }).debug('Fetch bucket objects')
+  logger
+    .withMetadata({ filename: fullKey, fileSize: prettyBytes(bytesWritten) })
+    .debug('File uploaded successfully')
 
   const data = { filename, contentType, fileSize: prettyBytes(bytesWritten), forceUpload }
 

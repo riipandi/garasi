@@ -2,10 +2,14 @@ import { defineProtectedHandler } from '~/server/platform/guards'
 import { getUserSessions } from '~/server/services/session.service'
 
 export default defineProtectedHandler(async (event) => {
-  const { db, auth } = event.context
+  const { db, auth, logger } = event.context
 
   // Get all active sessions for the user
   const sessions = await getUserSessions(db, auth.userId)
+
+  logger
+    .withMetadata({ userId: auth.userId, sessionCount: sessions.length })
+    .debug('User sessions retrieved')
 
   // Return sessions
   return {

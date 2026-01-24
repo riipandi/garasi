@@ -10,10 +10,11 @@ type GetWorkerVariableQueryParams = GetWorkerVariableParams & GetWorkerVariableR
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('GetWorkerVariable')
 
   const params = getQuery<GetWorkerVariableQueryParams>(event)
   if (!params?.node) {
-    logger.withPrefix('GetWorkerVariable').debug('Node parameter is required')
+    log.withPrefix('GetWorkerVariable').debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
@@ -22,7 +23,7 @@ export default defineProtectedHandler(async (event) => {
     params,
     body: { variable: params.variable }
   })
-  logger.withMetadata(data).debug('Getting worker variable')
+  log.withMetadata(data).debug('Getting worker variable')
 
   return createResponse<GetWorkerVariableResponse>(event, 'Get Worker Variable', { data })
 })

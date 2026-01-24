@@ -22,11 +22,18 @@ export default defineProtectedHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.debug('Token ID is required')
+    logger.warn('Token ID is required')
     throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
   }
 
   const body = await readBody<UpdateAdminTokenRequestBody>(event)
+  if (!body) {
+    logger.warn('Request body is required')
+    throw new HTTPError({ status: 400, statusText: 'Request body is required' })
+  }
+  logger
+    .withMetadata({ id, name: body.name, expiration: body.expiration })
+    .debug('Updating admin token')
   const resp = await gfetch<GetAdminTokenInfoResp>('/v2/UpdateAdminToken', {
     method: 'POST',
     params: { id },

@@ -6,12 +6,13 @@ import type { PreviewLayoutChangesResponse } from '~/shared/schemas/layout.schem
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
+  logger.debug('Previewing cluster layout changes')
   const data = await gfetch<PreviewLayoutChangesResponse>('/v2/PreviewClusterLayoutChanges', {
     method: 'POST'
   })
-  logger.withMetadata(data).debug('Previewing cluster layout changes')
 
   if (!data.message) {
+    logger.withMetadata({ error: data.error }).warn('Failed to preview layout changes')
     throw new HTTPError({
       status: 400,
       statusText: data.error || 'Failed to preview layout changes'

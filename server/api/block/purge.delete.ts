@@ -9,26 +9,26 @@ export default defineProtectedHandler(async (event) => {
 
   const params = getQuery<PurgeBlocksParams>(event)
   if (!params?.node) {
-    logger.withPrefix('PurgeBlocks').debug('Node parameter is required')
+    logger.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
   const body = await readBody<string[]>(event)
 
   if (!body || !Array.isArray(body) || body.length === 0) {
-    logger.withPrefix('PurgeBlocks').debug('Block hashes array is required and must not be empty')
+    logger.warn('Block hashes array is required and must not be empty')
     throw new HTTPError({
       status: 400,
       statusText: 'Block hashes array is required and must not be empty'
     })
   }
 
+  logger.withMetadata({ node: params.node, blockCount: body.length }).debug('Purging blocks')
   const data = await gfetch<PurgeBlocksResponse>('/v2/PurgeBlocks', {
     method: 'POST',
     params,
     body
   })
-  logger.withMetadata(data).debug('Purging blocks')
 
   return createResponse(event, 'Purge Blocks', { data })
 })

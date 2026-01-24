@@ -18,10 +18,12 @@ export default defineHandler(async (event) => {
     // Parse and validate request body
     const body = await readBody<{ email: string; password: string }>(event)
     if (!body?.email || !body?.password) {
-      logger.debug('Email and password are required')
+      logger.warn('Email and password are required')
       throw new HTTPError({ status: 400, statusText: 'Email and password are required' })
     }
     const { email, password } = body
+
+    logger.withMetadata({ email }).debug('Attempting user sign in')
 
     // Find user by email
     const user = await db
@@ -32,18 +34,18 @@ export default defineHandler(async (event) => {
 
     // Check if user exists
     if (!user) {
-      logger.withMetadata({ email, password }).debug('User not found')
+      logger.withMetadata({ email }).warn('User not found')
       throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
     // Verify password using Bun's password.verify
     const isPasswordValid = await Bun.password.verify(password, user.passwordHash)
     if (!isPasswordValid) {
-      logger.withMetadata({ email, password }).debug('Password validation failed')
+      logger.withMetadata({ email }).warn('Password validation failed')
       throw new HTTPError({ status: 401, statusText: 'Invalid email or password' })
     }
 
-    logger.withMetadata({ email, password }).debug('User found, creating session')
+    logger.withMetadata({ email, userId: user.id }).debug('User authenticated, creating session')
 
     // Get user agent and IP address from request
     const userAgent = parseUserAgent(event, { format: 'raw' })
@@ -53,7 +55,7 @@ export default defineHandler(async (event) => {
     const { sessionId, sessionRecord } = await createSession(db, user.id, ipAddress, userAgent)
 
     if (!sessionId || !sessionRecord) {
-      logger.withMetadata({ sessionId, sessionRecord }).debug('Failed to create session')
+      logger.withMetadata({ userId: user.id }).error('Failed to create session')
       throw new HTTPError({ status: 500, statusText: 'Failed to create session' })
     }
 
@@ -71,18 +73,20 @@ export default defineHandler(async (event) => {
 
     // Clean up expired sessions
     cleanupExpiredSessions(db).catch((error) =>
-      logger.withError(error).error('Error cleaning up sessions')
+      logger.withError(error).error('Error cleaning up expired sessions')
     )
 
     // Cleanup expired refresh tokens
     cleanupExpiredRefreshTokens(db).catch((error) =>
-      logger.withError(error).error('Error cleaning up refresh tokens')
+      logger.withError(error).error('Error cleaning up expired refresh tokens')
     )
 
     // Store accessToken, refreshToken, and sessionId on cookie
     storeCookie(event, 'atoken', tokens.accessToken, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
     storeCookie(event, 'rtoken', tokens.refreshToken, protectedEnv.PUBLIC_JWT_REFRESH_TOKEN_EXPIRY)
     storeCookie(event, 'sessid', sessionId, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
+
+    logger.withMetadata({ userId: user.id, sessionId }).info('User signed in successfully')
 
     // Return user data with JWT tokens and session info
     return {

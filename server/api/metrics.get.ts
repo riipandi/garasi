@@ -17,14 +17,19 @@ interface ParsedMetric {
 type ParsedMetrics = Record<string, ParsedMetric>
 
 export default defineProtectedHandler(async (event) => {
-  const { gfetch } = event.context
+  const { gfetch, logger } = event.context
 
   const { raw } = getQuery<{ raw: string | null }>(event)
   const printRaw = parseBoolean(raw ?? null) || false
 
+  logger.debug('Fetching Garage Prometheus metrics')
   const metricsToken = `Bearer ${protectedEnv.GARAGE_METRICS_TOKEN}`
   const resp = await gfetch<string>('/metrics', { headers: { Authorization: metricsToken } })
   const data = parsePrometheusMetrics(resp)
+  logger
+    .withMetadata({ metricCount: Object.keys(data).length, printRaw })
+    .debug('Metrics parsed successfully')
+
   const response = { status: 'success', message: 'Garage Prometheus Metrics', data }
 
   return !printRaw ? response : data

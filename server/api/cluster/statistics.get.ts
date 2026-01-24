@@ -10,9 +10,10 @@ export default defineProtectedHandler(async (event) => {
   const { raw } = getQuery<{ raw: string | null }>(event)
   const printRaw = parseBoolean(raw ?? null) || false
 
+  logger.debug('Getting cluster statistics')
   const resp = await gfetch<GetClusterStatisticsResponse>('/v2/GetClusterStatistics')
   const data = !printRaw ? parseClusterStatistics(resp.freeform) : resp
-  logger.withMetadata(data).info('Getting cluster statistics')
+  logger.withMetadata({ printRaw }).debug('Cluster statistics retrieved')
 
   return createResponse<ClusterStatistics | GetClusterStatisticsResponse>(
     event,

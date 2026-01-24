@@ -8,7 +8,7 @@ interface ResetPasswordBody {
 }
 
 export default defineEventHandler(async (event) => {
-  const { db } = event.context
+  const { db, logger } = event.context
 
   try {
     // Get token from query string
@@ -19,13 +19,19 @@ export default defineEventHandler(async (event) => {
 
     // Validate required fields
     if (!token || !body || !body.password) {
+      logger.warn('Token and password are required')
       throw new HTTPError({ status: 400, statusText: 'Token and password are required' })
     }
 
     // Validate password strength
     if (body.password.length < 6) {
+      logger.warn('Password must be at least 6 characters')
       throw new HTTPError({ status: 400, statusText: 'Password must be at least 6 characters' })
     }
+
+    logger
+      .withMetadata({ token: token.substring(0, 8) + '...' })
+      .debug('Validating password reset token')
 
     // Find the reset token
     const resetToken = await db
@@ -36,17 +42,20 @@ export default defineEventHandler(async (event) => {
 
     // Check if token exists
     if (!resetToken) {
+      logger.warn('Invalid or expired reset token')
       throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is expired
     const now = Math.floor(Date.now() / 1000)
     if (resetToken.expiresAt < now) {
+      logger.warn('Reset token has expired')
       throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is already used
     if (resetToken.used !== 0) {
+      logger.warn('Reset token has already been used')
       throw new HTTPError({ status: 400, statusText: 'Token has already been used' })
     }
 
@@ -68,10 +77,14 @@ export default defineEventHandler(async (event) => {
       .execute()
 
     // Revoke all refresh tokens for security
-    await revokeUserRefreshTokens(db, resetToken.userId)
+    const revokedCount = await revokeUserRefreshTokens(db, resetToken.userId)
 
     // Deactivate all sessions for security
-    await deactivateAllSessions(db, resetToken.userId)
+    const deactivatedCount = await deactivateAllSessions(db, resetToken.userId)
+
+    logger
+      .withMetadata({ userId: resetToken.userId, revokedCount, deactivatedCount })
+      .info('Password reset successful')
 
     return {
       success: true,
@@ -80,6 +93,7 @@ export default defineEventHandler(async (event) => {
       data: null
     }
   } catch (error) {
+    logger.withError(error).error('Error processing password reset')
     return createErrorResonse(event, error)
   }
 })

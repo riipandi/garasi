@@ -10,7 +10,7 @@ interface ChangeEmailBody {
 }
 
 export default defineProtectedHandler(async (event) => {
-  const { db, auth, baseURL } = event.context
+  const { db, auth, baseURL, logger } = event.context
 
   // Parse request body
   const body = await readBody<ChangeEmailBody>(event)
@@ -45,11 +45,13 @@ export default defineProtectedHandler(async (event) => {
   const isPasswordValid = await Bun.password.verify(body.password, user.passwordHash)
 
   if (!isPasswordValid) {
+    logger.withMetadata({ userId: auth.userId }).warn('Incorrect password')
     throw new HTTPError({ status: 401, statusText: 'Incorrect password' })
   }
 
   // Check if new email is the same as current email
   if (normalizedNewEmail === user.email) {
+    logger.warn('New email cannot be the same as current email')
     throw new HTTPError({
       status: 400,
       statusText: 'New email cannot be the same as current email'
@@ -64,6 +66,9 @@ export default defineProtectedHandler(async (event) => {
     .executeTakeFirst()
 
   if (existingUser) {
+    logger
+      .withMetadata({ newEmail: normalizedNewEmail })
+      .warn('Email is already in use by another account')
     throw new HTTPError({ status: 409, statusText: 'Email is already in use by another account' })
   }
 
@@ -77,6 +82,7 @@ export default defineProtectedHandler(async (event) => {
     .executeTakeFirst()
 
   if (pendingRequest) {
+    logger.withMetadata({ userId: auth.userId }).warn('Pending email change request already exists')
     throw new HTTPError({
       status: 400,
       statusText:

@@ -12,10 +12,11 @@ interface GetAdminTokenInfoResp {
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Getting current admin token information')
+  logger.debug('Getting current admin token information')
   const data = await gfetch<GetAdminTokenInfoResp>('/v2/GetCurrentAdminTokenInfo')
 
   if (!data) {
+    logger.warn('Current admin token not found')
     return { success: false, message: 'Admin token not found', data: null }
   }
 

@@ -9,15 +9,15 @@ export default defineProtectedHandler(async (event) => {
 
   const params = getQuery<CreateMetadataSnapshotParams>(event)
   if (!params?.node) {
-    logger.withPrefix('CreateMetadataSnapshot').debug('Node parameter is required')
+    logger.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
+  logger.withMetadata({ node: params.node }).debug('Creating metadata snapshot')
   const data = await gfetch<CreateMetadataSnapshotResponse>('/v2/CreateMetadataSnapshot', {
     method: 'POST',
     params
   })
-  logger.withMetadata(data).debug('Creating metadata snapshot')
 
   return createResponse<CreateMetadataSnapshotResponse>(event, 'Create Metadata Snapshot', { data })
 })

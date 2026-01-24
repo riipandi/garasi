@@ -9,7 +9,7 @@ interface ForgotPasswordBody {
 }
 
 export default defineEventHandler(async (event) => {
-  const { db, baseURL } = event.context
+  const { db, baseURL, logger } = event.context
 
   try {
     // Parse request body
@@ -17,8 +17,11 @@ export default defineEventHandler(async (event) => {
 
     // Validate required fields
     if (!body || !body.email) {
+      logger.warn('Email is required')
       throw new HTTPError({ status: 400, statusText: 'Email is required' })
     }
+
+    logger.withMetadata({ email: body.email }).debug('Processing forgot password request')
 
     // Find user by email
     const user = await db
@@ -30,6 +33,9 @@ export default defineEventHandler(async (event) => {
     // Always return success to prevent email enumeration
     // Even if user doesn't exist, we don't want to reveal that
     if (!user) {
+      logger
+        .withMetadata({ email: body.email })
+        .warn('User not found, but returning success for security')
       return {
         success: true,
         message: 'If an account exists with this email, a password reset link has been sent.'
@@ -55,6 +61,10 @@ export default defineEventHandler(async (event) => {
     const isDev = protectedEnv.APP_MODE === 'development'
     const resetLink = `${baseURL}/reset-password/${token}`
 
+    logger
+      .withMetadata({ userId: user.id, email: user.email })
+      .debug('Password reset token created')
+
     await sendMail({
       to: user.email,
       subject: 'Reset your password',
@@ -72,6 +82,7 @@ export default defineEventHandler(async (event) => {
       data: isDev ? { token, reset_link: resetLink, expires_at: expiresAt } : null
     }
   } catch (error) {
+    logger.withError(error).error('Error processing forgot password request')
     return createErrorResonse(event, error)
   }
 })

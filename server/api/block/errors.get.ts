@@ -9,12 +9,13 @@ export default defineProtectedHandler(async (event) => {
 
   const params = getQuery<ListBlockErrorsParams>(event)
   if (!params?.node) {
-    logger.withPrefix('ListBlockErrors').debug('Node parameter is required')
+    logger.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
+  logger.withMetadata({ node: params.node }).debug('Listing block errors')
   const data = await gfetch<ListBlockErrorsResponse>('/v2/ListBlockErrors', { params })
-  logger.withMetadata(data).debug('Listing block errors')
+  logger.withMetadata({ errorCount: data.error?.length || 0 }).debug('Block errors listed')
 
   return createResponse<ListBlockErrorsResponse>(event, 'List Block Errors', { data })
 })

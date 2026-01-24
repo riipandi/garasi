@@ -14,24 +14,26 @@ export default defineProtectedHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.withPrefix('AddBucketAlias').debug('Bucket ID is required')
+    logger.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const body = await readBody<AddAliasRequestBody>(event)
   if (!body?.globalAlias && !body?.localAlias) {
-    logger.withPrefix('AddBucketAlias').debug('Either globalAlias or localAlias is required')
+    logger.warn('Either globalAlias or localAlias is required')
     throw new HTTPError({
       status: 400,
       statusText: 'Either globalAlias or localAlias is required'
     })
   }
 
+  logger
+    .withMetadata({ bucketId: id, globalAlias: body.globalAlias, localAlias: body.localAlias })
+    .debug('Adding bucket alias')
   const data = await gfetch<AddBucketAliasResponse>('/v2/AddBucketAlias', {
     method: 'POST',
     body: { ...body, bucketId: id }
   })
-  logger.withMetadata(data).debug('Adding bucket alias')
 
   return createResponse<AddBucketAliasResponse>(event, 'Add Bucket Alias', { data })
 })

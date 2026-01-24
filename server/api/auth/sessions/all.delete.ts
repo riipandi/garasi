@@ -2,13 +2,17 @@ import { defineProtectedHandler } from '~/server/platform/guards'
 import { deactivateAllSessions, revokeUserRefreshTokens } from '~/server/services/session.service'
 
 export default defineProtectedHandler(async (event) => {
-  const { db, auth } = event.context
+  const { db, auth, logger } = event.context
 
   // Deactivate all sessions for the user
   const deactivatedCount = await deactivateAllSessions(db, auth.userId)
 
   // Revoke all refresh tokens for the user
   const revokedCount = await revokeUserRefreshTokens(db, auth.userId)
+
+  logger
+    .withMetadata({ userId: auth.userId, deactivatedCount, revokedCount })
+    .info('Signed out from all devices')
 
   // Return success message
   return {

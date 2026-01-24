@@ -10,10 +10,11 @@ type GetWorkerInfoQueryParams = GetWorkerInfoParams & GetWorkerInfoRequest
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('GetWorkerInfo')
 
   const params = getQuery<GetWorkerInfoQueryParams>(event)
   if (!params?.node || !params?.id) {
-    logger.withPrefix('GetWorkerInfo').debug('Node and id parameter is required')
+    log.withPrefix('GetWorkerInfo').debug('Node and id parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node and id parameter is required' })
   }
 
@@ -22,7 +23,7 @@ export default defineProtectedHandler(async (event) => {
     params: { node: params.node },
     body: { id: Number(params.id) }
   })
-  logger.withMetadata(data).debug('Getting worker information')
+  log.withMetadata(data).debug('Getting worker information')
 
   return createResponse<GetWorkerInfoResponse>(event, 'Get Worker Information', { data })
 })

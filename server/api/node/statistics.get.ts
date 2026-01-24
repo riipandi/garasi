@@ -9,12 +9,12 @@ export default defineProtectedHandler(async (event) => {
 
   const params = getQuery<GetNodeStatisticsParams>(event)
   if (!params?.node) {
-    logger.withPrefix('GetNodeStatistics').debug('Node parameter is required')
+    logger.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
+  logger.withMetadata({ node: params.node }).debug('Getting node statistics')
   const data = await gfetch<GetNodeStatisticsResponse>('/v2/GetNodeStatistics', { params })
-  logger.withMetadata(data).debug('Getting node statistics')
 
   return createResponse<GetNodeStatisticsResponse>(event, 'Get Node Statistics', { data })
 })

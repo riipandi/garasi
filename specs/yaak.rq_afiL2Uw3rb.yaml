@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_afiL2Uw3rb
 createdAt: 2026-01-19T18:47:05.009940
-updatedAt: 2026-01-23T17:21:13.001999
+updatedAt: 2026-01-24T05:47:43.208461
 workspaceId: wk_YrPa97TLKc
 folderId: fl_ougj9dmJYS
 authentication: {}
@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: tXdCB587eF
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: tXdCB587eF
 method: POST
 name: Signin with Email
 sortPriority: 0.0

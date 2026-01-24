@@ -4,9 +4,10 @@ import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('ListKeys')
 
   const data = await gfetch<ListAccessKeysResponse[]>('/v2/ListKeys')
-  logger.withMetadata(data).debug('List Access Keys')
+  log.withMetadata(data).debug('Access keys listed successfully')
 
   return createResponse<ListAccessKeysResponse[]>(event, 'List Access Keys', { data })
 })

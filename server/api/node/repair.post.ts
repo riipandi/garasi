@@ -10,22 +10,24 @@ export default defineProtectedHandler(async (event) => {
 
   const params = getQuery<LaunchRepairOperationParams>(event)
   if (!params?.node) {
-    logger.withPrefix('LaunchRepairOperation').debug('Node parameter is required')
+    logger.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
   const body = await readBody<LaunchRepairOperationRequest>(event)
   if (!body?.repairType) {
-    logger.withPrefix('LaunchRepairOperation').debug('Repair type is required')
+    logger.warn('Repair type is required')
     throw new HTTPError({ status: 400, statusText: 'Repair type is required' })
   }
 
+  logger
+    .withMetadata({ node: params.node, repairType: body.repairType })
+    .debug('Launching repair operation')
   const data = await gfetch<LaunchRepairOperationResponse>('/v2/LaunchRepairOperation', {
     method: 'POST',
     params,
     body
   })
-  logger.withMetadata(data).debug('Launching repair operation')
 
   const message = `Launch repair for operation ${body.repairType}`
   return createResponse<LaunchRepairOperationResponse>(event, message, { data })

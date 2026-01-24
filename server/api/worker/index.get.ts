@@ -8,10 +8,11 @@ import type { ListWorkersResponse } from '~/shared/schemas/worker.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('ListWorkers')
 
   const queryParams = getQuery(event)
   if (!queryParams?.node) {
-    logger.withPrefix('ListWorkers').debug('Node parameter is required')
+    log.debug('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
@@ -26,7 +27,7 @@ export default defineProtectedHandler(async (event) => {
     params,
     body
   })
-  logger.withMetadata(data).debug('Listing workers')
+  log.withMetadata(data).debug('Listing workers')
 
   return createResponse<ListWorkersResponse>(event, 'List Workers', { data })
 })

@@ -27,10 +27,13 @@ export default defineProtectedHandler(async (event) => {
   // Parse and validate request body
   const body = await readBody<UpdateAdminTokenRequestBody>(event)
   if (!body?.name) {
-    logger.debug('Name of the admin API token is required')
+    logger.warn('Admin token name is required')
     throw new HTTPError({ status: 400, statusText: 'Name of the admin API token is required' })
   }
 
+  logger
+    .withMetadata({ name: body.name, expiration: body.expiration })
+    .debug('Creating admin token')
   const resp = await gfetch<CreateAdminTokenResp>('/v2/CreateAdminToken', {
     method: 'POST',
     body

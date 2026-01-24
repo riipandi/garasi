@@ -4,7 +4,7 @@ import { createErrorResonse } from '~/server/platform/responder'
 import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
 export default defineEventHandler(async (event) => {
-  const { db } = event.context
+  const { db, logger } = event.context
 
   try {
     // Get token from query parameter
@@ -12,29 +12,37 @@ export default defineEventHandler(async (event) => {
     const token = query.token as string
 
     if (!token) {
+      logger.warn('Token is required')
       throw new HTTPError({ status: 400, statusText: 'Token is required' })
     }
+
+    logger
+      .withMetadata({ token: token.substring(0, 8) + '...' })
+      .debug('Validating email change token')
 
     // Find the email change token
     const emailChangeToken = await db
       .selectFrom('email_change_tokens')
-      .select(['id', 'userId', 'oldEmail', 'newEmail', 'expiresAt', 'used'])
+      .selectAll()
       .where('token', '=', token)
       .executeTakeFirst()
 
     // Check if token exists
     if (!emailChangeToken) {
+      logger.warn('Invalid or expired token')
       throw new HTTPError({ status: 404, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is already used
     if (emailChangeToken.used !== 0) {
+      logger.warn('Token has already been used')
       throw new HTTPError({ status: 400, statusText: 'This token has already been used' })
     }
 
     // Check if token is expired
     const currentTime = Math.floor(Date.now() / 1000)
     if (emailChangeToken.expiresAt < currentTime) {
+      logger.warn('Token has expired')
       throw new HTTPError({ status: 400, statusText: 'Token has expired' })
     }
 
@@ -46,11 +54,13 @@ export default defineEventHandler(async (event) => {
       .executeTakeFirst()
 
     if (!user) {
+      logger.withMetadata({ userId: emailChangeToken.userId }).warn('User not found')
       throw new HTTPError({ status: 404, statusText: 'User not found' })
     }
 
-    // Check if the old email in the token matches the current user email
+    // Check if old email in token matches of current user email
     if (emailChangeToken.oldEmail !== user.email) {
+      logger.warn('Email change request is no longer valid')
       throw new HTTPError({
         status: 400,
         statusText:
@@ -58,7 +68,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Check if the new email is already in use (double check)
+    // Check if new email is already in use by another user (double check)
     const existingUser = await db
       .selectFrom('users')
       .select(['id'])
@@ -66,11 +76,22 @@ export default defineEventHandler(async (event) => {
       .executeTakeFirst()
 
     if (existingUser && existingUser.id !== user.id) {
+      logger
+        .withMetadata({ newEmail: emailChangeToken.newEmail })
+        .warn('New email is already in use by another account')
       throw new HTTPError({
         status: 409,
         statusText: 'New email is already in use by another account'
       })
     }
+
+    logger
+      .withMetadata({
+        userId: user.id,
+        oldEmail: emailChangeToken.oldEmail,
+        newEmail: emailChangeToken.newEmail
+      })
+      .debug('Updating user email')
 
     // Update user email
     await db
@@ -82,7 +103,7 @@ export default defineEventHandler(async (event) => {
       .where('id', '=', user.id)
       .execute()
 
-    // Mark the token as used
+    // Mark token as used
     await db
       .updateTable('email_change_tokens')
       .set({ used: 1 })
@@ -95,6 +116,10 @@ export default defineEventHandler(async (event) => {
     // Deactivate all sessions for security
     const deactivatedCount = await deactivateAllSessions(db, user.id)
 
+    logger
+      .withMetadata({ userId: user.id, revokedCount, deactivatedCount })
+      .info('Email changed successfully')
+
     // Send notification email to old email address
     await sendMail({
       to: emailChangeToken.oldEmail,
@@ -103,8 +128,8 @@ export default defineEventHandler(async (event) => {
         <h2>Email Change Confirmation</h2>
         <p>Hello ${user.name},</p>
         <p>This is to confirm that your email address has been changed from <strong>${emailChangeToken.oldEmail}</strong> to <strong>${emailChangeToken.newEmail}</strong>.</p>
-        <p>If you did not make this change, please contact support immediately.</p>
         <p><strong>Security Notice:</strong> All your sessions have been terminated for security. Please sign in again with your new email address.</p>
+        <p>If you did not make this change, please contact support immediately.</p>
       `
     })
 
@@ -132,6 +157,7 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (error) {
+    logger.withError(error).error('Error processing email change confirmation')
     return createErrorResonse(event, error)
   }
 })

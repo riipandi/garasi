@@ -6,19 +6,20 @@ import type { GetKeyInformationResponse } from '~/shared/schemas/keys.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('GetKeyInfo')
 
   // Parse router and query parameters
   const params = getQuery<Omit<GetKeyInformationParams, 'id'>>(event)
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.withPrefix('GetKeyInfo').debug('Key ID not provided')
+    log.warn('Key ID is required')
     throw new HTTPError({ status: 400, statusText: 'Key ID is required' })
   }
 
   const data = await gfetch<GetKeyInformationResponse>('/v2/GetKeyInfo', {
     params: { id, ...params }
   })
-  logger.withMetadata(data).debug('Getting key information')
+  log.withMetadata({ keyId: id, data }).debug('Getting key information')
 
   return createResponse<GetKeyInformationResponse>(event, 'Get Key Information', { data })
 })

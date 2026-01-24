@@ -7,12 +7,12 @@ export default defineProtectedHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.withPrefix('DeleteBucket').debug('Bucket ID is required')
+    logger.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
+  logger.withMetadata({ bucketId: id }).debug('Deleting bucket')
   const data = await gfetch('/v2/DeleteBucket', { method: 'POST', params: { id } })
-  logger.withMetadata(data).debug('Deleting bucket')
 
   return createResponse(event, 'Delete Bucket', { data })
 })
