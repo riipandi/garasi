@@ -19,19 +19,20 @@ interface GetAdminTokenInfoResp {
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('UpdateAdminToken')
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.warn('Token ID is required')
+    log.warn('Token ID is required')
     throw new HTTPError({ status: 400, statusText: 'Token ID is required' })
   }
 
   const body = await readBody<UpdateAdminTokenRequestBody>(event)
   if (!body) {
-    logger.warn('Request body is required')
+    log.warn('Request body is required')
     throw new HTTPError({ status: 400, statusText: 'Request body is required' })
   }
-  logger
+  log
     .withMetadata({ id, name: body.name, expiration: body.expiration })
     .debug('Updating admin token')
   const resp = await gfetch<GetAdminTokenInfoResp>('/v2/UpdateAdminToken', {

@@ -8,18 +8,19 @@ interface CreateFolderRequestBody {
 
 export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
+  const log = logger.withPrefix('CreateFolder')
 
   // Validate required query parameter
   const { bucket } = getQuery<{ bucket: string }>(event)
   if (!bucket) {
-    logger.warn('Missing bucket parameter')
+    log.warn('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
   }
 
   // Validate request body
   const body = await readBody<CreateFolderRequestBody>(event)
   if (!body?.name) {
-    logger.warn('Missing name in request body')
+    log.warn('Missing name in request body')
     throw new HTTPError({ status: 400, statusText: 'Missing name in request body' })
   }
 
@@ -27,17 +28,17 @@ export default defineProtectedHandler(async (event) => {
 
   // Validate folder name
   if (typeof name !== 'string' || name.trim().length === 0) {
-    logger.warn('Invalid folder name')
+    log.warn('Invalid folder name')
     throw new HTTPError({ status: 400, statusText: 'Invalid folder name' })
   }
 
-  logger.withMetadata({ bucket, folderName: name }).debug('Creating folder')
+  log.withMetadata({ bucket, folderName: name }).debug('Creating folder')
 
   // Remove leading/trailing slashes and spaces
   const sanitizedFolderName = name.trim().replace(/^\/+|\/+$/g, '')
 
   if (sanitizedFolderName.length === 0) {
-    logger.warn('Folder name cannot be empty after sanitization')
+    log.warn('Folder name cannot be empty after sanitization')
     throw new HTTPError({ status: 400, statusText: 'Folder name cannot be empty' })
   }
 
@@ -50,7 +51,7 @@ export default defineProtectedHandler(async (event) => {
   // Check if folder already exists
   const folderExists = await s3Client.exists(folderKey, { bucket })
   if (folderExists) {
-    logger.withMetadata({ bucket, folderKey }).warn('Folder already exists')
+    log.withMetadata({ bucket, folderKey }).warn('Folder already exists')
     throw new HTTPError({ status: 409, statusText: `Folder '${name}' already exists` })
   }
 
@@ -62,11 +63,11 @@ export default defineProtectedHandler(async (event) => {
   // Verify the folder was created successfully
   const verifyExists = await s3Client.exists(folderKey, { bucket })
   if (!verifyExists) {
-    logger.withMetadata({ bucket, folderKey }).error('Failed to verify folder creation')
+    log.withMetadata({ bucket, folderKey }).error('Failed to verify folder creation')
     throw new HTTPError({ status: 500, statusText: 'Failed to create folder' })
   }
 
-  logger.withMetadata({ bucket, folderKey }).info('Folder created successfully')
+  log.withMetadata({ bucket, folderKey }).info('Folder created successfully')
   const data = { name: sanitizedFolderName, folderKey, bucket }
 
   return { status: 'success', message: 'Folder created successfully', data }

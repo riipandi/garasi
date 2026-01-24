@@ -7,6 +7,7 @@ import { prettyBytes } from '~/shared/utils/humanize'
 
 export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
+  const log = logger.withPrefix('UploadFile')
 
   // Validate required parameter
   const { bucket, prefix, overwrite } = getQuery<{
@@ -15,11 +16,11 @@ export default defineProtectedHandler(async (event) => {
     overwrite?: string | null
   }>(event)
   if (!bucket) {
-    logger.warn('Missing bucket parameter')
+    log.warn('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
   }
 
-  logger.withMetadata({ bucket, prefix }).debug('Processing file upload')
+  log.withMetadata({ bucket, prefix }).debug('Processing file upload')
 
   const form: FormData = await event.req.formData()
 
@@ -32,7 +33,7 @@ export default defineProtectedHandler(async (event) => {
   }
 
   if (files.length === 0) {
-    logger.warn('No file uploaded')
+    log.warn('No file uploaded')
     throw new HTTPError({ status: 401, statusText: 'Expecting form-data with a file field' })
   }
 
@@ -48,13 +49,13 @@ export default defineProtectedHandler(async (event) => {
 
   const buffer = Buffer.from(arrayBuf)
   if (buffer.length === 0) {
-    logger.warn('Uploaded file has no content')
+    log.warn('Uploaded file has no content')
     throw new HTTPError({ status: 401, statusText: 'File part contains no data' })
   }
 
   const maxUploadSize = protectedEnv.S3_MAX_UPLOAD_SIZE
   if (buffer.length > maxUploadSize) {
-    logger
+    log
       .withMetadata({ fileSize: buffer.length, maxSize: maxUploadSize })
       .warn('Uploaded file size too large')
     throw new HTTPError({ status: 401, statusText: `Max upload size is ${maxUploadSize} bytes` })
@@ -72,12 +73,12 @@ export default defineProtectedHandler(async (event) => {
   const forceUpload = parseBoolean(overwrite ?? null)
   const fileExists = await s3Client.exists(fullKey, { bucket })
   if (!forceUpload && fileExists) {
-    logger.withMetadata({ filename: fullKey }).warn('File already exists')
+    log.withMetadata({ filename: fullKey }).warn('File already exists')
     throw new HTTPError({ status: 401, statusText: `File '${fullKey}' already exists` })
   }
 
   const bytesWritten = await s3Client.write(fullKey, buffer, { bucket, type: contentType })
-  logger
+  log
     .withMetadata({ filename: fullKey, fileSize: prettyBytes(bytesWritten) })
     .debug('File uploaded successfully')
 

@@ -6,16 +6,17 @@ import type { ListBlockErrorsResponse } from '~/shared/schemas/block.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('ListBlockErrors')
 
   const params = getQuery<ListBlockErrorsParams>(event)
   if (!params?.node) {
-    logger.warn('Node parameter is required')
+    log.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  logger.withMetadata({ node: params.node }).debug('Listing block errors')
+  log.withMetadata({ node: params.node }).debug('Listing block errors')
   const data = await gfetch<ListBlockErrorsResponse>('/v2/ListBlockErrors', { params })
-  logger.withMetadata({ errorCount: data.error?.length || 0 }).debug('Block errors listed')
+  log.withMetadata({ errorCount: data.error?.length || 0 }).debug('Block errors listed')
 
   return createResponse<ListBlockErrorsResponse>(event, 'List Block Errors', { data })
 })

@@ -10,10 +10,11 @@ import type { ApiBucketKeyPerm } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('CreateBucket')
 
   const body = await readBody<CreateBucketRequest>(event)
   if (!body?.globalAlias) {
-    logger.warn('Global alias is required')
+    log.warn('Global alias is required')
     throw new HTTPError({ status: 400, statusText: 'Global alias is required' })
   }
 
@@ -21,11 +22,11 @@ export default defineProtectedHandler(async (event) => {
   if (body?.localAlias) {
     const localAlias = body.localAlias as CreateBucketLocalAlias
     if (!localAlias?.accessKeyId) {
-      logger.warn('Access Key ID is required for local alias')
+      log.warn('Access Key ID is required for local alias')
       throw new HTTPError({ status: 400, statusText: 'Access Key ID is required for local alias' })
     }
     if (!localAlias?.alias) {
-      logger.warn('Alias is required for local alias')
+      log.warn('Alias is required for local alias')
       throw new HTTPError({ status: 400, statusText: 'Alias is required for local alias' })
     }
   }
@@ -36,7 +37,7 @@ export default defineProtectedHandler(async (event) => {
     : null
   const requestBody: CreateBucketRequest = { globalAlias: body.globalAlias, localAlias }
 
-  logger.withMetadata({ globalAlias: body.globalAlias }).debug('Creating bucket')
+  log.withMetadata({ globalAlias: body.globalAlias }).debug('Creating bucket')
   const data = await gfetch<CreateBucketResponse>('/v2/CreateBucket', {
     method: 'POST',
     body: requestBody

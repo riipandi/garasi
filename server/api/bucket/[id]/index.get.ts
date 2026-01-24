@@ -6,16 +6,17 @@ import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('GetBucketInfo')
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.warn('Bucket ID is required')
+    log.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const queryParams = getQuery<Omit<GetBucketInfoParams, 'id'>>(event)
 
-  logger
+  log
     .withMetadata({
       bucketId: id,
       search: queryParams.search,

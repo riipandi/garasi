@@ -4,10 +4,11 @@ import type { GetClusterStatusResponse } from '~/shared/schemas/cluster.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('GetClusterStatus')
 
-  logger.debug('Getting cluster status')
+  log.debug('Getting cluster status')
   const data = await gfetch<GetClusterStatusResponse>('/v2/GetClusterStatus')
-  logger.withMetadata(data).debug('Cluster status retrieved')
+  log.withMetadata(data).debug('Cluster status retrieved')
 
   return createResponse<GetClusterStatusResponse>(event, 'Get Cluster Status', { data })
 })

@@ -11,23 +11,24 @@ type AddAliasRequestBody = {
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('AddBucketAlias')
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.warn('Bucket ID is required')
+    log.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const body = await readBody<AddAliasRequestBody>(event)
   if (!body?.globalAlias && !body?.localAlias) {
-    logger.warn('Either globalAlias or localAlias is required')
+    log.warn('Either globalAlias or localAlias is required')
     throw new HTTPError({
       status: 400,
       statusText: 'Either globalAlias or localAlias is required'
     })
   }
 
-  logger
+  log
     .withMetadata({ bucketId: id, globalAlias: body.globalAlias, localAlias: body.localAlias })
     .debug('Adding bucket alias')
   const data = await gfetch<AddBucketAliasResponse>('/v2/AddBucketAlias', {

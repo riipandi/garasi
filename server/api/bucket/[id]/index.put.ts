@@ -6,20 +6,21 @@ import type { UpdateBucketResponse } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('UpdateBucket')
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.warn('Bucket ID is required')
+    log.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const body = await readBody<UpdateBucketRequest>(event)
   if (!body?.websiteAccess && !body?.quotas) {
-    logger.warn('Either websiteAccess or quotas is required')
+    log.warn('Either websiteAccess or quotas is required')
     throw new HTTPError({ status: 400, statusText: 'Either websiteAccess or quotas is required' })
   }
 
-  logger.withMetadata({ bucketId: id }).debug('Updating bucket')
+  log.withMetadata({ bucketId: id }).debug('Updating bucket')
   const data = await gfetch<UpdateBucketResponse>('/v2/UpdateBucket', {
     method: 'POST',
     params: { id },

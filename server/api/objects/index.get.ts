@@ -4,15 +4,16 @@ import { createS3ClientFromBucket } from '~/server/platform/s3client'
 
 export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
+  const log = logger.withPrefix('ListBucketObjects')
 
   // Validate required parameter
   const { bucket, prefix } = getQuery<{ bucket: string; prefix?: string }>(event)
   if (!bucket) {
-    logger.warn('Missing bucket parameter')
+    log.warn('Missing bucket parameter')
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
   }
 
-  logger.withMetadata({ bucket, prefix }).debug('Listing bucket objects')
+  log.withMetadata({ bucket, prefix }).debug('Listing bucket objects')
 
   // Retrieve bucket objects
   const s3Client = await createS3ClientFromBucket(event, bucket)
@@ -34,7 +35,7 @@ export default defineProtectedHandler(async (event) => {
   const data = await s3Client.list(listOptions, { bucket })
 
   // Log detailed information for debugging folder recognition
-  logger
+  log
     .withMetadata({
       bucket,
       prefix,

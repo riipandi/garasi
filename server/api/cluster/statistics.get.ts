@@ -6,14 +6,15 @@ import type { GetClusterStatisticsResponse } from '~/shared/schemas/cluster.sche
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('GetClusterStatistics')
 
   const { raw } = getQuery<{ raw: string | null }>(event)
   const printRaw = parseBoolean(raw ?? null) || false
 
-  logger.debug('Getting cluster statistics')
+  log.debug('Getting cluster statistics')
   const resp = await gfetch<GetClusterStatisticsResponse>('/v2/GetClusterStatistics')
   const data = !printRaw ? parseClusterStatistics(resp.freeform) : resp
-  logger.withMetadata({ printRaw }).debug('Cluster statistics retrieved')
+  log.withMetadata({ printRaw }).debug('Cluster statistics retrieved')
 
   return createResponse<ClusterStatistics | GetClusterStatisticsResponse>(
     event,

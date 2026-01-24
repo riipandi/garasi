@@ -6,21 +6,22 @@ import type { InspectObjectResponse } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('InspectObject')
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.warn('Bucket ID is required')
+    log.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const { key } = getQuery<InspectObjectParams>(event)
 
   if (!key) {
-    logger.warn('Object key is required')
+    log.warn('Object key is required')
     throw new HTTPError({ status: 400, statusText: 'Object key is required' })
   }
 
-  logger.withMetadata({ bucketId: id, objectKey: key }).debug('Inspecting object')
+  log.withMetadata({ bucketId: id, objectKey: key }).debug('Inspecting object')
   const data = await gfetch<InspectObjectResponse>('/v2/InspectObject', {
     params: { bucketId: id, key }
   })

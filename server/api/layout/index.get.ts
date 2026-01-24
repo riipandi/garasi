@@ -4,10 +4,11 @@ import type { GetClusterLayoutResponse } from '~/shared/schemas/layout.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('GetClusterLayout')
 
-  logger.debug('Getting cluster layout')
+  log.debug('Getting cluster layout')
   const data = await gfetch<GetClusterLayoutResponse>('/v2/GetClusterLayout')
-  logger.withMetadata(data).debug('Cluster layout retrieved')
+  log.withMetadata(data).debug('Cluster layout retrieved')
 
   return createResponse<GetClusterLayoutResponse>(event, 'Get Cluster Layout', { data })
 })

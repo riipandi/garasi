@@ -6,10 +6,11 @@ import type { ConnectClusterNodesResponse } from '~/shared/schemas/cluster.schem
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('ConnectClusterNodes')
 
   const body = await readBody<ConnectClusterNodesRequest>(event)
   if (!body?.nodes || !Array.isArray(body.nodes) || body.nodes.length === 0) {
-    logger.warn('Nodes array is required and must not be empty')
+    log.warn('Nodes array is required and must not be empty')
     throw new HTTPError({
       status: 400,
       statusText: 'Nodes array is required and must not be empty'
@@ -21,14 +22,14 @@ export default defineProtectedHandler(async (event) => {
   const invalidNodes = body.nodes.filter((node) => !nodeFormatRegex.test(node))
 
   if (invalidNodes.length > 0) {
-    logger.withMetadata({ invalidNodes }).warn('Invalid node format detected')
+    log.withMetadata({ invalidNodes }).warn('Invalid node format detected')
     throw new HTTPError({
       status: 400,
       statusText: 'Invalid node format. Each node must follow the format <node_id>@<net_address>'
     })
   }
 
-  logger.withMetadata({ nodeCount: body.nodes.length }).debug('Connecting cluster nodes')
+  log.withMetadata({ nodeCount: body.nodes.length }).debug('Connecting cluster nodes')
   const data = await gfetch<ConnectClusterNodesResponse[]>('/v2/ConnectClusterNodes', {
     method: 'POST',
     body: body.nodes

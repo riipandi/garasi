@@ -6,20 +6,21 @@ import type { SkipDeadNodesResponse } from '~/shared/schemas/layout.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('SkipDeadNodes')
 
   const body = await readBody<SkipDeadNodesRequest>(event)
 
   if (body?.version === undefined || body?.version === null) {
-    logger.warn('Version is required')
+    log.warn('Version is required')
     throw new HTTPError({ status: 400, statusText: 'Version is required' })
   }
 
   if (body?.allowMissingData === undefined || body?.allowMissingData === null) {
-    logger.warn('allowMissingData is required')
+    log.warn('allowMissingData is required')
     throw new HTTPError({ status: 400, statusText: 'allowMissingData is required' })
   }
 
-  logger
+  log
     .withMetadata({ version: body.version, allowMissingData: body.allowMissingData })
     .debug('Skipping dead nodes in cluster layout')
   const data = await gfetch<SkipDeadNodesResponse>('/v2/ClusterLayoutSkipDeadNodes', {

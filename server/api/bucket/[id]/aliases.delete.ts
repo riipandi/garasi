@@ -6,22 +6,21 @@ import type { RemoveBucketAliasResponse } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('RemoveBucketAlias')
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.warn('Bucket ID is required')
+    log.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const params = getQuery<Omit<RemoveBucketAliasRequest, 'bucketId'>>(event)
   if (!params?.globalAlias) {
-    logger.warn('Global alias is required')
+    log.warn('Global alias is required')
     throw new HTTPError({ status: 400, statusText: 'Global alias is required' })
   }
 
-  logger
-    .withMetadata({ bucketId: id, globalAlias: params.globalAlias })
-    .debug('Removing bucket alias')
+  log.withMetadata({ bucketId: id, globalAlias: params.globalAlias }).debug('Removing bucket alias')
   const data = await gfetch<RemoveBucketAliasResponse>('/v2/RemoveBucketAlias', {
     method: 'POST',
     body: { ...params, bucketId: id }

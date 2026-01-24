@@ -6,15 +6,16 @@ import type { UpdateClusterLayoutResponse } from '~/shared/schemas/layout.schema
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('UpdateClusterLayout')
 
   const body = await readBody<UpdateClusterLayoutRequest>(event)
 
   if (!body?.roles || !Array.isArray(body.roles)) {
-    logger.warn('Roles array is required')
+    log.warn('Roles array is required')
     throw new HTTPError({ status: 400, statusText: 'Roles array is required' })
   }
 
-  logger.withMetadata({ roleCount: body.roles.length }).debug('Updating cluster layout')
+  log.withMetadata({ roleCount: body.roles.length }).debug('Updating cluster layout')
   const data = await gfetch<UpdateClusterLayoutResponse>('/v2/UpdateClusterLayout', {
     method: 'POST',
     body

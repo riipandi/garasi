@@ -6,24 +6,25 @@ import type { CleanupUploadsResponse } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('CleanupIncompleteUploads')
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    logger.warn('Bucket ID is required')
+    log.warn('Bucket ID is required')
     throw new HTTPError({ status: 400, statusText: 'Bucket ID is required' })
   }
 
   const body = await readBody<Omit<CleanupUploadsRequest, 'bucketId'>>(event)
 
   if (typeof body?.olderThanSecs !== 'number' || body.olderThanSecs < 0) {
-    logger.warn('olderThanSecs must be a non-negative number')
+    log.warn('olderThanSecs must be a non-negative number')
     throw new HTTPError({
       status: 400,
       statusText: 'olderThanSecs must be a non-negative number'
     })
   }
 
-  logger
+  log
     .withMetadata({ bucketId: id, olderThanSecs: body.olderThanSecs })
     .debug('Cleaning up incomplete uploads')
   const data = await gfetch<CleanupUploadsResponse>('/v2/CleanupIncompleteUploads', {

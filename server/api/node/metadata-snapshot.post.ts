@@ -6,14 +6,15 @@ import type { CreateMetadataSnapshotResponse } from '~/shared/schemas/node.schem
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('CreateMetadataSnapshot')
 
   const params = getQuery<CreateMetadataSnapshotParams>(event)
   if (!params?.node) {
-    logger.warn('Node parameter is required')
+    log.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
-  logger.withMetadata({ node: params.node }).debug('Creating metadata snapshot')
+  log.withMetadata({ node: params.node }).debug('Creating metadata snapshot')
   const data = await gfetch<CreateMetadataSnapshotResponse>('/v2/CreateMetadataSnapshot', {
     method: 'POST',
     params

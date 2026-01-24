@@ -6,22 +6,21 @@ import type { RetryBlockResyncResponse } from '~/shared/schemas/block.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
+  const log = logger.withPrefix('RetryBlockResync')
 
   const params = getQuery<RetryBlockResyncParams>(event)
   if (!params?.node) {
-    logger.warn('Node parameter is required')
+    log.warn('Node parameter is required')
     throw new HTTPError({ status: 400, statusText: 'Node parameter is required' })
   }
 
   const body = await readBody<RetryBlockResyncRequest>(event)
   if (!body || typeof body.all !== 'boolean') {
-    logger.warn('All parameter is required')
+    log.warn('All parameter is required')
     throw new HTTPError({ status: 400, statusText: 'All parameter is required' })
   }
 
-  logger
-    .withMetadata({ node: params.node, all: body.all })
-    .debug('Retrying block resynchronization')
+  log.withMetadata({ node: params.node, all: body.all }).debug('Retrying block resynchronization')
   const data = await gfetch<RetryBlockResyncResponse>('/v2/RetryBlockResync', {
     method: 'POST',
     params,
