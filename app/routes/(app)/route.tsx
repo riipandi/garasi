@@ -16,6 +16,13 @@ export const Route = createFileRoute('/(app)')({
     if (!context.auth.atoken) {
       throw redirect({ to: '/signin', search: { redirect: location.href } })
     }
+  },
+  loader: ({ context }) => {
+    // Pre-fetch buckets for sidebar to ensure data is available
+    context.queryClient.prefetchQuery({
+      queryKey: ['buckets'],
+      queryFn: listBuckets
+    })
   }
 })
 
@@ -30,10 +37,14 @@ function RouteComponent() {
   }, [])
 
   // Fetch buckets for quick access
-  const { data, isLoading, error } = useQuery<BucketListItem[]>({
+  const { data, isLoading, error, refetch } = useQuery<BucketListItem[]>({
     queryKey: ['buckets'],
     queryFn: listBuckets,
-    staleTime: 60000 // Cache for 1 minute
+    staleTime: 60000, // Cache for 1 minute
+    retry: 2, // Retry failed requests up to 2 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: true // Always refetch on mount to ensure fresh data
   })
   const buckets = Array.isArray(data) ? data : []
 
@@ -41,7 +52,7 @@ function RouteComponent() {
   if (error) {
     console.error('Error fetching buckets:', error)
   }
-  console.info('BUCKETS_DATA', { data, buckets, isLoading, error })
+
   const handleLogout = () => {
     logout()
       .then(() => router.navigate({ to: '/signin', search: { redirect: '/' } }))
@@ -119,7 +130,12 @@ function RouteComponent() {
                   <NavLink to='/keys' icon={Lucide.KeyRound} label='Access Keys' />
                   <NavDivider />
                   <NavSection title='Quick Access' />
-                  <QuickAccessBuckets buckets={buckets} />
+                  <QuickAccessBuckets
+                    buckets={buckets}
+                    isLoading={isLoading}
+                    error={error}
+                    onRetry={refetch}
+                  />
                 </nav>
               </div>
 
@@ -213,17 +229,46 @@ function NavDivider() {
 // Quick access buckets component
 function QuickAccessBuckets({
   buckets,
-  onBucketClick
+  isLoading,
+  error,
+  onBucketClick,
+  onRetry
 }: {
   buckets: BucketListItem[]
+  isLoading?: boolean
+  error?: Error | null
   onBucketClick?: () => void
+  onRetry?: () => void
 }) {
   // Handle loading state
-  if (!Array.isArray(buckets)) {
-    return <div className='px-3 py-2 text-xs text-gray-500'>Loading buckets...</div>
+  if (isLoading) {
+    return (
+      <div className='flex items-center gap-2 px-3 py-2'>
+        <Lucide.Loader2 className='size-3 animate-spin text-gray-400' />
+        <span className='text-xs text-gray-500'>Loading buckets...</span>
+      </div>
+    )
   }
 
-  if (buckets.length === 0) {
+  // Handle error state
+  if (error) {
+    return (
+      <div className='flex flex-col gap-1 px-3 py-2'>
+        <span className='text-xs text-red-600'>Failed to load buckets</span>
+        <button
+          type='button'
+          onClick={onRetry}
+          className='flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800'
+        >
+          <Lucide.RefreshCw className='size-3' />
+          <span>Retry</span>
+        </button>
+      </div>
+    )
+  }
+
+  // Handle empty state
+  if (!Array.isArray(buckets) || buckets.length === 0) {
     return <div className='px-3 py-2 text-xs text-gray-500'>No buckets available</div>
   }
 
