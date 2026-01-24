@@ -1,73 +1,52 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface CreateBucketLocalAlias {
-  accessKeyId: string // ID of the access key to which the local alias is attached
-  alias: string // Local alias for the bucket
-  allow?: {
-    owner?: boolean // Allow owner permissions
-    read?: boolean // Allow read permissions
-    write?: boolean // Allow write permissions
-  }
-}
-
-interface CreateBucketRequestBody {
-  globalAlias?: string | null // Global alias for the bucket
-  localAlias?: CreateBucketLocalAlias | null // Local alias for the bucket
-}
-
-interface GetBucketInfoResponse {
-  id: string
-  created: string
-  globalAliases: string[]
-  localAliases: Array<{
-    accessKeyId: string
-    alias: string
-  }>
-  websiteAccess: boolean
-  websiteConfig: {
-    indexDocument: string
-    errorDocument: string | null
-  } | null
-  keys: Array<{
-    accessKeyId: string
-    name: string
-    permissions: {
-      owner: boolean
-      read: boolean
-      write: boolean
-    }
-    bucketLocalAliases: string[]
-  }>
-  objects: number
-  bytes: number
-  unfinishedUploads: number
-  unfinishedMultipartUploads: number
-  unfinishedMultipartUploadParts: number
-  unfinishedMultipartUploadBytes: number
-  quotas: {
-    maxObjects: number | null
-    maxSize: number | null
-  }
-}
+import { createResponse } from '~/server/platform/responder'
+import type {
+  CreateBucketRequest,
+  CreateBucketResponse,
+  CreateBucketLocalAlias
+} from '~/shared/schemas/bucket.schema'
+import type { ApiBucketKeyPerm } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const body = await readBody<CreateBucketRequestBody>(event)
-  if (!body?.globalAlias && !body?.localAlias) {
-    logger.debug('Either globalAlias or localAlias is required')
-    throw new HTTPError({
-      status: 400,
-      statusText: 'Either globalAlias or localAlias is required'
-    })
+  const body = await readBody<CreateBucketRequest>(event)
+  if (!body?.globalAlias) {
+    logger.withPrefix('CreateBucket').withMetadata(body).debug('Global alias is required')
+    throw new HTTPError({ status: 400, statusText: 'Global alias is required' })
   }
 
-  logger.withMetadata({ body }).info('Creating bucket')
-  const data = await gfetch<GetBucketInfoResponse>('/v2/CreateBucket', {
-    method: 'POST',
-    body
-  })
+  // Validate localAlias if provided
+  if (body?.localAlias) {
+    const localAlias = body.localAlias as CreateBucketLocalAlias
+    if (!localAlias?.accessKeyId) {
+      logger
+        .withPrefix('CreateBucket')
+        .withMetadata(body)
+        .debug('Access Key ID is required for local alias')
+      throw new HTTPError({ status: 400, statusText: 'Access Key ID is required for local alias' })
+    }
+    if (!localAlias?.alias) {
+      logger
+        .withPrefix('CreateBucket')
+        .withMetadata(body)
+        .debug('Alias is required for local alias')
+      throw new HTTPError({ status: 400, statusText: 'Alias is required for local alias' })
+    }
+  }
 
-  return { status: 'success', message: 'Create Bucket', data }
+  const defaultLocalAliasPerm: ApiBucketKeyPerm = { owner: false, read: false, write: false }
+  const localAlias = body.localAlias
+    ? { ...body.localAlias, allow: body.localAlias.allow ?? defaultLocalAliasPerm }
+    : null
+  const requestBody: CreateBucketRequest = { globalAlias: body.globalAlias, localAlias }
+
+  const data = await gfetch<CreateBucketResponse>('/v2/CreateBucket', {
+    method: 'POST',
+    body: requestBody
+  })
+  logger.withMetadata(data).debug('Creating bucket')
+
+  return createResponse<CreateBucketResponse>(event, 'Create Bucket', { data })
 })

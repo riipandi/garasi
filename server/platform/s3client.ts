@@ -62,6 +62,8 @@ export async function createS3ClientFromBucket(event: H3Event, bucket: string): 
     throw new HTTPError({ status: 417, statusText: 'Failed to retrieve bucket information' })
   }
 
+  // You need to add a key with read & write access to your bucket to be able to browse it.
+
   const accessKeyId = bucketInfo.keys[0]?.accessKeyId
   if (!accessKeyId) {
     throw new HTTPError({ status: 417, statusText: "Bucket doesn't have access keys" })

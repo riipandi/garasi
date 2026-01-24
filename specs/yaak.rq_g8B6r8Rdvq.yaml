@@ -2,31 +2,20 @@ type: http_request
 model: http_request
 id: rq_g8B6r8Rdvq
 createdAt: 2026-01-19T18:51:40.322852
-updatedAt: 2026-01-22T19:37:14.395936
+updatedAt: 2026-01-24T05:08:09.577965
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
 authenticationType: null
 body:
-  text: |-
-    {
-      "globalAlias": "",
-      "localAlias": {
-        "accessKeyId": "",
-        "alias": ""
-      }
-    }
-bodyType: application/json
+  text: ''
+bodyType: null
 description: ''
-headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: HfM9RRniek
+headers: []
 method: DELETE
 name: Remove Bucket Alias
 sortPriority: 10000.0
-url: ${[ baseURL ]}/api/bucket/:id
+url: ${[ baseURL ]}/api/bucket/:id/aliases?globalAlias=demo
 urlParameters:
   - enabled: true
     name: :id

@@ -86,7 +86,7 @@ export interface InspectObjectResponse {
 export interface CreateBucketLocalAlias {
   accessKeyId: string
   alias: string
-  allow: ApiBucketKeyPerm
+  allow?: ApiBucketKeyPerm
 }
 
 /**

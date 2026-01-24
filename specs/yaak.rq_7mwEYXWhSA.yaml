@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: In8GpFtChM
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: In8GpFtChM
 method: POST
 name: Skip Dead Nodes
 sortPriority: 6000.0

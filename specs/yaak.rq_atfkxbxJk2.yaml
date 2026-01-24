@@ -12,10 +12,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: NI9dGcf2Zc
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: NI9dGcf2Zc
 method: PUT
 name: Update Cluster Layout
 sortPriority: 2000.0

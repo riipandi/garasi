@@ -15,10 +15,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: aX6N4TanBH
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: aX6N4TanBH
 method: POST
 name: Apply Cluster Layout
 sortPriority: 2333.3333333333335

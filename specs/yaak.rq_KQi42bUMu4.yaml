@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_KQi42bUMu4
 createdAt: 2026-01-19T20:20:51.336304
-updatedAt: 2026-01-21T10:21:32.901327
+updatedAt: 2026-01-24T05:05:04.539284
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -15,7 +15,7 @@ headers: []
 method: GET
 name: Get Bucket Info
 sortPriority: 3000.0
-url: ${[ baseURL ]}/api/bucket/:id
+url: ${[ baseURL ]}/api/bucket/:id?search=
 urlParameters:
   - enabled: true
     name: :id
