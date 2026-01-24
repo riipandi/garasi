@@ -14,7 +14,6 @@ export async function listAccessKeys() {
   })
 }
 
-// ID is route params, not the query params
 export async function getKeyInformation(
   id: GetKeyInformationParams['id'],
   params: Omit<GetKeyInformationParams, 'id'>
@@ -32,7 +31,6 @@ export async function createAccessKey(data: CreateAccessKeyRequest) {
   })
 }
 
-// ID is route params, not the query params
 export async function updateAccessKey(
   id: UpdateAccessKeyParams['id'],
   data: UpdateAccessKeyRequest
@@ -43,7 +41,6 @@ export async function updateAccessKey(
   })
 }
 
-// ID is route params, not the query params
 export async function deleteAccessKey(id: DeleteAccessKeyParams['id']) {
   return await fetcher<ApiResponse>(`/keys/${id}`, { method: 'DELETE' })
 }
