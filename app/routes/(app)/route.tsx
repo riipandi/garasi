@@ -4,9 +4,9 @@ import * as Lucide from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { NotFound } from '~/app/errors'
-import { listBuckets } from '~/app/fetcher'
 import { useAuth } from '~/app/guards'
 import type { BucketListItem } from '~/app/routes/(app)/buckets/-partials/types'
+import { listBuckets } from '~/app/services'
 import { uiStore } from '~/app/stores'
 
 export const Route = createFileRoute('/(app)')({

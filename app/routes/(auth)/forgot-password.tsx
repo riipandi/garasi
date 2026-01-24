@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 
 // Zod schema for form validation
 const forgotPasswordSchema = z.object({

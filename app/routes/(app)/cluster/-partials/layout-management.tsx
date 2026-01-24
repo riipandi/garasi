@@ -1,7 +1,7 @@
 import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import type {
   ClusterLayoutResponse,
   LayoutHistoryResponse,

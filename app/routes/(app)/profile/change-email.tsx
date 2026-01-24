@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
 import { PasswordInput } from '~/app/components/password-input'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 
 // Zod schema for form validation
 const changeEmailSchema = z.object({

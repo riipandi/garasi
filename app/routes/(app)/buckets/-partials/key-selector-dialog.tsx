@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import type { KeysResponse } from '../../keys/-partials/types'
 import type { Bucket } from './types'
 
@@ -214,7 +214,7 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                   Permissions
                 </label>
                 <div className='grid grid-cols-3 gap-3'>
-                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50'>
+                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-checked:border-blue-500 has-checked:bg-blue-50'>
                     <input
                       type='checkbox'
                       checked={permissions.owner}
@@ -223,7 +223,7 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                     />
                     <span className='text-sm font-medium text-gray-700'>Owner</span>
                   </label>
-                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50'>
+                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-checked:border-blue-500 has-checked:bg-blue-50'>
                     <input
                       type='checkbox'
                       checked={permissions.read}
@@ -232,7 +232,7 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                     />
                     <span className='text-sm font-medium text-gray-700'>Read</span>
                   </label>
-                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50'>
+                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-checked:border-blue-500 has-checked:bg-blue-50'>
                     <input
                       type='checkbox'
                       checked={permissions.write}

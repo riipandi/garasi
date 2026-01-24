@@ -3,7 +3,7 @@ import { queryOptions, useMutation, useSuspenseQuery } from '@tanstack/react-que
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import type { UserProfileResponse } from '~/app/types/api'
 
 // Zod schema for form validation

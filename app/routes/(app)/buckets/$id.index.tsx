@@ -2,7 +2,7 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import type { Bucket } from './-partials/types'
 
 // Code split browse tab component using React.lazy

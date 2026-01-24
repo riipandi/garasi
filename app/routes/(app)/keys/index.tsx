@@ -4,7 +4,7 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import { listAccessKeys } from '~/app/services/keys.service'
 import { KeyCreate } from './-partials/key-create'
 import { KeyImport } from './-partials/key-import'
@@ -13,14 +13,14 @@ import type { ImportKeyRequest } from './-partials/types'
 import type { AccessKey } from './-partials/types'
 import type { CreateKeyRequest, UpdateKeyRequest } from './-partials/types'
 
+const keysQueryOpts = queryOptions({ queryKey: ['keys'], queryFn: () => listAccessKeys() })
+
 export const Route = createFileRoute('/(app)/keys/')({
   component: RouteComponent,
   loader: ({ context }) => {
-    context.queryClient.ensureQueryData(keysQuery)
+    context.queryClient.ensureQueryData(keysQueryOpts)
   }
 })
-
-const keysQuery = queryOptions({ queryKey: ['keys'], queryFn: () => listAccessKeys() })
 
 function RouteComponent() {
   const { queryClient } = Route.useRouteContext()
@@ -38,7 +38,7 @@ function RouteComponent() {
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
   // Fetch access keys
-  const { data: keysData } = useSuspenseQuery(keysQuery)
+  const { data: keysData } = useSuspenseQuery(keysQueryOpts)
   const keys = Array.isArray(keysData.data) ? keysData.data : []
 
   // Create key mutation

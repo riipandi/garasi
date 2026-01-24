@@ -2,7 +2,7 @@ import { useSuspenseQuery, useMutation, QueryClient } from '@tanstack/react-quer
 import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { createFolder, listObjects, uploadFile } from '~/app/fetcher'
+import { createFolder, listObjects, uploadFile } from '~/app/services'
 import type { Bucket } from './types'
 
 // Code split components using React.lazy

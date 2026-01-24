@@ -1,6 +1,7 @@
 import { useRouter } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { fetcher, logout as logoutApi, onSessionExpired } from '~/app/fetcher'
+import { fetcher, onSessionExpired } from '~/app/fetcher'
+import { logout as logoutApi } from '~/app/services'
 import { authStore } from '~/app/stores'
 import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'

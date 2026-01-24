@@ -1,22 +1,9 @@
-import { SignJWT, jwtVerify, type JWTPayload } from 'jose'
+import { SignJWT, jwtVerify } from 'jose'
 import { UAParser, type IResult } from 'ua-parser-js'
 import logger from '~/server/platform/logger'
 import { parseUserAgentHash } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
-
-/**
- * JWT Token payload structure using standard JWT claims
- * - sub (subject): User ID
- * - sid (session ID): Session ID
- * - aud (audience): Hashed user agent string
- * - iss (issuer): Token issuer
- * - typ: Token type (access/refresh)
- * - nbf (not before): Token is valid from this time
- */
-export interface JWTClaims extends JWTPayload {
-  typ: 'access' | 'refresh' // Type - Token type (standard JWT claim)
-  sid?: string // Session ID
-}
+import type { JWTClaims } from '~/shared/schemas/auth.schema'
 
 /**
  * Generate a hash from user agent string using Bun.CryptoHasher with blake2b256

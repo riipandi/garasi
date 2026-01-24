@@ -1,7 +1,7 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import { ClusterInfo } from './-dashboard/cluster-info'
 import { QuickLinks } from './-dashboard/quick-links'
 import { RecentBuckets } from './-dashboard/recent-buckets'

@@ -1,10 +1,11 @@
-import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-query'
+import { useSuspenseQuery, useMutation } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
-import { createBucket, deleteBucket, listBuckets } from '~/app/fetcher'
+import { createBucket, deleteBucket } from '~/app/services'
+import { listBuckets } from '~/app/services/bucket.service'
 import { BucketCreate } from './-partials/bucket-create'
 import { BucketTable } from './-partials/bucket-table'
 import type { CreateBucketRequest } from './-partials/types'
@@ -12,13 +13,8 @@ import type { CreateBucketRequest } from './-partials/types'
 export const Route = createFileRoute('/(app)/buckets/')({
   component: RouteComponent,
   loader: ({ context }) => {
-    context.queryClient.ensureQueryData(bucketsQuery)
+    context.queryClient.ensureQueryData(listBuckets().queryOpts)
   }
-})
-
-const bucketsQuery = queryOptions({
-  queryKey: ['buckets'],
-  queryFn: listBuckets
 })
 
 function RouteComponent() {
@@ -31,7 +27,8 @@ function RouteComponent() {
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
   // Fetch buckets
-  const { data: buckets } = useSuspenseQuery(bucketsQuery)
+  const { data: bucketsResponse } = useSuspenseQuery(listBuckets().queryOpts)
+  const buckets = bucketsResponse?.data ?? []
 
   // Create bucket mutation
   const createBucketMutation = useMutation({
@@ -39,7 +36,7 @@ function RouteComponent() {
       return createBucket(values.globalAlias, values.localAlias)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['buckets'] })
+      queryClient.invalidateQueries({ queryKey: listBuckets().queryKey })
       setSuccessMessage('Bucket created successfully!')
       setShowCreateDialog(false)
     },

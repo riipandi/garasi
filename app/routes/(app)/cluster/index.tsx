@@ -1,7 +1,7 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import type { ClusterHealthResponse, ClusterStatusResponse } from './-partials/types'
 
 export const Route = createFileRoute('/(app)/cluster/')({

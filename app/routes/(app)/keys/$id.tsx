@@ -4,7 +4,7 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
-import { fetcher } from '~/app/fetcher'
+import fetcher from '~/app/fetcher'
 import { KeyEdit } from './-partials/key-edit'
 import type { AccessKey, UpdateKeyRequest } from './-partials/types'
 

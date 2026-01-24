@@ -3,15 +3,15 @@ import { getCoreRowModel, getFilteredRowModel } from '@tanstack/react-table'
 import { getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import type { BucketListItem } from './types'
+import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
 
 interface BucketTableProps {
-  buckets: BucketListItem[]
+  buckets: ListBucketsResponse[]
   onDelete: (bucketId: string) => void
   isLoading?: boolean
 }
 
-const columnHelper = createColumnHelper<BucketListItem>()
+const columnHelper = createColumnHelper<ListBucketsResponse>()
 
 export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTableProps) {
   const [filtering, setFiltering] = React.useState('')
@@ -54,7 +54,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
     columnHelper.accessor('globalAliases', {
       header: 'Global Aliases',
       cell: (info) => {
-        const aliases = info.getValue()
+        const aliases = info.getValue<string[]>()
         return aliases.length > 0 ? (
           <div className='flex flex-wrap gap-1'>
             {aliases.map((alias) => (
@@ -74,13 +74,14 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
     columnHelper.accessor('localAliases', {
       header: 'Local Aliases',
       cell: (info) => {
-        const aliases = info.getValue()
+        const aliases = info.getValue<{ accessKeyId: string; alias: string }[]>()
         return aliases.length > 0 ? (
           <div className='flex flex-wrap gap-1'>
             {aliases.map((alias, index) => (
               <span
                 key={index}
                 className='inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800'
+                title={`Key: ${alias.accessKeyId}`}
               >
                 {alias.alias}
               </span>
