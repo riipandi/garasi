@@ -2,22 +2,25 @@ type: http_request
 model: http_request
 id: rq_qT58ZTeJTh
 createdAt: 2026-01-19T20:17:03.304309
-updatedAt: 2026-01-22T15:01:02.836606
+updatedAt: 2026-01-24T04:41:24.153868
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
 authenticationType: null
 body:
-  text: '{}'
+  text: |-
+    {
+      "version": 3
+    }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: aX6N4TanBH
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: aX6N4TanBH
 method: POST
 name: Apply Cluster Layout
-sortPriority: 0.0
+sortPriority: 2333.3333333333335
 url: ${[ baseURL ]}/api/layout/apply
 urlParameters: []

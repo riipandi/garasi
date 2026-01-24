@@ -1,38 +1,29 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface ClusterLayoutSkipDeadNodesRequestBody {
-  version: number
-  allowMissingData: boolean
-}
-
-interface ClusterLayoutSkipDeadNodesResp {
-  ackUpdated: string[]
-  syncUpdated: string[]
-}
+import { createResponse } from '~/server/platform/responder'
+import type { SkipDeadNodesRequest } from '~/shared/schemas/layout.schema'
+import type { SkipDeadNodesResponse } from '~/shared/schemas/layout.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  const body = await readBody<ClusterLayoutSkipDeadNodesRequestBody>(event)
+  const body = await readBody<SkipDeadNodesRequest>(event)
 
   if (body?.version === undefined || body?.version === null) {
-    logger.debug('Version is required')
+    logger.withPrefix('SkipDeadNodes').debug('Version is required')
     throw new HTTPError({ status: 400, statusText: 'Version is required' })
   }
 
   if (body?.allowMissingData === undefined || body?.allowMissingData === null) {
-    logger.debug('allowMissingData is required')
+    logger.withPrefix('SkipDeadNodes').debug('allowMissingData is required')
     throw new HTTPError({ status: 400, statusText: 'allowMissingData is required' })
   }
 
-  logger
-    .withMetadata({ version: body.version, allowMissingData: body.allowMissingData })
-    .info('Cluster layout skip dead nodes')
-  const data = await gfetch<ClusterLayoutSkipDeadNodesResp>('/v2/ClusterLayoutSkipDeadNodes', {
+  const data = await gfetch<SkipDeadNodesResponse>('/v2/ClusterLayoutSkipDeadNodes', {
     method: 'POST',
     body
   })
+  logger.withMetadata(data).debug('Skipping dead nodes in cluster layout')
 
-  return { status: 'success', message: 'Cluster Layout Skip Dead Nodes', data }
+  return createResponse<SkipDeadNodesResponse>(event, 'Cluster Layout Skip Dead Nodes', { data })
 })

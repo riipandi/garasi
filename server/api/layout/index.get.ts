@@ -1,45 +1,12 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface ZoneRedundancy {
-  atLeast?: number | null
-  maximum?: string | null
-}
-
-interface LayoutParameters {
-  zoneRedundancy: ZoneRedundancy
-}
-
-interface LayoutNodeRole {
-  id: string
-  zone: string
-  tags: string[]
-  capacity: number | null
-  storedPartitions: number | null
-  usableCapacity: number | null
-}
-
-interface NodeRoleChange {
-  id: string
-  remove?: boolean
-  zone?: string
-  tags?: string[]
-  capacity?: number | null
-}
-
-interface GetClusterLayoutResp {
-  version: number
-  roles: LayoutNodeRole[]
-  parameters: LayoutParameters
-  partitionSize: number
-  stagedRoleChanges: NodeRoleChange[]
-  stagedParameters: LayoutParameters | null
-}
+import { createResponse } from '~/server/platform/responder'
+import type { GetClusterLayoutResponse } from '~/shared/schemas/layout.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Getting cluster layout')
-  const data = await gfetch<GetClusterLayoutResp>('/v2/GetClusterLayout')
+  const data = await gfetch<GetClusterLayoutResponse>('/v2/GetClusterLayout')
+  logger.withMetadata(data).debug('Getting cluster layout')
 
-  return { status: 'success', message: 'Get Cluster Layout', data }
+  return createResponse<GetClusterLayoutResponse>(event, 'Get Cluster Layout', { data })
 })

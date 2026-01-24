@@ -1,47 +1,14 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface ZoneRedundancy {
-  atLeast?: number | null
-  maximum?: string | null
-}
-
-interface LayoutParameters {
-  zoneRedundancy: ZoneRedundancy
-}
-
-interface LayoutNodeRole {
-  id: string
-  zone: string
-  tags: string[]
-  capacity: number | null
-  storedPartitions: number | null
-  usableCapacity: number | null
-}
-
-interface NodeRoleChange {
-  id: string
-  remove?: boolean
-  zone?: string
-  tags?: string[]
-  capacity?: number | null
-}
-
-interface GetClusterLayoutResp {
-  version: number
-  roles: LayoutNodeRole[]
-  parameters: LayoutParameters
-  partitionSize: number
-  stagedRoleChanges: NodeRoleChange[]
-  stagedParameters: LayoutParameters | null
-}
+import { createResponse } from '~/server/platform/responder'
+import type { RevertClusterLayoutResponse } from '~/shared/schemas/layout.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Reverting cluster layout')
-  const data = await gfetch<GetClusterLayoutResp>('/v2/RevertClusterLayout', {
+  const data = await gfetch<RevertClusterLayoutResponse>('/v2/RevertClusterLayout', {
     method: 'POST'
   })
+  logger.withMetadata(data).debug('Reverting cluster layout')
 
-  return { status: 'success', message: 'Revert Cluster Layout', data }
+  return createResponse<RevertClusterLayoutResponse>(event, 'Revert Cluster Layout', { data })
 })

@@ -2,20 +2,20 @@ type: http_request
 model: http_request
 id: rq_atfkxbxJk2
 createdAt: 2026-01-19T20:22:30.275031
-updatedAt: 2026-01-21T10:48:17.250356
+updatedAt: 2026-01-24T04:42:31.038683
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
 authenticationType: null
 body:
-  text: '{}'
+  text: "{\n    \"parameters\": {\n      \"zoneRedundancy\": \"maximum\"\n    },\n    \"roles\": [{\n        \"id\": \"${[ response.body.path(request='rq_v3pNLeFwR2', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhLnN1Y2Nlc3MuLi5ub2RlSWQ') ]}\",  \n        \"capacity\": 10000000000,\n        \"tags\": [\"local\"],\n        \"zone\": \"dc1\"\n    }]\n}"
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: NI9dGcf2Zc
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: NI9dGcf2Zc
 method: PUT
 name: Update Cluster Layout
 sortPriority: 2000.0

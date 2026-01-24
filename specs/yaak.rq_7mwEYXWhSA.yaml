@@ -2,20 +2,24 @@ type: http_request
 model: http_request
 id: rq_7mwEYXWhSA
 createdAt: 2026-01-19T20:22:31.129248
-updatedAt: 2026-01-21T10:48:35.438346
+updatedAt: 2026-01-24T04:37:31.485486
 workspaceId: wk_YrPa97TLKc
 folderId: fl_9Rjwumb9ff
 authentication: {}
 authenticationType: null
 body:
-  text: '{}'
+  text: |
+    {
+      "allowMissingData": false,
+      "version": 1
+    }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: In8GpFtChM
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: In8GpFtChM
 method: POST
 name: Skip Dead Nodes
 sortPriority: 6000.0

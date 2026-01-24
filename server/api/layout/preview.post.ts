@@ -1,60 +1,24 @@
+import { HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface ZoneRedundancy {
-  atLeast?: number | null
-  maximum?: string | null
-}
-
-interface LayoutParameters {
-  zoneRedundancy: ZoneRedundancy
-}
-
-interface LayoutNodeRole {
-  id: string
-  zone: string
-  tags: string[]
-  capacity: number | null
-  storedPartitions: number | null
-  usableCapacity: number | null
-}
-
-interface NodeRoleChange {
-  id: string
-  remove?: boolean
-  zone?: string
-  tags?: string[]
-  capacity?: number | null
-}
-
-interface GetClusterLayoutResp {
-  version: number
-  roles: LayoutNodeRole[]
-  parameters: LayoutParameters
-  partitionSize: number
-  stagedRoleChanges: NodeRoleChange[]
-  stagedParameters: LayoutParameters | null
-}
-
-interface PreviewClusterLayoutChangesRespSuccess {
-  message: string[]
-  newLayout: GetClusterLayoutResp
-}
-
-interface PreviewClusterLayoutChangesRespError {
-  error: string
-}
-
-type PreviewClusterLayoutChangesResp =
-  | PreviewClusterLayoutChangesRespSuccess
-  | PreviewClusterLayoutChangesRespError
+import { createResponse } from '~/server/platform/responder'
+import type { PreviewLayoutChangesResponse } from '~/shared/schemas/layout.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Previewing cluster layout changes')
-  const data = await gfetch<PreviewClusterLayoutChangesResp>('/v2/PreviewClusterLayoutChanges', {
+  const data = await gfetch<PreviewLayoutChangesResponse>('/v2/PreviewClusterLayoutChanges', {
     method: 'POST'
   })
+  logger.withMetadata(data).debug('Previewing cluster layout changes')
 
-  return { status: 'success', message: 'Preview Cluster Layout Changes', data }
+  if (!data.message) {
+    throw new HTTPError({
+      status: 400,
+      statusText: data.error || 'Failed to preview layout changes'
+    })
+  }
+
+  return createResponse<PreviewLayoutChangesResponse>(event, 'Preview Cluster Layout Changes', {
+    data
+  })
 })

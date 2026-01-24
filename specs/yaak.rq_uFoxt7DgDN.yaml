@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: aWVh0WxkTy
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: aWVh0WxkTy
 method: POST
 name: Set Worker Variable
 sortPriority: 0.003

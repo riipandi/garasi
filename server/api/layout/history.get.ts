@@ -1,32 +1,12 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
-
-interface NodeUpdateTrackers {
-  ack: number
-  sync: number
-  syncAck: number
-}
-
-interface ClusterLayoutVersion {
-  version: number
-  timestamp: number
-  nodes: object[]
-  roles: object[]
-  parameters: object
-  partitionSize: number
-}
-
-interface GetClusterLayoutHistoryResp {
-  currentVersion: number
-  minAck: number
-  versions: ClusterLayoutVersion[]
-  updateTrackers: Record<string, NodeUpdateTrackers> | null
-}
+import { createResponse } from '~/server/platform/responder'
+import type { GetLayoutHistoryResponse } from '~/shared/schemas/layout.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
 
-  logger.info('Getting cluster layout history')
-  const data = await gfetch<GetClusterLayoutHistoryResp>('/v2/GetClusterLayoutHistory')
+  const data = await gfetch<GetLayoutHistoryResponse>('/v2/GetClusterLayoutHistory')
+  logger.withMetadata(data).debug('Getting cluster layout history')
 
-  return { status: 'success', message: 'Get Cluster Layout History', data }
+  return createResponse<GetLayoutHistoryResponse>(event, 'Get Cluster Layout History', { data })
 })

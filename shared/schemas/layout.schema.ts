@@ -134,6 +134,7 @@ export interface PreviewLayoutChangesResponseError {
 export interface PreviewLayoutChangesResponse {
   message: string // Plain-text information about the layout computation (do not try to parse this)
   newLayout: GetClusterLayoutResponse // Details about the new cluster layout
+  error?: string | null
 }
 
 /**
