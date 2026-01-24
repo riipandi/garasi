@@ -18,7 +18,7 @@ export function NotFound() {
     <>
       <title>404 Not Found</title>
       <div className='relative flex min-h-screen flex-col items-center justify-center bg-gray-50'>
-        <div className='absolute inset-0 bg-gradient-to-b from-gray-100 via-transparent to-transparent' />
+        <div className='absolute inset-0 bg-linear-to-b from-gray-100 via-transparent to-transparent' />
         <div className='pointer-events-none fixed inset-0 z-10 flex items-center justify-center select-none'>
           <h2 className='text-[12rem] font-black text-red-900/10 mix-blend-overlay sm:text-[16rem] md:text-[20rem]'>
             404
@@ -62,6 +62,32 @@ export function ErrorGeneral({ error }: ErrorComponentProps) {
   React.useEffect(() => {
     queryErrorResetBoundary.reset()
   }, [queryErrorResetBoundary])
+
+  // Check if error is related to authentication (401 or session expired)
+  const isAuthError =
+    error.message?.includes('401') ||
+    error.message?.includes('Unauthorized') ||
+    error.message?.includes('session expired')
+
+  if (isAuthError) {
+    return (
+      <div className='flex min-h-full flex-1 items-center justify-center bg-gray-50'>
+        <div className='w-full max-w-md rounded-lg border border-amber-200 bg-amber-50 px-8 py-6 text-center shadow-md'>
+          <h2 className='mb-2 text-xl font-semibold text-amber-700'>Session Expired</h2>
+          <p className='mb-4 text-sm text-amber-600'>
+            Your session has expired. Please sign in again to continue.
+          </p>
+          <button
+            type='button'
+            onClick={() => router.navigate({ to: '/signin' })}
+            className='rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-700'
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className='flex min-h-full flex-1 items-center justify-center bg-gray-50'>

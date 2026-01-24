@@ -1,5 +1,6 @@
+import { useRouter } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { fetcher, logout as logoutApi } from '~/app/fetcher'
+import { fetcher, logout as logoutApi, onSessionExpired } from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'
@@ -10,6 +11,8 @@ import { AuthContext, type AuthContextType } from './context'
  * User information is fetched from /auth/whoami endpoint.
  */
 export function AuthProvider({ children }: React.PropsWithChildren) {
+  const router = useRouter()
+
   // Get current auth state from store
   const authState = authStore.get()
 
@@ -19,6 +22,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   // Store user data fetched from /auth/whoami endpoint
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [sessionExpired, setSessionExpired] = useState(false)
 
   /**
    * Fetch user information from /auth/whoami endpoint
@@ -61,6 +65,23 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       setUser(null)
     }
   }, [isAuthenticated])
+
+  // Listen to session expired events and redirect to signin
+  useEffect(() => {
+    const unsubscribe = onSessionExpired(() => {
+      setSessionExpired(true)
+      setUser(null)
+      // Redirect to signin after a short delay to show the session expired message
+      setTimeout(() => {
+        router.navigate({
+          to: '/signin',
+          search: { redirect: window.location.pathname + window.location.search }
+        })
+      }, 2000)
+    })
+
+    return unsubscribe
+  }, [router])
 
   /**
    * Login function with API authentication
@@ -117,10 +138,19 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     setUser(null) // Clear user state
   }
 
+  /**
+   * Dismiss session expired notification
+   */
+  const dismissSessionExpired = () => {
+    setSessionExpired(false)
+  }
+
   const contextValue: AuthContextType = {
     user,
     isAuthenticated,
     isLoading,
+    sessionExpired,
+    dismissSessionExpired,
     login,
     logout
   }

@@ -21,10 +21,11 @@ export const Route = createFileRoute('/(auth)/signin')({
 
 function RouteComponent() {
   const navigate = useNavigate()
-  const { login, isAuthenticated } = useAuth()
+  const { login, isAuthenticated, sessionExpired } = useAuth()
   const search = useSearch({ from: '/(auth)/signin' }) as {
     message?: string
     type?: 'success' | 'error'
+    redirect?: string
   }
   const emailInputRef = useRef<HTMLInputElement>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -33,6 +34,13 @@ function RouteComponent() {
   useEffect(() => {
     emailInputRef.current?.focus()
   }, [])
+
+  // Show session expired message if redirected due to session expiry
+  useEffect(() => {
+    if (sessionExpired && search.redirect) {
+      setSubmitError('Your session has expired. Please sign in again to continue.')
+    }
+  }, [sessionExpired, search.redirect])
 
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -60,7 +68,8 @@ function RouteComponent() {
       const loginResult = await login(value.email, value.password)
 
       if (loginResult.success) {
-        navigate({ to: '/' })
+        // Redirect to the original URL if provided, otherwise go to home
+        navigate({ to: search.redirect || '/' })
       } else {
         setSubmitError(loginResult.error || 'Invalid email or password. Please try again.')
       }

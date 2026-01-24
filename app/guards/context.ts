@@ -6,6 +6,8 @@ export interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
+  sessionExpired: boolean
+  dismissSessionExpired: () => void
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
 }

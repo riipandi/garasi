@@ -102,6 +102,33 @@ let isRefreshing = false
 let refreshPromise: Promise<any> | null = null
 
 /**
+ * Event listener for session expired events
+ * This allows components to listen to session expiry and handle it appropriately
+ */
+type SessionExpiredListener = () => void
+const sessionExpiredListeners: SessionExpiredListener[] = []
+
+export function onSessionExpired(callback: SessionExpiredListener) {
+  sessionExpiredListeners.push(callback)
+  return () => {
+    const index = sessionExpiredListeners.indexOf(callback)
+    if (index > -1) {
+      sessionExpiredListeners.splice(index, 1)
+    }
+  }
+}
+
+function notifySessionExpired() {
+  sessionExpiredListeners.forEach((listener) => {
+    try {
+      listener()
+    } catch (error) {
+      console.error('Error in session expired listener:', error)
+    }
+  })
+}
+
+/**
  * Create a fetcher instance with Bearer token interceptor and automatic token refresh
  *
  * This wrapper automatically adds Authorization header with Bearer token header
@@ -139,14 +166,25 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
         if (isTokenExpired(authState.atokenexp)) {
           // If already refreshing, wait for existing refresh to complete
           if (isRefreshing && refreshPromise) {
-            await refreshPromise
+            const refreshResult = await refreshPromise
+            if (!refreshResult) {
+              // Refresh failed, clear auth and redirect
+              handleSessionExpired()
+              return
+            }
           } else {
             // Start a new refresh
             isRefreshing = true
             refreshPromise = refreshAccessToken(authState.rtoken)
-            await refreshPromise
+            const refreshResult = await refreshPromise
             isRefreshing = false
             refreshPromise = null
+
+            if (!refreshResult) {
+              // Refresh failed, clear auth and redirect
+              handleSessionExpired()
+              return
+            }
           }
 
           // Get updated auth state after refresh
@@ -154,6 +192,10 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
           if (updatedAuthState?.atoken) {
             options.headers = new Headers(options.headers)
             options.headers.set('Authorization', `Bearer ${updatedAuthState.atoken}`)
+          } else {
+            // No valid token after refresh, handle session expired
+            handleSessionExpired()
+            return
           }
         } else {
           // Add Bearer token if access token exists and is valid
@@ -165,17 +207,27 @@ export function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fet
     onResponseError({ response }) {
       // Handle 401 Unauthorized errors
       if (response.status === 401) {
-        // Clear auth store on 401 error
-        authStore.set({
-          atoken: null,
-          atokenexp: null,
-          rtoken: null,
-          rtokenexp: null,
-          remember: false
-        })
+        handleSessionExpired()
       }
     }
   })
+}
+
+/**
+ * Handle session expired by clearing auth store and notifying listeners
+ */
+function handleSessionExpired() {
+  // Clear auth store
+  authStore.set({
+    atoken: null,
+    atokenexp: null,
+    rtoken: null,
+    rtokenexp: null,
+    remember: false
+  })
+
+  // Notify all listeners about session expiry
+  notifySessionExpired()
 }
 
 /**

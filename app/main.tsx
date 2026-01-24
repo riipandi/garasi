@@ -43,8 +43,21 @@ declare module '@tanstack/react-router' {
  */
 const queryClient = new QueryClient({
   defaultOptions: {
-    mutations: {},
-    queries: {}
+    mutations: {
+      retry: 1
+    },
+    queries: {
+      retry: (failureCount, error: any) => {
+        // Don't retry on 401 errors (session expired)
+        if (error?.status === 401 || error?.response?.status === 401) {
+          return false
+        }
+        // Retry other errors up to 2 times
+        return failureCount < 2
+      },
+      refetchOnWindowFocus: false,
+      staleTime: 60000 // 1 minute
+    }
   }
 })
 
