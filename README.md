@@ -20,32 +20,62 @@
 
 ---
 
-Graphical User Interface for Garage S3.
+A modern web-based GUI for [Garage S3](https://garagehq.deuxfleurs.fr/), a distributed object
+storage system. Built with React, TanStack Router/Query/Form/Table, Tailwind CSS v4, and Bun,
+Garasi provides a full-stack management interface featuring Nitro 3 server with SQLite/Kysely
+persistence and type-safe operations with Zod schema validation. Designed for simplicity and
+developer experience, it includes Docker-ready multi-stage builds with healthcheck monitoring,
+making deployment seamless across environments.
 
-## Garage Setup
+## Features
 
-- Generate rpc_secret: `openssl rand -hex 32`
-- Generate admin_token & metrics_token: `openssl rand -base64 32`
+- **Modern Stack**: React, TanStack (Router, Query, Form, Table), Tailwind CSS v4, Bun.
+- **Full-Stack**: Nitro 3 server with SQLite database via Kysely.
+- **Docker Ready**: Multi-stage builds with healthcheck monitoring.
+- **Type-Safe**: TypeScript with Zod schema validation.
 
-## References
+## Quick Start
 
-- https://garagehq.deuxfleurs.fr/documentation/quick-start/
-- https://garagehq.deuxfleurs.fr/documentation/cookbook/gateways/
-- https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility
-- https://garagehq.deuxfleurs.fr/documentation/reference-manual/admin-api/
-- https://garagehq.deuxfleurs.fr/api/garage-admin-v2.html
+### Using Docker Compose
+
+```bash
+docker compose up --detach --remove-orphans
+```
+
+### Development
+
+```bash
+cp .env.example .env.local
+bun install
+bun run dev
+```
+
+## Configuration
+
+Generate required secrets:
+
+```bash
+openssl rand -hex 32      # For GARAGE_RPC_SECRET
+openssl rand -base64 32   # For GARAGE_ADMIN_TOKEN, GARAGE_METRICS_TOKEN, SECRET_KEY
+```
+
+See [`.env.example`](./.env.example) for all available options.
+
+## Documentation
+
+- [Garage Quick Start](https://garagehq.deuxfleurs.fr/documentation/quick-start)
+- [Garage Admin API](https://garagehq.deuxfleurs.fr/documentation/reference-manual/admin-api)
+- [S3 Compatibility](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility)
 
 ## License
 
 Licensed under the [MIT license](https://www.tldrlegal.com/license/mit-license).
 
-Copyrights in this project are retained by their contributors.
-
 See the [LICENSE](./LICENSE) file for more information.
 
 ---
 
-<sub>🤫 Psst! If you like my work you can support me via [GitHub sponsors](https://github.com/sponsors/riipandi).</sub>
+<sub>🤫 If you like my work, consider [sponsoring](https://github.com/sponsors/riipandi).</sub>
 
 [![Made by](https://badgen.net/badge/icon/Aris%20Ripandi?label=Made+by&color=black&labelColor=black)][riipandi-x]
 
