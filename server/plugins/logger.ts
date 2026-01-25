@@ -10,7 +10,7 @@ export default definePlugin(({ hooks }) => {
   const requestId = typeid('req').toString()
 
   // Define paths to ignore for logging
-  const ignoredPaths = ['/api/health', '/api/metrics']
+  const ignoredPaths = ['/favicon.ico', '/api/health', '/api/metrics']
 
   // Initialize the wide event with request context (https://loggingsucks.com)
   const buildWideEvent = (event: H3Event): Record<string, unknown> => {
@@ -58,13 +58,13 @@ export default definePlugin(({ hooks }) => {
 
     const status_code = res.status
     const response_time = responseTime ? prettyMs(responseTime) : null
+    const request_id = buildWideEvent(event).request_id as string
 
     // Send the response log with wide event context
     logger
       .withPrefix('RES')
       .withContext(buildWideEvent(event))
-      .withMetadata({ status_code, response_time })
-      .info('Outgoing response', pathname)
+      .info('Outgoing response', pathname, request_id, status_code, response_time)
   })
 })
 

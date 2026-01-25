@@ -3,6 +3,7 @@ import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
 import { parseBoolean } from '~/server/utils/parser'
 import type { GetClusterStatisticsResponse } from '~/shared/schemas/cluster.schema'
+import type { ClusterStatistics, StorageNode } from '~/shared/schemas/dashboard.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
@@ -23,37 +24,7 @@ export default defineProtectedHandler(async (event) => {
   )
 })
 
-interface StorageNode {
-  id: string
-  hostname: string
-  zone: string
-  capacity: string
-  partitions: number
-  dataAvailable: {
-    used: string
-    total: string
-    percentage: number
-  }
-  metaAvailable: {
-    used: string
-    total: string
-    percentage: number
-  }
-}
-
-interface ClusterStatistics {
-  nodes: StorageNode[]
-  clusterWide: {
-    data: string
-    metadata: string
-  }
-}
-
-function parseStorageCapacity(capacityStr: string): {
-  used: string
-  total: string
-  percentage: number
-} {
+function parseStorageCapacity(capacityStr: string): StorageNode['dataAvailable'] {
   const match = capacityStr.match(/([\d.]+\s+\w+)\s*\/\s*([\d.]+\s+\w+)\s*\(([\d.]+)%\)/)
   if (!match || !match[1] || !match[2] || !match[3]) {
     return { used: '0 GB', total: '0 GB', percentage: 0 }
@@ -67,7 +38,7 @@ function parseStorageCapacity(capacityStr: string): {
 
 function parseClusterStatistics(freeform: string): ClusterStatistics {
   const nodes: StorageNode[] = []
-  let clusterWide: { data: string; metadata: string } = { data: '0 GB', metadata: '0 GB' }
+  let clusterWide: ClusterStatistics['clusterWide'] = { data: '0 GB', metadata: '0 GB' }
 
   const lines = freeform.split('\n')
   let inNodesSection = false

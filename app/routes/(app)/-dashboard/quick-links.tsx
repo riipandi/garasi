@@ -11,53 +11,47 @@ interface QuickLink {
 const quickLinks: QuickLink[] = [
   {
     to: '/metrics',
-    label: 'View Metrics',
+    label: 'Metrics',
     icon: Lucide.GanttChartSquare,
-    description: 'Monitor detailed cluster metrics'
+    description: 'Monitor cluster metrics'
   },
   {
     to: '/cluster',
-    label: 'Manage Cluster',
+    label: 'Cluster',
     icon: Lucide.Server,
-    description: 'View and manage cluster nodes'
+    description: 'Manage cluster nodes'
   },
   {
     to: '/buckets',
-    label: 'Manage Buckets',
+    label: 'Buckets',
     icon: Lucide.Database,
-    description: 'Create and manage S3 buckets'
+    description: 'Manage S3 buckets'
   },
   {
     to: '/keys',
     label: 'Access Keys',
     icon: Lucide.KeyRound,
-    description: 'Manage API access keys'
+    description: 'Manage API keys'
   }
 ]
 
 export function QuickLinks() {
   return (
-    <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'>
-      <div className='mb-4 flex items-center justify-between'>
-        <h2 className='text-lg font-semibold sm:text-xl'>Quick Links</h2>
-        <Lucide.Zap className='size-5 text-gray-400' />
-      </div>
+    <div className='flex h-full flex-col rounded-lg border border-gray-200 bg-white p-6'>
+      <h2 className='text-lg font-semibold text-gray-900'>Quick Links</h2>
 
-      <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+      <div className='mt-4 grid grid-cols-1 gap-3 sm:grid-cols-1'>
         {quickLinks.map((link) => (
           <Link
             key={link.to}
             to={link.to}
-            className='flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 transition-colors hover:border-gray-300 hover:bg-gray-100'
+            className='flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100'
           >
-            <div className='rounded-lg bg-blue-50 p-2.5'>
-              <link.icon className='size-5 text-blue-600' />
-            </div>
+            <link.icon className='size-5 text-gray-600' />
             <div className='flex-1'>
               <p className='font-medium text-gray-900'>{link.label}</p>
-              <p className='mt-1 text-sm text-gray-500'>{link.description}</p>
+              <p className='text-sm text-gray-500'>{link.description}</p>
             </div>
-            <Lucide.ArrowRight className='mt-1 size-5 text-gray-400' />
           </Link>
         ))}
       </div>

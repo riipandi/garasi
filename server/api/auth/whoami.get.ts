@@ -1,7 +1,8 @@
 import { HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import type { WhoamiResponse } from '~/shared/schemas/dashboard.schema'
 
-export default defineProtectedHandler(async (event) => {
+export default defineProtectedHandler(async (event): Promise<WhoamiResponse> => {
   const { db, auth, logger } = event.context
 
   // Fetch user from database

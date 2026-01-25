@@ -1,62 +1,14 @@
-// Types
-export interface WhoamiResponse {
-  success: boolean
-  message: string | null
-  data: {
-    user_id: string
-    email: string
-    name: string
-  } | null
-}
+// Import types from shared schemas
+import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
-export interface ClusterHealthResponse {
-  status: string
-  knownNodes: number
-  connectedNodes: number
-  storageNodes: number
-  storageNodesUp: number
-  partitions: number
-  partitionsQuorum: number
-  partitionsAllOk: number
-}
+// Re-export types for convenience
+export type { WhoamiResponse, ClusterStatistics } from '~/shared/schemas/dashboard.schema'
+export type { GetClusterHealthResponse as ClusterHealthResponse } from '~/shared/schemas/cluster.schema'
+export type { ListBucketsResponse as BucketResponse } from '~/shared/schemas/bucket.schema'
 
-export interface ClusterStatisticsResponse {
-  nodes: Array<{
-    id: string
-    hostname: string
-    zone: string
-    capacity: string
-    partitions: number
-    dataAvailable: {
-      used: string
-      total: string
-      percentage: number
-    }
-    metaAvailable: {
-      used: string
-      total: string
-      percentage: number
-    }
-  }>
-  clusterWide: {
-    data: string
-    metadata: string
-  }
-}
-
-export interface BucketResponse {
-  id: string
-  created: string
-  globalAliases: string[]
-  localAliases: Array<{
-    accessKeyId: string
-    alias: string
-  }>
-}
-
-export interface KeyResponse {
-  id: string
-  name: string
-  created: string | null
+/**
+ * Extended key response with deleted field for dashboard
+ */
+export interface KeyResponse extends ListAccessKeysResponse {
   deleted: boolean
 }

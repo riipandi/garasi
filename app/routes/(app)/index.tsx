@@ -1,14 +1,16 @@
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import fetcher from '~/app/fetcher'
 import { ClusterInfo } from './-dashboard/cluster-info'
+import { DashboardError } from './-dashboard/error-boundary'
+import { DashboardSkeleton } from './-dashboard/loading-skeleton'
 import { QuickLinks } from './-dashboard/quick-links'
 import { RecentBuckets } from './-dashboard/recent-buckets'
 import { StatCard } from './-dashboard/stat-card'
 import { StorageNodes } from './-dashboard/storage-nodes'
 import type { BucketResponse, KeyResponse, WhoamiResponse } from './-dashboard/types'
-import type { ClusterHealthResponse, ClusterStatisticsResponse } from './-dashboard/types'
+import type { ClusterHealthResponse, ClusterStatistics } from './-dashboard/types'
 
 export const Route = createFileRoute('/(app)/')({
   component: RouteComponent,
@@ -18,7 +20,8 @@ export const Route = createFileRoute('/(app)/')({
     context.queryClient.ensureQueryData(clusterStatisticsQuery)
     context.queryClient.ensureQueryData(bucketsQuery)
     context.queryClient.ensureQueryData(keysQuery)
-  }
+  },
+  errorComponent: ({ error }) => <DashboardError error={error} />
 })
 
 // Query options
@@ -34,8 +37,7 @@ const clusterHealthQuery = queryOptions({
 
 const clusterStatisticsQuery = queryOptions({
   queryKey: ['cluster', 'statistics'],
-  queryFn: () =>
-    fetcher<{ success: boolean; data: ClusterStatisticsResponse }>('/cluster/statistics')
+  queryFn: () => fetcher<{ success: boolean; data: ClusterStatistics }>('/cluster/statistics')
 })
 
 const bucketsQuery = queryOptions({
@@ -49,11 +51,19 @@ const keysQuery = queryOptions({
 })
 
 function RouteComponent() {
-  const { data: whoamiData } = useSuspenseQuery(whoamiQuery)
-  const { data: healthData } = useSuspenseQuery(clusterHealthQuery)
-  const { data: statisticsData } = useSuspenseQuery(clusterStatisticsQuery)
-  const { data: bucketsData } = useSuspenseQuery(bucketsQuery)
-  const { data: keysData } = useSuspenseQuery(keysQuery)
+  const { data: whoamiData, isLoading: isLoadingWhoami } = useQuery(whoamiQuery)
+  const { data: healthData, isLoading: isLoadingHealth } = useQuery(clusterHealthQuery)
+  const { data: statisticsData, isLoading: isLoadingStatistics } = useQuery(clusterStatisticsQuery)
+  const { data: bucketsData, isLoading: isLoadingBuckets } = useQuery(bucketsQuery)
+  const { data: keysData, isLoading: isLoadingKeys } = useQuery(keysQuery)
+
+  // Show loading skeleton while any query is loading
+  const isLoading =
+    isLoadingWhoami || isLoadingHealth || isLoadingStatistics || isLoadingBuckets || isLoadingKeys
+
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
 
   const health = healthData?.data
   const statistics = statisticsData?.data
@@ -62,14 +72,14 @@ function RouteComponent() {
 
   // Calculate cluster-wide storage
   const totalDataStorage =
-    statistics?.nodes.reduce((acc, node) => {
+    statistics?.nodes.reduce((acc: number, node) => {
       const match = node.dataAvailable.total.match(/([\d.]+)/)
       const value = match && match[1] ? parseFloat(match[1]) : 0
       return acc + value
     }, 0) || 0
 
   const usedDataStorage =
-    statistics?.nodes.reduce((acc, node) => {
+    statistics?.nodes.reduce((acc: number, node) => {
       const match = node.dataAvailable.used.match(/([\d.]+)/)
       const value = match && match[1] ? parseFloat(match[1]) : 0
       return acc + value
@@ -81,9 +91,10 @@ function RouteComponent() {
     <div className='space-y-6'>
       {/* Page Header */}
       <div className='min-w-0 flex-1'>
-        <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>Dashboard</h1>
-        <p className='mt-2 text-sm text-gray-500'>
-          Welcome back, {whoamiData?.data?.name || 'User'}! Here's an overview of your S3 storage.
+        <h1 className='text-2xl font-bold text-gray-900'>Dashboard</h1>
+        <p className='mt-1 text-sm text-gray-500'>
+          Welcome back, {whoamiData?.data?.name || 'User'}! Here's an overview of your S3 storage
+          cluster.
         </p>
       </div>
 
@@ -101,6 +112,7 @@ function RouteComponent() {
                 : 'red'
           }
           subtitle={`${health?.connectedNodes || 0}/${health?.knownNodes || 0} nodes connected`}
+          to='/cluster'
         />
 
         <StatCard
@@ -117,6 +129,7 @@ function RouteComponent() {
           icon={Lucide.Database}
           color='purple'
           subtitle={`${buckets.filter((b) => b.globalAliases.length > 0).length} with aliases`}
+          to='/buckets'
         />
 
         <StatCard
@@ -125,15 +138,21 @@ function RouteComponent() {
           icon={Lucide.KeyRound}
           color='indigo'
           subtitle={`${keys.filter((k) => k.deleted).length} deleted`}
+          to='/keys'
         />
       </div>
 
-      {/* Main Content Grid */}
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-        <QuickLinks />
-        <ClusterInfo health={health} statistics={statistics} />
+      {/* Main Content Grid - Equal height cards */}
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+        <div className='lg:col-span-2'>
+          <ClusterInfo health={health} statistics={statistics} />
+        </div>
+        <div>
+          <QuickLinks />
+        </div>
       </div>
 
+      {/* Bottom Section */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
         <StorageNodes statistics={statistics} />
         <RecentBuckets buckets={buckets} />
