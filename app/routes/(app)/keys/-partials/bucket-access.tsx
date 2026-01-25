@@ -1,20 +1,15 @@
 import * as Lucide from 'lucide-react'
-
-interface BucketPermission {
-  read: boolean
-  write: boolean
-  owner: boolean
-}
+import type { ApiBucketKeyPerm } from '~/shared/schemas/bucket.schema'
 
 interface BucketAccessSectionProps {
   buckets: Array<{ id: string; created: string; globalAliases: string[] }>
   selectedBuckets: Set<string>
-  bucketPermissions: Record<string, BucketPermission>
+  bucketPermissions: Record<string, ApiBucketKeyPerm>
   isLoadingPermissions: boolean
   isLoadingBuckets: boolean
   isSaving: boolean
   onBucketToggle: (bucketId: string) => void
-  onPermissionChange: (bucketId: string, permission: keyof BucketPermission, value: boolean) => void
+  onPermissionChange: (bucketId: string, permission: keyof ApiBucketKeyPerm, value: boolean) => void
   onSavePermissions: () => void
 }
 

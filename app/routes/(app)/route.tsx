@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { NotFound } from '~/app/errors'
 import { useAuth } from '~/app/guards'
-import type { BucketListItem } from '~/app/routes/(app)/buckets/-partials/types'
-import { listBuckets } from '~/app/services'
+import { listBuckets } from '~/app/services/bucket.service'
 import { uiStore } from '~/app/stores'
+import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
+import type { ApiResponse } from '~/shared/schemas/common.schema'
 
 export const Route = createFileRoute('/(app)')({
   component: RouteComponent,
@@ -37,7 +38,7 @@ function RouteComponent() {
   }, [])
 
   // Fetch buckets for quick access
-  const { data, isLoading, error, refetch } = useQuery<BucketListItem[]>({
+  const { data, isLoading, error, refetch } = useQuery<ApiResponse<ListBucketsResponse[]>>({
     queryKey: ['buckets'],
     queryFn: listBuckets,
     staleTime: 60000, // Cache for 1 minute
@@ -46,7 +47,7 @@ function RouteComponent() {
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchOnMount: true // Always refetch on mount to ensure fresh data
   })
-  const buckets = Array.isArray(data) ? data : []
+  const buckets = Array.isArray(data?.data) ? data.data : []
 
   // Debug logging
   if (error) {
@@ -234,7 +235,7 @@ function QuickAccessBuckets({
   onBucketClick,
   onRetry
 }: {
-  buckets: BucketListItem[]
+  buckets: ListBucketsResponse[]
   isLoading?: boolean
   error?: Error | null
   onBucketClick?: () => void
@@ -276,7 +277,10 @@ function QuickAccessBuckets({
     <div className='space-y-0.5 px-3'>
       {buckets.map((bucket) => {
         // Use global alias if available, otherwise use bucket id
-        const displayName = bucket.globalAliases[0] || bucket.id
+        const displayName =
+          bucket.globalAliases && bucket.globalAliases.length > 0 && bucket.globalAliases[0]
+            ? bucket.globalAliases[0]
+            : bucket.id
         const bucketPath = `/buckets/${bucket.id}`
 
         return (

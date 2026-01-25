@@ -4,14 +4,16 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
-import fetcher from '~/app/fetcher'
-import { listAccessKeys } from '~/app/services/keys.service'
+import {
+  listAccessKeys,
+  createAccessKey,
+  deleteAccessKey,
+  importKey
+} from '~/app/services/keys.service'
+import type { ImportKeyRequest, CreateAccessKeyRequest } from '~/shared/schemas/keys.schema'
 import { KeyCreate } from './-partials/key-create'
 import { KeyImport } from './-partials/key-import'
 import { KeyTable } from './-partials/key-table'
-import type { ImportKeyRequest } from './-partials/types'
-import type { AccessKey } from './-partials/types'
-import type { CreateKeyRequest, UpdateKeyRequest } from './-partials/types'
 
 const keysQueryOpts = queryOptions({ queryKey: ['keys'], queryFn: () => listAccessKeys() })
 
@@ -29,9 +31,8 @@ function RouteComponent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = React.useState(false)
   const [showCreateConfirm, setShowCreateConfirm] = React.useState(false)
-  const [pendingCreateValues, setPendingCreateValues] = React.useState<CreateKeyRequest | null>(
-    null
-  )
+  const [pendingCreateValues, setPendingCreateValues] =
+    React.useState<CreateAccessKeyRequest | null>(null)
   const [keyToDelete, setKeyToDelete] = React.useState<string | null>(null)
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
@@ -43,14 +44,8 @@ function RouteComponent() {
 
   // Create key mutation
   const createKeyMutation = useMutation({
-    mutationFn: async (values: CreateKeyRequest) => {
-      return fetcher<{
-        success: boolean
-        data: AccessKey
-      }>('/keys', {
-        method: 'POST',
-        body: values
-      })
+    mutationFn: async (values: CreateAccessKeyRequest) => {
+      return createAccessKey(values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
@@ -65,9 +60,7 @@ function RouteComponent() {
   // Delete key mutation
   const deleteKeyMutation = useMutation({
     mutationFn: async (keyId: string) => {
-      return fetcher<{ success: boolean; data: { id: string } }>(`/keys/${keyId}`, {
-        method: 'DELETE'
-      })
+      return deleteAccessKey(keyId)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
@@ -81,18 +74,7 @@ function RouteComponent() {
   // Import key mutation
   const importKeyMutation = useMutation({
     mutationFn: async (values: ImportKeyRequest) => {
-      return fetcher<{
-        success: boolean
-        data: {
-          id: string
-          name: string
-          accessKeyId: string
-          secretKeyId: string
-        }
-      }>('/keys/import', {
-        method: 'POST',
-        body: values
-      })
+      return importKey(values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
@@ -104,8 +86,8 @@ function RouteComponent() {
     }
   })
 
-  const handleCreateKey = async (values: CreateKeyRequest | UpdateKeyRequest) => {
-    const createValues = values as CreateKeyRequest
+  const handleCreateKey = async (values: CreateAccessKeyRequest) => {
+    const createValues = values as CreateAccessKeyRequest
     if (createValues.neverExpires) {
       setPendingCreateValues(createValues)
       setShowCreateConfirm(true)

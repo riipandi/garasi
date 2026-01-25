@@ -1,5 +1,12 @@
 import * as Lucide from 'lucide-react'
-import type { AccessKey } from './types'
+import type { GetKeyInformationResponse } from '~/shared/schemas/keys.schema'
+
+// Extend the schema type with additional properties needed by the UI
+interface AccessKey extends GetKeyInformationResponse {
+  deleted?: boolean
+  neverExpires?: boolean
+  secretKeyId?: string
+}
 
 interface KeyInformationCardProps {
   accessKey: AccessKey
@@ -95,7 +102,7 @@ export function KeyInformationCard({
           <label className='mb-1.5 block text-xs font-medium text-gray-600'>Created At</label>
           <div className='flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm'>
             <Lucide.Calendar className='size-4 text-gray-500' />
-            <span>{formatDate(accessKey.created)}</span>
+            <span>{formatDate(accessKey.created || null)}</span>
           </div>
         </div>
 

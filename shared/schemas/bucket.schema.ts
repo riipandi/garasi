@@ -244,8 +244,14 @@ export interface AddBucketAliasResponse {
  * Remove an alias for the target bucket. This can be either a global
  * or a local alias, depending on which fields are specified.
  */
-export interface RemoveBucketAliasRequest {
+export interface RemoveBucketGlobalAliasRequest {
   globalAlias: string
+  bucketId: string
+}
+
+export interface RemoveBucketLocalAliasRequest {
+  accessKeyId: string
+  localAlias: string
   bucketId: string
 }
 

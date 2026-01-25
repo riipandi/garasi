@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { z } from 'zod'
-import type { ImportKeyRequest } from './types'
+import type { ImportKeyRequest } from '~/shared/schemas/keys.schema'
 
 interface KeyImportProps {
   isOpen: boolean
@@ -13,7 +13,7 @@ interface KeyImportProps {
 
 const importKeySchema = z.object({
   accessKeyId: z.string().min(1, 'Access Key ID is required'),
-  secretKeyId: z.string().min(1, 'Secret Key ID is required'),
+  secretAccessKey: z.string().min(1, 'Secret Key ID is required'),
   name: z.string().max(100, 'Name must be less than 100 characters').optional()
 })
 
@@ -32,7 +32,7 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
   const Form = useForm({
     defaultValues: {
       accessKeyId: '',
-      secretKeyId: '',
+      secretAccessKey: '',
       name: ''
     },
     onSubmit: async ({ value }) => {
@@ -47,7 +47,7 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
 
       await onSubmit({
         accessKeyId: value.accessKeyId,
-        secretKeyId: value.secretKeyId,
+        secretAccessKey: value.secretAccessKey,
         name: value.name || null
       })
     }
@@ -119,10 +119,10 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
           />
 
           <Form.Field
-            name='secretKeyId'
+            name='secretAccessKey'
             validators={{
               onChange: ({ value }) => {
-                const result = importKeySchema.shape.secretKeyId.safeParse(value)
+                const result = importKeySchema.shape.secretAccessKey.safeParse(value)
                 if (!result.success) {
                   const firstError = result.error.issues[0]
                   return firstError ? firstError.message : undefined

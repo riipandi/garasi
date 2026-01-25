@@ -2,13 +2,13 @@ import { useQuery } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import fetcher from '~/app/fetcher'
-import type { KeysResponse } from '../../keys/-partials/types'
-import type { Bucket } from './types'
+import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
+import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
 interface KeySelectorDialogProps {
   isOpen: boolean
   onClose: () => void
-  bucket: Bucket
+  bucket: GetBucketInfoResponse
   onAllowKey: (
     accessKeyId: string,
     permissions: { owner?: boolean; read?: boolean; write?: boolean }
@@ -23,13 +23,13 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
   // Fetch all keys for the selector dialog
   const { data: keysData, isLoading: isKeysLoading } = useQuery({
     queryKey: ['keys'],
-    queryFn: () => fetcher<KeysResponse>('/keys')
+    queryFn: () => fetcher<{ data: ListAccessKeysResponse[] }>('/keys')
   })
 
   const allKeys = keysData?.data ?? []
 
   // Filter out keys that are already assigned to this bucket
-  const assignedKeyIds = bucket.keys?.map((k) => k.accessKeyId) ?? []
+  const assignedKeyIds = Array.isArray(bucket.keys) ? bucket.keys.map((k) => k.accessKeyId) : []
   const availableKeys = allKeys.filter((key) => !assignedKeyIds.includes(key.id))
 
   // Filter keys by search query

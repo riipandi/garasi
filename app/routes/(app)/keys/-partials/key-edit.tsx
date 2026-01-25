@@ -2,13 +2,23 @@ import { useForm } from '@tanstack/react-form'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { z } from 'zod'
-import type { AccessKey, UpdateKeyRequest } from './types'
+import type {
+  GetKeyInformationResponse,
+  UpdateAccessKeyRequest
+} from '~/shared/schemas/keys.schema'
+
+// Extend the schema type with additional properties needed by the UI
+interface AccessKey extends GetKeyInformationResponse {
+  deleted?: boolean
+  neverExpires?: boolean
+  secretKeyId?: string
+}
 
 interface KeyEditProps {
   isOpen: boolean
   accessKey: AccessKey
   onClose: () => void
-  onSubmit: (values: UpdateKeyRequest) => Promise<void>
+  onSubmit: (values: UpdateAccessKeyRequest) => Promise<void>
   isSubmitting?: boolean
 }
 
@@ -42,7 +52,7 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
         return
       }
 
-      const submitValue: UpdateKeyRequest = {
+      const submitValue: UpdateAccessKeyRequest = {
         name: value.name,
         neverExpires: value.neverExpires,
         expiration: value.neverExpires ? null : value.expiration || null,

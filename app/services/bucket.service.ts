@@ -8,7 +8,8 @@ import type { DenyBucketKeyRequest, DenyBucketKeyResponse } from '~/shared/schem
 import type { GetBucketInfoParams, GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 import type { InspectObjectParams, InspectObjectResponse } from '~/shared/schemas/bucket.schema'
 import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
-import type { RemoveBucketAliasRequest } from '~/shared/schemas/bucket.schema'
+import type { RemoveBucketGlobalAliasRequest } from '~/shared/schemas/bucket.schema'
+import type { RemoveBucketLocalAliasRequest } from '~/shared/schemas/bucket.schema'
 import type { RemoveBucketAliasResponse } from '~/shared/schemas/bucket.schema'
 import type { UpdateBucketRequest, UpdateBucketParams } from '~/shared/schemas/bucket.schema'
 import type { UpdateBucketResponse } from '~/shared/schemas/bucket.schema'
@@ -22,6 +23,14 @@ export async function listBuckets() {
 }
 
 export async function getBucketInfo(params: GetBucketInfoParams) {
+  if (params.id) {
+    const { id, ...queryParams } = params // Use route parameter for bucket ID
+    return await fetcher<ApiResponse<GetBucketInfoResponse>>(`/bucket/${id}`, {
+      method: 'GET',
+      query: queryParams
+    })
+  }
+  // Use query params for search or globalAlias
   return await fetcher<ApiResponse<GetBucketInfoResponse>>('/bucket', {
     method: 'GET',
     query: params
@@ -79,7 +88,9 @@ export async function addBucketAlias(
 
 export async function removeBucketAlias(
   id: UpdateBucketParams['id'],
-  data: Omit<RemoveBucketAliasRequest, 'bucketId'>
+  data:
+    | Omit<RemoveBucketGlobalAliasRequest, 'bucketId'>
+    | Omit<RemoveBucketLocalAliasRequest, 'bucketId'>
 ) {
   return await fetcher<ApiResponse<RemoveBucketAliasResponse>>(`/bucket/${id}/aliases`, {
     method: 'DELETE',

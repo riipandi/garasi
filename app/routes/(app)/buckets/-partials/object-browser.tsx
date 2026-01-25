@@ -2,8 +2,8 @@ import { useSuspenseQuery, useMutation, QueryClient } from '@tanstack/react-quer
 import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { createFolder, listObjects, uploadFile } from '~/app/services'
-import type { Bucket } from './types'
+import { createFolder, listBucketObjects, uploadFile } from '~/app/services/objects.service'
+import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 // Code split components using React.lazy
 const DropdownMenu = React.lazy(() =>
@@ -30,27 +30,41 @@ interface FileItem {
 
 interface ObjectBrowserProps {
   queryClient: QueryClient
-  bucket: Bucket
+  bucket: GetBucketInfoResponse
   prefix?: string | null
   key?: string | null
   bucketId: string
 }
 
 export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: ObjectBrowserProps) {
-  const bucketParam = bucket.globalAliases[0] || bucket.id
+  const bucketParam =
+    bucket.globalAliases && bucket.globalAliases.length > 0 && bucket.globalAliases[0]
+      ? bucket.globalAliases[0]
+      : bucket.id
+
+  // Check if bucket has any access keys
+  const hasAccessKeys = bucket.keys && bucket.keys.length > 0
 
   // Query to fetch bucket objects with prefix and key support
+  // Only fetch if bucket has access keys, otherwise show empty state
   const objectsQuery = useSuspenseQuery({
     queryKey: ['objects', bucket.id, prefix, key],
-    queryFn: async () => listObjects(bucketParam, prefix, key)
+    queryFn: async () => {
+      if (!hasAccessKeys) {
+        // Return empty data if no access keys
+        return { data: { commonPrefixes: [], contents: [] } }
+      }
+      return listBucketObjects({ bucket: bucketParam, prefix: prefix || undefined })
+    }
   })
 
   // Create folder mutation
   const createFolderMutation = useMutation({
     mutationFn: async (folderName: string) => {
-      // Prepend prefix to folder name if we're in a subdirectory
-      const fullFolderName = prefix ? `${prefix}${folderName}/` : `${folderName}/`
-      return createFolder(bucketParam, fullFolderName)
+      return createFolder(
+        { bucket: bucketParam, prefix: prefix || undefined },
+        { name: folderName }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })
@@ -63,7 +77,7 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
   // Upload file mutation
   const uploadFileMutation = useMutation({
     mutationFn: async (file: File) => {
-      return uploadFile(bucketParam, file, prefix || undefined)
+      return uploadFile({ bucket: bucketParam }, { file })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })
@@ -84,8 +98,8 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
   // In S3 with delimiter, folders are in commonPrefixes and files are in contents
   // Empty folders (folder markers) may also appear in contents with trailing slash
   const fileItems: FileItem[] = React.useMemo(() => {
-    const commonPrefixes = objectsQuery.data?.commonPrefixes || []
-    const contents = objectsQuery.data?.contents || []
+    const commonPrefixes = objectsQuery.data?.data?.commonPrefixes || []
+    const contents = objectsQuery.data?.data?.contents || []
 
     // Get folders from commonPrefixes (folders with content)
     // Filter out the current prefix to avoid showing the selected folder itself
@@ -237,7 +251,9 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
           <button
             type='button'
             onClick={() => setShowCreateFolderDialog(true)}
-            className='flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+            disabled={!hasAccessKeys}
+            className='flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white'
+            title={!hasAccessKeys ? 'Assign access keys to create folders' : 'Create folder'}
           >
             <Lucide.FolderPlus className='size-4' />
             Create Folder
@@ -245,7 +261,9 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
           <button
             type='button'
             onClick={() => setShowUploadFileDialog(true)}
-            className='flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+            disabled={!hasAccessKeys}
+            className='flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-blue-600'
+            title={!hasAccessKeys ? 'Assign access keys to upload files' : 'Upload file'}
           >
             <Lucide.Upload className='size-4' />
             Upload File
@@ -451,13 +469,25 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         {/* Empty State */}
         {filteredFiles.length === 0 && (
           <div className='flex flex-col items-center justify-center py-12 text-center'>
-            <Lucide.FolderOpen className='size-12 text-gray-400' />
-            <p className='mt-4 text-sm font-medium text-gray-700'>No files or folders found</p>
-            <p className='mt-1 text-xs text-gray-500'>
-              {filterText
-                ? 'Try adjusting your search'
-                : 'Upload files or create folders to get started'}
-            </p>
+            {!hasAccessKeys ? (
+              <>
+                <Lucide.Lock className='size-12 text-gray-400' />
+                <p className='mt-4 text-sm font-medium text-gray-700'>No access keys assigned</p>
+                <p className='mt-1 text-xs text-gray-500'>
+                  Assign access keys to this bucket to view and manage objects
+                </p>
+              </>
+            ) : (
+              <>
+                <Lucide.FolderOpen className='size-12 text-gray-400' />
+                <p className='mt-4 text-sm font-medium text-gray-700'>No files or folders found</p>
+                <p className='mt-1 text-xs text-gray-500'>
+                  {filterText
+                    ? 'Try adjusting your search'
+                    : 'Upload files or create folders to get started'}
+                </p>
+              </>
+            )}
           </div>
         )}
       </div>

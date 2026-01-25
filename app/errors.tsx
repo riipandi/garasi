@@ -1,17 +1,10 @@
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
-import { type ErrorComponentProps, useCanGoBack, useRouter } from '@tanstack/react-router'
+import { type ErrorComponentProps, Link } from '@tanstack/react-router'
 import * as React from 'react'
 
 export function NotFound() {
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
-
   const handleBack = () => {
-    if (canGoBack) {
-      router.history.back()
-    } else {
-      router.navigate({ href: '/' })
-    }
+    window.history.back()
   }
 
   return (
@@ -30,7 +23,7 @@ export function NotFound() {
             Page not found
           </h1>
           <p className='mt-6 text-base leading-7 font-medium text-gray-500'>
-            Sorry, we couldn&apos;t find the page you&apos;re looking for.
+            Sorry, we couldn't find the page you're looking for.
           </p>
           <div className='mt-10 flex items-center justify-center gap-x-4'>
             <button
@@ -40,14 +33,12 @@ export function NotFound() {
             >
               Go back
             </button>
-            <a
-              href='https://tanstack.com/router/latest/docs'
+            <Link
+              to='/'
               className='min-w-35 rounded-md border border-gray-300 bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-200'
-              rel='noopener noreferrer'
-              target='_blank'
             >
-              Docs
-            </a>
+              Home
+            </Link>
           </div>
         </div>
       </div>
@@ -55,8 +46,7 @@ export function NotFound() {
   )
 }
 
-export function ErrorGeneral({ error }: ErrorComponentProps) {
-  const router = useRouter()
+export function ErrorGeneral({ error, reset }: ErrorComponentProps) {
   const queryErrorResetBoundary = useQueryErrorResetBoundary()
 
   React.useEffect(() => {
@@ -77,13 +67,12 @@ export function ErrorGeneral({ error }: ErrorComponentProps) {
           <p className='mb-4 text-sm text-amber-600'>
             Your session has expired. Please sign in again to continue.
           </p>
-          <button
-            type='button'
-            onClick={() => router.navigate({ to: '/signin' })}
+          <Link
+            to='/signin'
             className='rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-700'
           >
             Sign In
-          </button>
+          </Link>
         </div>
       </div>
     )
@@ -96,7 +85,7 @@ export function ErrorGeneral({ error }: ErrorComponentProps) {
         <p className='mb-4 text-sm text-gray-500'>{error.message}</p>
         <button
           type='button'
-          onClick={() => router.invalidate()}
+          onClick={() => reset()}
           className='rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700'
         >
           Retry

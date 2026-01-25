@@ -4,15 +4,22 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
-import fetcher from '~/app/fetcher'
-import { addBucketAlias, removeBucketAlias } from '~/app/services'
-import { updateBucket, deleteBucket, allowBucketKey, denyBucketKey } from '~/app/services'
+import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
+import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
+import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
+import type { UpdateBucketRequest } from '~/shared/schemas/bucket.schema'
+import type { RemoveBucketLocalAliasRequest } from '~/shared/schemas/bucket.schema'
+import type { RemoveBucketGlobalAliasRequest } from '~/shared/schemas/bucket.schema'
+import type { AllowBucketKeyRequest, DenyBucketKeyRequest } from '~/shared/schemas/bucket.schema'
+import type { AddGlobalBucketAliasRequest } from '~/shared/schemas/bucket.schema'
+import type { AddLocalBucketAliasRequest } from '~/shared/schemas/bucket.schema'
+import { AccessKeysSection } from './-partials/access-keys-section'
 import { AddGlobalAlias } from './-partials/add-global-alias'
 import { AddLocalAlias } from './-partials/add-local-alias'
-import { AliasesAndKeysSection } from './-partials/aliases-and-keys-section'
+import { AliasesSection } from './-partials/aliases-section'
 import { BucketConfigurationForm } from './-partials/bucket-configuration-form'
 import { DeleteBucketSection } from './-partials/delete-bucket-section'
-import type { Bucket, UpdateBucketRequest } from './-partials/types'
+import { KeySelectorDialog } from './-partials/key-selector-dialog'
 
 type SizeUnit = 'MB' | 'GB' | 'TB'
 
@@ -68,7 +75,7 @@ export const Route = createFileRoute('/(app)/buckets/$id/settings')({
 function bucketQuery(bucketId: string) {
   return queryOptions({
     queryKey: ['bucket', bucketId],
-    queryFn: () => fetcher<{ success: boolean; data: Bucket }>(`/bucket/${bucketId}`)
+    queryFn: () => getBucketInfo({ id: bucketId })
   })
 }
 
@@ -79,19 +86,20 @@ function RouteComponent() {
 
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [showAddGlobalAliasDialog, setShowAddGlobalAliasDialog] = React.useState(false)
-  const [showAddLocalAliasDialog, setShowAddLocalAliasDialog] = React.useState(false)
   const [showDeleteGlobalAliasConfirm, setShowDeleteGlobalAliasConfirm] = React.useState(false)
-  const [showDeleteLocalAliasConfirm, setShowDeleteLocalAliasConfirm] = React.useState(false)
   const [showDeleteKeyConfirm, setShowDeleteKeyConfirm] = React.useState(false)
+  const [showKeySelectorDialog, setShowKeySelectorDialog] = React.useState(false)
+  const [showAddLocalAliasDialog, setShowAddLocalAliasDialog] = React.useState(false)
+  const [isAddingLocalAlias, setIsAddingLocalAlias] = React.useState(false)
   const [globalAliasToDelete, setGlobalAliasToDelete] = React.useState<string | null>(null)
+  const [keyToDelete, setKeyToDelete] = React.useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+  const [showDeleteLocalAliasConfirm, setShowDeleteLocalAliasConfirm] = React.useState(false)
   const [localAliasToDelete, setLocalAliasToDelete] = React.useState<{
     accessKeyId: string
     alias: string
   } | null>(null)
-  const [keyToDelete, setKeyToDelete] = React.useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
-  const [aliasTab, setAliasTab] = React.useState<'global' | 'local' | 'keys'>('global')
 
   // Inline edit form state
   const [websiteAccessEnabled, setWebsiteAccessEnabled] = React.useState(false)
@@ -112,8 +120,8 @@ function RouteComponent() {
       setWebsiteAccessEnabled(bucket.websiteAccess)
       setIndexDocument(bucket.websiteConfig?.indexDocument || '')
       setErrorDocument(bucket.websiteConfig?.errorDocument || '')
-      setMaxObjects(bucket.quotas.maxObjects?.toString() || '')
-      const sizeData = bytesToSizeUnit(bucket.quotas.maxSize)
+      setMaxObjects(bucket.quotas?.maxObjects?.toString() || '')
+      const sizeData = bytesToSizeUnit(bucket.quotas?.maxSize)
       setMaxSize(sizeData.value)
       setMaxSizeUnit(sizeData.unit)
     }
@@ -148,7 +156,7 @@ function RouteComponent() {
   // Update bucket mutation
   const updateBucketMutation = useMutation({
     mutationFn: async (values: UpdateBucketRequest) => {
-      return updateBucket(id, values.websiteAccess, values.quotas)
+      return updateBucket(id, values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -178,7 +186,8 @@ function RouteComponent() {
   // Add global alias mutation
   const addGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
-      return addBucketAlias(id, globalAlias)
+      const data: AddGlobalBucketAliasRequest = { globalAlias, bucketId: id }
+      return addBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -191,26 +200,11 @@ function RouteComponent() {
     }
   })
 
-  // Add local alias mutation
-  const addLocalAliasMutation = useMutation({
-    mutationFn: async (localAlias: { accessKeyId: string; alias: string }) => {
-      return addBucketAlias(id, undefined, localAlias)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bucket', id] })
-      queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Local alias added successfully!')
-      setShowAddLocalAliasDialog(false)
-    },
-    onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to add local alias')
-    }
-  })
-
   // Remove global alias mutation
   const removeGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
-      return removeBucketAlias(id, globalAlias)
+      const data: Omit<RemoveBucketGlobalAliasRequest, 'bucketId'> = { globalAlias }
+      return removeBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -222,10 +216,29 @@ function RouteComponent() {
     }
   })
 
+  // Add local alias mutation
+  const addLocalAliasMutation = useMutation({
+    mutationFn: async (data: AddLocalBucketAliasRequest) => {
+      return addBucketAlias(id, data)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bucket', id] })
+      queryClient.invalidateQueries({ queryKey: ['buckets'] })
+      setSuccessMessage('Local alias added successfully!')
+    },
+    onError: (error) => {
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to add local alias')
+    }
+  })
+
   // Remove local alias mutation
   const removeLocalAliasMutation = useMutation({
-    mutationFn: async (localAlias: { accessKeyId: string; alias: string }) => {
-      return removeBucketAlias(id, undefined, localAlias)
+    mutationFn: async (data: { localAlias: string; accessKeyId: string }) => {
+      const requestData: Omit<RemoveBucketLocalAliasRequest, 'bucketId'> = {
+        localAlias: data.localAlias,
+        accessKeyId: data.accessKeyId
+      }
+      return removeBucketAlias(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -243,7 +256,15 @@ function RouteComponent() {
       accessKeyId: string
       permissions: { owner?: boolean; read?: boolean; write?: boolean }
     }) => {
-      return allowBucketKey(id, data.accessKeyId, data.permissions)
+      const requestData: Omit<AllowBucketKeyRequest, 'bucketId'> = {
+        accessKeyId: data.accessKeyId,
+        permissions: {
+          owner: data.permissions.owner ?? false,
+          read: data.permissions.read ?? false,
+          write: data.permissions.write ?? false
+        }
+      }
+      return allowBucketKey(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -260,7 +281,15 @@ function RouteComponent() {
       accessKeyId: string
       permissions: { owner?: boolean; read?: boolean; write?: boolean }
     }) => {
-      return denyBucketKey(id, data.accessKeyId, data.permissions)
+      const requestData: Omit<DenyBucketKeyRequest, 'bucketId'> = {
+        accessKeyId: data.accessKeyId,
+        permissions: {
+          owner: data.permissions.owner ?? false,
+          read: data.permissions.read ?? false,
+          write: data.permissions.write ?? false
+        }
+      }
+      return denyBucketKey(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -272,6 +301,7 @@ function RouteComponent() {
   })
 
   const handleDeleteBucket = () => {
+    if (!bucket) return
     if (bucket.objects > 0) {
       setErrorMessage(
         `Cannot delete bucket. This bucket contains ${bucket.objects} object${bucket.objects !== 1 ? 's' : ''}. You must delete all objects before deleting the bucket.`
@@ -303,7 +333,13 @@ function RouteComponent() {
       }
     }
 
-    const values: UpdateBucketRequest = {}
+    const values: UpdateBucketRequest = {
+      websiteAccess: null,
+      quotas: {
+        maxObjects: null,
+        maxSize: null
+      }
+    }
 
     // Website access configuration
     if (websiteAccessEnabled || indexDocument || errorDocument) {
@@ -329,18 +365,9 @@ function RouteComponent() {
     await addGlobalAliasMutation.mutateAsync(globalAlias)
   }
 
-  const handleAddLocalAlias = async (localAlias: { accessKeyId: string; alias: string }) => {
-    await addLocalAliasMutation.mutateAsync(localAlias)
-  }
-
   const handleRemoveGlobalAlias = (alias: string) => {
     setGlobalAliasToDelete(alias)
     setShowDeleteGlobalAliasConfirm(true)
-  }
-
-  const handleRemoveLocalAlias = (accessKeyId: string, alias: string) => {
-    setLocalAliasToDelete({ accessKeyId, alias })
-    setShowDeleteLocalAliasConfirm(true)
   }
 
   const handleConfirmDeleteGlobalAlias = async () => {
@@ -356,9 +383,26 @@ function RouteComponent() {
     setGlobalAliasToDelete(null)
   }
 
+  const handleAddLocalAlias = async (data: { accessKeyId: string; alias: string }) => {
+    const requestData: AddLocalBucketAliasRequest = {
+      localAlias: data.alias,
+      bucketId: id,
+      accessKeyId: data.accessKeyId
+    }
+    await addLocalAliasMutation.mutateAsync(requestData)
+  }
+
+  const handleRemoveLocalAlias = (accessKeyId: string, alias: string) => {
+    setLocalAliasToDelete({ accessKeyId, alias })
+    setShowDeleteLocalAliasConfirm(true)
+  }
+
   const handleConfirmDeleteLocalAlias = async () => {
     if (localAliasToDelete) {
-      await removeLocalAliasMutation.mutateAsync(localAliasToDelete)
+      await removeLocalAliasMutation.mutateAsync({
+        localAlias: localAliasToDelete.alias,
+        accessKeyId: localAliasToDelete.accessKeyId
+      })
       setShowDeleteLocalAliasConfirm(false)
       setLocalAliasToDelete(null)
     }
@@ -401,6 +445,28 @@ function RouteComponent() {
     setKeyToDelete(null)
   }
 
+  const handleCloseKeySelector = () => {
+    setShowKeySelectorDialog(false)
+  }
+
+  const handleAllowBucketKeyFromDialog = async (
+    accessKeyId: string,
+    permissions: { owner?: boolean; read?: boolean; write?: boolean }
+  ) => {
+    await handleAllowBucketKey(accessKeyId, permissions)
+    setShowKeySelectorDialog(false)
+  }
+
+  const handleAddLocalAliasFromDialog = async (data: { accessKeyId: string; alias: string }) => {
+    setIsAddingLocalAlias(true)
+    try {
+      await handleAddLocalAlias(data)
+      setShowAddLocalAliasDialog(false)
+    } finally {
+      setIsAddingLocalAlias(false)
+    }
+  }
+
   React.useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(null), 5000)
@@ -433,7 +499,7 @@ function RouteComponent() {
             <path
               className='opacity-75'
               fill='currentColor'
-              d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+              d='M4 12a8 8 0 018-8V0C5.373 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
             />
           </svg>
           <p className='mt-4 text-sm text-gray-600'>Loading bucket settings...</p>
@@ -497,16 +563,19 @@ function RouteComponent() {
             sizeWarning={sizeWarning}
           />
 
-          {/* Aliases and Keys Section */}
-          <AliasesAndKeysSection
+          {/* Aliases Section */}
+          <AliasesSection
             bucket={bucket}
-            aliasTab={aliasTab}
-            setAliasTab={setAliasTab}
             onShowAddGlobalAliasDialog={() => setShowAddGlobalAliasDialog(true)}
             onShowAddLocalAliasDialog={() => setShowAddLocalAliasDialog(true)}
             onRemoveGlobalAlias={handleRemoveGlobalAlias}
             onRemoveLocalAlias={handleRemoveLocalAlias}
-            onAllowBucketKey={handleAllowBucketKey}
+          />
+
+          {/* Access Keys Section */}
+          <AccessKeysSection
+            bucket={bucket}
+            onShowKeySelectorDialog={() => setShowKeySelectorDialog(true)}
             onViewKey={handleViewKey}
             onDeleteKey={handleDeleteKey}
           />
@@ -534,14 +603,6 @@ function RouteComponent() {
         isSubmitting={addGlobalAliasMutation.isPending}
       />
 
-      {/* Add Local Alias Dialog */}
-      <AddLocalAlias
-        isOpen={showAddLocalAliasDialog}
-        onClose={() => setShowAddLocalAliasDialog(false)}
-        onSubmit={handleAddLocalAlias}
-        isSubmitting={addLocalAliasMutation.isPending}
-      />
-
       {/* Delete Global Alias Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showDeleteGlobalAliasConfirm}
@@ -552,24 +613,40 @@ function RouteComponent() {
         isConfirming={removeGlobalAliasMutation.isPending}
       />
 
+      {/* Delete Key Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteKeyConfirm}
+        title='Delete Key'
+        message={`Are you sure you want to delete the key "${keyToDelete}"? This action cannot be undone.`}
+        onConfirm={handleConfirmDeleteKey}
+        onCancel={handleCancelDeleteKey}
+        isConfirming={denyBucketKeyMutation.isPending}
+      />
+
       {/* Delete Local Alias Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showDeleteLocalAliasConfirm}
         title='Delete Local Alias'
-        message={`Are you sure you want to delete the local alias "${localAliasToDelete?.alias}" for key "${localAliasToDelete?.accessKeyId}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete local alias "${localAliasToDelete?.alias}"? This action cannot be undone.`}
         onConfirm={handleConfirmDeleteLocalAlias}
         onCancel={handleCancelDeleteLocalAlias}
         isConfirming={removeLocalAliasMutation.isPending}
       />
 
-      {/* Delete Key Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteKeyConfirm}
-        title='Remove Key Access'
-        message={`Are you sure you want to remove access for key "${keyToDelete}"? This action cannot be undone.`}
-        onConfirm={handleConfirmDeleteKey}
-        onCancel={handleCancelDeleteKey}
-        isConfirming={denyBucketKeyMutation.isPending}
+      {/* Key Selector Dialog */}
+      <KeySelectorDialog
+        isOpen={showKeySelectorDialog}
+        onClose={handleCloseKeySelector}
+        bucket={bucket}
+        onAllowKey={handleAllowBucketKeyFromDialog}
+      />
+
+      {/* Add Local Alias Dialog */}
+      <AddLocalAlias
+        isOpen={showAddLocalAliasDialog}
+        onClose={() => setShowAddLocalAliasDialog(false)}
+        onSubmit={handleAddLocalAliasFromDialog}
+        isSubmitting={isAddingLocalAlias}
       />
     </div>
   )

@@ -2,8 +2,8 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import fetcher from '~/app/fetcher'
-import type { Bucket } from './-partials/types'
+import { getBucketInfo } from '~/app/services/bucket.service'
+import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 // Code split browse tab component using React.lazy
 const ObjectBrowser = React.lazy(() =>
@@ -24,7 +24,7 @@ export const Route = createFileRoute('/(app)/buckets/$id/')({
 function bucketQuery(bucketId: string) {
   return queryOptions({
     queryKey: ['bucket', bucketId],
-    queryFn: () => fetcher<{ success: boolean; data: Bucket }>(`/bucket/${bucketId}`)
+    queryFn: () => getBucketInfo({ id: bucketId })
   })
 }
 
@@ -38,13 +38,17 @@ function formatBytes(bytes: number): string {
 }
 
 // Helper function to get bucket display name
-function getBucketDisplayName(bucket: Bucket): string {
-  // Prefer global alias, then local alias, then bucket ID
-  if (bucket.globalAliases && bucket.globalAliases.length > 0) {
-    return bucket.globalAliases[0]!
-  }
-  if (bucket.localAliases && bucket.localAliases.length > 0) {
-    return bucket.localAliases[0]!.alias
+function getBucketDisplayName(bucket: GetBucketInfoResponse): string {
+  // Prefer global alias, then bucket ID
+  if (
+    bucket.globalAliases &&
+    Array.isArray(bucket.globalAliases) &&
+    bucket.globalAliases.length > 0
+  ) {
+    const alias = bucket.globalAliases[0]
+    if (alias) {
+      return alias
+    }
   }
   return bucket.id
 }

@@ -1,5 +1,12 @@
 import * as Lucide from 'lucide-react'
-import type { AccessKey } from './types'
+import type { GetKeyInformationResponse } from '~/shared/schemas/keys.schema'
+
+// Extend the schema type with additional properties needed by the UI
+interface AccessKey extends GetKeyInformationResponse {
+  deleted?: boolean
+  neverExpires?: boolean
+  secretKeyId?: string
+}
 
 interface PermissionsSectionProps {
   accessKey: AccessKey

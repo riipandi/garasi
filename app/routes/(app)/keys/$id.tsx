@@ -4,9 +4,20 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
-import fetcher from '~/app/fetcher'
+import { listBuckets, getBucketInfo } from '~/app/services/bucket.service'
+import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
+import { getKeyInformation, updateAccessKey, deleteAccessKey } from '~/app/services/keys.service'
+import type { ApiBucketKeyPerm } from '~/shared/schemas/bucket.schema'
+import type { GetKeyInformationResponse } from '~/shared/schemas/keys.schema'
+import type { UpdateAccessKeyRequest } from '~/shared/schemas/keys.schema'
 import { KeyEdit } from './-partials/key-edit'
-import type { AccessKey, UpdateKeyRequest } from './-partials/types'
+
+// Extend the schema type with additional properties needed by the UI
+interface AccessKey extends GetKeyInformationResponse {
+  deleted?: boolean
+  neverExpires?: boolean
+  secretKeyId?: string
+}
 
 // Lazy load components for code splitting
 const KeyInformationCard = React.lazy(() =>
@@ -30,37 +41,13 @@ export const Route = createFileRoute('/(app)/keys/$id')({
 const keyDetailsQuery = (keyId: string) =>
   queryOptions({
     queryKey: ['keyDetails', keyId],
-    queryFn: () => fetcher<{ success: boolean; data: AccessKey }>(`/keys/${keyId}?secret=true`)
+    queryFn: () => getKeyInformation(keyId, { showSecretKey: 'true' })
   })
 
 const bucketsQuery = queryOptions({
   queryKey: ['buckets'],
-  queryFn: () =>
-    fetcher<{
-      success: boolean
-      data: Array<{ id: string; created: string; globalAliases: string[] }>
-    }>('/buckets')
+  queryFn: () => listBuckets()
 })
-
-interface BucketPermission {
-  read: boolean
-  write: boolean
-  owner: boolean
-}
-
-interface KeyBucketPermission {
-  accessKeyId: string
-  name: string
-  permissions: BucketPermission
-  bucketLocalAliases: string[]
-}
-
-interface BucketWithPermissions {
-  id: string
-  created: string
-  globalAliases: string[]
-  keys?: KeyBucketPermission[]
-}
 
 function RouteComponent() {
   const { id } = Route.useParams()
@@ -73,12 +60,12 @@ function RouteComponent() {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
   const [selectedBuckets, setSelectedBuckets] = React.useState<Set<string>>(new Set())
   const [bucketPermissions, setBucketPermissions] = React.useState<
-    Record<string, BucketPermission>
+    Record<string, ApiBucketKeyPerm>
   >({})
 
   // Fetch key details with secret
   const { data: keyData, isLoading: isLoadingKey } = useSuspenseQuery(keyDetailsQuery(id))
-  const accessKey = keyData?.data
+  const accessKey = (keyData?.data as AccessKey) || null
 
   // Fetch buckets
   const { data: bucketsData, isLoading: isLoadingBuckets } = useSuspenseQuery(bucketsQuery)
@@ -88,11 +75,7 @@ function RouteComponent() {
   const { data: bucketsWithPermissions, isLoading: isLoadingPermissions } = useQuery({
     queryKey: ['bucketsWithPermissions', id],
     queryFn: async () => {
-      const results = await Promise.all(
-        buckets.map((bucket) =>
-          fetcher<{ success: boolean; data: BucketWithPermissions }>(`/buckets/${bucket.id}`)
-        )
-      )
+      const results = await Promise.all(buckets.map((bucket) => getBucketInfo({ id: bucket.id })))
       return results.map((r) => r.data)
     },
     enabled: buckets.length > 0
@@ -105,12 +88,9 @@ function RouteComponent() {
       permissions
     }: {
       bucketId: string
-      permissions: BucketPermission
+      permissions: ApiBucketKeyPerm
     }) => {
-      return fetcher(`/buckets/${bucketId}/allow-key`, {
-        method: 'POST',
-        body: { accessKeyId: id, permissions }
-      })
+      return allowBucketKey(bucketId, { accessKeyId: id, permissions })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
@@ -129,12 +109,9 @@ function RouteComponent() {
       permissions
     }: {
       bucketId: string
-      permissions: BucketPermission
+      permissions: ApiBucketKeyPerm
     }) => {
-      return fetcher(`/buckets/${bucketId}/deny-key`, {
-        method: 'POST',
-        body: { accessKeyId: id, permissions }
-      })
+      return denyBucketKey(bucketId, { accessKeyId: id, permissions })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
@@ -148,14 +125,8 @@ function RouteComponent() {
 
   // Update key mutation
   const updateKeyMutation = useMutation({
-    mutationFn: async (values: UpdateKeyRequest) => {
-      return fetcher<{
-        success: boolean
-        data: AccessKey
-      }>(`/keys/${id}?secret=true`, {
-        method: 'PUT',
-        body: values
-      })
+    mutationFn: async (values: UpdateAccessKeyRequest) => {
+      return updateAccessKey(id, values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keyDetails', id] })
@@ -171,9 +142,7 @@ function RouteComponent() {
   // Delete key mutation
   const deleteKeyMutation = useMutation({
     mutationFn: async () => {
-      return fetcher<{ success: boolean }>(`/keys/${id}`, {
-        method: 'DELETE'
-      })
+      return deleteAccessKey(id)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
@@ -189,14 +158,16 @@ function RouteComponent() {
   // Initialize bucket permissions when data loads
   React.useEffect(() => {
     if (bucketsWithPermissions) {
-      const permissions: Record<string, BucketPermission> = {}
+      const permissions: Record<string, ApiBucketKeyPerm> = {}
       const selected: Set<string> = new Set()
 
       bucketsWithPermissions.forEach((bucket) => {
-        const keyPermission = bucket.keys?.find((k) => k.accessKeyId === id)
-        if (keyPermission) {
-          permissions[bucket.id] = keyPermission.permissions
-          selected.add(bucket.id)
+        if (bucket) {
+          const keyPermission = bucket.keys?.find((k) => k.accessKeyId === id)
+          if (keyPermission) {
+            permissions[bucket.id] = keyPermission.permissions
+            selected.add(bucket.id)
+          }
         }
       })
 
@@ -219,7 +190,7 @@ function RouteComponent() {
 
   const handlePermissionChange = (
     bucketId: string,
-    permission: keyof BucketPermission,
+    permission: keyof ApiBucketKeyPerm,
     value: boolean
   ) => {
     setBucketPermissions((prev) => {
@@ -257,7 +228,7 @@ function RouteComponent() {
     setShowEditDialog(true)
   }
 
-  const handleUpdateKey = async (values: UpdateKeyRequest) => {
+  const handleUpdateKey = async (values: UpdateAccessKeyRequest) => {
     await updateKeyMutation.mutateAsync(values)
   }
 

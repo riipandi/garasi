@@ -30,7 +30,13 @@ export function RecentBuckets({ buckets }: RecentBucketsProps) {
               className='flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-4 py-3'
             >
               <div className='flex-1'>
-                <p className='font-medium text-gray-900'>{bucket.globalAliases[0] || bucket.id}</p>
+                <p className='font-medium text-gray-900'>
+                  {bucket.globalAliases &&
+                  bucket.globalAliases.length > 0 &&
+                  bucket.globalAliases[0]
+                    ? bucket.globalAliases[0]
+                    : bucket.id}
+                </p>
                 <p className='text-xs text-gray-500'>{bucket.id}</p>
               </div>
               <div className='flex items-center gap-2'>

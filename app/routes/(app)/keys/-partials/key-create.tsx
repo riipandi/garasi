@@ -2,12 +2,12 @@ import { useForm } from '@tanstack/react-form'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { z } from 'zod'
-import type { CreateKeyRequest } from './types'
+import type { CreateAccessKeyRequest } from '~/shared/schemas/keys.schema'
 
 interface KeyCreateProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (values: CreateKeyRequest) => Promise<void>
+  onSubmit: (values: CreateAccessKeyRequest) => Promise<void>
   isSubmitting?: boolean
 }
 

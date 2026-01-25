@@ -9,7 +9,12 @@ import {
 } from '@tanstack/react-table'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import type { AccessKeyListItem } from './types'
+import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
+
+// Extend to add deleted property for UI
+interface AccessKeyListItem extends ListAccessKeysResponse {
+  deleted?: boolean
+}
 
 interface KeyTableProps {
   keys: AccessKeyListItem[]
@@ -59,7 +64,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
     }),
     columnHelper.accessor('created', {
       header: 'Created',
-      cell: (info) => formatDate(info.getValue())
+      cell: (info) => formatDate(info.getValue() || null)
     }),
     columnHelper.display({
       id: 'status',
