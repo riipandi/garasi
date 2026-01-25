@@ -1,9 +1,33 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import fetcher from '~/app/fetcher'
+import { getClusterStatus, getClusterStatistics } from '~/app/services/cluster.service'
 import { LayoutManagement } from './-partials/layout-management'
-import type { ClusterStatisticsResponse, ClusterStatusResponse } from './-partials/types'
+
+// Local type for statistics since the API returns freeform that needs parsing
+interface ClusterStatisticsResponse {
+  nodes: Array<{
+    id: string
+    hostname: string
+    zone: string
+    capacity: string
+    partitions: number
+    dataAvailable: {
+      used: string
+      total: string
+      percentage: number
+    }
+    metaAvailable: {
+      used: string
+      total: string
+      percentage: number
+    }
+  }>
+  clusterWide: {
+    data: string
+    metadata: string
+  }
+}
 
 export const Route = createFileRoute('/(app)/cluster/layout')({
   component: RouteComponent,
@@ -16,13 +40,12 @@ export const Route = createFileRoute('/(app)/cluster/layout')({
 // Query options
 const clusterStatusQuery = queryOptions({
   queryKey: ['cluster', 'status'],
-  queryFn: () => fetcher<{ success: boolean; data: ClusterStatusResponse }>('/cluster/status')
+  queryFn: () => getClusterStatus()
 })
 
 const clusterStatisticsQuery = queryOptions({
   queryKey: ['cluster', 'statistics'],
-  queryFn: () =>
-    fetcher<{ success: boolean; data: ClusterStatisticsResponse }>('/cluster/statistics')
+  queryFn: () => getClusterStatistics()
 })
 
 function RouteComponent() {
@@ -31,7 +54,15 @@ function RouteComponent() {
   const { data: statisticsData } = useSuspenseQuery(clusterStatisticsQuery)
 
   const status = statusData?.data
-  const statistics = statisticsData?.data
+  // Parse the freeform field to extract structured data
+  let statistics: ClusterStatisticsResponse | null = null
+  if (statisticsData?.data?.freeform) {
+    try {
+      statistics = JSON.parse(statisticsData.data.freeform)
+    } catch {
+      console.error('Failed to parse statistics freeform data')
+    }
+  }
 
   const nodes = statistics?.nodes || []
   const clusterWide = statistics?.clusterWide

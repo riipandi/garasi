@@ -153,11 +153,22 @@ export function AddLocalAlias({ isOpen, onClose, onSubmit, isSubmitting }: AddLo
             )}
           />
 
+          {/* Info Box */}
+          <div className='mt-4 rounded-md border border-purple-200 bg-purple-50 p-3'>
+            <div className='flex gap-2'>
+              <Lucide.Info className='mt-0.5 size-4 shrink-0 text-purple-600' />
+              <p className='text-xs text-purple-700'>
+                Local aliases are accessible only by the specified access key. Use lowercase
+                letters, numbers, and dashes only.
+              </p>
+            </div>
+          </div>
+
           {/* Actions */}
           <Form.Subscribe
             selector={(state) => [state.canSubmit, state.isSubmitting]}
             children={([canSubmit, isSubmittingForm]) => (
-              <div className='flex justify-end gap-3 pt-4'>
+              <div className='flex justify-end gap-3 pt-2'>
                 <button
                   type='button'
                   onClick={onClose}
@@ -199,17 +210,6 @@ export function AddLocalAlias({ isOpen, onClose, onSubmit, isSubmitting }: AddLo
             )}
           />
         </form>
-
-        {/* Info Box */}
-        <div className='mt-4 rounded-md border border-purple-200 bg-purple-50 p-3'>
-          <div className='flex gap-2'>
-            <Lucide.Info className='mt-0.5 size-4 shrink-0 text-purple-600' />
-            <p className='text-xs text-purple-700'>
-              Local aliases are accessible only by the specified access key. Use lowercase letters,
-              numbers, and dashes only.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   )

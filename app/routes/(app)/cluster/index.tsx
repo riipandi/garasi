@@ -1,8 +1,7 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import fetcher from '~/app/fetcher'
-import type { ClusterHealthResponse, ClusterStatusResponse } from './-partials/types'
+import { getClusterHealth, getClusterStatus } from '~/app/services/cluster.service'
 
 export const Route = createFileRoute('/(app)/cluster/')({
   component: RouteComponent,
@@ -15,12 +14,12 @@ export const Route = createFileRoute('/(app)/cluster/')({
 // Query options
 const clusterHealthQuery = queryOptions({
   queryKey: ['cluster', 'health'],
-  queryFn: () => fetcher<{ success: boolean; data: ClusterHealthResponse }>('/cluster/health')
+  queryFn: () => getClusterHealth()
 })
 
 const clusterStatusQuery = queryOptions({
   queryKey: ['cluster', 'status'],
-  queryFn: () => fetcher<{ success: boolean; data: ClusterStatusResponse }>('/cluster/status')
+  queryFn: () => getClusterStatus()
 })
 
 function RouteComponent() {

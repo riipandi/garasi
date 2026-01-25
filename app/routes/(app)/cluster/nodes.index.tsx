@@ -1,19 +1,18 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
-  getSortedRowModel,
-  getFilteredRowModel
-} from '@tanstack/react-table'
+import { createColumnHelper } from '@tanstack/react-table'
+import { flexRender } from '@tanstack/react-table'
+import { getCoreRowModel } from '@tanstack/react-table'
+import { useReactTable } from '@tanstack/react-table'
+import { getPaginationRowModel } from '@tanstack/react-table'
+import { getSortedRowModel } from '@tanstack/react-table'
+import { getFilteredRowModel } from '@tanstack/react-table'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import fetcher from '~/app/fetcher'
+import { getClusterStatus } from '~/app/services/cluster.service'
+import { getNodeInfo } from '~/app/services/node.service'
+import type { NodeResp } from '~/shared/schemas/cluster.schema'
 import { ConnectNodesDialog } from './-partials/connect-nodes-dialog'
-import type { NodeResp, ClusterStatusResponse, NodeInfoResponse } from './-partials/types'
 
 export const Route = createFileRoute('/(app)/cluster/nodes/')({
   component: RouteComponent,
@@ -26,12 +25,12 @@ export const Route = createFileRoute('/(app)/cluster/nodes/')({
 // Query options
 const clusterStatusQuery = queryOptions({
   queryKey: ['cluster', 'status'],
-  queryFn: () => fetcher<{ success: boolean; data: ClusterStatusResponse }>('/cluster/status')
+  queryFn: () => getClusterStatus()
 })
 
 const nodeInfoQuery = queryOptions({
   queryKey: ['cluster', 'node', 'info'],
-  queryFn: () => fetcher<NodeInfoResponse>('/node/info', { params: { node: '*' } })
+  queryFn: () => getNodeInfo({ node: '*' })
 })
 
 const columnHelper = createColumnHelper<NodeResp>()
@@ -54,7 +53,7 @@ function RouteComponent() {
   }
 
   const status = statusData?.data
-  const nodeInfo = nodeInfoData
+  const nodeInfo = nodeInfoData?.data
   const nodes = status?.nodes || []
 
   const columns = [

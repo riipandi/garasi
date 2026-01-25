@@ -1,8 +1,7 @@
 import { QueryClient, useMutation } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import fetcher from '~/app/fetcher'
-import type { ConnectNodeResponse } from './types'
+import { connectClusterNodes } from '~/app/services/cluster.service'
 
 interface ConnectNodesDialogProps {
   isOpen: boolean
@@ -16,10 +15,7 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
 
   const connectMutation = useMutation({
     mutationFn: (nodeList: string[]) =>
-      fetcher<{ success: boolean; data: ConnectNodeResponse[] }>('/cluster/connect-nodes', {
-        method: 'POST',
-        body: { nodes: nodeList.filter((n) => n.trim() !== '') }
-      }),
+      connectClusterNodes({ nodes: nodeList.filter((n) => n.trim() !== '') }),
     onSuccess: () => {
       // Invalidate cluster queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })

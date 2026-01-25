@@ -1,13 +1,13 @@
 import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import fetcher from '~/app/fetcher'
-import type {
-  ClusterLayoutResponse,
-  LayoutHistoryResponse,
-  PreviewLayoutResponse,
-  SkipDeadNodesResponse
-} from './types'
+import { getClusterLayout } from '~/app/services/layout.service'
+import { getLayoutHistory } from '~/app/services/layout.service'
+import { previewLayoutChanges } from '~/app/services/layout.service'
+import { applyClusterLayout } from '~/app/services/layout.service'
+import { updateClusterLayout } from '~/app/services/layout.service'
+import { revertClusterLayout } from '~/app/services/layout.service'
+import { skipDeadNodes } from '~/app/services/layout.service'
 
 interface LayoutManagementProps {
   layoutVersion?: number
@@ -22,16 +22,21 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
   const [selectedZone, setSelectedZone] = React.useState<string>('')
   const [selectedCapacity, setSelectedCapacity] = React.useState<string>('')
 
+  // Helper function to check if stagedRoleChanges is an array
+  const isStagedChangesArray = (changes: any): changes is any[] => {
+    return Array.isArray(changes)
+  }
+
   // Get cluster layout
   const { data: layoutData, isLoading: isLoadingLayout } = useQuery({
     queryKey: ['cluster', 'layout'],
-    queryFn: () => fetcher<{ success: boolean; data: ClusterLayoutResponse }>('/layout')
+    queryFn: () => getClusterLayout()
   })
 
   // Get layout history
   const { data: historyData } = useQuery({
     queryKey: ['cluster', 'layout', 'history'],
-    queryFn: () => fetcher<{ success: boolean; data: LayoutHistoryResponse }>('/layout/history'),
+    queryFn: () => getLayoutHistory(),
     enabled: showHistory
   })
 
@@ -40,10 +45,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
 
   // Preview layout changes
   const previewMutation = useMutation({
-    mutationFn: () =>
-      fetcher<{ success: boolean; data: PreviewLayoutResponse }>('/layout/preview', {
-        method: 'POST'
-      }),
+    mutationFn: () => previewLayoutChanges(),
     onSuccess: () => {
       setShowPreview(true)
     }
@@ -51,11 +53,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
 
   // Apply layout
   const applyMutation = useMutation({
-    mutationFn: (version: number) =>
-      fetcher<{ success: boolean; data: { message: string[] } }>('/layout/apply', {
-        method: 'POST',
-        body: { version }
-      }),
+    mutationFn: (version: number) => applyClusterLayout({ version }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })
@@ -65,11 +63,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
 
   // Update layout
   const updateMutation = useMutation({
-    mutationFn: (data: { roles: any[]; parameters: any }) =>
-      fetcher<{ success: boolean; data: ClusterLayoutResponse }>('/layout', {
-        method: 'PUT',
-        body: data
-      }),
+    mutationFn: (data: { roles: any[]; parameters: any }) => updateClusterLayout(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })
@@ -83,10 +77,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
 
   // Revert layout
   const revertMutation = useMutation({
-    mutationFn: () =>
-      fetcher<{ success: boolean; data: ClusterLayoutResponse }>('/layout/revert', {
-        method: 'POST'
-      }),
+    mutationFn: () => revertClusterLayout(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })
@@ -96,11 +87,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
 
   // Skip dead nodes
   const skipDeadMutation = useMutation({
-    mutationFn: (data: { version: number; allowMissingData: boolean }) =>
-      fetcher<{ success: boolean; data: SkipDeadNodesResponse }>('/layout/skip-dead-nodes', {
-        method: 'POST',
-        body: data
-      }),
+    mutationFn: (data: { version: number; allowMissingData: boolean }) => skipDeadNodes(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
     }
@@ -132,7 +119,10 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
     }
   }
 
-  const hasStagedChanges = layout?.stagedRoleChanges && layout.stagedRoleChanges.length > 0
+  const hasStagedChanges =
+    layout?.stagedRoleChanges &&
+    isStagedChangesArray(layout.stagedRoleChanges) &&
+    layout.stagedRoleChanges.length > 0
 
   return (
     <div className='space-y-6'>
@@ -177,14 +167,15 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
         <div className='mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4'>
           <p className='text-sm font-medium text-gray-500'>Zone Redundancy</p>
           <div className='mt-2 flex gap-2'>
-            {layout.parameters.zoneRedundancy.atLeast && (
-              <span className='rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800'>
-                At least {layout.parameters.zoneRedundancy.atLeast}
-              </span>
-            )}
-            {layout.parameters.zoneRedundancy.maximum && (
+            {typeof layout.parameters.zoneRedundancy === 'object' &&
+              layout.parameters.zoneRedundancy.atLeast && (
+                <span className='rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800'>
+                  At least {layout.parameters.zoneRedundancy.atLeast}
+                </span>
+              )}
+            {layout.parameters.zoneRedundancy === 'maximum' && (
               <span className='rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800'>
-                Max {layout.parameters.zoneRedundancy.maximum}
+                Max maximum
               </span>
             )}
           </div>
@@ -198,25 +189,30 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
             <Lucide.AlertTriangle className='mt-0.5 size-6 shrink-0 text-yellow-600' />
             <div className='flex-1'>
               <p className='text-base font-medium text-yellow-800'>
-                Staged Changes ({layout.stagedRoleChanges.length})
+                Staged Changes (
+                {isStagedChangesArray(layout.stagedRoleChanges)
+                  ? layout.stagedRoleChanges.length
+                  : 1}
+                )
               </p>
               <p className='mt-1 text-sm text-yellow-700'>
                 There are pending changes to the cluster layout. Preview and apply to make them
                 active.
               </p>
               <div className='mt-3 space-y-2'>
-                {layout.stagedRoleChanges.map((change, index) => (
-                  <div
-                    key={index}
-                    className='flex items-center gap-2 rounded-lg border border-yellow-200 bg-white p-3'
-                  >
-                    <Lucide.Edit3 className='size-4 text-yellow-600' />
-                    <span className='text-sm text-yellow-800'>
-                      {change.remove ? 'Remove' : 'Update'} node {change.id}
-                      {change.zone && ` to zone ${change.zone}`}
-                    </span>
-                  </div>
-                ))}
+                {isStagedChangesArray(layout.stagedRoleChanges) &&
+                  layout.stagedRoleChanges.map((change: any, index: number) => (
+                    <div
+                      key={index}
+                      className='flex items-center gap-2 rounded-lg border border-yellow-200 bg-white p-3'
+                    >
+                      <Lucide.Edit3 className='size-4 text-yellow-600' />
+                      <span className='text-sm text-yellow-800'>
+                        {change.remove ? 'Remove' : 'Update'} node {change.id}
+                        {change.zone && ` to zone ${change.zone}`}
+                      </span>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -477,7 +473,8 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
                   )}
                 </div>
                 <span className='text-sm text-gray-500'>
-                  {new Date(version.timestamp * 1000).toLocaleString()}
+                  {/* Version timestamp not available in shared schema */}
+                  Layout version {version.version}
                 </span>
               </div>
             ))}
@@ -493,14 +490,12 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
             <div className='flex-1'>
               <p className='text-base font-medium text-blue-800'>Preview Results</p>
               <div className='mt-2 space-y-2'>
-                {'message' in previewMutation.data.data ? (
-                  previewMutation.data.data.message.map((msg: string, index: number) => (
-                    <p key={index} className='text-sm text-blue-700'>
-                      • {msg}
-                    </p>
-                  ))
+                {previewMutation.data.data.message ? (
+                  <p className='text-sm text-blue-700'>{previewMutation.data.data.message}</p>
                 ) : (
-                  <p className='text-sm text-red-700'>Error: {previewMutation.data.data.error}</p>
+                  <p className='text-sm text-red-700'>
+                    Error: {previewMutation.data.data.error || 'Unknown error'}
+                  </p>
                 )}
               </div>
             </div>
