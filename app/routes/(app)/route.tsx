@@ -125,7 +125,7 @@ function RouteComponent() {
 
                 <nav className='space-y-0.5'>
                   <NavLink to='/' icon={Lucide.LayoutDashboard} label='Dashboard' exact />
-                  <NavLink to='/metrics' icon={Lucide.GanttChartSquare} label='Metrics' />
+                  {/* <NavLink to='/metrics' icon={Lucide.GanttChartSquare} label='Metrics' /> */}
                   <NavLink to='/cluster' icon={Lucide.Server} label='Cluster' />
                   <NavLink to='/buckets' icon={Lucide.Database} label='Buckets' exact />
                   <NavLink to='/keys' icon={Lucide.KeyRound} label='Access Keys' />
