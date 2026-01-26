@@ -21,7 +21,7 @@
 ---
 
 A modern web-based GUI for [Garage S3](https://garagehq.deuxfleurs.fr/), a distributed object
-storage system. Built with React, TanStack Router/Query/Form/Table, Tailwind CSS v4, and Bun,
+storage system. Built with React, TanStack Router/Query/Form/Table, Tailwind CSS, and Bun,
 Garasi provides a full-stack management interface featuring Nitro 3 server with SQLite/Kysely
 persistence and type-safe operations with Zod schema validation. Designed for simplicity and
 developer experience, it includes Docker-ready multi-stage builds with healthcheck monitoring,
@@ -29,7 +29,7 @@ making deployment seamless across environments.
 
 ## Features
 
-- **Modern Stack**: React, TanStack (Router, Query, Form, Table), Tailwind CSS v4, Bun.
+- **Modern Stack**: React, TanStack (Router, Query, Form, Table), Tailwind CSS, Bun.
 - **Full-Stack**: Nitro 3 server with SQLite database via Kysely.
 - **Docker Ready**: Multi-stage builds with healthcheck monitoring.
 - **Type-Safe**: TypeScript with Zod schema validation.
@@ -38,13 +38,13 @@ making deployment seamless across environments.
 
 ### Using Docker Compose
 
-```bash
+```sh
 docker compose up --detach --remove-orphans
 ```
 
 ### Development
 
-```bash
+```sh
 cp .env.example .env.local
 bun install
 bun run dev
@@ -54,7 +54,7 @@ bun run dev
 
 Generate required secrets:
 
-```bash
+```sh
 openssl rand -hex 32      # For GARAGE_RPC_SECRET
 openssl rand -base64 32   # For GARAGE_ADMIN_TOKEN, GARAGE_METRICS_TOKEN, SECRET_KEY
 ```
@@ -69,8 +69,7 @@ See [`.env.example`](./.env.example) for all available options.
 
 ## License
 
-Licensed under the [MIT license](https://www.tldrlegal.com/license/mit-license).
-
+Licensed under the [Apache 2.0 license](https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0).
 See the [LICENSE](./LICENSE) file for more information.
 
 ---
