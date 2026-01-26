@@ -5,13 +5,13 @@
         <img src="https://img.shields.io/github/v/release/riipandi/garasi?logo=docker&logoColor=white&color=orange" alt="Release">
     </a>
     <a href="https://github.com/riipandi/garasi">
-        <img src="https://img.shields.io/github/repo-size/riipandi/garasi?color=teal" alt="Repo Size">
+        <img src="https://img.shields.io/github/repo-size/riipandi/garasi?color=red" alt="Repo Size">
     </a>
     <a href="https://github.com/riipandi/garasi/blob/main/LICENSE">
-        <img src="https://img.shields.io/github/license/riipandi/garasi?color=green" alt="License">
+        <img src="https://img.shields.io/github/license/riipandi/garasi?color=blue" alt="License">
     </a>
     <a href="https://github.com/riipandi/garasi/graphs/contributors">
-        <img src="https://img.shields.io/badge/Contributions-welcome-gray.svg?labelColor=blue" alt="Contributions welcome">
+        <img src="https://img.shields.io/badge/Contributions-welcome-gray.svg?labelColor=green" alt="Contributions welcome">
     </a>
     <!-- <a href="https://github.com/riipandi/garasi/actions/workflows/build.yaml">
         <img src="https://github.com/riipandi/garasi/actions/workflows/build.yaml/badge.svg?event=workflow_dispatch" alt="CI Build">
