@@ -19,7 +19,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2023",
-    "tsBuildInfoFile": "./node_modules/tsconfig.app.tsbuildinfo",
+    "tsBuildInfoFile": "./node_modules/tsconfig_app.tsbuildinfo",
     "types": ["vite/client"],
     "useDefineForClassFields": true,
     "verbatimModuleSyntax": true,
@@ -28,5 +28,5 @@
     }
   },
   "include": ["app", "server", "shared", "stories"],
-  "exclude": [".output", "storage", "temp", "vite.config.ts", "vitest.config.ts"]
+  "exclude": [".output", "storage", "temp", "vite.config.ts"]
 }

@@ -21,10 +21,10 @@
     "strict": true,
     "strictPropertyInitialization": true,
     "target": "ES2023",
-    "tsBuildInfoFile": "./node_modules/tsconfig.bun.tsbuildinfo",
+    "tsBuildInfoFile": "./node_modules/tsconfig_bun.tsbuildinfo",
     "types": ["bun"],
     "verbatimModuleSyntax": true
   },
-  "include": ["vite.config.ts", "vitest.config.ts", ".storybook"],
+  "include": ["vite.config.ts", ".storybook"],
   "exclude": [".output", "storage", "temp"]
 }

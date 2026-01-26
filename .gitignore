@@ -19,6 +19,7 @@ npm-debug.log*
 !.vscode/settings.json
 !.vscode/launch.json
 !.vscode/mcp.json
+!.vscode/tasks.json
 *.bak
 
 # SQLite
