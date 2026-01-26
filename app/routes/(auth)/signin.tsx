@@ -3,8 +3,8 @@ import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-r
 import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
-import { Alert } from '~/app/components/alert'
 import { PasswordInput } from '~/app/components/password-input'
+import { Alert } from '~/app/components/selia/alert'
 import { useAuth } from '~/app/guards'
 import type { SigninRequest } from '~/app/types/api'
 
@@ -95,9 +95,13 @@ function RouteComponent() {
               Form.handleSubmit()
             }}
           >
-            {search.message && <Alert type={search.type || 'success'}>{search.message}</Alert>}
+            {search.message && (
+              <Alert variant={search.type === 'success' ? 'success' : 'danger'}>
+                {search.message}
+              </Alert>
+            )}
 
-            {submitError && <Alert type='error'>{submitError}</Alert>}
+            {submitError && <Alert variant='danger'>{submitError}</Alert>}
 
             <Form.Field
               name='email'

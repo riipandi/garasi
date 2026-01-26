@@ -2,8 +2,8 @@ import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Alert } from '~/app/components/alert'
 import { PasswordInput } from '~/app/components/password-input'
+import { Alert } from '~/app/components/selia/alert'
 import fetcher from '~/app/fetcher'
 
 // Zod schema for form validation
@@ -85,7 +85,7 @@ function RouteComponent() {
 
         {changeEmailMutation.isSuccess && (
           <div className='mb-4'>
-            <Alert type='success'>
+            <Alert variant='success'>
               <div className='space-y-1'>
                 <p className='font-medium'>Email change request sent!</p>
                 <p className='text-sm opacity-90'>
@@ -99,7 +99,7 @@ function RouteComponent() {
 
         {changeEmailMutation.error && (
           <div className='mb-4'>
-            <Alert type='error'>
+            <Alert variant='danger'>
               {changeEmailMutation.error instanceof Error
                 ? changeEmailMutation.error.message
                 : 'Failed to request email change. Please try again.'}

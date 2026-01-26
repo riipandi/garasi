@@ -2,9 +2,9 @@ import { useForm } from '@tanstack/react-form'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
-import { Alert } from '~/app/components/alert'
 import { PasswordInput } from '~/app/components/password-input'
 import { PasswordStrength } from '~/app/components/password-strength'
+import { Alert } from '~/app/components/selia/alert'
 import fetcher from '~/app/fetcher'
 
 interface ResetPasswordLoaderData {
@@ -112,7 +112,7 @@ function RouteComponent() {
           {isInvalidToken ? (
             // Show error for invalid token
             <div className='space-y-6'>
-              <Alert type='error'>
+              <Alert variant='danger'>
                 <div className='flex items-start gap-3'>
                   <svg className='mt-0.5 size-5 shrink-0' fill='currentColor' viewBox='0 0 20 20'>
                     <path
@@ -147,7 +147,7 @@ function RouteComponent() {
           ) : isSuccess ? (
             // Success state
             <div className='space-y-6'>
-              <Alert type='success'>
+              <Alert variant='success'>
                 <div className='flex items-start gap-3'>
                   <svg className='mt-0.5 size-5 shrink-0' fill='currentColor' viewBox='0 0 20 20'>
                     <path
@@ -180,7 +180,9 @@ function RouteComponent() {
                 Form.handleSubmit()
               }}
             >
-              {Form.state.errors.length > 0 && <Alert type='error'>{Form.state.errors[0]}</Alert>}
+              {Form.state.errors.length > 0 && (
+                <Alert variant='danger'>{Form.state.errors[0]}</Alert>
+              )}
 
               <Form.Field
                 name='password'

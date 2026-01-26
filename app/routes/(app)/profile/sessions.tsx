@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { decodeJwt } from 'jose'
 import * as Lucide from 'lucide-react'
-import { Alert } from '~/app/components/alert'
+import { Alert } from '~/app/components/selia/alert'
 import fetcher from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 
@@ -162,7 +162,7 @@ function RouteComponent() {
   if (error) {
     return (
       <div className='mx-auto w-full max-w-4xl'>
-        <Alert type='error'>Failed to load sessions. Please try again later.</Alert>
+        <Alert variant='danger'>Failed to load sessions. Please try again later.</Alert>
       </div>
     )
   }
@@ -201,13 +201,13 @@ function RouteComponent() {
 
         {revokeAllOtherSessionsMutation.isSuccess && (
           <div className='mb-4'>
-            <Alert type='success'>All other sessions have been revoked successfully!</Alert>
+            <Alert variant='success'>All other sessions have been revoked successfully!</Alert>
           </div>
         )}
 
         {revokeAllSessionsMutation.isSuccess && (
           <div className='mb-4'>
-            <Alert type='success'>All sessions have been revoked successfully!</Alert>
+            <Alert variant='success'>All sessions have been revoked successfully!</Alert>
           </div>
         )}
 

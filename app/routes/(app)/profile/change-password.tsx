@@ -2,9 +2,9 @@ import { useForm } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Alert } from '~/app/components/alert'
 import { PasswordInput } from '~/app/components/password-input'
 import { PasswordStrength } from '~/app/components/password-strength'
+import { Alert } from '~/app/components/selia/alert'
 import fetcher from '~/app/fetcher'
 
 // Zod schema for form validation
@@ -81,13 +81,13 @@ function RouteComponent() {
 
         {changePasswordMutation.isSuccess && (
           <div className='mb-4'>
-            <Alert type='success'>Password changed successfully!</Alert>
+            <Alert variant='success'>Password changed successfully!</Alert>
           </div>
         )}
 
         {changePasswordMutation.error && (
           <div className='mb-4'>
-            <Alert type='error'>
+            <Alert variant='danger'>
               {changePasswordMutation.error instanceof Error
                 ? changePasswordMutation.error.message
                 : 'Failed to change password. Please try again.'}

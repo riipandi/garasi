@@ -2,8 +2,8 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/alert'
 import { ConfirmDialog } from '~/app/components/confirm-dialog'
+import { Alert } from '~/app/components/selia/alert'
 import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
 import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
@@ -535,12 +535,12 @@ function RouteComponent() {
           {/* Alerts */}
           {successMessage && (
             <div className='mx-auto w-full'>
-              <Alert type='success'>{successMessage}</Alert>
+              <Alert variant='success'>{successMessage}</Alert>
             </div>
           )}
           {errorMessage && (
             <div className='mx-auto w-full'>
-              <Alert type='error'>{errorMessage}</Alert>
+              <Alert variant='danger'>{errorMessage}</Alert>
             </div>
           )}
 

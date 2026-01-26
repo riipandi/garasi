@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import { queryOptions, useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Alert } from '~/app/components/alert'
+import { Alert } from '~/app/components/selia/alert'
 import fetcher from '~/app/fetcher'
 import type { UserProfileResponse } from '~/app/types/api'
 
@@ -90,7 +90,7 @@ function RouteComponent() {
   }
 
   if (error) {
-    return <Alert type='error'>Failed to load profile. Please try again later.</Alert>
+    return <Alert variant='danger'>Failed to load profile. Please try again later.</Alert>
   }
 
   return (
@@ -103,13 +103,13 @@ function RouteComponent() {
 
         {updateProfileMutation.isSuccess && (
           <div className='mb-4'>
-            <Alert type='success'>Profile updated successfully!</Alert>
+            <Alert variant='success'>Profile updated successfully!</Alert>
           </div>
         )}
 
         {updateProfileMutation.error && (
           <div className='mb-4'>
-            <Alert type='error'>
+            <Alert variant='danger'>
               {updateProfileMutation.error instanceof Error
                 ? updateProfileMutation.error.message
                 : 'Failed to update profile. Please try again.'}
