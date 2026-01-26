@@ -1,8 +1,12 @@
+/// <reference types="vitest/config" />
+
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import type { Config as RouterConfig } from '@tanstack/router-plugin/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
+import { playwright } from '@vitest/browser-playwright'
 import type { NitroConfig } from 'nitro/types'
 import { nitro } from 'nitro/vite'
 import { isProduction } from 'std-env'
@@ -47,5 +51,25 @@ export default defineConfig({
     watch: {
       ignored: ['**/docs/**', '**/specs/**', '**/scripts/**']
     }
+  },
+  test: {
+    projects: [
+      {
+        extends: true,
+        // The plugin will run tests for the stories defined in your Storybook config
+        // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+        plugins: [storybookTest({ configDir: '.storybook' })],
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [{ browser: 'chromium' }]
+          },
+          setupFiles: ['.storybook/vitest.setup.ts']
+        }
+      }
+    ]
   }
 })
