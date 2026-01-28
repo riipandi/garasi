@@ -3,6 +3,12 @@ import { getCoreRowModel, getFilteredRowModel } from '@tanstack/react-table'
 import { getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { Badge } from '~/app/components/badge'
+import { Button } from '~/app/components/button'
+import { IconBox } from '~/app/components/icon-box'
+import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
 
 interface BucketTableProps {
@@ -29,17 +35,17 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       header: 'Bucket ID',
       cell: (info) => (
         <div className='flex items-center gap-2'>
-          <code className='font-mono text-sm'>{info.getValue()}</code>
+          <Text className='font-mono text-sm'>{info.getValue()}</Text>
           <button
             type='button'
             onClick={(e) => {
               e.stopPropagation()
               navigator.clipboard.writeText(info.getValue())
             }}
-            className='text-gray-400 transition-colors hover:text-gray-600'
+            className='text-dimmed hover:text-foreground transition-colors'
             title='Copy Bucket ID'
           >
-            <Lucide.Copy className='h-3.5 w-3.5' />
+            <Lucide.Copy className='size-3.5' />
           </button>
         </div>
       ),
@@ -56,18 +62,15 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       cell: (info) => {
         const aliases = info.getValue<string[]>()
         return aliases.length > 0 ? (
-          <div className='flex flex-wrap gap-1'>
+          <Stack direction='row'>
             {aliases.map((alias) => (
-              <span
-                key={alias}
-                className='inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800'
-              >
+              <Badge key={alias} variant='success' size='sm' pill>
                 {alias}
-              </span>
+              </Badge>
             ))}
-          </div>
+          </Stack>
         ) : (
-          <span className='text-gray-400'>None</span>
+          <Text className='text-dimmed'>None</Text>
         )
       }
     }),
@@ -76,19 +79,21 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       cell: (info) => {
         const aliases = info.getValue<{ accessKeyId: string; alias: string }[]>()
         return aliases.length > 0 ? (
-          <div className='flex flex-wrap gap-1'>
+          <Stack direction='row'>
             {aliases.map((alias, index) => (
-              <span
-                key={index}
-                className='inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800'
+              <Badge
+                key={`${alias.accessKeyId}-${alias.alias}-${index}`}
+                variant='primary'
+                size='sm'
+                pill
                 title={`Key: ${alias.accessKeyId}`}
               >
                 {alias.alias}
-              </span>
+              </Badge>
             ))}
-          </div>
+          </Stack>
         ) : (
-          <span className='text-gray-400'>None</span>
+          <Text className='text-dimmed'>None</Text>
         )
       }
     }),
@@ -99,17 +104,18 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
         const bucket = info.row.original
         return (
           <div className='mx-2 flex justify-center'>
-            <button
+            <Button
               type='button'
+              variant='danger'
+              size='sm-icon'
               onClick={(e) => {
                 e.stopPropagation()
                 onDelete(bucket.id)
               }}
-              className='rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none'
               title='Delete Bucket'
             >
               <Lucide.Trash2 className='size-4' />
-            </button>
+            </Button>
           </div>
         )
       }
@@ -129,45 +135,44 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
     getFilteredRowModel: getFilteredRowModel()
   })
 
-  // Skeleton loader for table rows
   const TableSkeleton = () => (
-    <div className='overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
-      <table className='min-w-full divide-y divide-gray-200'>
-        <thead className='bg-gray-50'>
+    <div className='border-border bg-background overflow-x-auto rounded-lg border shadow-sm'>
+      <table className='divide-border min-w-full divide-y'>
+        <thead className='bg-muted/30'>
           <tr>
-            <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
+            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
               Bucket ID
             </th>
-            <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
+            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
               Created
             </th>
-            <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
+            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
               Global Aliases
             </th>
-            <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
+            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
               Local Aliases
             </th>
-            <th className='w-16 px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'></th>
+            <th className='text-muted-foreground w-16 px-6 py-3 text-right text-xs font-medium tracking-wider uppercase'></th>
           </tr>
         </thead>
-        <tbody className='divide-y divide-gray-200'>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <tr key={index} className='animate-pulse'>
+        <tbody className='divide-border divide-y'>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <tr key={`skeleton-row-${i}`} className='animate-pulse'>
               <td className='px-6 py-4'>
-                <div className='h-4 w-64 rounded bg-gray-200' />
+                <div className='bg-muted h-4 w-64 rounded' />
               </td>
               <td className='px-6 py-4'>
-                <div className='h-4 w-32 rounded bg-gray-200' />
+                <div className='bg-muted h-4 w-32 rounded' />
               </td>
               <td className='px-6 py-4'>
-                <div className='h-4 w-40 rounded bg-gray-200' />
+                <div className='bg-muted h-4 w-40 rounded' />
               </td>
               <td className='px-6 py-4'>
-                <div className='h-4 w-40 rounded bg-gray-200' />
+                <div className='bg-muted h-4 w-40 rounded' />
               </td>
               <td className='px-6 py-4'>
                 <div className='flex justify-end'>
-                  <div className='h-8 w-8 rounded bg-gray-200' />
+                  <div className='bg-muted h-8 w-8 rounded' />
                 </div>
               </td>
             </tr>
@@ -178,59 +183,68 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
   )
 
   return (
-    <div className='space-y-4'>
-      {/* Search/Filter Input */}
-      <div className='relative'>
-        <div className='pointer-events-none absolute left-3 flex h-full items-center'>
-          <Lucide.Search className='size-4 text-gray-400' />
-        </div>
+    <Stack>
+      <InputGroup>
+        <InputGroupAddon align='start'>
+          <Lucide.Search className='text-dimmed size-4' />
+        </InputGroupAddon>
         <input
           type='text'
           value={filtering}
           onChange={(e) => setFiltering(e.target.value)}
           placeholder='Search buckets by ID or alias...'
           disabled={isLoading}
-          className='w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+          className='text-foreground flex-1 bg-transparent py-2 pr-4 pl-2 text-sm ring-0 outline-none disabled:cursor-not-allowed disabled:opacity-50'
         />
         {filtering && !isLoading && (
-          <button
-            type='button'
-            onClick={() => setFiltering('')}
-            className='absolute top-1.5 right-2 rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none'
-            title='Clear search'
-          >
-            <Lucide.X className='size-4' />
-          </button>
+          <InputGroupAddon align='end'>
+            <Button
+              type='button'
+              variant='plain'
+              size='xs-icon'
+              onClick={() => setFiltering('')}
+              title='Clear search'
+            >
+              <Lucide.X className='size-4' />
+            </Button>
+          </InputGroupAddon>
         )}
-      </div>
+      </InputGroup>
 
-      {/* Table */}
       {isLoading ? (
         <TableSkeleton />
       ) : table.getRowModel().rows.length === 0 && buckets.length > 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-          <Lucide.Search className='mb-4 h-16 w-16 text-gray-400' />
-          <h3 className='text-lg font-medium text-gray-900'>No buckets found</h3>
-          <p className='text-normal mt-2 text-gray-500'>Try adjusting your search or filters.</p>
+        <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+          <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+            <Lucide.Search className='size-16' />
+          </IconBox>
+          <Stack>
+            <Text className='font-semibold'>No buckets found</Text>
+            <Text className='text-muted-foreground'>Try adjusting your search or filters.</Text>
+          </Stack>
         </div>
       ) : buckets.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-          <Lucide.Database className='mb-4 h-16 w-16 text-gray-400' />
-          <h3 className='text-lg font-medium text-gray-900'>No buckets found</h3>
-          <p className='text-normal mt-2 text-gray-500'>
-            Get started by creating your first bucket to store your data.
-          </p>
+        <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+          <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+            <Lucide.Database className='size-16' />
+          </IconBox>
+          <Stack>
+            <Text className='font-semibold'>No buckets found</Text>
+            <Text className='text-muted-foreground'>
+              Get started by creating your first bucket to store your data.
+            </Text>
+          </Stack>
         </div>
       ) : (
-        <div className='overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
-          <table className='min-w-full divide-y divide-gray-200'>
-            <thead className='bg-gray-50'>
+        <div className='border-border bg-background overflow-x-auto rounded-lg border shadow-sm'>
+          <table className='divide-border min-w-full divide-y'>
+            <thead className='bg-muted/30'>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className={`px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase ${
+                      className={`text-muted-foreground px-6 py-3 text-xs font-medium tracking-wider uppercase ${
                         header.id === 'delete' ? 'w-16 text-right' : 'text-left'
                       }`}
                     >
@@ -242,11 +256,11 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
                 </tr>
               ))}
             </thead>
-            <tbody className='divide-y divide-gray-200'>
+            <tbody className='divide-border divide-y'>
               {table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className='cursor-pointer transition-colors hover:bg-gray-50'
+                  className='hover:bg-muted/50 cursor-pointer transition-colors'
                   onClick={() => {
                     const bucketId = row.original.id
                     window.location.href = `/buckets/${bucketId}`
@@ -255,7 +269,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
-                      className={`px-6 py-3 text-sm whitespace-nowrap text-gray-900 ${
+                      className={`text-foreground px-6 py-3 text-sm whitespace-nowrap ${
                         cell.column.id === 'delete' ? 'text-right' : ''
                       }`}
                     >
@@ -268,6 +282,6 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           </table>
         </div>
       )}
-    </div>
+    </Stack>
   )
 }

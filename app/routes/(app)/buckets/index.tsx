@@ -14,6 +14,10 @@ import {
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
+import { Heading } from '~/app/components/heading'
+import { IconBox } from '~/app/components/icon-box'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import { createBucket, deleteBucket, listBuckets } from '~/app/services/bucket.service'
 import type { CreateBucketRequest } from '~/shared/schemas/bucket.schema'
 import { BucketCreate } from './-partials/bucket-create'
@@ -40,11 +44,9 @@ function RouteComponent() {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
-  // Fetch buckets
   const { data: bucketsResponse } = useSuspenseQuery(bucketsQueryOpts)
   const buckets = bucketsResponse?.data ?? []
 
-  // Create bucket mutation
   const createBucketMutation = useMutation({
     mutationFn: async (values: CreateBucketRequest) => {
       return createBucket(values)
@@ -59,7 +61,6 @@ function RouteComponent() {
     }
   })
 
-  // Delete bucket mutation
   const deleteBucketMutation = useMutation({
     mutationFn: async (bucketId: string) => {
       return deleteBucket(bucketId)
@@ -125,93 +126,59 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
-      {/* Page Header */}
-      <div className='min-w-0 flex-1'>
-        <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>Buckets</h1>
-        <p className='text-normal mt-2 text-gray-500'>Manage your S3 buckets</p>
-      </div>
+      <Stack>
+        <Heading size='lg'>Buckets</Heading>
+        <Text>Manage your S3 buckets</Text>
+      </Stack>
 
-      {/* Page Content */}
-      <div className='min-w-0 flex-1'>
-        <div className='space-y-4'>
-          {/* Action Buttons */}
-          <div className='flex flex-wrap gap-2'>
-            <button
-              type='button'
-              onClick={handleShowCreateDialog}
-              className='flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-            >
-              <Lucide.Plus className='size-4' />
-              Create Bucket
-            </button>
-            <button
-              type='button'
-              onClick={handleRefreshBuckets}
-              disabled={isRefreshing}
-              className={`flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
-                isRefreshing ? 'animate-pulse' : ''
-              }`}
-            >
-              {isRefreshing ? (
-                <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                  <circle
-                    className='opacity-25'
-                    cx='12'
-                    cy='12'
-                    r='10'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                  />
-                  <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                  />
-                </svg>
-              ) : (
-                <Lucide.RefreshCw className='size-4' />
-              )}
-              {isRefreshing ? 'Refreshing...' : 'Refresh'}
-            </button>
-          </div>
-
-          {/* Alerts */}
-          {successMessage && (
-            <div className='mx-auto w-full'>
-              <Alert variant='success'>{successMessage}</Alert>
-            </div>
-          )}
-          {errorMessage && (
-            <div className='mx-auto w-full'>
-              <Alert variant='danger'>{errorMessage}</Alert>
-            </div>
-          )}
-
-          {/* Bucket List */}
-          <BucketTable buckets={buckets} onDelete={handleDeleteBucket} isLoading={isRefreshing} />
-
-          {/* Info Box */}
-          <div
-            className='rounded-lg border border-blue-200 bg-blue-50 p-4'
-            role='region'
-            aria-label='Information'
+      <Stack>
+        <div className='flex flex-wrap gap-2'>
+          <Button
+            variant='primary'
+            onClick={handleShowCreateDialog}
           >
-            <div className='flex gap-3'>
-              <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' aria-hidden='true' />
-              <div>
-                <h4 className='text-sm font-medium text-blue-900'>Information</h4>
-                <p className='mt-1 text-xs text-blue-700'>
+            <Lucide.Plus className='size-4' />
+            Create Bucket
+          </Button>
+          <Button
+            variant='outline'
+            onClick={handleRefreshBuckets}
+            disabled={isRefreshing}
+            progress={isRefreshing}
+          >
+            <Lucide.RefreshCw className='size-4' />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+        </div>
+
+        {successMessage && (
+          <Alert variant='success'>{successMessage}</Alert>
+        )}
+        {errorMessage && (
+          <Alert variant='danger'>{errorMessage}</Alert>
+        )}
+
+        <BucketTable buckets={buckets} onDelete={handleDeleteBucket} isLoading={isRefreshing} />
+
+        <div className='overflow-hidden rounded-lg border border-info/20 bg-info/5 p-4'>
+          <div className='flex gap-3'>
+            <IconBox variant='info' size='md'>
+              <Lucide.Info className='size-5' />
+            </IconBox>
+            <div className='flex-1'>
+              <Stack>
+                <Heading level={4} size='sm'>Information</Heading>
+                <Text>
                   Buckets are containers for objects stored in Garage. Each bucket can have global
                   aliases (accessible by all keys) or local aliases (accessible only by specific
                   keys). Click on a bucket ID to view details and manage its settings.
-                </p>
-              </div>
+                </Text>
+              </Stack>
             </div>
           </div>
         </div>
-      </div>
+      </Stack>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogPopup>
           <AlertDialogHeader>
@@ -231,6 +198,7 @@ function RouteComponent() {
                   variant='danger'
                   onClick={handleConfirmDelete}
                   disabled={deleteBucketMutation.isPending}
+                  progress={deleteBucketMutation.isPending}
                 >
                   {deleteBucketMutation.isPending ? 'Deleting...' : 'Delete'}
                 </Button>
@@ -240,7 +208,6 @@ function RouteComponent() {
         </AlertDialogPopup>
       </AlertDialog>
 
-      {/* Bucket Create Dialog */}
       <BucketCreate
         isOpen={showCreateDialog}
         onClose={handleCancelCreateDialog}
