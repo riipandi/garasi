@@ -115,7 +115,7 @@ export function UploadFileDialog({
             onDrop={handleDrop}
           >
             <div
-              className={`bg-muted/30 mt-4 rounded-lg border-2 border-dashed px-6 py-8 text-center transition-all ${
+              className={`bg-muted/5 mt-4 rounded-lg border-2 border-dashed px-6 py-8 text-center transition-all ${
                 dragActive ? 'border-primary bg-primary/10' : 'border-border'
               }`}
             >
@@ -133,7 +133,7 @@ export function UploadFileDialog({
               />
             </div>
             {selectedFiles.length > 0 && (
-              <div className='border-border bg-muted/30 mt-4 rounded-lg border p-3'>
+              <div className='border-border bg-muted/5 mt-4 rounded-lg border p-3'>
                 <Text className='mb-2 text-sm font-medium'>
                   {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
                 </Text>

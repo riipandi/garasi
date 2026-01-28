@@ -67,12 +67,7 @@ function RouteComponent() {
         <Navbar user={user} logoutFn={handleLogout} />
       </div>
       <main className={clx('transition-all', sidebarOpen ? 'xl:ml-72' : 'xl:ml-0')}>
-        <nav
-          className={clx(
-            'flex h-14 items-center gap-2.5 max-lg:px-4',
-            sidebarOpen ? 'xl:pr-4 xl:pl-2' : 'xl:px-4'
-          )}
-        >
+        <nav className='flex h-16 items-center gap-2.5 px-4'>
           <Button variant='plain' size='sm-icon' onClick={handleSidebarOpen}>
             {sidebarOpen ? <Lucide.SidebarCloseIcon /> : <Lucide.SidebarOpenIcon />}
           </Button>

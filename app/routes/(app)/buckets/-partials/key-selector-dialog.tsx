@@ -96,7 +96,7 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
               <Text className='text-muted-foreground mt-3 text-sm'>Loading keys...</Text>
             </div>
           ) : availableKeys.length === 0 ? (
-            <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-12'>
+            <div className='border-border bg-muted/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-12'>
               <IconBox variant='tertiary-subtle' size='lg' circle>
                 <Lucide.Lock className='size-6' />
               </IconBox>
@@ -202,7 +202,7 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                 </div>
               </div>
 
-              <div className='border-border bg-muted/30 rounded-lg border p-4'>
+              <div className='border-border bg-muted/5 rounded-lg border p-4'>
                 <Text className='text-muted-foreground mb-3 block text-xs font-semibold tracking-wider uppercase'>
                   Permissions
                 </Text>

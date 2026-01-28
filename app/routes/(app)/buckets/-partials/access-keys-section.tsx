@@ -92,7 +92,7 @@ export function AccessKeysSection({
             ))}
           </Stack>
         ) : (
-          <div className='border-border bg-muted/30 flex items-center gap-4 rounded-lg border-2 border-dashed px-4 py-4'>
+          <div className='border-border bg-muted/5 flex items-center gap-4 rounded-lg border-2 border-dashed px-4 py-4'>
             <IconBox variant='tertiary-subtle' size='md' circle>
               <Lucide.Lock className='size-6' />
             </IconBox>

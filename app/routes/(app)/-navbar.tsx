@@ -53,7 +53,7 @@ function renderNavItem(item: NavItem) {
 function renderNavGroup(group: NavGroup, index: number) {
   return (
     <SidebarGroup key={`${index}-${group.title}`}>
-      {group.title && <SidebarGroupTitle>{group.title}</SidebarGroupTitle>}
+      {group.title ? <SidebarGroupTitle>{group.title}</SidebarGroupTitle> : null}
       <SidebarList>{group.items.map((item) => renderNavItem(item))}</SidebarList>
     </SidebarGroup>
   )
@@ -81,11 +81,14 @@ export function Navbar({ user, logoutFn }: NavbarProps) {
   const navGroups = [overviewGroup, primaryGroup, secondaryGroup]
 
   return (
-    <Sidebar size='loose' className='bg-background border-border max-lg:border-r xl:bg-gray-50'>
+    <Sidebar
+      size='loose'
+      className='bg-background border-border max-lg:border-r xl:bg-neutral-50 dark:xl:bg-neutral-950'
+    >
       <SidebarHeader>
-        <SidebarLogo className='px-2 py-1'>
+        <SidebarLogo className='-mx-4 -mt-2 px-6 pt-4'>
           <img src='/images/vite.svg' alt='Garasi' className='size-6' />
-          <span className='font-semibold'>Garasi</span>
+          <span className='font-semibold'>Garage S3 Console</span>
         </SidebarLogo>
       </SidebarHeader>
       <SidebarContent>

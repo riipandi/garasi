@@ -209,7 +209,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
       {isLoading ? (
         <TableSkeleton />
       ) : table.getRowModel().rows.length === 0 && keys.length > 0 ? (
-        <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-muted/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.Search className='size-16' />
           </IconBox>
@@ -219,7 +219,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
           </Stack>
         </div>
       ) : keys.length === 0 ? (
-        <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-muted/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.KeyRound className='size-16' />
           </IconBox>

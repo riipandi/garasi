@@ -126,7 +126,7 @@ export function AliasesSection({
             ))}
           </Stack>
         ) : (
-          <div className='border-border bg-muted/30 flex flex-col items-center gap-6 rounded-lg border-2 border-dashed p-8'>
+          <div className='border-border bg-muted/5 flex flex-col items-center gap-6 rounded-lg border-2 border-dashed p-8'>
             <IconBox variant='tertiary-subtle' size='lg' circle>
               <Lucide.Link2 className='size-12' />
             </IconBox>
