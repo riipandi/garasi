@@ -3,7 +3,16 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { z } from 'zod'
 import { Checkbox } from '~/app/components/checkbox'
-import { Dialog, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogPopup, DialogTitle } from '~/app/components/dialog'
+import {
+  Dialog,
+  DialogBody,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogPopup,
+  DialogTitle
+} from '~/app/components/dialog'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
@@ -113,7 +122,9 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
                     disabled={isSubmitting}
                   />
                   {field.state.meta.errors[0] && (
-                    <p className='mt-1 text-xs text-red-600'>{String(field.state.meta.errors[0])}</p>
+                    <p className='mt-1 text-xs text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </p>
                   )}
                 </div>
               )}

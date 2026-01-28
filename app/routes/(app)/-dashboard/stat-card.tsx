@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import { Card, CardBody } from '~/app/components/card'
+import { IconBox } from '~/app/components/icon-box'
 
 interface StatCardProps {
   title: string
@@ -9,53 +11,31 @@ interface StatCardProps {
   to?: string
 }
 
-const colorClasses = {
-  green: {
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    iconText: 'text-green-600'
-  },
-  yellow: {
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
-    iconText: 'text-yellow-600'
-  },
-  red: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    iconText: 'text-red-600'
-  },
-  blue: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    iconText: 'text-blue-600'
-  },
-  purple: {
-    bg: 'bg-purple-50',
-    border: 'border-purple-200',
-    iconText: 'text-purple-600'
-  },
-  indigo: {
-    bg: 'bg-indigo-50',
-    border: 'border-indigo-200',
-    iconText: 'text-indigo-600'
-  }
+const iconBoxSubtleVariant = {
+  green: 'success-subtle' as const,
+  yellow: 'warning-subtle' as const,
+  red: 'danger-subtle' as const,
+  blue: 'primary-subtle' as const,
+  purple: 'info-subtle' as const,
+  indigo: 'secondary-subtle' as const
 }
 
 export function StatCard({ title, value, icon: Icon, color, subtitle, to }: StatCardProps) {
   const cardContent = (
-    <div
-      className={`rounded-lg border ${colorClasses[color].border} ${colorClasses[color].bg} p-4 ${to ? 'cursor-pointer hover:shadow-sm' : ''}`}
-    >
-      <div className='flex items-center justify-between'>
-        <div>
-          <p className='text-sm font-medium text-gray-500'>{title}</p>
-          <p className='mt-1 text-lg font-semibold text-gray-900'>{value}</p>
-          <p className='mt-1 text-sm text-gray-600'>{subtitle}</p>
+    <Card className={to ? 'cursor-pointer transition-shadow hover:shadow-md' : ''}>
+      <CardBody>
+        <div className='flex items-start justify-between gap-4'>
+          <div className='flex-1 space-y-1'>
+            <p className='text-dimmed text-sm font-medium'>{title}</p>
+            <p className='text-foreground text-2xl font-semibold'>{value}</p>
+            <p className='text-dimmed text-sm'>{subtitle}</p>
+          </div>
+          <IconBox variant={iconBoxSubtleVariant[color]} circle size='lg'>
+            <Icon className='size-5.5' />
+          </IconBox>
         </div>
-        <Icon className={`size-5 ${colorClasses[color].iconText}`} />
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   )
 
   if (to) {

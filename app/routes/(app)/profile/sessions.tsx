@@ -19,7 +19,14 @@ import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { IconBox } from '~/app/components/icon-box'
-import { Item, ItemContent, ItemMedia, ItemTitle, ItemDescription, ItemAction } from '~/app/components/item'
+import {
+  Item,
+  ItemContent,
+  ItemMedia,
+  ItemTitle,
+  ItemDescription,
+  ItemAction
+} from '~/app/components/item'
 import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/text'
@@ -310,17 +317,15 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to revoke all other sessions? You will be logged out from all other devices.
+              Are you sure you want to revoke all other sessions? You will be logged out from all
+              other devices.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
             <AlertDialogClose>Cancel</AlertDialogClose>
             <AlertDialogClose
               render={
-                <Button
-                  variant='danger'
-                  onClick={() => revokeAllOtherSessionsMutation.mutate()}
-                >
+                <Button variant='danger' onClick={() => revokeAllOtherSessionsMutation.mutate()}>
                   Revoke All Others
                 </Button>
               }
@@ -336,17 +341,15 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to revoke all sessions? You will be logged out from all devices including this one.
+              Are you sure you want to revoke all sessions? You will be logged out from all devices
+              including this one.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
             <AlertDialogClose>Cancel</AlertDialogClose>
             <AlertDialogClose
               render={
-                <Button
-                  variant='danger'
-                  onClick={() => revokeAllSessionsMutation.mutate()}
-                >
+                <Button variant='danger' onClick={() => revokeAllSessionsMutation.mutate()}>
                   Revoke All
                 </Button>
               }

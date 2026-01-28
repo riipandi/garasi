@@ -388,68 +388,68 @@ function RouteComponent() {
       {successMessage && <Alert variant='success'>{successMessage}</Alert>}
       {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
 
-        <Stack direction='column' spacing='lg'>
+      <Stack direction='column' spacing='lg'>
+        <React.Suspense
+          fallback={
+            <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+              <div className='flex items-center justify-center py-8'>
+                <Spinner />
+              </div>
+            </div>
+          }
+        >
+          <KeyInformationCard
+            accessKey={accessKey}
+            showSecretKey={showSecretKey}
+            onToggleSecretKey={() => setShowSecretKey(!showSecretKey)}
+            onCopyAccessKey={handleCopyAccessKey}
+            onCopySecretKey={handleCopySecretKey}
+            formatDate={formatDate}
+            formatExpiration={formatExpiration}
+            expired={expired}
+          />
+        </React.Suspense>
+
+        {accessKey.permissions && (
           <React.Suspense
             fallback={
               <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <div className='flex items-center justify-center py-8'>
+                <div
+                  className='flex items-center justify-center py-8'
+                  role='status'
+                  aria-live='polite'
+                >
                   <Spinner />
                 </div>
               </div>
             }
           >
-            <KeyInformationCard
-              accessKey={accessKey}
-              showSecretKey={showSecretKey}
-              onToggleSecretKey={() => setShowSecretKey(!showSecretKey)}
-              onCopyAccessKey={handleCopyAccessKey}
-              onCopySecretKey={handleCopySecretKey}
-              formatDate={formatDate}
-              formatExpiration={formatExpiration}
-              expired={expired}
-            />
+            <PermissionsSection accessKey={accessKey} />
           </React.Suspense>
+        )}
 
-          {accessKey.permissions && (
-            <React.Suspense
-              fallback={
-                <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                  <div
-                    className='flex items-center justify-center py-8'
-                    role='status'
-                    aria-live='polite'
-                  >
-                    <Spinner />
-                  </div>
-                </div>
-              }
-            >
-              <PermissionsSection accessKey={accessKey} />
-            </React.Suspense>
-          )}
-
-          <React.Suspense
-            fallback={
-              <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <div className='flex items-center justify-center py-8'>
-                  <Spinner />
-                </div>
+        <React.Suspense
+          fallback={
+            <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+              <div className='flex items-center justify-center py-8'>
+                <Spinner />
               </div>
-            }
-          >
-            <BucketAccessSection
-              buckets={buckets}
-              selectedBuckets={selectedBuckets}
-              bucketPermissions={bucketPermissions}
-              isLoadingPermissions={isLoadingPermissions}
-              isLoadingBuckets={isLoadingBuckets}
-              isSaving={allowBucketKeyMutation.isPending || denyBucketKeyMutation.isPending}
-              onBucketToggle={handleBucketToggle}
-              onPermissionChange={handlePermissionChange}
-              onSavePermissions={handleSavePermissions}
-            />
-          </React.Suspense>
-        </Stack>
+            </div>
+          }
+        >
+          <BucketAccessSection
+            buckets={buckets}
+            selectedBuckets={selectedBuckets}
+            bucketPermissions={bucketPermissions}
+            isLoadingPermissions={isLoadingPermissions}
+            isLoadingBuckets={isLoadingBuckets}
+            isSaving={allowBucketKeyMutation.isPending || denyBucketKeyMutation.isPending}
+            onBucketToggle={handleBucketToggle}
+            onPermissionChange={handlePermissionChange}
+            onSavePermissions={handleSavePermissions}
+          />
+        </React.Suspense>
+      </Stack>
 
       {/* Edit Key Dialog */}
       <KeyEdit

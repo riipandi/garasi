@@ -72,7 +72,9 @@ function RouteComponent() {
           <CardTitle>Change Email</CardTitle>
         </CardHeader>
         <CardBody>
-          <Text className='mb-6'>Update your email address for account notifications and login</Text>
+          <Text className='mb-6'>
+            Update your email address for account notifications and login
+          </Text>
 
           <div className='mb-6 rounded-md bg-gray-50 p-4'>
             <Text className='font-medium'>Current Email</Text>
@@ -134,7 +136,9 @@ function RouteComponent() {
                     disabled={changeEmailMutation.isPending}
                   />
                   {field.state.meta.errors.length > 0 && (
-                    <Text className='mt-1 text-red-600 text-sm'>{String(field.state.meta.errors[0])}</Text>
+                    <Text className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </Text>
                   )}
                 </Field>
               )}
@@ -170,7 +174,9 @@ function RouteComponent() {
                     disabled={changeEmailMutation.isPending}
                   />
                   {field.state.meta.errors.length > 0 && (
-                    <Text className='mt-1 text-red-600 text-sm'>{String(field.state.meta.errors[0])}</Text>
+                    <Text className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </Text>
                   )}
                 </Field>
               )}
@@ -179,11 +185,7 @@ function RouteComponent() {
             <changeEmailForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
                 <div className='flex justify-end gap-3'>
-                  <Button
-                    type='button'
-                    variant='secondary'
-                    onClick={() => changeEmailForm.reset()}
-                  >
+                  <Button type='button' variant='secondary' onClick={() => changeEmailForm.reset()}>
                     Cancel
                   </Button>
                   <Button
@@ -212,8 +214,8 @@ function RouteComponent() {
                 <Text className='font-medium text-blue-900'>Email change process</Text>
                 <Text className='mt-1 text-xs text-blue-700'>
                   After submitting, we'll send a confirmation link to your new email address. You'll
-                  need to click the link to complete the email change. Your current email will remain
-                  active until the change is confirmed.
+                  need to click the link to complete the email change. Your current email will
+                  remain active until the change is confirmed.
                 </Text>
               </div>
             </div>

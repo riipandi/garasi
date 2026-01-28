@@ -1,6 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
+import { Heading } from '~/app/components/heading'
+import { Stack } from '~/app/components/stack'
 import fetcher from '~/app/fetcher'
 import { ClusterInfo } from './-dashboard/cluster-info'
 import { DashboardError } from './-dashboard/error-boundary'
@@ -24,7 +26,6 @@ export const Route = createFileRoute('/(app)/')({
   errorComponent: ({ error }) => <DashboardError error={error} />
 })
 
-// Query options
 const whoamiQuery = queryOptions({
   queryKey: ['whoami'],
   queryFn: () => fetcher<WhoamiResponse>('/auth/whoami')
@@ -57,7 +58,6 @@ function RouteComponent() {
   const { data: bucketsData, isLoading: isLoadingBuckets } = useQuery(bucketsQuery)
   const { data: keysData, isLoading: isLoadingKeys } = useQuery(keysQuery)
 
-  // Show loading skeleton while any query is loading
   const isLoading =
     isLoadingWhoami || isLoadingHealth || isLoadingStatistics || isLoadingBuckets || isLoadingKeys
 
@@ -70,7 +70,6 @@ function RouteComponent() {
   const buckets = bucketsData?.data || []
   const keys = keysData?.data || []
 
-  // Calculate cluster-wide storage
   const totalDataStorage =
     statistics?.nodes.reduce((acc: number, node) => {
       const match = node.dataAvailable.total.match(/([\d.]+)/)
@@ -88,17 +87,15 @@ function RouteComponent() {
   const storagePercentage = totalDataStorage > 0 ? (usedDataStorage / totalDataStorage) * 100 : 0
 
   return (
-    <div className='space-y-6'>
-      {/* Page Header */}
+    <Stack spacing='lg'>
       <div className='min-w-0 flex-1'>
-        <h1 className='text-2xl font-bold text-gray-900'>Dashboard</h1>
-        <p className='mt-1 text-sm text-gray-500'>
+        <Heading size='md'>Dashboard</Heading>
+        <p className='text-dimmed mt-1 text-sm'>
           Welcome back, {whoamiData?.data?.name || 'User'}! Here's an overview of your S3 storage
           cluster.
         </p>
       </div>
 
-      {/* Stats Grid */}
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
         <StatCard
           title='Cluster Status'
@@ -133,7 +130,7 @@ function RouteComponent() {
         />
 
         <StatCard
-          title='Access Keys'
+          title='AccessKeys'
           value={keys.filter((k) => !k.deleted).length.toString()}
           icon={Lucide.KeyRound}
           color='indigo'
@@ -142,7 +139,6 @@ function RouteComponent() {
         />
       </div>
 
-      {/* Main Content Grid - Equal height cards */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         <div className='lg:col-span-2'>
           <ClusterInfo health={health} statistics={statistics} />
@@ -152,11 +148,10 @@ function RouteComponent() {
         </div>
       </div>
 
-      {/* Bottom Section */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
         <StorageNodes statistics={statistics} />
         <RecentBuckets buckets={buckets} />
       </div>
-    </div>
+    </Stack>
   )
 }

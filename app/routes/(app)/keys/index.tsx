@@ -167,9 +167,7 @@ function RouteComponent() {
           <Heading level={1} size='lg'>
             Access Keys
           </Heading>
-          <Text className='mt-2 text-muted'>
-            Manage access keys for S3 API authentication
-          </Text>
+          <Text className='text-muted mt-2'>Manage access keys for S3 API authentication</Text>
         </div>
 
         <Stack direction='row' className='flex-wrap gap-2'>
@@ -181,11 +179,7 @@ function RouteComponent() {
             <Lucide.Download className='size-4' />
             Import Key
           </Button>
-          <Button
-            variant='outline'
-            onClick={handleDeleteAllKeys}
-            disabled={keys.length === 0}
-          >
+          <Button variant='outline' onClick={handleDeleteAllKeys} disabled={keys.length === 0}>
             <Lucide.Trash2 className='size-4' />
             Delete All
           </Button>
@@ -212,9 +206,9 @@ function RouteComponent() {
             <div>
               <h4 className='text-sm font-medium text-blue-900'>Information</h4>
               <p className='mt-1 text-xs text-blue-700'>
-                Access keys are used to authenticate with the Garage S3 API. Each key consists of
-                an Access Key ID and a Secret Key ID. Keep your secret keys secure and never share
-                them publicly.
+                Access keys are used to authenticate with the Garage S3 API. Each key consists of an
+                Access Key ID and a Secret Key ID. Keep your secret keys secure and never share them
+                publicly.
               </p>
             </div>
           </div>

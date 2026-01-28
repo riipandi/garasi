@@ -1,3 +1,6 @@
+import { CardBody } from '~/app/components/card'
+import { Text } from '~/app/components/text'
+
 interface InfoItemProps {
   label: string
   value: string
@@ -5,9 +8,9 @@ interface InfoItemProps {
 
 export function InfoItem({ label, value }: InfoItemProps) {
   return (
-    <div className='rounded-lg border border-gray-200 bg-white p-3'>
-      <p className='text-xs font-medium text-gray-500 uppercase'>{label}</p>
-      <p className='mt-1 text-sm font-semibold text-gray-900'>{value}</p>
-    </div>
+    <CardBody className='p-3'>
+      <Text className='text-dimmed text-xs font-medium uppercase'>{label}</Text>
+      <p className='mt-1 text-sm font-semibold'>{value}</p>
+    </CardBody>
   )
 }

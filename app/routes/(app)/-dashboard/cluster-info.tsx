@@ -1,5 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
+import { Badge } from '~/app/components/badge'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
+import { Stack } from '~/app/components/stack'
+import { Text, Strong } from '~/app/components/text'
 import { InfoItem } from './info-items'
 import type { ClusterHealthResponse, ClusterStatistics } from './types'
 
@@ -9,87 +13,80 @@ interface ClusterInfoProps {
 }
 
 export function ClusterInfo({ health, statistics }: ClusterInfoProps) {
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): 'success' | 'warning' | 'danger' => {
     switch (status?.toLowerCase()) {
       case 'healthy':
-        return 'text-green-600 bg-green-50 border-green-200'
+        return 'success'
       case 'degraded':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+        return 'warning'
       default:
-        return 'text-red-600 bg-red-50 border-red-200'
+        return 'danger'
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'healthy':
-        return Lucide.CheckCircle
-      case 'degraded':
-        return Lucide.AlertTriangle
-      default:
-        return Lucide.XCircle
-    }
-  }
-
-  const StatusIcon = getStatusIcon(health?.status || '')
+  const StatusIcon =
+    health?.status === 'healthy'
+      ? Lucide.CheckCircle
+      : health?.status === 'degraded'
+        ? Lucide.AlertTriangle
+        : Lucide.XCircle
 
   return (
-    <div className='flex h-full flex-col rounded-lg border border-gray-200 bg-white p-6'>
-      <div className='mb-4 flex items-center justify-between'>
-        <h2 className='text-lg font-semibold text-gray-900'>Cluster Information</h2>
+    <Card>
+      <CardHeader>
+        <CardTitle>Cluster Information</CardTitle>
         <Link
           to='/cluster'
-          className='flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700'
+          className='text-primary hover:text-primary/80 inline-flex items-center gap-1 text-sm font-medium'
         >
           View Details
           <Lucide.ArrowRight className='size-4' />
         </Link>
-      </div>
+      </CardHeader>
+      <CardBody>
+        <Stack spacing='lg'>
+          <div className='bg-accent flex items-center justify-between rounded-lg p-3'>
+            <div className='flex items-center gap-2'>
+              <StatusIcon
+                className={`size-5 ${health?.status === 'healthy' ? 'text-success' : health?.status === 'degraded' ? 'text-warning' : 'text-danger'}`}
+              />
+              <Text>
+                <Strong>Cluster Status</Strong>
+              </Text>
+            </div>
+            <Badge variant={getStatusVariant(health?.status || '')} pill>
+              {health?.status || 'Unknown'}
+            </Badge>
+          </div>
 
-      {/* Cluster Status */}
-      <div className='mb-4 flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3'>
-        <div className='flex items-center gap-2'>
-          <StatusIcon
-            className={`size-5 ${health?.status === 'healthy' ? 'text-green-600' : health?.status === 'degraded' ? 'text-yellow-600' : 'text-red-600'}`}
-          />
-          <span className='text-sm font-medium text-gray-900'>Cluster Status</span>
-        </div>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(health?.status || '')}`}
-        >
-          {health?.status || 'Unknown'}
-        </span>
-      </div>
+          <div>
+            <p className='mb-3 font-semibold'>Nodes</p>
+            <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
+              <InfoItem label='Known' value={health?.knownNodes?.toString() || '0'} />
+              <InfoItem label='Connected' value={health?.connectedNodes?.toString() || '0'} />
+              <InfoItem label='Storage' value={health?.storageNodes?.toString() || '0'} />
+              <InfoItem label='Storage Up' value={health?.storageNodesUp?.toString() || '0'} />
+            </div>
+          </div>
 
-      {/* Node Information */}
-      <div className='mb-4'>
-        <h3 className='mb-3 text-sm font-medium text-gray-900'>Nodes</h3>
-        <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
-          <InfoItem label='Known' value={health?.knownNodes?.toString() || '0'} />
-          <InfoItem label='Connected' value={health?.connectedNodes?.toString() || '0'} />
-          <InfoItem label='Storage' value={health?.storageNodes?.toString() || '0'} />
-          <InfoItem label='Storage Up' value={health?.storageNodesUp?.toString() || '0'} />
-        </div>
-      </div>
+          <div>
+            <p className='mb-3 font-semibold'>Partitions</p>
+            <div className='grid grid-cols-3 gap-3'>
+              <InfoItem label='Total' value={health?.partitions?.toString() || '0'} />
+              <InfoItem label='Quorum' value={health?.partitionsQuorum?.toString() || '0'} />
+              <InfoItem label='All OK' value={health?.partitionsAllOk?.toString() || '0'} />
+            </div>
+          </div>
 
-      {/* Partition Information */}
-      <div className='mb-4'>
-        <h3 className='mb-3 text-sm font-medium text-gray-900'>Partitions</h3>
-        <div className='grid grid-cols-3 gap-3'>
-          <InfoItem label='Total' value={health?.partitions?.toString() || '0'} />
-          <InfoItem label='Quorum' value={health?.partitionsQuorum?.toString() || '0'} />
-          <InfoItem label='All OK' value={health?.partitionsAllOk?.toString() || '0'} />
-        </div>
-      </div>
-
-      {/* Cluster-Wide Storage */}
-      <div className='mt-auto border-t border-gray-200 pt-4'>
-        <h3 className='mb-3 text-sm font-medium text-gray-900'>Cluster-Wide Storage</h3>
-        <div className='grid grid-cols-2 gap-3'>
-          <InfoItem label='Data' value={statistics?.clusterWide.data || 'N/A'} />
-          <InfoItem label='Metadata' value={statistics?.clusterWide.metadata || 'N/A'} />
-        </div>
-      </div>
-    </div>
+          <div className='border-card-separator border-t pt-4'>
+            <p className='mb-3 font-semibold'>Cluster-Wide Storage</p>
+            <div className='grid grid-cols-2 gap-3'>
+              <InfoItem label='Data' value={statistics?.clusterWide.data || 'N/A'} />
+              <InfoItem label='Metadata' value={statistics?.clusterWide.metadata || 'N/A'} />
+            </div>
+          </div>
+        </Stack>
+      </CardBody>
+    </Card>
   )
 }

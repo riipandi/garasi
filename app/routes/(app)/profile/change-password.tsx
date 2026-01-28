@@ -76,7 +76,9 @@ function RouteComponent() {
           <CardTitle>Change Password</CardTitle>
         </CardHeader>
         <CardBody>
-          <Text className='mb-6'>Ensure your account is using a long, random password to stay secure</Text>
+          <Text className='mb-6'>
+            Ensure your account is using a long, random password to stay secure
+          </Text>
 
           {changePasswordMutation.isSuccess && (
             <Alert variant='success'>Password changed successfully!</Alert>
@@ -128,7 +130,9 @@ function RouteComponent() {
                     disabled={changePasswordMutation.isPending}
                   />
                   {field.state.meta.errors.length > 0 && (
-                    <Text className='mt-1 text-red-600 text-sm'>{String(field.state.meta.errors[0])}</Text>
+                    <Text className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </Text>
                   )}
                 </Field>
               )}
@@ -143,12 +147,12 @@ function RouteComponent() {
                     const firstError = result.error.issues[0]
                     return firstError ? firstError.message : undefined
                   }
-                  
+
                   const confirmPasswordValue = fieldApi.form.getFieldValue('confirmPassword')
                   if (confirmPasswordValue && confirmPasswordValue !== value) {
                     fieldApi.form.setFieldValue('confirmPassword', confirmPasswordValue)
                   }
-                  
+
                   return undefined
                 }
               }}
@@ -171,7 +175,9 @@ function RouteComponent() {
                     disabled={changePasswordMutation.isPending}
                   />
                   {field.state.meta.errors.length > 0 && (
-                    <Text className='mt-1 text-red-600 text-sm'>{String(field.state.meta.errors[0])}</Text>
+                    <Text className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </Text>
                   )}
                 </Field>
               )}
@@ -212,13 +218,17 @@ function RouteComponent() {
                     disabled={changePasswordMutation.isPending}
                   />
                   {field.state.meta.errors.length > 0 && (
-                    <Text className='mt-1 text-red-600 text-sm'>{String(field.state.meta.errors[0])}</Text>
+                    <Text className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </Text>
                   )}
                 </Field>
               )}
             </changePasswordForm.Field>
 
-            <changePasswordForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            <changePasswordForm.Subscribe
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
+            >
               {([canSubmit, isSubmitting]) => (
                 <div className='flex justify-end gap-3'>
                   <Button

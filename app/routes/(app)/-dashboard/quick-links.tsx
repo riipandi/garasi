@@ -1,5 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 
 interface QuickLink {
   to: string
@@ -29,7 +32,7 @@ const quickLinks: QuickLink[] = [
   },
   {
     to: '/keys',
-    label: 'Access Keys',
+    label: 'AccessKeys',
     icon: Lucide.KeyRound,
     description: 'Manage API keys'
   }
@@ -37,24 +40,28 @@ const quickLinks: QuickLink[] = [
 
 export function QuickLinks() {
   return (
-    <div className='flex h-full flex-col rounded-lg border border-gray-200 bg-white p-6'>
-      <h2 className='text-lg font-semibold text-gray-900'>Quick Links</h2>
-
-      <div className='mt-4 grid grid-cols-1 gap-3 sm:grid-cols-1'>
-        {quickLinks.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className='flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100'
-          >
-            <link.icon className='size-5 text-gray-600' />
-            <div className='flex-1'>
-              <p className='font-medium text-gray-900'>{link.label}</p>
-              <p className='text-sm text-gray-500'>{link.description}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Quick Links</CardTitle>
+      </CardHeader>
+      <CardBody>
+        <Stack spacing='sm'>
+          {quickLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className='border-border bg-accent hover:bg-accent/80 flex items-center gap-3 rounded-lg border p-3 transition-colors'
+            >
+              <link.icon className='text-dimmed size-5' />
+              <div className='flex-1'>
+                <p className='text-foreground font-medium'>{link.label}</p>
+                <Text className='text-dimmed text-sm'>{link.description}</Text>
+              </div>
+              <Lucide.ChevronRight className='text-dimmed size-4' />
+            </Link>
+          ))}
+        </Stack>
+      </CardBody>
+    </Card>
   )
 }

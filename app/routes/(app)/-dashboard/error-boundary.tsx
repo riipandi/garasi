@@ -1,11 +1,8 @@
-/**
- * Error Boundary Components for Dashboard
- *
- * These components provide visual feedback when data loading fails,
- * improving error handling and user experience.
- */
-
 import * as Lucide from 'lucide-react'
+import { Alert } from '~/app/components/alert'
+import { Button } from '~/app/components/button'
+import { IconBox } from '~/app/components/icon-box'
+import { Text, Strong } from '~/app/components/text'
 
 interface ErrorStateProps {
   title: string
@@ -21,22 +18,21 @@ export function ErrorState({
   icon: Icon = Lucide.AlertCircle
 }: ErrorStateProps) {
   return (
-    <div className='flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50 p-8 text-center'>
-      <div className='mb-4 rounded-full bg-red-100 p-4'>
-        <Icon className='size-8 text-red-600' />
-      </div>
-      <h3 className='mb-2 text-lg font-semibold text-gray-900'>{title}</h3>
-      <p className='mb-6 max-w-md text-sm text-gray-600'>{message}</p>
+    <Alert variant='danger' className='min-h-100'>
+      <IconBox variant='danger-subtle' size='lg' circle className='mb-4'>
+        <Icon className='size-8' />
+      </IconBox>
+      <Text>
+        <Strong className='mb-2 text-lg'>{title}</Strong>
+      </Text>
+      <Text className='text-dimmed mb-6 max-w-md text-sm'>{message}</Text>
       {onRetry && (
-        <button
-          onClick={onRetry}
-          className='inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-red-700 hover:shadow-md'
-        >
+        <Button variant='danger' onClick={onRetry}>
           <Lucide.RefreshCw className='size-4' />
           Try Again
-        </button>
+        </Button>
       )}
-    </div>
+    </Alert>
   )
 }
 
@@ -70,20 +66,19 @@ export function EmptyState({
   actionLabel?: string
 }) {
   return (
-    <div className='flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center'>
-      <div className='mb-4 rounded-full bg-gray-100 p-4'>
-        <Icon className='size-8 text-gray-400' />
-      </div>
-      <h3 className='mb-2 text-lg font-semibold text-gray-900'>{title}</h3>
-      <p className='mb-6 max-w-md text-sm text-gray-600'>{message}</p>
+    <div className='border-border bg-accent flex min-h-[300px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center'>
+      <IconBox variant='secondary-subtle' size='lg' circle className='mb-4'>
+        <Icon className='text-dimmed size-8' />
+      </IconBox>
+      <Text>
+        <Strong className='mb-2 text-lg'>{title}</Strong>
+      </Text>
+      <Text className='text-dimmed mb-6 max-w-md text-sm'>{message}</Text>
       {action && actionLabel && (
-        <button
-          onClick={action}
-          className='inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:scale-105 hover:shadow-md'
-        >
+        <Button variant='primary' onClick={action}>
           <Lucide.Plus className='size-4' />
           {actionLabel}
-        </button>
+        </Button>
       )}
     </div>
   )
@@ -93,7 +88,7 @@ export function NetworkError({ onRetry }: { onRetry?: () => void }) {
   return (
     <ErrorState
       title='Network Error'
-      message='Unable to connect to the server. Please check your internet connection and try again.'
+      message='Unable to connect to server. Please check your internet connection and try again.'
       onRetry={onRetry}
       icon={Lucide.WifiOff}
     />

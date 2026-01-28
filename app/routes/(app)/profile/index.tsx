@@ -131,7 +131,9 @@ function RouteComponent() {
                     disabled={updateProfileMutation.isPending}
                   />
                   {field.state.meta.errors.length > 0 && (
-                    <Text className='mt-1 text-red-600 text-sm'>{String(field.state.meta.errors[0])}</Text>
+                    <Text className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </Text>
                   )}
                 </Field>
               )}
@@ -162,12 +164,7 @@ function RouteComponent() {
 
             <Field>
               <FieldLabel htmlFor='userId'>User ID</FieldLabel>
-              <Input
-                id='userId'
-                type='text'
-                value={profileData?.data?.user_id || ''}
-                disabled
-              />
+              <Input id='userId' type='text' value={profileData?.data?.user_id || ''} disabled />
             </Field>
 
             <profileForm.Subscribe

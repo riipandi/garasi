@@ -1,10 +1,10 @@
 import { createFileRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import { NotFound } from '~/app/errors'
 import { Heading } from '~/app/components/heading'
-import { Text } from '~/app/components/text'
 import { Item, ItemContent, ItemMedia, ItemTitle } from '~/app/components/item'
 import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
+import { NotFound } from '~/app/errors'
 
 export const Route = createFileRoute('/(app)/profile')({
   component: RouteComponent,
@@ -81,14 +81,8 @@ function ProfileNavLink({
   isActive: boolean
 }) {
   return (
-    <Route.Link
-      to={to}
-      className='w-full'
-    >
-      <Item
-        variant={isActive ? 'info' : 'plain'}
-        className='cursor-pointer w-full'
-      >
+    <Route.Link to={to} className='w-full'>
+      <Item variant={isActive ? 'info' : 'plain'} className='w-full cursor-pointer'>
         <ItemMedia>
           <Icon className='size-4' />
         </ItemMedia>
