@@ -1,4 +1,9 @@
 import * as Lucide from 'lucide-react'
+import { Button } from '~/app/components/button'
+import { Heading } from '~/app/components/heading'
+import { IconBox } from '~/app/components/icon-box'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 interface AccessKeysSectionProps {
@@ -18,99 +23,100 @@ export function AccessKeysSection({
   const hasKeys = keys.length > 0
 
   return (
-    <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
-      <div className='border-b border-gray-200 px-6 py-4'>
-        <h3 className='text-lg font-semibold text-gray-900'>Access Keys</h3>
-        <p className='text-sm text-gray-500'>Manage access keys that can access this bucket</p>
+    <div className='border-border bg-background overflow-hidden rounded-lg border shadow-sm'>
+      <div className='border-border border-b px-6 py-4'>
+        <Heading level={3} size='md'>
+          Access Keys
+        </Heading>
+        <Text className='text-muted-foreground text-sm'>
+          Manage access keys that can access this bucket
+        </Text>
       </div>
       <div className='p-6'>
         {hasKeys ? (
-          <div className='flex flex-col gap-3'>
+          <Stack>
             {keys.map((key) => (
               <div
                 key={key.accessKeyId}
-                className='flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-3 shadow-sm'
+                className='border-border bg-background flex items-center justify-between rounded-md border px-4 py-3 shadow-sm'
               >
                 <div className='flex items-center gap-3'>
-                  <Lucide.Lock className='size-4 text-gray-600' />
+                  <IconBox variant='tertiary-subtle' size='sm'>
+                    <Lucide.Lock className='size-4' />
+                  </IconBox>
                   <div>
-                    <span className='text-sm font-medium text-gray-900'>{key.name}</span>
-                    <span className='ml-2 text-sm text-gray-500'>({key.accessKeyId})</span>
+                    <Text className='text-sm font-medium'>{key.name}</Text>
+                    <Text className='text-muted-foreground ml-2 text-sm'>({key.accessKeyId})</Text>
                   </div>
                 </div>
                 <div className='flex items-center gap-3'>
-                  <div className='flex flex-wrap gap-2'>
+                  <Stack direction='row'>
                     {key.permissions.owner && (
-                      <span className='inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800'>
+                      <Text className='inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800'>
                         Owner
-                      </span>
+                      </Text>
                     )}
                     {key.permissions.read && (
-                      <span className='inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800'>
+                      <Text className='inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800'>
                         Read
-                      </span>
+                      </Text>
                     )}
                     {key.permissions.write && (
-                      <span className='inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800'>
+                      <Text className='inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800'>
                         Write
-                      </span>
+                      </Text>
                     )}
-                  </div>
-                  <div className='ml-4 flex items-center gap-2 border-l border-gray-200 pl-4'>
-                    <button
+                  </Stack>
+                  <div className='border-border ml-4 flex items-center gap-2 border-l pl-4'>
+                    <Button
                       type='button'
+                      variant='plain'
+                      size='sm'
                       onClick={() => onViewKey(key.accessKeyId)}
-                      className='flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 focus:outline-none'
                     >
                       <Lucide.Eye className='size-4' />
                       View Key
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type='button'
+                      variant='danger'
+                      size='sm'
                       onClick={() => onDeleteKey(key.accessKeyId)}
-                      className='flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-red-600 transition-all hover:bg-red-50 focus:outline-none'
                     >
                       <Lucide.Trash2 className='size-4' />
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
+          </Stack>
         ) : (
-          <div className='flex items-center gap-4 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-4'>
-            <Lucide.Lock className='size-6 shrink-0 text-gray-400' />
+          <div className='border-border bg-muted/30 flex items-center gap-4 rounded-lg border-2 border-dashed px-4 py-4'>
+            <IconBox variant='tertiary-subtle' size='md' circle>
+              <Lucide.Lock className='size-6' />
+            </IconBox>
             <div className='flex-1'>
-              <p className='text-sm font-medium text-gray-700'>
+              <Text className='text-sm font-medium'>
                 No access keys have access to this bucket.
-              </p>
-              <p className='text-sm text-gray-500'>
+              </Text>
+              <Text className='text-muted-foreground text-sm'>
                 Keys that have access to this bucket will appear here.
-              </p>
+              </Text>
             </div>
-            <button
-              type='button'
-              onClick={onShowKeySelectorDialog}
-              className='flex shrink-0 items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-            >
+            <Button type='button' variant='primary' onClick={onShowKeySelectorDialog}>
               <Lucide.Plus className='size-4' />
               Assign Key
-            </button>
+            </Button>
           </div>
         )}
 
-        {/* Assign Key Button (shown when there are keys) */}
         {hasKeys && (
-          <div className='mt-4 flex justify-end border-t border-gray-200 pt-4'>
-            <button
-              type='button'
-              onClick={onShowKeySelectorDialog}
-              className='flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-            >
+          <div className='border-border mt-4 flex justify-end border-t pt-4'>
+            <Button type='button' variant='outline' onClick={onShowKeySelectorDialog}>
               <Lucide.Plus className='size-4' />
               Assign Key
-            </button>
+            </Button>
           </div>
         )}
       </div>

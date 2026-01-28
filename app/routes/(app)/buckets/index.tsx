@@ -133,10 +133,7 @@ function RouteComponent() {
 
       <Stack>
         <div className='flex flex-wrap gap-2'>
-          <Button
-            variant='primary'
-            onClick={handleShowCreateDialog}
-          >
+          <Button variant='primary' onClick={handleShowCreateDialog}>
             <Lucide.Plus className='size-4' />
             Create Bucket
           </Button>
@@ -151,23 +148,21 @@ function RouteComponent() {
           </Button>
         </div>
 
-        {successMessage && (
-          <Alert variant='success'>{successMessage}</Alert>
-        )}
-        {errorMessage && (
-          <Alert variant='danger'>{errorMessage}</Alert>
-        )}
+        {successMessage && <Alert variant='success'>{successMessage}</Alert>}
+        {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
 
         <BucketTable buckets={buckets} onDelete={handleDeleteBucket} isLoading={isRefreshing} />
 
-        <div className='overflow-hidden rounded-lg border border-info/20 bg-info/5 p-4'>
+        <div className='border-info/20 bg-info/5 overflow-hidden rounded-lg border p-4'>
           <div className='flex gap-3'>
             <IconBox variant='info' size='md'>
               <Lucide.Info className='size-5' />
             </IconBox>
             <div className='flex-1'>
               <Stack>
-                <Heading level={4} size='sm'>Information</Heading>
+                <Heading level={4} size='sm'>
+                  Information
+                </Heading>
                 <Text>
                   Buckets are containers for objects stored in Garage. Each bucket can have global
                   aliases (accessible by all keys) or local aliases (accessible only by specific

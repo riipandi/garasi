@@ -1,5 +1,21 @@
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { Alert } from '~/app/components/alert'
+import { Button } from '~/app/components/button'
+import { Heading } from '~/app/components/heading'
+import { IconBox } from '~/app/components/icon-box'
+import { Input } from '~/app/components/input'
+import { Label } from '~/app/components/label'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectPopup,
+  SelectList,
+  SelectItem
+} from '~/app/components/select'
+import { Switch } from '~/app/components/switch'
+import { Text } from '~/app/components/text'
 
 type SizeUnit = 'MB' | 'GB' | 'TB'
 
@@ -39,186 +55,147 @@ export function BucketConfigurationForm({
   sizeWarning
 }: BucketConfigurationFormProps) {
   return (
-    <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
-      <div className='border-b border-gray-200 px-6 py-4'>
-        <h3 className='text-lg font-semibold text-gray-900'>Bucket Configuration</h3>
-        <p className='text-sm text-gray-500'>Configure website access and storage quotas</p>
+    <div className='border-border bg-background overflow-hidden rounded-lg border shadow-sm'>
+      <div className='border-border border-b px-6 py-4'>
+        <Heading level={3} size='md'>
+          Bucket Configuration
+        </Heading>
+        <Text className='text-muted-foreground text-sm'>
+          Configure website access and storage quotas
+        </Text>
       </div>
       <form
         onSubmit={onSubmit}
         className={`space-y-6 px-6 py-4 ${isPending ? 'animate-pulse' : ''}`}
       >
-        {/* Website Access Section */}
         <div>
           <div className='mb-4 flex items-center gap-3'>
-            <Lucide.Globe className='size-5 text-gray-500' />
-            <h3 className='text-base font-semibold text-gray-900'>Website Access</h3>
+            <IconBox variant='info' size='md'>
+              <Lucide.Globe className='size-5' />
+            </IconBox>
+            <Heading level={4}>Website Access</Heading>
           </div>
           <div className='space-y-4'>
             <div className='flex items-center gap-3'>
-              <input
-                type='checkbox'
+              <Switch
                 id='websiteAccessEnabled'
                 checked={websiteAccessEnabled}
-                onChange={(e) => setWebsiteAccessEnabled(e.target.checked)}
-                className='size-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                onCheckedChange={setWebsiteAccessEnabled}
               />
-              <label
-                htmlFor='websiteAccessEnabled'
-                className='cursor-pointer text-sm font-medium text-gray-700'
-              >
-                Enable website access for this bucket
-              </label>
+              <Label htmlFor='websiteAccessEnabled'>Enable website access for this bucket</Label>
             </div>
 
             {websiteAccessEnabled && (
               <div className='mt-4 grid gap-4 sm:grid-cols-2'>
                 <div>
-                  <label
-                    htmlFor='indexDocument'
-                    className='mb-2 block text-sm font-medium text-gray-700'
-                  >
-                    Index Document
-                  </label>
-                  <input
-                    type='text'
+                  <Label htmlFor='indexDocument'>Index Document</Label>
+                  <Input
                     id='indexDocument'
+                    type='text'
                     value={indexDocument}
                     onChange={(e) => setIndexDocument(e.target.value)}
                     placeholder='index.html'
-                    className='w-full rounded-md border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none'
                   />
-                  <p className='mt-1 text-xs text-gray-500'>
+                  <Text className='text-muted-foreground mt-1 text-xs'>
                     The document to serve when a directory is requested
-                  </p>
+                  </Text>
                 </div>
 
                 <div>
-                  <label
-                    htmlFor='errorDocument'
-                    className='mb-2 block text-sm font-medium text-gray-700'
-                  >
-                    Error Document
-                  </label>
-                  <input
-                    type='text'
+                  <Label htmlFor='errorDocument'>Error Document</Label>
+                  <Input
                     id='errorDocument'
+                    type='text'
                     value={errorDocument}
                     onChange={(e) => setErrorDocument(e.target.value)}
                     placeholder='error.html'
-                    className='w-full rounded-md border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none'
                   />
-                  <p className='mt-1 text-xs text-gray-500'>
+                  <Text className='text-muted-foreground mt-1 text-xs'>
                     The document to serve when an error occurs
-                  </p>
+                  </Text>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        <div className='border-t border-gray-200' />
+        <div className='border-border border-t' />
 
-        {/* Quotas Section */}
         <div>
           <div className='mb-4 flex items-center gap-3'>
-            <Lucide.HardDrive className='size-5 text-gray-500' />
-            <h3 className='text-base font-semibold text-gray-900'>Storage Quotas</h3>
+            <IconBox variant='tertiary' size='md'>
+              <Lucide.HardDrive className='size-5' />
+            </IconBox>
+            <Heading level={4}>Storage Quotas</Heading>
           </div>
           <div className='space-y-6'>
-            {/* Max Objects */}
             <div>
-              <label htmlFor='maxObjects' className='mb-2 block text-sm font-medium text-gray-700'>
-                Max Objects
-              </label>
-              <input
-                type='number'
+              <Label htmlFor='maxObjects'>Max Objects</Label>
+              <Input
                 id='maxObjects'
+                type='text'
                 value={maxObjects}
                 onChange={(e) => setMaxObjects(e.target.value)}
                 placeholder='Unlimited'
-                min='0'
-                className='w-full rounded-md border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none'
               />
-              <p className='mt-1 text-xs text-gray-500'>
+              <Text className='text-muted-foreground mt-1 text-xs'>
                 Maximum number of objects allowed in this bucket
-              </p>
+              </Text>
             </div>
 
-            {/* Max Size */}
             <div>
-              <label htmlFor='maxSize' className='mb-2 block text-sm font-medium text-gray-700'>
-                Max Size
-              </label>
+              <Label htmlFor='maxSize'>Max Size</Label>
               <div className='flex gap-2'>
-                <input
-                  type='number'
+                <Input
                   id='maxSize'
+                  type='text'
                   value={maxSize}
                   onChange={(e) => setMaxSize(e.target.value)}
                   placeholder='Unlimited'
-                  min='0'
-                  step='any'
-                  className='flex-1 rounded-md border border-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+                  className='flex-1'
                 />
-                <select
+                <Select
                   value={maxSizeUnit}
-                  onChange={(e) => setMaxSizeUnit(e.target.value as SizeUnit)}
-                  className='rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+                  onValueChange={(value) => setMaxSizeUnit(value as SizeUnit)}
                 >
-                  <option value='MB'>MB</option>
-                  <option value='GB'>GB</option>
-                  <option value='TB'>TB</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectPopup>
+                    <SelectList>
+                      <SelectItem value='MB'>MB</SelectItem>
+                      <SelectItem value='GB'>GB</SelectItem>
+                      <SelectItem value='TB'>TB</SelectItem>
+                    </SelectList>
+                  </SelectPopup>
+                </Select>
               </div>
-              <p className='mt-1 text-xs text-gray-500'>
+              <Text className='text-muted-foreground mt-1 text-xs'>
                 Maximum total size of all objects (minimum 100MB)
-              </p>
+              </Text>
               {sizeWarning && (
-                <div className='mt-2 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2'>
-                  <Lucide.AlertTriangle className='mt-0.5 size-4 flex-shrink-0 text-amber-600' />
-                  <p className='text-xs text-amber-800'>{sizeWarning}</p>
-                </div>
+                <Alert variant='warning' className='mt-2'>
+                  <div className='flex items-start gap-2'>
+                    <Lucide.AlertTriangle className='mt-0.5 size-4 shrink-0' />
+                    <Text className='text-xs'>{sizeWarning}</Text>
+                  </div>
+                </Alert>
               )}
             </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className='flex justify-end border-t border-gray-200 pt-4'>
-          <button
-            type='submit'
-            disabled={isPending}
-            className={`flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
-              isPending ? 'animate-pulse' : ''
-            }`}
-          >
+        <div className='border-border flex justify-end border-t pt-4'>
+          <Button type='submit' variant='primary' disabled={isPending} progress={isPending}>
             {isPending ? (
-              <>
-                <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                  <circle
-                    className='opacity-25'
-                    cx='12'
-                    cy='12'
-                    r='10'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                  />
-                  <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                  />
-                </svg>
-                Saving...
-              </>
+              'Saving...'
             ) : (
               <>
                 <Lucide.Save className='size-4' />
                 Save Changes
               </>
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

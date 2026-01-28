@@ -1,6 +1,8 @@
 import { useForm } from '@tanstack/react-form'
 import * as React from 'react'
 import { z } from 'zod'
+import { Button } from '~/app/components/button'
+import { Checkbox } from '~/app/components/checkbox'
 import {
   Dialog,
   DialogBody,
@@ -10,8 +12,6 @@ import {
   DialogFooter,
   DialogHeader
 } from '~/app/components/dialog'
-import { Button } from '~/app/components/button'
-import { Checkbox } from '~/app/components/checkbox'
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
 import { Stack } from '~/app/components/stack'
@@ -214,7 +214,7 @@ export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: Bucket
             <Stack>
               <Form.Field name='localAlias.allow.owner'>
                 {(field) => (
-                  <div className='flex items-center gap-2 cursor-pointer'>
+                  <div className='flex cursor-pointer items-center gap-2'>
                     <Checkbox
                       id='localAlias.allow.owner'
                       checked={field.state.value}
@@ -228,7 +228,7 @@ export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: Bucket
 
               <Form.Field name='localAlias.allow.read'>
                 {(field) => (
-                  <div className='flex items-center gap-2 cursor-pointer'>
+                  <div className='flex cursor-pointer items-center gap-2'>
                     <Checkbox
                       id='localAlias.allow.read'
                       checked={field.state.value}
@@ -242,7 +242,7 @@ export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: Bucket
 
               <Form.Field name='localAlias.allow.write'>
                 {(field) => (
-                  <div className='flex items-center gap-2 cursor-pointer'>
+                  <div className='flex cursor-pointer items-center gap-2'>
                     <Checkbox
                       id='localAlias.allow.write'
                       checked={field.state.value}

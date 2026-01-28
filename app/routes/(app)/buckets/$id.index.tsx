@@ -2,10 +2,22 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbButton,
+  BreadcrumbSeparator
+} from '~/app/components/breadcrumb'
+import { Button } from '~/app/components/button'
+import { Heading } from '~/app/components/heading'
+import { IconBox } from '~/app/components/icon-box'
+import { Spinner } from '~/app/components/spinner'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import { getBucketInfo } from '~/app/services/bucket.service'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
-// Code split browse tab component using React.lazy
 const ObjectBrowser = React.lazy(() =>
   import('./-partials/object-browser').then((m) => ({ default: m.ObjectBrowser }))
 )
@@ -28,7 +40,6 @@ function bucketQuery(bucketId: string) {
   })
 }
 
-// Helper function to format bytes
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B'
   const k = 1024
@@ -37,9 +48,7 @@ function formatBytes(bytes: number): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }
 
-// Helper function to get bucket display name
 function getBucketDisplayName(bucket: GetBucketInfoResponse): string {
-  // Prefer global alias, then bucket ID
   if (
     bucket.globalAliases &&
     Array.isArray(bucket.globalAliases) &&
@@ -59,19 +68,27 @@ function RouteComponent() {
   const search = Route.useSearch()
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
-  // Fetch bucket info
   const { data: bucketData, refetch } = useSuspenseQuery(bucketQuery(id))
   const bucket = bucketData?.data
 
   if (!bucket) {
     return (
       <div className='mx-auto max-w-screen-2xl space-y-6'>
-        <div className='rounded-lg border border-red-200 bg-white px-8 py-6 text-center shadow-md'>
-          <h2 className='mb-2 text-xl font-semibold text-red-600'>Bucket not found</h2>
-          <p className='mb-4 text-sm text-gray-500'>The bucket you're looking for doesn't exist.</p>
-          <Link to='/buckets' className='text-blue-600 hover:text-blue-800'>
-            Back to Buckets
-          </Link>
+        <div className='border-danger/20 bg-danger/5 flex flex-col items-center gap-4 rounded-lg border px-8 py-6 text-center'>
+          <IconBox variant='danger' size='lg' circle>
+            <Lucide.AlertTriangle className='size-12' />
+          </IconBox>
+          <Stack>
+            <Heading level={2} className='text-danger'>
+              Bucket not found
+            </Heading>
+            <Text className='text-muted-foreground'>
+              The bucket you're looking for doesn't exist.
+            </Text>
+            <Link to='/buckets' className='text-primary hover:text-primary/80'>
+              Back to Buckets
+            </Link>
+          </Stack>
         </div>
       </div>
     )
@@ -79,7 +96,6 @@ function RouteComponent() {
 
   const displayName = getBucketDisplayName(bucket)
 
-  // Handle refresh button click
   const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
@@ -91,132 +107,99 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
-      {/* Breadcrumb Navigation */}
-      <nav className='flex items-center gap-2 text-sm'>
-        <Link
-          to='/buckets'
-          className='flex items-center gap-1 text-gray-500 transition-colors hover:text-gray-700'
-        >
-          <Lucide.Home className='size-4' />
-          <span>Buckets</span>
-        </Link>
-        <Lucide.ChevronRight className='size-4 text-gray-400' />
-        <span className='truncate font-medium text-gray-900'>{displayName}</span>
-      </nav>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbButton render={<Link to='/buckets' />}>
+              <Lucide.Home className='size-4' />
+              Buckets
+            </BreadcrumbButton>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbButton active>{displayName}</BreadcrumbButton>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-      {/* Page Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='space-y-1'>
-          <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>{displayName}</h1>
+          <Heading size='lg'>{displayName}</Heading>
           {displayName !== bucket.id && (
-            <p className='text-sm text-gray-500'>
+            <Text className='text-sm'>
               ID:{' '}
-              <code className='rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-600'>
-                {bucket.id}
-              </code>
-            </p>
+              <Text className='bg-muted rounded px-1.5 py-0.5 font-mono text-xs'>{bucket.id}</Text>
+            </Text>
           )}
         </div>
         <div className='flex gap-2'>
-          <button
-            type='button'
+          <Button
+            variant='outline'
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className={`inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
-              isRefreshing ? 'animate-pulse' : ''
-            }`}
-            title='Refresh'
+            progress={isRefreshing}
           >
-            {isRefreshing ? (
-              <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
-            ) : (
-              <Lucide.RefreshCw className='size-4' />
-            )}
-          </button>
-          <Link
-            to='/buckets/$id/settings'
-            params={{ id }}
-            className='inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-          >
-            <Lucide.Settings2 className='size-4' />
-            Settings
+            <Lucide.RefreshCw className='size-4' />
+            Refresh
+          </Button>
+          <Link to='/buckets/$id/settings' params={{ id }}>
+            <Button variant='outline'>
+              <Lucide.Settings2 className='size-4' />
+              Settings
+            </Button>
           </Link>
         </div>
       </div>
 
-      {/* Quick Stats Bar */}
-      <div className='grid grid-cols-2 gap-4 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-4'>
+      <div className='border-border bg-background grid grid-cols-2 gap-4 rounded-xl border p-4 sm:grid-cols-4'>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50'>
-            <Lucide.FileText className='size-5 text-blue-600' />
-          </div>
+          <IconBox variant='info' size='md'>
+            <Lucide.FileText className='size-5' />
+          </IconBox>
           <div className='min-w-0'>
-            <p className='text-xs font-medium text-gray-500'>Objects</p>
-            <p className='text-sm font-semibold text-gray-900'>{bucket.objects}</p>
+            <Text className='text-muted-foreground text-xs font-medium'>Objects</Text>
+            <Text className='text-sm font-semibold'>{bucket.objects}</Text>
           </div>
         </div>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-purple-50'>
-            <Lucide.HardDrive className='size-5 text-purple-600' />
-          </div>
+          <IconBox variant='tertiary' size='md'>
+            <Lucide.HardDrive className='size-5' />
+          </IconBox>
           <div className='min-w-0'>
-            <p className='text-xs font-medium text-gray-500'>Size</p>
-            <p className='text-sm font-semibold text-gray-900'>{formatBytes(bucket.bytes)}</p>
+            <Text className='text-muted-foreground text-xs font-medium'>Size</Text>
+            <Text className='text-sm font-semibold'>{formatBytes(bucket.bytes)}</Text>
           </div>
         </div>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-green-50'>
-            <Lucide.Calendar className='size-5 text-green-600' />
-          </div>
+          <IconBox variant='success' size='md'>
+            <Lucide.Calendar className='size-5' />
+          </IconBox>
           <div className='min-w-0'>
-            <p className='text-xs font-medium text-gray-500'>Created</p>
-            <p className='text-sm font-semibold text-gray-900'>
+            <Text className='text-muted-foreground text-xs font-medium'>Created</Text>
+            <Text className='text-sm font-semibold'>
               {new Date(bucket.created).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric'
               })}
-            </p>
+            </Text>
           </div>
         </div>
         <div className='flex items-center gap-3'>
-          <div
-            className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${
-              bucket.websiteAccess ? 'bg-emerald-50' : 'bg-gray-100'
-            }`}
-          >
-            <Lucide.Globe
-              className={`size-5 ${bucket.websiteAccess ? 'text-emerald-600' : 'text-gray-400'}`}
-            />
-          </div>
+          <IconBox variant={bucket.websiteAccess ? 'success' : 'secondary-subtle'} size='md'>
+            <Lucide.Globe className='size-5' />
+          </IconBox>
           <div className='min-w-0'>
-            <p className='text-xs font-medium text-gray-500'>Website</p>
-            <p
-              className={`text-sm font-semibold ${
-                bucket.websiteAccess ? 'text-emerald-600' : 'text-gray-500'
-              }`}
+            <Text className='text-muted-foreground text-xs font-medium'>Website</Text>
+            <Text
+              className={`text-sm font-semibold ${bucket.websiteAccess ? 'text-success' : 'text-muted-foreground'}`}
             >
               {bucket.websiteAccess ? 'Enabled' : 'Disabled'}
-            </p>
+            </Text>
           </div>
         </div>
       </div>
 
-      {/* Object Browser */}
       <React.Suspense fallback={<ObjectBrowserFallback />}>
         <ObjectBrowser
           queryClient={queryClient}
@@ -230,27 +213,12 @@ function RouteComponent() {
   )
 }
 
-// Loading fallback component for Suspense
 function ObjectBrowserFallback() {
   return (
     <div className='animate-in fade-in flex items-center justify-center py-12 duration-300'>
       <div className='flex flex-col items-center gap-4'>
-        <svg className='size-8 animate-spin text-blue-600' fill='none' viewBox='0 0 24 24'>
-          <circle
-            className='opacity-25'
-            cx='12'
-            cy='12'
-            r='10'
-            stroke='currentColor'
-            strokeWidth='4'
-          />
-          <path
-            className='opacity-75'
-            fill='currentColor'
-            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-          />
-        </svg>
-        <p className='text-sm text-gray-500'>Loading bucket content...</p>
+        <Spinner className='text-primary size-8' />
+        <Text className='text-muted-foreground text-sm'>Loading bucket content...</Text>
       </div>
     </div>
   )

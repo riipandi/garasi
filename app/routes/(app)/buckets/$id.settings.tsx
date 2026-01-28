@@ -14,6 +14,10 @@ import {
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
+import { Heading } from '~/app/components/heading'
+import { Spinner } from '~/app/components/spinner'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
 import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
@@ -33,7 +37,6 @@ import { KeySelectorDialog } from './-partials/key-selector-dialog'
 
 type SizeUnit = 'MB' | 'GB' | 'TB'
 
-// Conversion utilities
 const BYTES_PER_MB = 1024 * 1024
 const BYTES_PER_GB = 1024 * 1024 * 1024
 const BYTES_PER_TB = 1024 * 1024 * 1024 * 1024
@@ -43,7 +46,6 @@ function bytesToSizeUnit(bytes: number | null | undefined): { value: string; uni
     return { value: '', unit: 'GB' }
   }
 
-  // Determine the best unit to use
   if (bytes >= BYTES_PER_TB) {
     return { value: (bytes / BYTES_PER_TB).toString(), unit: 'TB' }
   } else if (bytes >= BYTES_PER_GB) {
@@ -111,20 +113,17 @@ function RouteComponent() {
     alias: string
   } | null>(null)
 
-  // Inline edit form state
   const [websiteAccessEnabled, setWebsiteAccessEnabled] = React.useState(false)
   const [indexDocument, setIndexDocument] = React.useState('')
   const [errorDocument, setErrorDocument] = React.useState('')
-  const [maxObjects, setMaxObjects] = React.useState<string>('')
+  const [maxObjects, setMaxObjects] = React.useState('')
   const [maxSize, setMaxSize] = React.useState('')
   const [maxSizeUnit, setMaxSizeUnit] = React.useState<SizeUnit>('GB')
   const [sizeWarning, setSizeWarning] = React.useState<string | null>(null)
 
-  // Fetch bucket info
   const { data: bucketData } = useSuspenseQuery(bucketQuery(id))
   const bucket = bucketData?.data
 
-  // Initialize form with bucket data
   React.useEffect(() => {
     if (bucket) {
       setWebsiteAccessEnabled(bucket.websiteAccess)
@@ -137,7 +136,6 @@ function RouteComponent() {
     }
   }, [bucket])
 
-  // Validate max size minimum limit (100MB)
   React.useEffect(() => {
     if (!maxSize || maxSize === '') {
       setSizeWarning(null)
@@ -163,7 +161,6 @@ function RouteComponent() {
     }
   }, [maxSize, maxSizeUnit])
 
-  // Update bucket mutation
   const updateBucketMutation = useMutation({
     mutationFn: async (values: UpdateBucketRequest) => {
       return updateBucket(id, values)
@@ -178,7 +175,6 @@ function RouteComponent() {
     }
   })
 
-  // Delete bucket mutation
   const deleteBucketMutation = useMutation({
     mutationFn: async () => {
       return deleteBucket(id)
@@ -193,7 +189,6 @@ function RouteComponent() {
     }
   })
 
-  // Add global alias mutation
   const addGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
       const data: AddGlobalBucketAliasRequest = { globalAlias, bucketId: id }
@@ -210,7 +205,6 @@ function RouteComponent() {
     }
   })
 
-  // Remove global alias mutation
   const removeGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
       const data: Omit<RemoveBucketGlobalAliasRequest, 'bucketId'> = { globalAlias }
@@ -226,7 +220,6 @@ function RouteComponent() {
     }
   })
 
-  // Add local alias mutation
   const addLocalAliasMutation = useMutation({
     mutationFn: async (data: AddLocalBucketAliasRequest) => {
       return addBucketAlias(id, data)
@@ -241,7 +234,6 @@ function RouteComponent() {
     }
   })
 
-  // Remove local alias mutation
   const removeLocalAliasMutation = useMutation({
     mutationFn: async (data: { localAlias: string; accessKeyId: string }) => {
       const requestData: Omit<RemoveBucketLocalAliasRequest, 'bucketId'> = {
@@ -260,7 +252,6 @@ function RouteComponent() {
     }
   })
 
-  // Allow bucket key mutation
   const allowBucketKeyMutation = useMutation({
     mutationFn: async (data: {
       accessKeyId: string
@@ -285,7 +276,6 @@ function RouteComponent() {
     }
   })
 
-  // Deny bucket key mutation
   const denyBucketKeyMutation = useMutation({
     mutationFn: async (data: {
       accessKeyId: string
@@ -329,7 +319,6 @@ function RouteComponent() {
   const handleEditBucket = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validate max size minimum limit (100MB)
     if (maxSize) {
       const bytes = sizeUnitToBytes(maxSize, maxSizeUnit)
       const MIN_SIZE_BYTES = 100 * BYTES_PER_MB
@@ -347,7 +336,6 @@ function RouteComponent() {
       }
     }
 
-    // Website access configuration
     if (websiteAccessEnabled || indexDocument || errorDocument) {
       values.websiteAccess = {
         enabled: websiteAccessEnabled,
@@ -356,7 +344,6 @@ function RouteComponent() {
       }
     }
 
-    // Quotas configuration
     if (maxObjects || maxSize) {
       values.quotas = {
         maxObjects: maxObjects ? parseInt(maxObjects, 10) : null,
@@ -478,22 +465,8 @@ function RouteComponent() {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='flex flex-col items-center'>
-          <svg className='size-12 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
-            <circle
-              className='opacity-25'
-              cx='12'
-              cy='12'
-              r='10'
-              stroke='currentColor'
-              strokeWidth='4'
-            />
-            <path
-              className='opacity-75'
-              fill='currentColor'
-              d='M4 12a8 8 0 018-8V0C5.373 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-            />
-          </svg>
-          <p className='mt-4 text-sm text-gray-600'>Loading bucket settings...</p>
+          <Spinner className='text-primary size-12' />
+          <Text className='text-muted-foreground mt-4 text-sm'>Loading bucket settings...</Text>
         </div>
       </div>
     )
@@ -501,41 +474,28 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-5xl space-y-6'>
-      {/* Page Header */}
       <div className='min-w-0 flex-1'>
         <div className='flex items-center justify-between'>
           <div>
-            <Link
-              to='/buckets/$id'
-              params={{ id }}
-              search={{ key: undefined, prefix: undefined }}
-              className='mb-3 inline-flex items-center text-sm text-gray-500 hover:text-gray-700'
-            >
-              <Lucide.ArrowLeft className='mr-2 size-4' />
-              Back to Bucket
+            <Link to='/buckets/$id' params={{ id }} search={{ key: undefined, prefix: undefined }}>
+              <Button variant='plain' size='sm'>
+                <Lucide.ArrowLeft className='mr-2 size-4' />
+                Back to Bucket
+              </Button>
             </Link>
-            <h1 className='text-3xl font-bold text-gray-900'>Bucket Settings</h1>
-            <p className='mt-1 text-base text-gray-500'>Manage settings for bucket {bucket.id}</p>
+            <Stack>
+              <Heading size='lg'>Bucket Settings</Heading>
+              <Text className='text-muted-foreground'>Manage settings for bucket {bucket.id}</Text>
+            </Stack>
           </div>
         </div>
       </div>
 
-      {/* Page Content */}
       <div className='min-w-0 flex-1'>
-        <div className='space-y-6'>
-          {/* Alerts */}
-          {successMessage && (
-            <div className='mx-auto w-full'>
-              <Alert variant='success'>{successMessage}</Alert>
-            </div>
-          )}
-          {errorMessage && (
-            <div className='mx-auto w-full'>
-              <Alert variant='danger'>{errorMessage}</Alert>
-            </div>
-          )}
+        <Stack>
+          {successMessage && <Alert variant='success'>{successMessage}</Alert>}
+          {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
 
-          {/* Settings Form */}
           <BucketConfigurationForm
             websiteAccessEnabled={websiteAccessEnabled}
             setWebsiteAccessEnabled={setWebsiteAccessEnabled}
@@ -554,7 +514,6 @@ function RouteComponent() {
             sizeWarning={sizeWarning}
           />
 
-          {/* Aliases Section */}
           <AliasesSection
             bucket={bucket}
             onShowAddGlobalAliasDialog={() => setShowAddGlobalAliasDialog(true)}
@@ -563,7 +522,6 @@ function RouteComponent() {
             onRemoveLocalAlias={handleRemoveLocalAlias}
           />
 
-          {/* Access Keys Section */}
           <AccessKeysSection
             bucket={bucket}
             onShowKeySelectorDialog={() => setShowKeySelectorDialog(true)}
@@ -571,12 +529,10 @@ function RouteComponent() {
             onDeleteKey={handleDeleteKey}
           />
 
-          {/* Delete Bucket Section - Moved to Last Position */}
           <DeleteBucketSection onDeleteBucket={handleDeleteBucket} objectCount={bucket.objects} />
-        </div>
+        </Stack>
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogPopup>
           <AlertDialogHeader>
@@ -596,6 +552,7 @@ function RouteComponent() {
                   variant='danger'
                   onClick={handleConfirmDelete}
                   disabled={deleteBucketMutation.isPending}
+                  progress={deleteBucketMutation.isPending}
                 >
                   {deleteBucketMutation.isPending ? 'Deleting...' : 'Delete'}
                 </Button>
@@ -605,7 +562,6 @@ function RouteComponent() {
         </AlertDialogPopup>
       </AlertDialog>
 
-      {/* Add Global Alias Dialog */}
       <AddGlobalAlias
         isOpen={showAddGlobalAliasDialog}
         onClose={() => setShowAddGlobalAliasDialog(false)}
@@ -613,7 +569,6 @@ function RouteComponent() {
         isSubmitting={addGlobalAliasMutation.isPending}
       />
 
-      {/* Delete Global Alias Confirmation Dialog */}
       <AlertDialog
         open={showDeleteGlobalAliasConfirm}
         onOpenChange={setShowDeleteGlobalAliasConfirm}
@@ -636,6 +591,7 @@ function RouteComponent() {
                   variant='danger'
                   onClick={handleConfirmDeleteGlobalAlias}
                   disabled={removeGlobalAliasMutation.isPending}
+                  progress={removeGlobalAliasMutation.isPending}
                 >
                   {removeGlobalAliasMutation.isPending ? 'Deleting...' : 'Delete'}
                 </Button>
@@ -645,7 +601,6 @@ function RouteComponent() {
         </AlertDialogPopup>
       </AlertDialog>
 
-      {/* Delete Key Confirmation Dialog */}
       <AlertDialog open={showDeleteKeyConfirm} onOpenChange={setShowDeleteKeyConfirm}>
         <AlertDialogPopup>
           <AlertDialogHeader>
@@ -664,6 +619,7 @@ function RouteComponent() {
                   variant='danger'
                   onClick={handleConfirmDeleteKey}
                   disabled={denyBucketKeyMutation.isPending}
+                  progress={denyBucketKeyMutation.isPending}
                 >
                   {denyBucketKeyMutation.isPending ? 'Deleting...' : 'Delete'}
                 </Button>
@@ -673,7 +629,6 @@ function RouteComponent() {
         </AlertDialogPopup>
       </AlertDialog>
 
-      {/* Delete Local Alias Confirmation Dialog */}
       <AlertDialog open={showDeleteLocalAliasConfirm} onOpenChange={setShowDeleteLocalAliasConfirm}>
         <AlertDialogPopup>
           <AlertDialogHeader>
@@ -693,6 +648,7 @@ function RouteComponent() {
                   variant='danger'
                   onClick={handleConfirmDeleteLocalAlias}
                   disabled={removeLocalAliasMutation.isPending}
+                  progress={removeLocalAliasMutation.isPending}
                 >
                   {removeLocalAliasMutation.isPending ? 'Deleting...' : 'Delete'}
                 </Button>
@@ -702,7 +658,6 @@ function RouteComponent() {
         </AlertDialogPopup>
       </AlertDialog>
 
-      {/* Key Selector Dialog */}
       <KeySelectorDialog
         isOpen={showKeySelectorDialog}
         onClose={handleCloseKeySelector}
@@ -710,7 +665,6 @@ function RouteComponent() {
         onAllowKey={handleAllowBucketKeyFromDialog}
       />
 
-      {/* Add Local Alias Dialog */}
       <AddLocalAlias
         isOpen={showAddLocalAliasDialog}
         onClose={() => setShowAddLocalAliasDialog(false)}

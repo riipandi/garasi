@@ -1,6 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { Button } from '~/app/components/button'
+import { Checkbox } from '~/app/components/checkbox'
+import { Heading } from '~/app/components/heading'
+import { IconBox } from '~/app/components/icon-box'
+import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
+import { Spinner } from '~/app/components/spinner'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import fetcher from '~/app/fetcher'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
@@ -20,7 +28,6 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
   const [permissions, setPermissions] = React.useState({ owner: true, read: true, write: true })
   const [searchQuery, setSearchQuery] = React.useState('')
 
-  // Fetch all keys for the selector dialog
   const { data: keysData, isLoading: isKeysLoading } = useQuery({
     queryKey: ['keys'],
     queryFn: () => fetcher<{ data: ListAccessKeysResponse[] }>('/keys')
@@ -28,11 +35,9 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
 
   const allKeys = keysData?.data ?? []
 
-  // Filter out keys that are already assigned to this bucket
   const assignedKeyIds = Array.isArray(bucket.keys) ? bucket.keys.map((k) => k.accessKeyId) : []
   const availableKeys = allKeys.filter((key) => !assignedKeyIds.includes(key.id))
 
-  // Filter keys by search query
   const filteredKeys = availableKeys.filter((key) => {
     const query = searchQuery.toLowerCase()
     return key.name.toLowerCase().includes(query) || key.id.toLowerCase().includes(query)
@@ -62,210 +67,190 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
         isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
       }`}
     >
-      <div className='mx-auto w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl'>
-        {/* Header */}
-        <div className='flex items-center justify-between border-b border-gray-200 px-6 py-4'>
-          <div className='flex items-center gap-3'>
-            <div className='flex size-10 items-center justify-center rounded-full bg-blue-100'>
-              <Lucide.Lock className='size-5 text-blue-600' />
-            </div>
+      <div className='border-border bg-background mx-auto w-full max-w-md overflow-hidden rounded-lg border shadow-xl'>
+        <div className='border-border flex items-center justify-between border-b px-6 py-4'>
+          <Stack direction='row' className='items-start'>
+            <IconBox variant='info' size='md' circle>
+              <Lucide.Lock className='size-5' />
+            </IconBox>
             <div>
-              <h3 className='text-base font-semibold text-gray-900'>Allow Access Key</h3>
-              <p className='text-xs text-gray-500'>Grant access to this bucket</p>
+              <Heading level={3}>Allow Access Key</Heading>
+              <Text className='text-muted-foreground text-xs'>Grant access to this bucket</Text>
             </div>
-          </div>
-          <button
-            type='button'
-            onClick={handleClose}
-            className='rounded-md p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:outline-none'
-          >
+          </Stack>
+          <Button type='button' variant='plain' size='sm-icon' onClick={handleClose}>
             <Lucide.X className='size-5' />
-          </button>
+          </Button>
         </div>
 
-        {/* Content */}
         <div className='px-6 py-4'>
           {isKeysLoading ? (
             <div className='flex flex-col items-center justify-center py-12'>
-              <svg className='size-8 animate-spin text-blue-600' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
-              <p className='mt-3 text-sm text-gray-600'>Loading keys...</p>
+              <Spinner className='text-primary size-8' />
+              <Text className='text-muted-foreground mt-3 text-sm'>Loading keys...</Text>
             </div>
           ) : availableKeys.length === 0 ? (
-            <div className='flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 px-6 py-12'>
-              <div className='flex size-12 items-center justify-center rounded-full bg-gray-100'>
-                <Lucide.Lock className='size-6 text-gray-400' />
-              </div>
-              <p className='mt-3 text-sm font-medium text-gray-700'>
+            <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-12'>
+              <IconBox variant='tertiary-subtle' size='lg' circle>
+                <Lucide.Lock className='size-6' />
+              </IconBox>
+              <Text className='mt-3 text-sm font-medium'>
                 {allKeys.length === 0 ? 'No keys available' : 'All keys already have access'}
-              </p>
-              <p className='mt-1 text-xs text-gray-500'>
+              </Text>
+              <Text className='text-muted-foreground mt-1 text-xs'>
                 {allKeys.length === 0
                   ? 'Create a key first to grant access'
                   : 'All existing keys are already assigned to this bucket'}
-              </p>
+              </Text>
             </div>
           ) : (
             <>
               <div className='mb-4'>
-                <label className='mb-2 block text-xs font-semibold tracking-wider text-gray-500 uppercase'>
+                <Text className='text-muted-foreground mb-2 block text-xs font-semibold tracking-wider uppercase'>
                   Select Key
-                </label>
-                {/* Search Bar */}
-                <div className='relative mb-3'>
-                  <Lucide.Search className='absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400' />
+                </Text>
+                <InputGroup>
+                  <InputGroupAddon align='start'>
+                    <Lucide.Search className='text-muted-foreground size-4' />
+                  </InputGroupAddon>
                   <input
                     type='text'
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder='Search by name or ID...'
-                    className='w-full rounded-lg border border-gray-200 py-2 pr-4 pl-10 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 focus:outline-none'
+                    className='flex-1 bg-transparent py-2 pr-4 pl-2 text-sm outline-none'
                   />
                   {searchQuery && (
-                    <button
-                      type='button'
-                      onClick={() => setSearchQuery('')}
-                      className='absolute top-1/2 right-3 size-4 -translate-y-1/2 rounded-full bg-gray-200 text-gray-500 hover:bg-gray-300 focus:outline-none'
-                    >
-                      <Lucide.X className='size-3' />
-                    </button>
+                    <InputGroupAddon align='end'>
+                      <Button
+                        type='button'
+                        variant='plain'
+                        size='xs-icon'
+                        onClick={() => setSearchQuery('')}
+                      >
+                        <Lucide.X className='size-3' />
+                      </Button>
+                    </InputGroupAddon>
                   )}
-                </div>
+                </InputGroup>
 
-                {/* Key List */}
-                <div className='max-h-56 overflow-y-auto rounded-lg border border-gray-200'>
+                <div className='border-border max-h-56 overflow-y-auto rounded-lg border'>
                   {filteredKeys.length === 0 ? (
                     <div className='flex flex-col items-center justify-center px-4 py-8'>
-                      <Lucide.Search className='size-8 text-gray-300' />
-                      <p className='mt-2 text-sm text-gray-500'>
+                      <IconBox variant='tertiary-subtle' size='md' circle>
+                        <Lucide.Search className='size-8' />
+                      </IconBox>
+                      <Text className='text-muted-foreground mt-2 text-sm'>
                         {searchQuery ? 'No keys found matching your search' : 'No keys available'}
-                      </p>
+                      </Text>
                     </div>
                   ) : (
-                    <div className='divide-y divide-gray-100'>
+                    <Stack>
                       {filteredKeys.map((key) => (
                         <button
                           key={key.id}
                           type='button'
                           onClick={() => handleSelectKey(key.id)}
                           className={`flex w-full items-center gap-2 px-3 py-2 text-left transition-all ${
-                            selectedKey === key.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+                            selectedKey === key.id ? 'bg-primary/10' : 'hover:bg-muted/50'
                           }`}
                         >
-                          <div
-                            className={`flex size-6 shrink-0 items-center justify-center rounded-full ${
-                              selectedKey === key.id ? 'bg-blue-500' : 'bg-gray-100'
-                            }`}
+                          <IconBox
+                            variant={selectedKey === key.id ? 'primary' : 'secondary-subtle'}
+                            size='sm'
+                            circle
                           >
                             {selectedKey === key.id ? (
-                              <Lucide.Check className='size-3.5 text-white' />
+                              <Lucide.Check className='size-3.5' />
                             ) : (
-                              <Lucide.Key className='size-3 text-gray-500' />
+                              <Lucide.Key className='size-3' />
                             )}
-                          </div>
+                          </IconBox>
                           <div className='min-w-0 flex-1'>
-                            <span className='block truncate text-sm font-medium text-gray-900'>
-                              {key.name}
-                            </span>
-                            <span className='block truncate font-mono text-xs text-gray-500'>
+                            <Text className='block truncate text-sm font-medium'>{key.name}</Text>
+                            <Text className='text-muted-foreground block truncate font-mono text-xs'>
                               {key.id}
-                            </span>
+                            </Text>
                           </div>
                         </button>
                       ))}
-                    </div>
+                    </Stack>
                   )}
                 </div>
 
-                {/* Key Count */}
-                <div className='mt-2 flex items-center justify-between text-xs text-gray-500'>
-                  <span>
+                <div className='text-muted-foreground mt-2 flex items-center justify-between text-xs'>
+                  <Text>
                     Showing {filteredKeys.length} of {availableKeys.length} key
                     {availableKeys.length !== 1 ? 's' : ''}
-                  </span>
+                  </Text>
                   {searchQuery && (
-                    <button
+                    <Button
                       type='button'
+                      variant='plain'
+                      size='xs'
                       onClick={() => setSearchQuery('')}
-                      className='text-blue-600 hover:text-blue-700'
                     >
                       Clear search
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
 
-              {/* Permissions */}
-              <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <label className='mb-3 block text-xs font-semibold tracking-wider text-gray-500 uppercase'>
+              <div className='border-border bg-muted/30 rounded-lg border p-4'>
+                <Text className='text-muted-foreground mb-3 block text-xs font-semibold tracking-wider uppercase'>
                   Permissions
-                </label>
-                <div className='grid grid-cols-3 gap-3'>
-                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-checked:border-blue-500 has-checked:bg-blue-50'>
-                    <input
-                      type='checkbox'
+                </Text>
+                <Stack direction='row'>
+                  <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
+                    <Checkbox
+                      id='owner'
                       checked={permissions.owner}
-                      onChange={(e) => setPermissions({ ...permissions, owner: e.target.checked })}
-                      className='h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0'
+                      onCheckedChange={(checked) =>
+                        setPermissions({ ...permissions, owner: checked as boolean })
+                      }
                     />
-                    <span className='text-sm font-medium text-gray-700'>Owner</span>
-                  </label>
-                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-checked:border-blue-500 has-checked:bg-blue-50'>
-                    <input
-                      type='checkbox'
+                    <Text className='text-sm font-medium'>Owner</Text>
+                  </div>
+                  <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
+                    <Checkbox
+                      id='read'
                       checked={permissions.read}
-                      onChange={(e) => setPermissions({ ...permissions, read: e.target.checked })}
-                      className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0'
+                      onCheckedChange={(checked) =>
+                        setPermissions({ ...permissions, read: checked as boolean })
+                      }
                     />
-                    <span className='text-sm font-medium text-gray-700'>Read</span>
-                  </label>
-                  <label className='flex cursor-pointer items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5 transition-all hover:border-blue-300 has-checked:border-blue-500 has-checked:bg-blue-50'>
-                    <input
-                      type='checkbox'
+                    <Text className='text-sm font-medium'>Read</Text>
+                  </div>
+                  <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
+                    <Checkbox
+                      id='write'
                       checked={permissions.write}
-                      onChange={(e) => setPermissions({ ...permissions, write: e.target.checked })}
-                      className='h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-0'
+                      onCheckedChange={(checked) =>
+                        setPermissions({ ...permissions, write: checked as boolean })
+                      }
                     />
-                    <span className='text-sm font-medium text-gray-700'>Write</span>
-                  </label>
-                </div>
+                    <Text className='text-sm font-medium'>Write</Text>
+                  </div>
+                </Stack>
               </div>
             </>
           )}
         </div>
 
-        {/* Footer */}
         {availableKeys.length > 0 && !isKeysLoading && filteredKeys.length > 0 && (
-          <div className='flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4'>
-            <button
-              type='button'
-              onClick={handleClose}
-              className='rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-            >
+          <div className='border-border bg-muted/30 flex items-center justify-end gap-3 border-t px-6 py-4'>
+            <Button type='button' variant='outline' onClick={handleClose}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type='button'
-              onClick={handleAllowSelectedKey}
+              variant='primary'
               disabled={!selectedKey}
-              className='flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+              onClick={handleAllowSelectedKey}
             >
               <Lucide.Plus className='size-4' />
               Allow Key
-            </button>
+            </Button>
           </div>
         )}
       </div>
