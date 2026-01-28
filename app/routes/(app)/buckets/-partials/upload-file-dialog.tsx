@@ -1,5 +1,6 @@
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { Button } from '~/app/components/button'
 import {
   Dialog,
   DialogBody,
@@ -8,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader
 } from '~/app/components/dialog'
-import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/text'
@@ -100,7 +100,7 @@ export function UploadFileDialog({
             </IconBox>
             <div>
               <DialogTitle>Upload Files</DialogTitle>
-              <Text className='text-sm text-muted-foreground'>Select files to upload</Text>
+              <Text className='text-muted-foreground text-sm'>Select files to upload</Text>
             </div>
           </Stack>
         </DialogHeader>
@@ -115,19 +115,15 @@ export function UploadFileDialog({
             onDrop={handleDrop}
           >
             <div
-              className={`mt-4 rounded-lg border-2 border-dashed bg-muted/30 px-6 py-8 text-center transition-all ${
+              className={`bg-muted/30 mt-4 rounded-lg border-2 border-dashed px-6 py-8 text-center transition-all ${
                 dragActive ? 'border-primary bg-primary/10' : 'border-border'
               }`}
             >
               <Lucide.UploadCloud
                 className={`mx-auto size-12 transition-all ${dragActive ? 'text-primary' : 'text-muted-foreground'}`}
               />
-              <Text className='mt-2 text-sm font-medium'>
-                Click to upload or drag and drop
-              </Text>
-              <Text className='mt-1 text-xs text-muted-foreground'>
-                Any file type is supported
-              </Text>
+              <Text className='mt-2 text-sm font-medium'>Click to upload or drag and drop</Text>
+              <Text className='text-muted-foreground mt-1 text-xs'>Any file type is supported</Text>
               <input
                 type='file'
                 multiple
@@ -137,15 +133,18 @@ export function UploadFileDialog({
               />
             </div>
             {selectedFiles.length > 0 && (
-              <div className='mt-4 rounded-lg border border-border bg-muted/30 p-3'>
+              <div className='border-border bg-muted/30 mt-4 rounded-lg border p-3'>
                 <Text className='mb-2 text-sm font-medium'>
                   {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
                 </Text>
                 <Stack>
                   {selectedFiles.map((file, index) => (
-                    <div key={`file-${index}`} className='flex items-center justify-between text-sm'>
+                    <div
+                      key={`file-${index}`}
+                      className='flex items-center justify-between text-sm'
+                    >
                       <Text className='truncate'>{file.name}</Text>
-                      <Text className='text-xs text-muted-foreground'>
+                      <Text className='text-muted-foreground text-xs'>
                         {formatFileSize(file.size)}
                       </Text>
                     </div>
@@ -154,12 +153,7 @@ export function UploadFileDialog({
               </div>
             )}
             <Stack>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
+              <Button type='button' variant='outline' onClick={onClose} disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button

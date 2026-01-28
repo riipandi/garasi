@@ -15,7 +15,6 @@ import {
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
 import { Heading } from '~/app/components/heading'
-import { IconBox } from '~/app/components/icon-box'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/text'
 import {
@@ -198,21 +197,17 @@ function RouteComponent() {
 
         <KeyTable keys={keys} onDelete={handleDeleteKey} isLoading={isRefreshing} />
 
-        <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
-          <div className='flex gap-3'>
-            <IconBox variant='info' size='sm'>
-              <Lucide.Info className='size-4' />
-            </IconBox>
-            <div>
-              <h4 className='text-sm font-medium text-blue-900'>Information</h4>
-              <p className='mt-1 text-xs text-blue-700'>
-                Access keys are used to authenticate with the Garage S3 API. Each key consists of an
-                Access Key ID and a Secret Key ID. Keep your secret keys secure and never share them
-                publicly.
-              </p>
-            </div>
+        <Alert variant='info'>
+          <Lucide.Info className='size-4' />
+          <div>
+            <h4 className='text-sm font-medium'>Information</h4>
+            <p className='mt-1 text-xs'>
+              Access keys are used to authenticate with the Garage S3 API. Each key consists of an
+              Access Key ID and a Secret Key ID. Keep your secret keys secure and never share them
+              publicly.
+            </p>
           </div>
-        </div>
+        </Alert>
       </Stack>
 
       {/* Import Modal */}

@@ -196,9 +196,7 @@ function RouteComponent() {
           </Stack>
         ) : (
           <>
-            {Form.state.errors.length > 0 && (
-              <Alert variant='danger'>{Form.state.errors[0]}</Alert>
-            )}
+            {Form.state.errors.length > 0 && <Alert variant='danger'>{Form.state.errors[0]}</Alert>}
 
             <Form.Field
               name='password'
@@ -221,7 +219,9 @@ function RouteComponent() {
             >
               {(field) => (
                 <Field>
-                  <FieldLabel htmlFor='password'>New Password <span className='ml-1 text-red-500'>*</span></FieldLabel>
+                  <FieldLabel htmlFor='password'>
+                    New Password <span className='ml-1 text-red-500'>*</span>
+                  </FieldLabel>
                   <Input
                     ref={passwordInputRef}
                     id='password'
@@ -261,7 +261,9 @@ function RouteComponent() {
             >
               {(field) => (
                 <Field>
-                  <FieldLabel htmlFor='confirmPassword'>Confirm New Password <span className='ml-1 text-red-500'>*</span></FieldLabel>
+                  <FieldLabel htmlFor='confirmPassword'>
+                    Confirm New Password <span className='ml-1 text-red-500'>*</span>
+                  </FieldLabel>
                   <Input
                     id='confirmPassword'
                     name={field.name}

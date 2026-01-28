@@ -1,4 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
+import { Heading } from '~/app/components/heading'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 
 export const Route = createFileRoute('/(app)/metrics')({
   component: RouteComponent
@@ -6,17 +10,20 @@ export const Route = createFileRoute('/(app)/metrics')({
 
 function RouteComponent() {
   return (
-    <div className='mx-auto max-w-screen-2xl space-y-6'>
-      {/* Page Header */}
+    <Stack spacing='lg'>
       <div className='min-w-0 flex-1'>
-        <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>Metrics</h1>
-        <p className='text-normal mt-2 text-gray-500'>Metrics</p>
+        <Heading level={1}>Metrics</Heading>
+        <Text className='mt-2'>Metrics</Text>
       </div>
 
-      {/* Page Content */}
-      <div className='min-w-0 flex-1'>
-        <p>This is page content</p>
-      </div>
-    </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Page Content</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <Text>This is page content</Text>
+        </CardBody>
+      </Card>
+    </Stack>
   )
 }

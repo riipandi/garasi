@@ -3,7 +3,15 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Button } from '~/app/components/button'
 import { Checkbox } from '~/app/components/checkbox'
-import { Heading } from '~/app/components/heading'
+import {
+  Dialog,
+  DialogBody,
+  DialogClose,
+  DialogFooter,
+  DialogHeader,
+  DialogPopup,
+  DialogTitle
+} from '~/app/components/dialog'
 import { IconBox } from '~/app/components/icon-box'
 import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
 import { Spinner } from '~/app/components/spinner'
@@ -62,28 +70,26 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
   }
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity duration-200 ${
-        isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
-      }`}
-    >
-      <div className='border-border bg-background mx-auto w-full max-w-md overflow-hidden rounded-lg border shadow-xl'>
-        <div className='border-border flex items-center justify-between border-b px-6 py-4'>
+    <Dialog open={isOpen}>
+      <DialogPopup className='max-w-md'>
+        <DialogHeader>
           <Stack direction='row' className='items-start'>
             <IconBox variant='info' size='md' circle>
               <Lucide.Lock className='size-5' />
             </IconBox>
             <div>
-              <Heading level={3}>Allow Access Key</Heading>
+              <DialogTitle>Allow Access Key</DialogTitle>
               <Text className='text-muted-foreground text-xs'>Grant access to this bucket</Text>
             </div>
           </Stack>
-          <Button type='button' variant='plain' size='sm-icon' onClick={handleClose}>
-            <Lucide.X className='size-5' />
-          </Button>
-        </div>
+          <DialogClose>
+            <Button type='button' variant='plain' size='sm-icon'>
+              <Lucide.X className='size-5' />
+            </Button>
+          </DialogClose>
+        </DialogHeader>
 
-        <div className='px-6 py-4'>
+        <DialogBody>
           {isKeysLoading ? (
             <div className='flex flex-col items-center justify-center py-12'>
               <Spinner className='text-primary size-8' />
@@ -235,13 +241,15 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
               </div>
             </>
           )}
-        </div>
+        </DialogBody>
 
         {availableKeys.length > 0 && !isKeysLoading && filteredKeys.length > 0 && (
-          <div className='border-border bg-muted/30 flex items-center justify-end gap-3 border-t px-6 py-4'>
-            <Button type='button' variant='outline' onClick={handleClose}>
-              Cancel
-            </Button>
+          <DialogFooter>
+            <DialogClose>
+              <Button type='button' variant='outline'>
+                Cancel
+              </Button>
+            </DialogClose>
             <Button
               type='button'
               variant='primary'
@@ -251,9 +259,9 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
               <Lucide.Plus className='size-4' />
               Allow Key
             </Button>
-          </div>
+          </DialogFooter>
         )}
-      </div>
-    </div>
+      </DialogPopup>
+    </Dialog>
   )
 }

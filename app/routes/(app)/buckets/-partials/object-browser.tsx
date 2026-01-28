@@ -2,18 +2,27 @@ import { useSuspenseQuery, useMutation, QueryClient } from '@tanstack/react-quer
 import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { createFolder, listBucketObjects, uploadFile } from '~/app/services/objects.service'
-import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
-import { DropdownMenu } from './dropdown-menu'
-import { DropdownItem } from './dropdown-item'
-import { CreateFolderDialog } from './create-folder-dialog'
-import { UploadFileDialog } from './upload-file-dialog'
+import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
 import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
+import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
-import { Button } from '~/app/components/button'
-import { TextLink } from '~/app/components/text'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '~/app/components/table'
+import { Text, TextLink } from '~/app/components/text'
+import { createFolder, listBucketObjects, uploadFile } from '~/app/services/objects.service'
+import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
+import { CreateFolderDialog } from './create-folder-dialog'
+import { DropdownItem } from './dropdown-item'
+import { DropdownMenu } from './dropdown-menu'
+import { UploadFileDialog } from './upload-file-dialog'
 
 interface FileItem {
   id: string
@@ -200,7 +209,7 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
       <div className='flex flex-wrap items-center justify-between gap-4'>
         <InputGroup className='min-w-64 flex-1'>
           <InputGroupAddon align='start'>
-            <Lucide.Search className='size-4 text-muted-foreground' />
+            <Lucide.Search className='text-muted-foreground size-4' />
           </InputGroupAddon>
           <input
             type='text'
@@ -211,7 +220,12 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
           />
           {filterText && (
             <InputGroupAddon align='end'>
-              <Button type='button' variant='plain' size='xs-icon' onClick={() => setFilterText('')}>
+              <Button
+                type='button'
+                variant='plain'
+                size='xs-icon'
+                onClick={() => setFilterText('')}
+              >
                 <Lucide.X className='size-4' />
               </Button>
             </InputGroupAddon>
@@ -219,19 +233,33 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         </InputGroup>
 
         <Stack direction='row'>
-          <Button type='button' variant='outline' onClick={() => setShowCreateFolderDialog(true)} disabled={!hasAccessKeys}>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => setShowCreateFolderDialog(true)}
+            disabled={!hasAccessKeys}
+          >
             <Lucide.FolderPlus className='size-4' />
             Create Folder
           </Button>
-          <Button type='button' variant='primary' onClick={() => setShowUploadFileDialog(true)} disabled={!hasAccessKeys}>
+          <Button
+            type='button'
+            variant='primary'
+            onClick={() => setShowUploadFileDialog(true)}
+            disabled={!hasAccessKeys}
+          >
             <Lucide.Upload className='size-4' />
             Upload File
           </Button>
         </Stack>
       </div>
 
-      <div className='flex items-center gap-2 rounded-md border-border bg-background px-2 py-1.5'>
-        <Link to='/buckets/$id' params={{ id: bucketId }} search={{ prefix: undefined, key: undefined }}>
+      <div className='border-border bg-background flex items-center gap-2 rounded-md px-2 py-1.5'>
+        <Link
+          to='/buckets/$id'
+          params={{ id: bucketId }}
+          search={{ prefix: undefined, key: undefined }}
+        >
           <Button variant='plain' size='sm'>
             <Lucide.Home className='size-4' />
           </Button>
@@ -240,10 +268,16 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
           <>
             {breadcrumbSegments.map((segment, index) => (
               <React.Fragment key={segment.path}>
-                <Lucide.ChevronRight className='size-4 text-muted-foreground' />
-                <Link to='/buckets/$id' params={{ id: bucketId }} search={{ prefix: segment.path, key: undefined }}>
+                <Lucide.ChevronRight className='text-muted-foreground size-4' />
+                <Link
+                  to='/buckets/$id'
+                  params={{ id: bucketId }}
+                  search={{ prefix: segment.path, key: undefined }}
+                >
                   <Button variant='plain' size='sm'>
-                    <TextLink className={index === breadcrumbSegments.length - 1 ? 'font-semibold' : ''}>
+                    <TextLink
+                      className={index === breadcrumbSegments.length - 1 ? 'font-semibold' : ''}
+                    >
                       {segment.name}
                     </TextLink>
                   </Button>
@@ -254,40 +288,39 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         )}
       </div>
 
-      <div className='overflow-hidden rounded-lg border-border bg-background'>
-        <div className='grid grid-cols-12 gap-4 border-b border-border bg-muted/30 px-6 py-3'>
-          <Text className='col-span-6 text-xs font-medium tracking-wider text-muted-foreground uppercase'>
-            Name
-          </Text>
-          <Text className='col-span-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>
-            Size
-          </Text>
-          <Text className='col-span-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>
-            Last Modified
-          </Text>
-        </div>
-
-        {folders.length > 0 && (
-          <div className='divide-y divide-border'>
+      <TableContainer>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className='w-1/2'>Name</TableHead>
+              <TableHead className='w-1/4'>Size</TableHead>
+              <TableHead className='w-1/4'>Last Modified</TableHead>
+              <TableHead className='w-12'></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {folders.map((folder) => (
-              <Link
-                key={folder.id}
-                to='/buckets/$id'
-                params={{ id: bucketId }}
-                search={{ prefix: folder.id, key: undefined }}
-                className='relative grid grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-muted/50'
-              >
-                <div className='col-span-6 flex items-center gap-3'>
-                  <IconBox variant='info' size='sm'>
-                    <Lucide.Folder className='size-5' />
-                  </IconBox>
-                  <Text className='text-sm font-medium'>{folder.name}</Text>
-                </div>
-                <div className='col-span-3 text-sm text-muted-foreground'>-</div>
-                <div className='col-span-3 text-sm text-muted-foreground'>
-                  {formatDate(folder.modified)}
-                </div>
-                <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+              <TableRow key={folder.id}>
+                <TableCell>
+                  <Link
+                    to='/buckets/$id'
+                    params={{ id: bucketId }}
+                    search={{ prefix: folder.id, key: undefined }}
+                    className='flex items-center gap-3'
+                  >
+                    <IconBox variant='info' size='sm'>
+                      <Lucide.Folder className='size-5' />
+                    </IconBox>
+                    <Text className='text-sm font-medium'>{folder.name}</Text>
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Text className='text-muted-foreground'>-</Text>
+                </TableCell>
+                <TableCell>
+                  <Text className='text-muted-foreground'>{formatDate(folder.modified)}</Text>
+                </TableCell>
+                <TableCell>
                   <DropdownMenu
                     isOpen={activeDropdown === folder.id}
                     onClose={() => setActiveDropdown(null)}
@@ -299,30 +332,26 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
                       Delete
                     </DropdownItem>
                   </DropdownMenu>
-                </div>
-              </Link>
+                </TableCell>
+              </TableRow>
             ))}
-          </div>
-        )}
-
-        {folders.length > 0 && files.length > 0 && <div className='border-b border-border' />}
-
-        {files.length > 0 && (
-          <div className='divide-y divide-border'>
             {files.map((file) => (
-              <div
-                key={file.id}
-                className='relative grid grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-muted/50 cursor-pointer'
-              >
-                <div className='col-span-6 flex items-center gap-3'>
-                  <IconBox variant='tertiary-subtle' size='sm'>
-                    <Lucide.File className='size-5' />
-                  </IconBox>
-                  <Text className='text-sm font-medium'>{file.name}</Text>
-                </div>
-                <div className='col-span-3 text-sm text-muted-foreground'>{formatFileSize(file.size)}</div>
-                <div className='col-span-3 text-sm text-muted-foreground'>{formatDate(file.modified)}</div>
-                <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+              <TableRow key={file.id}>
+                <TableCell>
+                  <div className='flex items-center gap-3'>
+                    <IconBox variant='tertiary-subtle' size='sm'>
+                      <Lucide.File className='size-5' />
+                    </IconBox>
+                    <Text className='text-sm font-medium'>{file.name}</Text>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Text className='text-muted-foreground'>{formatFileSize(file.size)}</Text>
+                </TableCell>
+                <TableCell>
+                  <Text className='text-muted-foreground'>{formatDate(file.modified)}</Text>
+                </TableCell>
+                <TableCell>
                   <DropdownMenu
                     isOpen={activeDropdown === file.id}
                     onClose={() => setActiveDropdown(null)}
@@ -337,53 +366,51 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
                       Delete
                     </DropdownItem>
                   </DropdownMenu>
-                </div>
-              </div>
+                </TableCell>
+              </TableRow>
             ))}
-          </div>
-        )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-        {filteredFiles.length === 0 && (
-          <div className='flex flex-col items-center justify-center py-12 text-center'>
-            {!hasAccessKeys ? (
-              <>
-                <IconBox variant='tertiary-subtle' size='lg' circle>
-                  <Lucide.Lock className='size-12' />
-                </IconBox>
-                <Stack>
-                  <Text className='text-base font-medium'>No access keys assigned</Text>
-                  <Text className='text-sm text-muted-foreground'>
-                    Assign access keys to this bucket to view and manage objects
-                  </Text>
-                </Stack>
-              </>
-            ) : (
-              <>
-                <IconBox variant='tertiary-subtle' size='lg' circle>
-                  <Lucide.FolderOpen className='size-12' />
-                </IconBox>
-                <Stack>
-                  <Text className='text-base font-medium'>No files or folders found</Text>
-                  <Text className='text-sm text-muted-foreground'>
-                    {filterText
-                      ? 'Try adjusting your search'
-                      : 'Upload files or create folders to get started'}
-                  </Text>
-                </Stack>
-              </>
-            )}
-          </div>
-        )}
-      </div>
+      {filteredFiles.length === 0 && (
+        <div className='flex flex-col items-center justify-center py-12 text-center'>
+          {!hasAccessKeys ? (
+            <>
+              <IconBox variant='tertiary-subtle' size='lg' circle>
+                <Lucide.Lock className='size-12' />
+              </IconBox>
+              <Stack>
+                <Text className='text-base font-medium'>No access keys assigned</Text>
+                <Text className='text-muted-foreground text-sm'>
+                  Assign access keys to this bucket to view and manage objects
+                </Text>
+              </Stack>
+            </>
+          ) : (
+            <>
+              <IconBox variant='tertiary-subtle' size='lg' circle>
+                <Lucide.FolderOpen className='size-12' />
+              </IconBox>
+              <Stack>
+                <Text className='text-base font-medium'>No files or folders found</Text>
+                <Text className='text-muted-foreground text-sm'>
+                  {filterText
+                    ? 'Try adjusting your search'
+                    : 'Upload files or create folders to get started'}
+                </Text>
+              </Stack>
+            </>
+          )}
+        </div>
+      )}
 
       <React.Suspense
         fallback={
           <div className='animate-in fade-in flex items-center justify-center py-8'>
             <div className='flex flex-col items-center'>
-              <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24' data-slot='spinner'>
-                <path d='M21 12a9 9 0 1 1-6.219' />
-              </svg>
-              <Text className='mt-4 text-sm text-muted-foreground'>Loading folder...</Text>
+              <Spinner className='size-6' />
+              <Text className='text-muted-foreground mt-4 text-sm'>Loading folder...</Text>
             </div>
           </div>
         }
@@ -400,10 +427,8 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         fallback={
           <div className='animate-in fade-in flex items-center justify-center py-8'>
             <div className='flex flex-col items-center'>
-              <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24' data-slot='spinner'>
-                <path d='M21 12a9 9 0 1 1-6.219' />
-              </svg>
-              <Text className='mt-4 text-sm text-muted-foreground'>Loading upload dialog...</Text>
+              <Spinner className='size-6' />
+              <Text className='text-muted-foreground mt-4 text-sm'>Loading upload dialog...</Text>
             </div>
           </div>
         }

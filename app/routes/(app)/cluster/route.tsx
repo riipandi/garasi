@@ -1,5 +1,6 @@
-import { createFileRoute, Link, Outlet, useLocation } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useLocation, useRouter } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
+import { Tabs, TabsItem, TabsList } from '~/app/components/tabs'
 
 export const Route = createFileRoute('/(app)/cluster')({
   component: RouteComponent
@@ -9,6 +10,7 @@ type TabType = 'overview' | 'layout' | 'nodes'
 
 function RouteComponent() {
   const location = useLocation()
+  const router = useRouter()
 
   // Determine active tab from current path
   const getActiveTab = (): TabType => {
@@ -26,9 +28,15 @@ function RouteComponent() {
     { id: 'nodes', label: 'Nodes', icon: Lucide.Server, path: '/cluster/nodes' }
   ]
 
+  const handleTabChange = (tabId: TabType) => {
+    const tab = tabs.find((t) => t.id === tabId)
+    if (tab) {
+      router.navigate({ to: tab.path })
+    }
+  }
+
   return (
     <div className='mx-auto max-w-screen-2xl space-y-6'>
-      {/* Page Header */}
       <div className='min-w-0 flex-1'>
         <div>
           <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>Cluster</h1>
@@ -36,27 +44,17 @@ function RouteComponent() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className='border-b border-gray-200'>
-        <nav className='-mb-px flex space-x-8' aria-label='Tabs'>
+      <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as TabType)}>
+        <TabsList>
           {tabs.map((tab) => (
-            <Link
-              key={tab.id}
-              to={tab.path}
-              className={`flex items-center gap-2 border-b-2 py-2.5 text-sm font-medium transition-colors ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
-            >
+            <TabsItem key={tab.id} value={tab.id}>
               <tab.icon className='size-4' />
               {tab.label}
-            </Link>
+            </TabsItem>
           ))}
-        </nav>
-      </div>
+        </TabsList>
+      </Tabs>
 
-      {/* Tab Content */}
       <Outlet />
     </div>
   )

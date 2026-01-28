@@ -8,6 +8,15 @@ import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
 import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
 import { Stack } from '~/app/components/stack'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '~/app/components/table'
 import { Text } from '~/app/components/text'
 import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
 
@@ -136,50 +145,40 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
   })
 
   const TableSkeleton = () => (
-    <div className='border-border bg-background overflow-x-auto rounded-lg border shadow-sm'>
-      <table className='divide-border min-w-full divide-y'>
-        <thead className='bg-muted/30'>
-          <tr>
-            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
-              Bucket ID
-            </th>
-            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
-              Created
-            </th>
-            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
-              Global Aliases
-            </th>
-            <th className='text-muted-foreground px-6 py-3 text-left text-xs font-medium tracking-wider uppercase'>
-              Local Aliases
-            </th>
-            <th className='text-muted-foreground w-16 px-6 py-3 text-right text-xs font-medium tracking-wider uppercase'></th>
-          </tr>
-        </thead>
-        <tbody className='divide-border divide-y'>
+    <TableContainer>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Bucket ID</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead>Global Aliases</TableHead>
+            <TableHead>Local Aliases</TableHead>
+            <TableHead className='w-16 text-right'></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {Array.from({ length: 5 }).map((_, i) => (
-            <tr key={`skeleton-row-${i}`} className='animate-pulse'>
-              <td className='px-6 py-4'>
-                <div className='bg-muted h-4 w-64 rounded' />
-              </td>
-              <td className='px-6 py-4'>
-                <div className='bg-muted h-4 w-32 rounded' />
-              </td>
-              <td className='px-6 py-4'>
-                <div className='bg-muted h-4 w-40 rounded' />
-              </td>
-              <td className='px-6 py-4'>
-                <div className='bg-muted h-4 w-40 rounded' />
-              </td>
-              <td className='px-6 py-4'>
-                <div className='flex justify-end'>
-                  <div className='bg-muted h-8 w-8 rounded' />
-                </div>
-              </td>
-            </tr>
+            <TableRow key={`skeleton-row-bucket-${i}`}>
+              <TableCell>
+                <div className='bg-muted h-4 w-64 animate-pulse rounded' />
+              </TableCell>
+              <TableCell>
+                <div className='bg-muted h-4 w-32 animate-pulse rounded' />
+              </TableCell>
+              <TableCell>
+                <div className='bg-muted h-4 w-40 animate-pulse rounded' />
+              </TableCell>
+              <TableCell>
+                <div className='bg-muted h-4 w-40 animate-pulse rounded' />
+              </TableCell>
+              <TableCell className='text-right'>
+                <div className='bg-muted ml-auto h-8 w-8 animate-pulse rounded' />
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 
   return (
@@ -236,51 +235,47 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           </Stack>
         </div>
       ) : (
-        <div className='border-border bg-background overflow-x-auto rounded-lg border shadow-sm'>
-          <table className='divide-border min-w-full divide-y'>
-            <thead className='bg-muted/30'>
+        <TableContainer>
+          <Table>
+            <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
+                <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <th
+                    <TableHead
                       key={header.id}
-                      className={`text-muted-foreground px-6 py-3 text-xs font-medium tracking-wider uppercase ${
-                        header.id === 'delete' ? 'w-16 text-right' : 'text-left'
-                      }`}
+                      className={header.id === 'delete' ? 'w-16 text-right' : ''}
                     >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
+                    </TableHead>
                   ))}
-                </tr>
+                </TableRow>
               ))}
-            </thead>
-            <tbody className='divide-border divide-y'>
+            </TableHeader>
+            <TableBody>
               {table.getRowModel().rows.map((row) => (
-                <tr
+                <TableRow
                   key={row.id}
-                  className='hover:bg-muted/50 cursor-pointer transition-colors'
+                  className='cursor-pointer'
                   onClick={() => {
                     const bucketId = row.original.id
                     window.location.href = `/buckets/${bucketId}`
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td
+                    <TableCell
                       key={cell.id}
-                      className={`text-foreground px-6 py-3 text-sm whitespace-nowrap ${
-                        cell.column.id === 'delete' ? 'text-right' : ''
-                      }`}
+                      className={cell.column.id === 'delete' ? 'text-right' : ''}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
+                    </TableCell>
                   ))}
-                </tr>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Stack>
   )

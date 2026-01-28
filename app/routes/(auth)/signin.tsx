@@ -81,16 +81,12 @@ function RouteComponent() {
         <Heading level={1} size='lg'>
           Sign in to your account
         </Heading>
-        <Text>
-          Enter your credentials to access your account
-        </Text>
+        <Text>Enter your credentials to access your account</Text>
       </Stack>
 
       <Stack>
         {search.message && (
-          <Alert variant={search.type === 'success' ? 'success' : 'danger'}>
-            {search.message}
-          </Alert>
+          <Alert variant={search.type === 'success' ? 'success' : 'danger'}>{search.message}</Alert>
         )}
 
         {submitError && <Alert variant='danger'>{submitError}</Alert>}
@@ -162,12 +158,9 @@ function RouteComponent() {
           )}
         </Form.Field>
 
-        <Form.Field
-          name='remember'
-          validators={{}}
-        >
+        <Form.Field name='remember' validators={{}}>
           {(field) => (
-            <label htmlFor='remember' className='flex items-center gap-2 text-sm cursor-pointer'>
+            <label htmlFor='remember' className='flex cursor-pointer items-center gap-2 text-sm'>
               <Checkbox
                 id='remember'
                 name={field.name}
@@ -198,7 +191,10 @@ function RouteComponent() {
         </Form.Subscribe>
 
         <Text className='text-center'>
-          <Link to='/forgot-password' className='text-primary hover:text-primary/80 transition-colors'>
+          <Link
+            to='/forgot-password'
+            className='text-primary hover:text-primary/80 transition-colors'
+          >
             Forgot your password?
           </Link>
         </Text>

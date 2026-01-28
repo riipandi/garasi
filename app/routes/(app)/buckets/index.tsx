@@ -15,7 +15,6 @@ import {
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
 import { Heading } from '~/app/components/heading'
-import { IconBox } from '~/app/components/icon-box'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/text'
 import { createBucket, deleteBucket, listBuckets } from '~/app/services/bucket.service'
@@ -153,25 +152,19 @@ function RouteComponent() {
 
         <BucketTable buckets={buckets} onDelete={handleDeleteBucket} isLoading={isRefreshing} />
 
-        <div className='border-info/20 bg-info/5 overflow-hidden rounded-lg border p-4'>
-          <div className='flex gap-3'>
-            <IconBox variant='info' size='md'>
-              <Lucide.Info className='size-5' />
-            </IconBox>
-            <div className='flex-1'>
-              <Stack>
-                <Heading level={4} size='sm'>
-                  Information
-                </Heading>
-                <Text>
-                  Buckets are containers for objects stored in Garage. Each bucket can have global
-                  aliases (accessible by all keys) or local aliases (accessible only by specific
-                  keys). Click on a bucket ID to view details and manage its settings.
-                </Text>
-              </Stack>
-            </div>
-          </div>
-        </div>
+        <Alert>
+          <Lucide.Info className='size-5' />
+          <Stack>
+            <Heading level={4} size='sm'>
+              Information
+            </Heading>
+            <Text>
+              Buckets are containers for objects stored in Garage. Each bucket can have global
+              aliases (accessible by all keys) or local aliases (accessible only by specific keys).
+              Click on a bucket ID to view details and manage its settings.
+            </Text>
+          </Stack>
+        </Alert>
       </Stack>
 
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>

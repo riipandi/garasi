@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { Card, CardBody } from '~/app/components/card'
 import { Heading } from '~/app/components/heading'
+import { Progress } from '~/app/components/progress'
 import { Text } from '~/app/components/text'
 import { getClusterStatus, getClusterStatistics } from '~/app/services/cluster.service'
 import { LayoutManagement } from './-partials/layout-management'
@@ -152,12 +153,9 @@ function RouteComponent() {
               </div>
               <Lucide.Database className='text-muted size-6' />
             </div>
-            <div className='mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-200'>
-              <div
-                className={`h-full transition-all duration-500 ${getStorageColor(dataPercentage)}`}
-                style={{ width: `${Math.min(dataPercentage, 100)}%` }}
-              />
-            </div>
+            <Progress value={dataPercentage} className='h-1.5 w-full'>
+              <div className={`transition-all duration-500 ${getStorageColor(dataPercentage)}`} />
+            </Progress>
           </CardBody>
         </Card>
 
@@ -174,12 +172,11 @@ function RouteComponent() {
               </div>
               <Lucide.FileText className='text-muted size-6' />
             </div>
-            <div className='mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-200'>
+            <Progress value={metaPercentage} className='h-1.5 w-full'>
               <div
                 className={`h-full transition-all duration-500 ${getStorageColor(metaPercentage)}`}
-                style={{ width: `${Math.min(metaPercentage, 100)}%` }}
               />
-            </div>
+            </Progress>
           </CardBody>
         </Card>
       </div>
@@ -209,12 +206,11 @@ function RouteComponent() {
                   </Text>
                 </div>
               </div>
-              <div className='h-2.5 w-full overflow-hidden rounded-full bg-gray-200'>
+              <Progress value={dataPercentage} className='h-2.5 w-full'>
                 <div
                   className={`h-full transition-all duration-500 ${getStorageColor(dataPercentage)}`}
-                  style={{ width: `${Math.min(dataPercentage, 100)}%` }}
                 />
-              </div>
+              </Progress>
               <Text className='text-muted mt-1 text-xs'>
                 {dataPercentage.toFixed(1)}% used ({clusterWide?.data || 'N/A'})
               </Text>
@@ -235,12 +231,11 @@ function RouteComponent() {
                   </Text>
                 </div>
               </div>
-              <div className='h-2.5 w-full overflow-hidden rounded-full bg-gray-200'>
+              <Progress value={metaPercentage} className='h-2.5 w-full'>
                 <div
                   className={`h-full transition-all duration-500 ${getStorageColor(metaPercentage)}`}
-                  style={{ width: `${Math.min(metaPercentage, 100)}%` }}
                 />
-              </div>
+              </Progress>
               <Text className='text-muted mt-1 text-xs'>
                 {metaPercentage.toFixed(1)}% used ({clusterWide?.metadata || 'N/A'})
               </Text>

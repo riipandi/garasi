@@ -1,5 +1,6 @@
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { Button } from '~/app/components/button'
 import {
   Dialog,
   DialogBody,
@@ -8,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader
 } from '~/app/components/dialog'
-import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Stack } from '~/app/components/stack'
@@ -66,7 +66,7 @@ export function CreateFolderDialog({
             </IconBox>
             <div>
               <DialogTitle>Create Folder</DialogTitle>
-              <Text className='text-sm text-muted-foreground'>Enter a name for new folder</Text>
+              <Text className='text-muted-foreground text-sm'>Enter a name for new folder</Text>
             </div>
           </Stack>
         </DialogHeader>
@@ -88,12 +88,7 @@ export function CreateFolderDialog({
             </Stack>
 
             <Stack>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
+              <Button type='button' variant='outline' onClick={onClose} disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button

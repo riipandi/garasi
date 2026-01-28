@@ -61,9 +61,7 @@ function RouteComponent() {
         <Heading level={1} size='lg'>
           Forgot your password?
         </Heading>
-        <Text>
-          Enter your email address and we'll send you a link to reset your password
-        </Text>
+        <Text>Enter your email address and we'll send you a link to reset your password</Text>
       </Stack>
 
       <Stack>
@@ -71,7 +69,12 @@ function RouteComponent() {
           <Stack>
             <Alert variant='success'>
               <div className='flex items-start gap-3'>
-                <svg className='mt-0.5 size-5 shrink-0' fill='currentColor' viewBox='0 0 20 20' aria-hidden='true'>
+                <svg
+                  className='mt-0.5 size-5 shrink-0'
+                  fill='currentColor'
+                  viewBox='0 0 20 20'
+                  aria-hidden='true'
+                >
                   <title>Success icon</title>
                   <path
                     fillRule='evenodd'
@@ -116,9 +119,7 @@ function RouteComponent() {
           </Stack>
         ) : (
           <>
-            {Form.state.errors.length > 0 && (
-              <Alert variant='danger'>{Form.state.errors[0]}</Alert>
-            )}
+            {Form.state.errors.length > 0 && <Alert variant='danger'>{Form.state.errors[0]}</Alert>}
 
             <Form.Field
               name='email'

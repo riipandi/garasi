@@ -10,7 +10,10 @@ import {
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Badge } from '~/app/components/badge'
+import { Button } from '~/app/components/button'
+import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
+import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
 import { Stack } from '~/app/components/stack'
 import {
   Table,
@@ -21,6 +24,7 @@ import {
   TableHeader,
   TableRow
 } from '~/app/components/table'
+import { Text } from '~/app/components/text'
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
 // Extend to add deleted property for UI
@@ -59,17 +63,17 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
       header: 'Access Key ID',
       cell: (info) => (
         <div className='flex items-center gap-2'>
-          <code className='font-mono text-sm'>{info.getValue()}</code>
+          <Text className='font-mono text-sm'>{info.getValue()}</Text>
           <button
             type='button'
             onClick={(e) => {
               e.stopPropagation()
               navigator.clipboard.writeText(info.getValue())
             }}
-            className='text-gray-400 transition-colors hover:text-gray-600'
+            className='text-dimmed hover:text-foreground transition-colors'
             title='Copy Access Key ID'
           >
-            <Lucide.Copy className='h-3.5 w-3.5' />
+            <Lucide.Copy className='size-3.5' />
           </button>
         </div>
       )
@@ -106,17 +110,18 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
         const key = info.row.original
         return (
           <div className='mx-2 flex justify-center'>
-            <button
+            <Button
               type='button'
+              variant='danger'
+              size='sm-icon'
               onClick={(e) => {
                 e.stopPropagation()
                 onDelete(key.id)
               }}
-              className='rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none'
               title='Delete Access Key'
             >
               <Lucide.Trash2 className='size-4' />
-            </button>
+            </Button>
           </div>
         )
       }
@@ -136,95 +141,94 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
     getFilteredRowModel: getFilteredRowModel()
   })
 
-  // Skeleton loader for table rows
   const TableSkeleton = () => (
-    <div className='overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
-      <table className='min-w-full divide-y divide-gray-200'>
-        <thead className='bg-gray-50'>
-          <tr>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Name
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Access Key ID
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Created
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Status
-            </th>
-            <th className='w-16 px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase'></th>
-          </tr>
-        </thead>
-        <tbody className='divide-y divide-gray-200'>
+    <TableContainer>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Access Key ID</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className='w-16 text-right'></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {Array.from({ length: 5 }).map((_, index) => (
-            <tr key={`skeleton-${index}`} className='animate-pulse'>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-32 rounded bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-40 rounded bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-24 rounded bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-6 w-20 rounded-full bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='flex justify-end'>
-                  <div className='h-8 w-8 rounded bg-gray-200' />
-                </div>
-              </td>
-            </tr>
+            <TableRow key={`skeleton-key-${index}`}>
+              <TableCell>
+                <div className='bg-muted h-4 w-32 animate-pulse rounded' />
+              </TableCell>
+              <TableCell>
+                <div className='bg-muted h-4 w-40 animate-pulse rounded' />
+              </TableCell>
+              <TableCell>
+                <div className='bg-muted h-4 w-24 animate-pulse rounded' />
+              </TableCell>
+              <TableCell>
+                <div className='bg-muted h-6 w-20 animate-pulse rounded-full' />
+              </TableCell>
+              <TableCell className='text-right'>
+                <div className='bg-muted ml-auto h-8 w-8 animate-pulse rounded' />
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 
   return (
     <Stack direction='column' spacing='md'>
-      <div className='relative'>
-        <div className='pointer-events-none absolute left-3 flex h-full items-center'>
-          <Lucide.Search className='size-4 text-gray-400' />
-        </div>
+      <InputGroup>
+        <InputGroupAddon align='start'>
+          <Lucide.Search className='text-dimmed size-4' />
+        </InputGroupAddon>
         <Input
           type='text'
           value={filtering}
           onChange={(e) => setFiltering(e.target.value)}
           placeholder='Search access keys by name...'
           disabled={isLoading}
-          className='pl-10'
         />
         {filtering && !isLoading && (
-          <button
-            type='button'
-            onClick={() => setFiltering('')}
-            className='absolute top-1.5 right-2 rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none'
-            title='Clear search'
-          >
-            <Lucide.X className='size-4' />
-          </button>
+          <InputGroupAddon align='end'>
+            <Button
+              type='button'
+              variant='plain'
+              size='xs-icon'
+              onClick={() => setFiltering('')}
+              title='Clear search'
+            >
+              <Lucide.X className='size-4' />
+            </Button>
+          </InputGroupAddon>
         )}
-      </div>
+      </InputGroup>
 
       {isLoading ? (
         <TableSkeleton />
       ) : table.getRowModel().rows.length === 0 && keys.length > 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-          <Lucide.Search className='mb-4 h-16 w-16 text-gray-400' />
-          <h3 className='text-lg font-medium text-gray-900'>No keys found</h3>
-          <p className='text-normal mt-2 text-gray-500'>Try adjusting your search or filters.</p>
+        <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+          <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+            <Lucide.Search className='size-16' />
+          </IconBox>
+          <Stack>
+            <Text className='font-semibold'>No keys found</Text>
+            <Text className='text-muted-foreground'>Try adjusting your search or filters.</Text>
+          </Stack>
         </div>
       ) : keys.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-          <Lucide.KeyRound className='mb-4 h-16 w-16 text-gray-400' />
-          <h3 className='text-lg font-medium text-gray-900'>No access keys found</h3>
-          <p className='text-normal mt-2 text-gray-500'>
-            Get started by creating a new access key or importing an existing one.
-          </p>
+        <div className='border-border bg-muted/30 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+          <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+            <Lucide.KeyRound className='size-16' />
+          </IconBox>
+          <Stack>
+            <Text className='font-semibold'>No access keys found</Text>
+            <Text className='text-muted-foreground'>
+              Get started by creating a new access key or importing an existing one.
+            </Text>
+          </Stack>
         </div>
       ) : (
         <TableContainer>

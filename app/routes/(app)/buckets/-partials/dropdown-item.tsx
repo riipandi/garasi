@@ -1,3 +1,5 @@
+import { MenuItem } from '~/app/components/menu'
+
 interface DropdownItemProps {
   icon: React.ComponentType<{ className?: string }>
   onClick: () => void
@@ -7,15 +9,12 @@ interface DropdownItemProps {
 
 export function DropdownItem({ icon: Icon, onClick, children, danger = false }: DropdownItemProps) {
   return (
-    <button
-      type='button'
+    <MenuItem
       onClick={onClick}
-      className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition-all hover:bg-muted/50 ${
-        danger ? 'text-danger hover:bg-danger/10' : 'text-foreground'
-      }`}
+      className={danger ? 'text-danger data-[highlighted]:bg-danger/10' : ''}
     >
       <Icon className='size-4' />
       {children}
-    </button>
+    </MenuItem>
   )
 }
