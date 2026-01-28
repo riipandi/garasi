@@ -2,7 +2,27 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { decodeJwt } from 'jose'
 import * as Lucide from 'lucide-react'
+import { useState } from 'react'
 import { Alert } from '~/app/components/alert'
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogClose,
+  AlertDialogPopup,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '~/app/components/alert-dialog'
+import { Badge } from '~/app/components/badge'
+import { Button } from '~/app/components/button'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
+import { IconBox } from '~/app/components/icon-box'
+import { Item, ItemContent, ItemMedia, ItemTitle, ItemDescription, ItemAction } from '~/app/components/item'
+import { Spinner } from '~/app/components/spinner'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import fetcher from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 
@@ -12,8 +32,9 @@ export const Route = createFileRoute('/(app)/profile/sessions')({
 
 function RouteComponent() {
   const { queryClient } = Route.useRouteContext()
+  const [revokeOthersDialog, setRevokeOthersDialog] = useState(false)
+  const [revokeAllDialog, setRevokeAllDialog] = useState(false)
 
-  // Get current session ID from access token
   const currentSessionId = (() => {
     try {
       const token = authStore.get().atoken
@@ -25,7 +46,6 @@ function RouteComponent() {
     }
   })()
 
-  // Fetch user sessions
   const {
     data: sessionsData,
     isLoading,
@@ -48,7 +68,6 @@ function RouteComponent() {
       }>('/auth/sessions')
   })
 
-  // Revoke session mutation
   const revokeSessionMutation = useMutation({
     mutationFn: async (sessionId: string) => {
       return fetcher('/auth/sessions', {
@@ -57,12 +76,10 @@ function RouteComponent() {
       })
     },
     onSuccess: () => {
-      // Invalidate sessions query to refresh data
       queryClient.invalidateQueries({ queryKey: ['user-sessions'] })
     }
   })
 
-  // Revoke all other sessions mutation
   const revokeAllOtherSessionsMutation = useMutation({
     mutationFn: async () => {
       return fetcher('/auth/sessions/others', {
@@ -70,12 +87,11 @@ function RouteComponent() {
       })
     },
     onSuccess: () => {
-      // Invalidate sessions query to refresh data
       queryClient.invalidateQueries({ queryKey: ['user-sessions'] })
+      setRevokeOthersDialog(false)
     }
   })
 
-  // Revoke all sessions mutation
   const revokeAllSessionsMutation = useMutation({
     mutationFn: async () => {
       return fetcher('/auth/sessions/all', {
@@ -83,35 +99,17 @@ function RouteComponent() {
       })
     },
     onSuccess: () => {
-      // Invalidate sessions query to refresh data
       queryClient.invalidateQueries({ queryKey: ['user-sessions'] })
+      setRevokeAllDialog(false)
     }
   })
 
-  const handleRevokeSession = async (sessionId: string) => {
-    if (confirm('Are you sure you want to revoke this session?')) {
-      await revokeSessionMutation.mutateAsync(sessionId)
-    }
+  const handleRevokeAllOtherSessions = () => {
+    setRevokeOthersDialog(true)
   }
 
-  const handleRevokeAllOtherSessions = async () => {
-    if (
-      confirm(
-        'Are you sure you want to revoke all other sessions? You will be logged out from all other devices.'
-      )
-    ) {
-      await revokeAllOtherSessionsMutation.mutateAsync()
-    }
-  }
-
-  const handleRevokeAllSessions = async () => {
-    if (
-      confirm(
-        'Are you sure you want to revoke all sessions? You will be logged out from all devices including this one.'
-      )
-    ) {
-      await revokeAllSessionsMutation.mutateAsync()
-    }
+  const handleRevokeAllSessions = () => {
+    setRevokeAllDialog(true)
   }
 
   const formatDate = (timestamp: number) => {
@@ -138,22 +136,8 @@ function RouteComponent() {
     return (
       <div className='flex min-h-100 items-center justify-center'>
         <div className='flex items-center gap-2 text-gray-500'>
-          <svg className='size-5 animate-spin' fill='none' viewBox='0 0 24 24'>
-            <circle
-              className='opacity-25'
-              cx='12'
-              cy='12'
-              r='10'
-              stroke='currentColor'
-              strokeWidth='4'
-            />
-            <path
-              className='opacity-75'
-              fill='currentColor'
-              d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-            />
-          </svg>
-          <span>Loading sessions...</span>
+          <Spinner className='size-5' />
+          <Text>Loading sessions...</Text>
         </div>
       </div>
     )
@@ -171,121 +155,205 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-3xl space-y-6'>
-      <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'>
-        <div className='mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <div>
-            <h2 className='text-lg font-semibold text-gray-900 sm:text-xl'>Active Sessions</h2>
-            <p className='text-normal mt-2 text-gray-500'>
-              Manage your active sessions across devices
-            </p>
-          </div>
-          <div className='flex gap-2'>
-            <button
-              type='button'
-              onClick={handleRevokeAllOtherSessions}
-              disabled={revokeAllOtherSessionsMutation.isPending || sessions.length <= 1}
-              className='rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:px-4'
-            >
-              {revokeAllOtherSessionsMutation.isPending ? 'Revoking...' : 'Revoke Others'}
-            </button>
-            <button
-              type='button'
-              onClick={handleRevokeAllSessions}
-              disabled={revokeAllSessionsMutation.isPending || sessions.length === 0}
-              className='rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:px-4'
-            >
-              {revokeAllSessionsMutation.isPending ? 'Revoking...' : 'Revoke All'}
-            </button>
-          </div>
-        </div>
-
-        {revokeAllOtherSessionsMutation.isSuccess && (
-          <div className='mb-4'>
-            <Alert variant='success'>All other sessions have been revoked successfully!</Alert>
-          </div>
-        )}
-
-        {revokeAllSessionsMutation.isSuccess && (
-          <div className='mb-4'>
-            <Alert variant='success'>All sessions have been revoked successfully!</Alert>
-          </div>
-        )}
-
-        {sessions.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-12 text-center'>
-            <Lucide.Smartphone className='mb-4 h-12 w-12 text-gray-400' />
-            <h3 className='text-lg font-medium text-gray-900'>No active sessions</h3>
-            <p className='text-normal mt-2 text-gray-500'>
-              You don't have any active sessions at the moment.
-            </p>
-          </div>
-        ) : (
-          <div className='space-y-3'>
-            {sessions.map((session) => (
-              <div
-                key={session.session_id}
-                className={`rounded-lg border p-4 ${
-                  session.session_id === currentSessionId
-                    ? 'border-blue-200 bg-blue-50'
-                    : 'border-gray-200 bg-white'
-                }`}
+      <Card>
+        <CardHeader>
+          <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+            <div>
+              <CardTitle>Active Sessions</CardTitle>
+              <Text className='mt-2'>Manage your active sessions across devices</Text>
+            </div>
+            <div className='flex gap-2'>
+              <Button
+                type='button'
+                variant='secondary'
+                size='sm'
+                onClick={handleRevokeAllOtherSessions}
+                disabled={revokeAllOtherSessionsMutation.isPending || sessions.length <= 1}
               >
-                <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                  <div className='flex-1 space-y-1'>
+                {revokeAllOtherSessionsMutation.isPending ? 'Revoking...' : 'Revoke Others'}
+              </Button>
+              <Button
+                type='button'
+                variant='danger'
+                size='sm'
+                onClick={handleRevokeAllSessions}
+                disabled={revokeAllSessionsMutation.isPending || sessions.length === 0}
+              >
+                {revokeAllSessionsMutation.isPending ? 'Revoking...' : 'Revoke All'}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardBody>
+          {revokeAllOtherSessionsMutation.isSuccess && (
+            <Alert variant='success'>All other sessions have been revoked successfully!</Alert>
+          )}
+
+          {revokeAllSessionsMutation.isSuccess && (
+            <Alert variant='success'>All sessions have been revoked successfully!</Alert>
+          )}
+
+          {sessions.length === 0 ? (
+            <div className='flex flex-col items-center justify-center py-12 text-center'>
+              <Lucide.Smartphone className='mb-4 h-12 w-12 text-gray-400' />
+              <Text className='text-lg font-medium text-gray-900'>No active sessions</Text>
+              <Text className='mt-2 text-gray-500'>
+                You don't have any active sessions at moment.
+              </Text>
+            </div>
+          ) : (
+            <Stack>
+              {sessions.map((session) => (
+                <Item
+                  key={session.session_id}
+                  variant={session.session_id === currentSessionId ? 'info' : 'default'}
+                  className={
+                    session.session_id === currentSessionId
+                      ? 'border-blue-200 bg-blue-50'
+                      : 'bg-white'
+                  }
+                >
+                  <ItemMedia>
+                    <Lucide.Smartphone className='size-4 text-gray-500' />
+                  </ItemMedia>
+                  <ItemContent>
                     <div className='flex items-center gap-2'>
-                      <h3 className='text-sm font-medium text-gray-900'>
-                        {session.device_info || 'Unknown Device'}
-                      </h3>
+                      <ItemTitle>{session.device_info || 'Unknown Device'}</ItemTitle>
                       {session.session_id === currentSessionId && (
-                        <span className='inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800'>
-                          Current
-                        </span>
+                        <Badge variant='success'>Current</Badge>
                       )}
                     </div>
-                    <div className='flex flex-col gap-1 text-xs text-gray-500 sm:flex-row sm:gap-4'>
-                      <span className='flex items-center gap-1'>
-                        <Lucide.MapPin className='h-3 w-3' />
-                        {session.ip_address || 'Unknown IP'}
-                      </span>
-                      <span className='flex items-center gap-1'>
-                        <Lucide.Clock className='h-3 w-3' />
-                        Last active: {formatRelativeTime(session.last_activity_at)}
-                      </span>
-                      <span className='flex items-center gap-1'>
-                        <Lucide.Calendar className='h-3 w-3' />
-                        {formatDate(session.created_at)}
-                      </span>
-                    </div>
-                  </div>
+                    <ItemDescription>
+                      <div className='flex flex-col gap-1 sm:flex-row sm:gap-4'>
+                        <span className='flex items-center gap-1'>
+                          <Lucide.MapPin className='h-3 w-3' />
+                          {session.ip_address || 'Unknown IP'}
+                        </span>
+                        <span className='flex items-center gap-1'>
+                          <Lucide.Clock className='h-3 w-3' />
+                          Last active: {formatRelativeTime(session.last_activity_at)}
+                        </span>
+                        <span className='flex items-center gap-1'>
+                          <Lucide.Calendar className='h-3 w-3' />
+                          {formatDate(session.created_at)}
+                        </span>
+                      </div>
+                    </ItemDescription>
+                  </ItemContent>
                   {session.session_id !== currentSessionId && (
-                    <button
-                      type='button'
-                      onClick={() => handleRevokeSession(session.session_id)}
-                      disabled={revokeSessionMutation.isPending}
-                      className='rounded-md border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 shadow-sm transition-colors hover:bg-red-50 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                    >
-                      Revoke
-                    </button>
+                    <ItemAction>
+                      <AlertDialog>
+                        <AlertDialogTrigger
+                          render={
+                            <Button
+                              type='button'
+                              variant='danger'
+                              size='xs'
+                              disabled={revokeSessionMutation.isPending}
+                            >
+                              Revoke
+                            </Button>
+                          }
+                        />
+                        <AlertDialogPopup>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Revoke Session</AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <AlertDialogBody>
+                            <AlertDialogDescription>
+                              Are you sure you want to revoke this session?
+                            </AlertDialogDescription>
+                          </AlertDialogBody>
+                          <AlertDialogFooter>
+                            <AlertDialogClose>Cancel</AlertDialogClose>
+                            <AlertDialogClose
+                              render={
+                                <Button
+                                  variant='danger'
+                                  onClick={() => revokeSessionMutation.mutate(session.session_id)}
+                                >
+                                  Revoke
+                                </Button>
+                              }
+                            />
+                          </AlertDialogFooter>
+                        </AlertDialogPopup>
+                      </AlertDialog>
+                    </ItemAction>
                   )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                </Item>
+              ))}
+            </Stack>
+          )}
+        </CardBody>
+      </Card>
 
-      <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
+      <div className='rounded-md border border-blue-200 bg-blue-50 p-4'>
         <div className='flex gap-3'>
-          <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' />
+          <IconBox variant='info' className='mt-0.5 size-5 shrink-0'>
+            <Lucide.Info className='size-3' />
+          </IconBox>
           <div>
-            <h4 className='text-sm font-medium text-blue-900'>About sessions</h4>
-            <p className='mt-1 text-xs text-blue-700'>
+            <Text className='font-medium text-blue-900'>About sessions</Text>
+            <Text className='mt-1 text-xs text-blue-700'>
               Sessions represent your signed-in devices. You can revoke sessions to sign out from
               specific devices. Revoking current session will sign you out from this device.
-            </p>
+            </Text>
           </div>
         </div>
       </div>
+
+      <AlertDialog open={revokeOthersDialog} onOpenChange={setRevokeOthersDialog}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke All Other Sessions</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to revoke all other sessions? You will be logged out from all other devices.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={() => revokeAllOtherSessionsMutation.mutate()}
+                >
+                  Revoke All Others
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
+
+      <AlertDialog open={revokeAllDialog} onOpenChange={setRevokeAllDialog}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke All Sessions</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to revoke all sessions? You will be logged out from all devices including this one.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={() => revokeAllSessionsMutation.mutate()}
+                >
+                  Revoke All
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
     </div>
   )
 }

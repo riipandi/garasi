@@ -1,6 +1,10 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { NotFound } from '~/app/errors'
+import { Heading } from '~/app/components/heading'
+import { Text } from '~/app/components/text'
+import { Item, ItemContent, ItemMedia, ItemTitle } from '~/app/components/item'
+import { Stack } from '~/app/components/stack'
 
 export const Route = createFileRoute('/(app)/profile')({
   component: RouteComponent,
@@ -8,33 +12,55 @@ export const Route = createFileRoute('/(app)/profile')({
 })
 
 function RouteComponent() {
+  const location = useRouterState().location.pathname
+
+  const getActiveTab = () => {
+    if (location === '/profile') return 'profile'
+    if (location === '/profile/change-password') return 'change-password'
+    if (location === '/profile/sessions') return 'sessions'
+    if (location === '/profile/change-email') return 'change-email'
+    return 'profile'
+  }
+
+  const activeTab = getActiveTab()
+
   return (
     <div className='mx-auto max-w-5xl space-y-6'>
-      {/* Page Header */}
-      <div className='pb-4'>
-        <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>Profile</h1>
-        <p className='text-normal mt-2 text-gray-500'>
-          Manage your account settings and preferences
-        </p>
+      <div className='space-y-2 pb-4'>
+        <Heading size='lg'>Profile</Heading>
+        <Text>Manage your account settings and preferences</Text>
       </div>
 
-      {/* Profile Layout with Sidebar */}
       <div className='flex flex-col gap-6 lg:flex-row lg:gap-8'>
-        {/* Profile Sidebar Navigation */}
-        <aside className='w-full shrink-0 lg:w-64'>
-          <nav className='space-y-1 rounded-lg border border-gray-200 bg-white p-2 shadow-sm'>
-            <ProfileNavLink to='/profile' icon={Lucide.User} label='Profile' exact />
+        <div className='w-full lg:w-64'>
+          <Stack>
+            <ProfileNavLink
+              to='/profile'
+              icon={Lucide.User}
+              label='Profile'
+              isActive={activeTab === 'profile'}
+            />
             <ProfileNavLink
               to='/profile/change-password'
               icon={Lucide.Lock}
               label='Change Password'
+              isActive={activeTab === 'change-password'}
             />
-            <ProfileNavLink to='/profile/sessions' icon={Lucide.Smartphone} label='Sessions' />
-            <ProfileNavLink to='/profile/change-email' icon={Lucide.Mail} label='Change Email' />
-          </nav>
-        </aside>
+            <ProfileNavLink
+              to='/profile/sessions'
+              icon={Lucide.Smartphone}
+              label='Sessions'
+              isActive={activeTab === 'sessions'}
+            />
+            <ProfileNavLink
+              to='/profile/change-email'
+              icon={Lucide.Mail}
+              label='Change Email'
+              isActive={activeTab === 'change-email'}
+            />
+          </Stack>
+        </div>
 
-        {/* Page Content */}
         <div className='min-w-0 flex-1'>
           <Outlet />
         </div>
@@ -45,26 +71,31 @@ function RouteComponent() {
 
 function ProfileNavLink({
   to,
-  icon: Icon,
   label,
-  exact = false
+  icon: Icon,
+  isActive
 }: {
   to: string
-  icon: React.ComponentType<{ className?: string }>
   label: string
-  exact?: boolean
+  icon: React.ComponentType<{ className?: string }>
+  isActive: boolean
 }) {
   return (
     <Route.Link
       to={to}
-      className='flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900'
-      activeProps={{
-        className: 'bg-blue-50 text-blue-700 hover:bg-blue-50 hover:text-blue-700'
-      }}
-      activeOptions={{ exact }}
+      className='w-full'
     >
-      <Icon className='size-4' />
-      <span>{label}</span>
+      <Item
+        variant={isActive ? 'info' : 'plain'}
+        className='cursor-pointer w-full'
+      >
+        <ItemMedia>
+          <Icon className='size-4' />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>{label}</ItemTitle>
+        </ItemContent>
+      </Item>
     </Route.Link>
   )
 }
