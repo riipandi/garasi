@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Stack } from '~/app/components/stack'
 
 interface DropdownMenuProps {
   children: React.ReactNode
@@ -30,9 +31,9 @@ export function DropdownMenu({ children, isOpen, onClose }: DropdownMenuProps) {
   return (
     <div
       ref={dropdownRef}
-      className='animate-in fade-in slide-in-from-top-2 absolute top-full right-0 z-50 mt-1 min-w-48 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg duration-200'
+      className='animate-in fade-in slide-in-from-top-2 absolute top-full right-0 z-50 mt-1 min-w-48 overflow-hidden rounded-lg border-border bg-background shadow-lg'
     >
-      {children}
+      <Stack>{children}</Stack>
     </div>
   )
 }

@@ -1,5 +1,17 @@
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import {
+  Dialog,
+  DialogBody,
+  DialogPopup,
+  DialogTitle,
+  DialogFooter,
+  DialogHeader
+} from '~/app/components/dialog'
+import { Button } from '~/app/components/button'
+import { IconBox } from '~/app/components/icon-box'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 
 interface UploadFileDialogProps {
   isOpen: boolean
@@ -70,117 +82,100 @@ export function UploadFileDialog({
     }
   }
 
-  if (!isOpen) return null
+  const formatFileSize = (bytes?: number): string => {
+    if (!bytes) return '-'
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
+  }
 
   return (
-    <div className='animate-in zoom-in-95 fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm duration-200'>
-      <div className='animate-in zoom-in-95 fade-in w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-lg duration-200'>
-        <div className='mb-4 flex items-center justify-between'>
-          <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100'>
-              <Lucide.UploadCloud className='size-5 text-green-600' />
-            </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogPopup>
+        <DialogHeader>
+          <Stack direction='row' className='items-start'>
+            <IconBox variant='success' size='md' circle>
+              <Lucide.UploadCloud className='size-5' />
+            </IconBox>
             <div>
-              <h3 className='text-lg font-medium text-gray-900'>Upload Files</h3>
-              <p className='text-sm text-gray-500'>Select files to upload</p>
+              <DialogTitle>Upload Files</DialogTitle>
+              <Text className='text-sm text-muted-foreground'>Select files to upload</Text>
             </div>
-          </div>
-          <button
-            type='button'
-            onClick={onClose}
-            className='rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-            aria-label='Close dialog'
+          </Stack>
+        </DialogHeader>
+
+        <DialogBody>
+          <form
+            className={`space-y-4 ${isSubmitting ? 'animate-pulse' : ''}`}
+            onSubmit={handleSubmit}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
           >
-            <Lucide.X className='size-5' />
-          </button>
-        </div>
-        <form
-          onSubmit={handleSubmit}
-          className={`space-y-4 ${isSubmitting ? 'animate-pulse' : ''}`}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-        >
-          <div
-            className={`mt-4 rounded-lg border-2 border-dashed bg-gray-50 px-6 py-8 text-center transition-all ${
-              dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-            }`}
-          >
-            <Lucide.UploadCloud
-              className={`mx-auto size-12 transition-all ${dragActive ? 'text-blue-500' : 'text-gray-400'}`}
-            />
-            <p className='mt-2 text-sm font-medium text-gray-700'>
-              Click to upload or drag and drop
-            </p>
-            <p className='mt-1 text-xs text-gray-500'>Any file type is supported</p>
-            <input
-              type='file'
-              multiple
-              onChange={handleFileSelect}
-              className='absolute inset-0 size-full cursor-pointer opacity-0'
-              disabled={isSubmitting}
-            />
-          </div>
-          {selectedFiles.length > 0 && (
-            <div className='mt-4 rounded-md border border-gray-200 bg-gray-50 p-3'>
-              <p className='mb-2 text-sm font-medium text-gray-700'>
-                {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
-              </p>
-              <ul className='space-y-1 text-sm text-gray-600'>
-                {selectedFiles.map((file, index) => (
-                  <li key={index} className='flex items-center justify-between'>
-                    <span className='truncate'>{file.name}</span>
-                    <span className='text-xs text-gray-500'>
-                      {(file.size / 1024).toFixed(2)} KB
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <div className='flex justify-end gap-3 pt-4'>
-            <button
-              type='button'
-              onClick={onClose}
-              className='rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type='submit'
-              disabled={selectedFiles.length === 0 || isSubmitting}
-              className={`rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
-                isSubmitting ? 'animate-pulse' : ''
+            <div
+              className={`mt-4 rounded-lg border-2 border-dashed bg-muted/30 px-6 py-8 text-center transition-all ${
+                dragActive ? 'border-primary bg-primary/10' : 'border-border'
               }`}
             >
-              {isSubmitting ? (
-                <span className='flex items-center gap-2'>
-                  <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                    <circle
-                      className='opacity-25'
-                      cx='12'
-                      cy='12'
-                      r='10'
-                      stroke='currentColor'
-                      strokeWidth='4'
-                    />
-                    <path
-                      className='opacity-75'
-                      fill='currentColor'
-                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                    />
-                  </svg>
-                  Uploading...
-                </span>
-              ) : (
-                'Upload'
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              <Lucide.UploadCloud
+                className={`mx-auto size-12 transition-all ${dragActive ? 'text-primary' : 'text-muted-foreground'}`}
+              />
+              <Text className='mt-2 text-sm font-medium'>
+                Click to upload or drag and drop
+              </Text>
+              <Text className='mt-1 text-xs text-muted-foreground'>
+                Any file type is supported
+              </Text>
+              <input
+                type='file'
+                multiple
+                onChange={handleFileSelect}
+                className='absolute inset-0 size-full cursor-pointer opacity-0'
+                disabled={isSubmitting}
+              />
+            </div>
+            {selectedFiles.length > 0 && (
+              <div className='mt-4 rounded-lg border border-border bg-muted/30 p-3'>
+                <Text className='mb-2 text-sm font-medium'>
+                  {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
+                </Text>
+                <Stack>
+                  {selectedFiles.map((file, index) => (
+                    <div key={`file-${index}`} className='flex items-center justify-between text-sm'>
+                      <Text className='truncate'>{file.name}</Text>
+                      <Text className='text-xs text-muted-foreground'>
+                        {formatFileSize(file.size)}
+                      </Text>
+                    </div>
+                  ))}
+                </Stack>
+              </div>
+            )}
+            <Stack>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type='submit'
+                variant='primary'
+                disabled={selectedFiles.length === 0 || isSubmitting}
+                progress={isSubmitting}
+              >
+                {isSubmitting ? 'Uploading...' : 'Upload'}
+              </Button>
+            </Stack>
+          </form>
+        </DialogBody>
+
+        <DialogFooter />
+      </DialogPopup>
+    </Dialog>
   )
 }

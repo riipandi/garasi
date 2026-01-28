@@ -4,22 +4,17 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { createFolder, listBucketObjects, uploadFile } from '~/app/services/objects.service'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
+import { DropdownMenu } from './dropdown-menu'
+import { DropdownItem } from './dropdown-item'
+import { CreateFolderDialog } from './create-folder-dialog'
+import { UploadFileDialog } from './upload-file-dialog'
+import { IconBox } from '~/app/components/icon-box'
+import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
+import { Button } from '~/app/components/button'
+import { TextLink } from '~/app/components/text'
 
-// Code split components using React.lazy
-const DropdownMenu = React.lazy(() =>
-  import('./dropdown-menu').then((m) => ({ default: m.DropdownMenu }))
-)
-const DropdownItem = React.lazy(() =>
-  import('./dropdown-item').then((m) => ({ default: m.DropdownItem }))
-)
-const CreateFolderDialog = React.lazy(() =>
-  import('./create-folder-dialog').then((m) => ({ default: m.CreateFolderDialog }))
-)
-const UploadFileDialog = React.lazy(() =>
-  import('./upload-file-dialog').then((m) => ({ default: m.UploadFileDialog }))
-)
-
-// File item types
 interface FileItem {
   id: string
   name: string
@@ -42,23 +37,18 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
       ? bucket.globalAliases[0]
       : bucket.id
 
-  // Check if bucket has any access keys
   const hasAccessKeys = bucket.keys && bucket.keys.length > 0
 
-  // Query to fetch bucket objects with prefix and key support
-  // Only fetch if bucket has access keys, otherwise show empty state
   const objectsQuery = useSuspenseQuery({
     queryKey: ['objects', bucket.id, prefix, key],
     queryFn: async () => {
       if (!hasAccessKeys) {
-        // Return empty data if no access keys
         return { data: { commonPrefixes: [], contents: [] } }
       }
       return listBucketObjects({ bucket: bucketParam, prefix: prefix || undefined })
     }
   })
 
-  // Create folder mutation
   const createFolderMutation = useMutation({
     mutationFn: async (folderName: string) => {
       return createFolder(
@@ -74,7 +64,6 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
     }
   })
 
-  // Upload file mutation
   const uploadFileMutation = useMutation({
     mutationFn: async (file: File) => {
       return uploadFile({ bucket: bucketParam }, { file })
@@ -94,27 +83,20 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
   const [isCreatingFolder, setIsCreatingFolder] = React.useState(false)
   const [isUploadingFile, setIsUploadingFile] = React.useState(false)
 
-  // Transform API data to FileItem format
-  // In S3 with delimiter, folders are in commonPrefixes and files are in contents
-  // Empty folders (folder markers) may also appear in contents with trailing slash
   const fileItems: FileItem[] = React.useMemo(() => {
     const commonPrefixes = objectsQuery.data?.data?.commonPrefixes || []
     const contents = objectsQuery.data?.data?.contents || []
 
-    // Get folders from commonPrefixes (folders with content)
-    // Filter out the current prefix to avoid showing the selected folder itself
     const folderItemsFromPrefixes = commonPrefixes
       .filter((folder: any) => folder.prefix !== prefix)
       .map((folder: any) => ({
         id: folder.prefix,
-        name: folder.prefix.replace(/\/$/, '').replace(prefix || '', ''), // Remove prefix and trailing slash for display
+        name: folder.prefix.replace(/\/$/, '').replace(prefix || '', ''),
         type: 'folder' as const,
         size: 0,
-        modified: new Date().toISOString() // Folders don't have lastModified in S3
+        modified: new Date().toISOString()
       }))
 
-    // Get empty folders from contents (folder markers with trailing slash)
-    // Filter out the current prefix to avoid showing the selected folder itself
     const emptyFolders = contents
       .filter((obj: any) => obj.key.endsWith('/') && obj.key !== prefix)
       .map((obj: any) => ({
@@ -125,7 +107,6 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         modified: obj.lastModified || new Date().toISOString()
       }))
 
-    // Get files (exclude folder markers)
     const fileItems = contents
       .filter((obj: any) => !obj.key.endsWith('/'))
       .map((obj: any) => ({
@@ -139,14 +120,12 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
     return [...folderItemsFromPrefixes, ...emptyFolders, ...fileItems]
   }, [objectsQuery.data, prefix])
 
-  // Filter files based on search text
   const filteredFiles = React.useMemo(() => {
     if (!filterText) return fileItems
     const lowerFilter = filterText.toLowerCase()
     return fileItems.filter((file) => file.name.toLowerCase().includes(lowerFilter))
   }, [filterText, fileItems])
 
-  // Separate folders and files
   const folders = filteredFiles.filter((file) => file.type === 'folder')
   const files = filteredFiles.filter((file) => file.type === 'file')
 
@@ -196,7 +175,6 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
   const handleUploadFiles = async (files: File[]) => {
     setIsUploadingFile(true)
     try {
-      // Upload files one by one
       for (const file of files) {
         await uploadFileMutation.mutateAsync(file)
       }
@@ -208,7 +186,6 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
     }
   }
 
-  // Generate breadcrumb path segments
   const breadcrumbSegments = React.useMemo(() => {
     if (!prefix) return []
     const segments = prefix.split('/').filter(Boolean)
@@ -220,86 +197,56 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
 
   return (
     <div className='space-y-4'>
-      {/* Toolbar */}
       <div className='flex flex-wrap items-center justify-between gap-4'>
-        {/* Search/Filter */}
-        <div className='relative min-w-64 flex-1'>
-          <div className='pointer-events-none absolute left-3 flex h-full items-center'>
-            <Lucide.Search className='size-4 text-gray-400' />
-          </div>
+        <InputGroup className='min-w-64 flex-1'>
+          <InputGroupAddon align='start'>
+            <Lucide.Search className='size-4 text-muted-foreground' />
+          </InputGroupAddon>
           <input
             type='text'
             placeholder='Search files and folders...'
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            className='w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none'
+            className='bg-transparent py-2 pr-4 pl-2 text-sm outline-none'
           />
           {filterText && (
-            <button
-              type='button'
-              onClick={() => setFilterText('')}
-              className='absolute top-1.5 right-2 rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-              title='Clear search'
-            >
-              <Lucide.X className='size-4' />
-            </button>
+            <InputGroupAddon align='end'>
+              <Button type='button' variant='plain' size='xs-icon' onClick={() => setFilterText('')}>
+                <Lucide.X className='size-4' />
+              </Button>
+            </InputGroupAddon>
           )}
-        </div>
+        </InputGroup>
 
-        {/* Action Buttons */}
-        <div className='flex gap-2'>
-          <button
-            type='button'
-            onClick={() => setShowCreateFolderDialog(true)}
-            disabled={!hasAccessKeys}
-            className='flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white'
-            title={!hasAccessKeys ? 'Assign access keys to create folders' : 'Create folder'}
-          >
+        <Stack direction='row'>
+          <Button type='button' variant='outline' onClick={() => setShowCreateFolderDialog(true)} disabled={!hasAccessKeys}>
             <Lucide.FolderPlus className='size-4' />
             Create Folder
-          </button>
-          <button
-            type='button'
-            onClick={() => setShowUploadFileDialog(true)}
-            disabled={!hasAccessKeys}
-            className='flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-blue-600'
-            title={!hasAccessKeys ? 'Assign access keys to upload files' : 'Upload file'}
-          >
+          </Button>
+          <Button type='button' variant='primary' onClick={() => setShowUploadFileDialog(true)} disabled={!hasAccessKeys}>
             <Lucide.Upload className='size-4' />
             Upload File
-          </button>
-        </div>
+          </Button>
+        </Stack>
       </div>
 
-      {/* Breadcrumb */}
-      <div className='flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2 py-1.5 text-sm shadow-xs'>
-        <Link
-          to='/buckets/$id'
-          params={{ id: bucketId }}
-          search={{ prefix: undefined, key: undefined }}
-          className='flex items-center gap-2 rounded-md px-2 py-1 text-gray-600 transition-all hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-        >
-          <Lucide.Home className='size-4' />
-          <span className='font-medium'>Root</span>
+      <div className='flex items-center gap-2 rounded-md border-border bg-background px-2 py-1.5'>
+        <Link to='/buckets/$id' params={{ id: bucketId }} search={{ prefix: undefined, key: undefined }}>
+          <Button variant='plain' size='sm'>
+            <Lucide.Home className='size-4' />
+          </Button>
         </Link>
         {breadcrumbSegments.length > 0 && (
           <>
             {breadcrumbSegments.map((segment, index) => (
               <React.Fragment key={segment.path}>
-                <Lucide.ChevronRight className='size-4 text-gray-400' />
-                <Link
-                  to='/buckets/$id'
-                  params={{ id: bucketId }}
-                  search={{ prefix: segment.path, key: undefined }}
-                  className='flex items-center gap-2 rounded-md px-2 py-1 text-gray-600 transition-all hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-                >
-                  <span
-                    className={
-                      index === breadcrumbSegments.length - 1 ? 'font-medium text-gray-900' : ''
-                    }
-                  >
-                    {segment.name}
-                  </span>
+                <Lucide.ChevronRight className='size-4 text-muted-foreground' />
+                <Link to='/buckets/$id' params={{ id: bucketId }} search={{ prefix: segment.path, key: undefined }}>
+                  <Button variant='plain' size='sm'>
+                    <TextLink className={index === breadcrumbSegments.length - 1 ? 'font-semibold' : ''}>
+                      {segment.name}
+                    </TextLink>
+                  </Button>
                 </Link>
               </React.Fragment>
             ))}
@@ -307,212 +254,136 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         )}
       </div>
 
-      {/* File List */}
-      <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xs'>
-        {/* Table Header */}
-        <div className='grid grid-cols-12 gap-4 border-b border-gray-200 bg-gray-50 px-6 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase'>
-          <div className='col-span-6'>Name</div>
-          <div className='col-span-3'>Size</div>
-          <div className='col-span-3'>Last Modified</div>
+      <div className='overflow-hidden rounded-lg border-border bg-background'>
+        <div className='grid grid-cols-12 gap-4 border-b border-border bg-muted/30 px-6 py-3'>
+          <Text className='col-span-6 text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+            Name
+          </Text>
+          <Text className='col-span-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+            Size
+          </Text>
+          <Text className='col-span-3 text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+            Last Modified
+          </Text>
         </div>
 
-        {/* Folders */}
         {folders.length > 0 && (
-          <div className='divide-y divide-gray-200'>
+          <div className='divide-y divide-border'>
             {folders.map((folder) => (
               <Link
                 key={folder.id}
                 to='/buckets/$id'
                 params={{ id: bucketId }}
                 search={{ prefix: folder.id, key: undefined }}
-                className='relative grid grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-gray-50'
+                className='relative grid grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-muted/50'
               >
                 <div className='col-span-6 flex items-center gap-3'>
-                  <Lucide.Folder className='size-5 text-blue-500' />
-                  <span className='text-sm text-gray-900'>{folder.name}</span>
+                  <IconBox variant='info' size='sm'>
+                    <Lucide.Folder className='size-5' />
+                  </IconBox>
+                  <Text className='text-sm font-medium'>{folder.name}</Text>
                 </div>
-                <div className='col-span-3 text-sm text-gray-500'>-</div>
-                <div className='col-span-3 text-sm text-gray-500'>
+                <div className='col-span-3 text-sm text-muted-foreground'>-</div>
+                <div className='col-span-3 text-sm text-muted-foreground'>
                   {formatDate(folder.modified)}
                 </div>
-                {/* Action Menu Button */}
-                <div
-                  className='absolute top-1/2 right-2 -translate-y-1/2'
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <button
-                    type='button'
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setActiveDropdown(activeDropdown === folder.id ? null : folder.id)
-                    }}
-                    className='rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-                    title='Actions'
+                <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+                  <DropdownMenu
+                    isOpen={activeDropdown === folder.id}
+                    onClose={() => setActiveDropdown(null)}
                   >
-                    <Lucide.MoreVertical className='size-4' />
-                  </button>
-                  <React.Suspense
-                    fallback={
-                      <div className='absolute top-full right-0 z-50 mt-1'>
-                        <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                          <circle
-                            className='opacity-25'
-                            cx='12'
-                            cy='12'
-                            r='10'
-                            stroke='currentColor'
-                            strokeWidth='4'
-                          />
-                          <path
-                            className='opacity-75'
-                            fill='currentColor'
-                            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                          />
-                        </svg>
-                      </div>
-                    }
-                  >
-                    <DropdownMenu
-                      isOpen={activeDropdown === folder.id}
-                      onClose={() => setActiveDropdown(null)}
-                    >
-                      <DropdownItem icon={Lucide.Share} onClick={() => handleShare(folder)}>
-                        Share
-                      </DropdownItem>
-                      <DropdownItem
-                        icon={Lucide.Trash2}
-                        onClick={() => handleDelete(folder)}
-                        danger
-                      >
-                        Delete
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </React.Suspense>
+                    <DropdownItem icon={Lucide.Share} onClick={() => handleShare(folder)}>
+                      Share
+                    </DropdownItem>
+                    <DropdownItem icon={Lucide.Trash2} onClick={() => handleDelete(folder)} danger>
+                      Delete
+                    </DropdownItem>
+                  </DropdownMenu>
                 </div>
               </Link>
             ))}
           </div>
         )}
 
-        {/* Divider between folders and files */}
-        {folders.length > 0 && files.length > 0 && <div className='border-b border-gray-200' />}
+        {folders.length > 0 && files.length > 0 && <div className='border-b border-border' />}
 
-        {/* Files */}
         {files.length > 0 && (
-          <div className='divide-y divide-gray-200'>
+          <div className='divide-y divide-border'>
             {files.map((file) => (
               <div
                 key={file.id}
-                className='relative grid cursor-pointer grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-gray-50'
+                className='relative grid grid-cols-12 items-center gap-4 px-6 py-3 transition-all hover:bg-muted/50 cursor-pointer'
               >
                 <div className='col-span-6 flex items-center gap-3'>
-                  <Lucide.File className='size-5 text-gray-400' />
-                  <span className='text-sm text-gray-900'>{file.name}</span>
+                  <IconBox variant='tertiary-subtle' size='sm'>
+                    <Lucide.File className='size-5' />
+                  </IconBox>
+                  <Text className='text-sm font-medium'>{file.name}</Text>
                 </div>
-                <div className='col-span-3 text-sm text-gray-500'>{formatFileSize(file.size)}</div>
-                <div className='col-span-3 text-sm text-gray-500'>{formatDate(file.modified)}</div>
-                {/* Action Menu Button */}
+                <div className='col-span-3 text-sm text-muted-foreground'>{formatFileSize(file.size)}</div>
+                <div className='col-span-3 text-sm text-muted-foreground'>{formatDate(file.modified)}</div>
                 <div className='absolute top-1/2 right-2 -translate-y-1/2'>
-                  <button
-                    type='button'
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setActiveDropdown(activeDropdown === file.id ? null : file.id)
-                    }}
-                    className='rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-                    title='Actions'
+                  <DropdownMenu
+                    isOpen={activeDropdown === file.id}
+                    onClose={() => setActiveDropdown(null)}
                   >
-                    <Lucide.MoreVertical className='size-4' />
-                  </button>
-                  <React.Suspense
-                    fallback={
-                      <div className='absolute top-full right-0 z-50 mt-1'>
-                        <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                          <circle
-                            className='opacity-25'
-                            cx='12'
-                            cy='12'
-                            r='10'
-                            stroke='currentColor'
-                            strokeWidth='4'
-                          />
-                          <path
-                            className='opacity-75'
-                            fill='currentColor'
-                            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                          />
-                        </svg>
-                      </div>
-                    }
-                  >
-                    <DropdownMenu
-                      isOpen={activeDropdown === file.id}
-                      onClose={() => setActiveDropdown(null)}
-                    >
-                      <DropdownItem icon={Lucide.Download} onClick={() => handleDownload(file)}>
-                        Download
-                      </DropdownItem>
-                      <DropdownItem icon={Lucide.Share} onClick={() => handleShare(file)}>
-                        Share
-                      </DropdownItem>
-                      <DropdownItem icon={Lucide.Trash2} onClick={() => handleDelete(file)} danger>
-                        Delete
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </React.Suspense>
+                    <DropdownItem icon={Lucide.Download} onClick={() => handleDownload(file)}>
+                      Download
+                    </DropdownItem>
+                    <DropdownItem icon={Lucide.Share} onClick={() => handleShare(file)}>
+                      Share
+                    </DropdownItem>
+                    <DropdownItem icon={Lucide.Trash2} onClick={() => handleDelete(file)} danger>
+                      Delete
+                    </DropdownItem>
+                  </DropdownMenu>
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Empty State */}
         {filteredFiles.length === 0 && (
           <div className='flex flex-col items-center justify-center py-12 text-center'>
             {!hasAccessKeys ? (
               <>
-                <Lucide.Lock className='size-12 text-gray-400' />
-                <p className='mt-4 text-sm font-medium text-gray-700'>No access keys assigned</p>
-                <p className='mt-1 text-xs text-gray-500'>
-                  Assign access keys to this bucket to view and manage objects
-                </p>
+                <IconBox variant='tertiary-subtle' size='lg' circle>
+                  <Lucide.Lock className='size-12' />
+                </IconBox>
+                <Stack>
+                  <Text className='text-base font-medium'>No access keys assigned</Text>
+                  <Text className='text-sm text-muted-foreground'>
+                    Assign access keys to this bucket to view and manage objects
+                  </Text>
+                </Stack>
               </>
             ) : (
               <>
-                <Lucide.FolderOpen className='size-12 text-gray-400' />
-                <p className='mt-4 text-sm font-medium text-gray-700'>No files or folders found</p>
-                <p className='mt-1 text-xs text-gray-500'>
-                  {filterText
-                    ? 'Try adjusting your search'
-                    : 'Upload files or create folders to get started'}
-                </p>
+                <IconBox variant='tertiary-subtle' size='lg' circle>
+                  <Lucide.FolderOpen className='size-12' />
+                </IconBox>
+                <Stack>
+                  <Text className='text-base font-medium'>No files or folders found</Text>
+                  <Text className='text-sm text-muted-foreground'>
+                    {filterText
+                      ? 'Try adjusting your search'
+                      : 'Upload files or create folders to get started'}
+                  </Text>
+                </Stack>
               </>
             )}
           </div>
         )}
       </div>
 
-      {/* Create Folder Dialog */}
       <React.Suspense
         fallback={
           <div className='animate-in fade-in flex items-center justify-center py-8'>
             <div className='flex flex-col items-center'>
-              <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
+              <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24' data-slot='spinner'>
+                <path d='M21 12a9 9 0 1 1-6.219' />
               </svg>
-              <p className='mt-4 text-sm text-gray-600'>Loading dialog...</p>
+              <Text className='mt-4 text-sm text-muted-foreground'>Loading folder...</Text>
             </div>
           </div>
         }
@@ -525,27 +396,14 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         />
       </React.Suspense>
 
-      {/* Upload File Dialog */}
       <React.Suspense
         fallback={
           <div className='animate-in fade-in flex items-center justify-center py-8'>
             <div className='flex flex-col items-center'>
-              <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
+              <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24' data-slot='spinner'>
+                <path d='M21 12a9 9 0 1 1-6.219' />
               </svg>
-              <p className='mt-4 text-sm text-gray-600'>Loading dialog...</p>
+              <Text className='mt-4 text-sm text-muted-foreground'>Loading upload dialog...</Text>
             </div>
           </div>
         }
