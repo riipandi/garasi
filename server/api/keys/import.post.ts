@@ -15,7 +15,7 @@ export default defineProtectedHandler(async (event) => {
   }
 
   const data = await gfetch<ImportKeyResponse>('/v2/ImportKey', { method: 'POST', body })
-  log.withMetadata({ body, data }).debug('Importing access key')
+  log.withMetadata(data).debug('Importing access key')
 
   return createResponse<ImportKeyResponse>(event, 'Import Key', { data })
 })

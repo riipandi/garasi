@@ -19,7 +19,7 @@ export default defineProtectedHandler(async (event) => {
   const data = await gfetch<GetKeyInformationResponse>('/v2/GetKeyInfo', {
     params: { id, ...params }
   })
-  log.withMetadata({ keyId: id, data }).debug('Getting key information')
+  log.withMetadata(data).debug('Getting key information')
 
   return createResponse<GetKeyInformationResponse>(event, 'Get Key Information', { data })
 })

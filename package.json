@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bunx --bun vite dev",
     "build": "bun run typecheck && bunx --bun vite build",
-    "start": "PORT=3980 bun run --env-file=.env.local .output/server/index.mjs",
+    "start": "PORT=3990 bun run --env-file=.env.local .output/server/index.mjs",
     "docker:build": "docker build -f Dockerfile . -t $npm_package_config_image:$npm_package_version-dev",
     "docker:push": "docker push $npm_package_config_image:latest-dev && docker push $npm_package_config_image:$npm_package_version-dev",
     "docker:run": "pnpm --silent run dockerx --name $npm_package_name $npm_package_config_image:$npm_package_version-dev",

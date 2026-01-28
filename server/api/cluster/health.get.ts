@@ -8,7 +8,7 @@ export default defineProtectedHandler(async (event) => {
 
   log.debug('Getting cluster health status')
   const data = await gfetch<GetClusterHealthResponse>('/v2/GetClusterHealth')
-  log.withMetadata({ status: data.status }).debug('Cluster health retrieved')
+  log.withMetadata(data).debug('Cluster health retrieved')
 
   return createResponse<GetClusterHealthResponse>(event, 'Get Cluster Health', { data })
 })

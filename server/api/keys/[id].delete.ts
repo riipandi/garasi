@@ -14,7 +14,7 @@ export default defineProtectedHandler(async (event) => {
   }
 
   const data = await gfetch('/v2/DeleteKey', { method: 'POST', params: { id } })
-  log.withMetadata({ id, data }).debug('Deleting access key')
+  log.withMetadata(data).debug('Deleting access key')
 
   return createResponse(event, 'Delete Access Key', { data })
 })

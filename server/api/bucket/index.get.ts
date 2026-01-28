@@ -8,7 +8,7 @@ export default defineProtectedHandler(async (event) => {
 
   log.debug('Listing buckets')
   const data = await gfetch<ListBucketsResponse[]>('/v2/ListBuckets')
-  log.withMetadata({ bucketCount: data.length }).debug('Buckets listed successfully')
+  log.withMetadata(data).debug('Buckets listed successfully')
 
   return createResponse<ListBucketsResponse[]>(event, 'List Buckets', { data })
 })

@@ -16,7 +16,7 @@ export default defineProtectedHandler(async (event) => {
 
   log.withMetadata({ node: params.node }).debug('Listing block errors')
   const data = await gfetch<ListBlockErrorsResponse>('/v2/ListBlockErrors', { params })
-  log.withMetadata({ errorCount: data.error?.length || 0 }).debug('Block errors listed')
+  log.withMetadata(data).debug('Block errors listed')
 
   return createResponse<ListBlockErrorsResponse>(event, 'List Block Errors', { data })
 })

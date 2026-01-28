@@ -14,6 +14,6 @@ export default defineProtectedHandler(async (event) => {
   const log = logger.withPrefix('ListAdminTokens')
   log.debug('Listing admin tokens')
   const data = await gfetch<GetAdminTokenInfoResp[]>('/v2/ListAdminTokens')
-  log.withMetadata({ tokenCount: data.length }).debug('Admin tokens listed successfully')
+  log.withMetadata(data).debug('Admin tokens listed successfully')
   return { status: 'success', message: 'List Admin Tokens', data }
 })

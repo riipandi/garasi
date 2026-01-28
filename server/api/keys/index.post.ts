@@ -14,7 +14,7 @@ export default defineProtectedHandler(async (event) => {
   }
 
   const data = await gfetch<CreateAccessKeyResponse>('/v2/CreateKey', { method: 'POST', body })
-  log.withMetadata({ body, data }).debug('Creating access key')
+  log.withMetadata(data).debug('Creating access key')
 
   return createResponse(event, 'Create Access Key', { data })
 })

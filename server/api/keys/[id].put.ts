@@ -30,7 +30,7 @@ export default defineProtectedHandler(async (event) => {
     params: { id, ...params },
     body
   })
-  log.withMetadata({ params, body, data }).debug('Updating access key')
+  log.withMetadata(data).debug('Updating access key')
 
   return createResponse<UpdateAccessKeyResponse>(event, 'Update Access Key', { data })
 })

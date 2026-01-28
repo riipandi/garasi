@@ -12,7 +12,7 @@ parentId: null
 variables:
   - enabled: true
     name: baseURL
-    value: http://localhost:3980
+    value: http://localhost:3990
     id: T6ET9rAwNY
   - enabled: true
     name: defaultPassword

@@ -46,7 +46,7 @@ export default defineConfig({
     minify: isProduction ? 'oxc' : false
   },
   server: {
-    port: 3980,
+    port: 3990,
     strictPort: true,
     watch: {
       ignored: ['**/docs/**', '**/specs/**', '**/scripts/**']
