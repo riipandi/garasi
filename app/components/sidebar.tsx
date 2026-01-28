@@ -150,7 +150,7 @@ export function SidebarList({ className, children, ...props }: React.ComponentPr
   return (
     <ul
       data-slot='sidebar-list'
-      className={clx('flex w-full flex-col gap-0.5', className)}
+      className={clx('mt-1.5 flex w-full flex-col gap-1', className)}
       {...props}
     >
       {children}
