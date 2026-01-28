@@ -1,11 +1,11 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import { getClusterStatus, getClusterStatistics } from '~/app/services/cluster.service'
-import { LayoutManagement } from './-partials/layout-management'
 import { Card, CardBody } from '~/app/components/card'
 import { Heading } from '~/app/components/heading'
 import { Text } from '~/app/components/text'
+import { getClusterStatus, getClusterStatistics } from '~/app/services/cluster.service'
+import { LayoutManagement } from './-partials/layout-management'
 
 interface ClusterStatisticsResponse {
   nodes: Array<{
@@ -120,11 +120,9 @@ function RouteComponent() {
             <div className='flex items-center justify-between'>
               <div>
                 <Text className='text-muted'>Layout Version</Text>
-                <Text className='mt-1 text-lg font-semibold'>
-                  {status?.layoutVersion || 0}
-                </Text>
+                <Text className='mt-1 text-lg font-semibold'>{status?.layoutVersion || 0}</Text>
               </div>
-              <Lucide.LayoutGrid className='size-6 text-muted' />
+              <Lucide.LayoutGrid className='text-muted size-6' />
             </div>
           </CardBody>
         </Card>
@@ -136,7 +134,7 @@ function RouteComponent() {
                 <Text className='text-muted'>Total Nodes</Text>
                 <Text className='mt-1 text-lg font-semibold'>{nodes.length}</Text>
               </div>
-              <Lucide.Server className='size-6 text-muted' />
+              <Lucide.Server className='text-muted size-6' />
             </div>
           </CardBody>
         </Card>
@@ -146,11 +144,13 @@ function RouteComponent() {
             <div className='flex items-center justify-between'>
               <div>
                 <Text className='text-muted'>Data Storage</Text>
-                <Text className={`mt-1 text-lg font-semibold ${getStorageStatusColor(dataPercentage)}`}>
+                <Text
+                  className={`mt-1 text-lg font-semibold ${getStorageStatusColor(dataPercentage)}`}
+                >
                   {dataPercentage.toFixed(1)}%
                 </Text>
               </div>
-              <Lucide.Database className='size-6 text-muted' />
+              <Lucide.Database className='text-muted size-6' />
             </div>
             <div className='mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-200'>
               <div
@@ -166,11 +166,13 @@ function RouteComponent() {
             <div className='flex items-center justify-between'>
               <div>
                 <Text className='text-muted'>Metadata Storage</Text>
-                <Text className={`mt-1 text-lg font-semibold ${getStorageStatusColor(metaPercentage)}`}>
+                <Text
+                  className={`mt-1 text-lg font-semibold ${getStorageStatusColor(metaPercentage)}`}
+                >
                   {metaPercentage.toFixed(1)}%
                 </Text>
               </div>
-              <Lucide.FileText className='size-6 text-muted' />
+              <Lucide.FileText className='text-muted size-6' />
             </div>
             <div className='mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-200'>
               <div
@@ -195,14 +197,14 @@ function RouteComponent() {
             <div>
               <div className='mb-2 flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <Lucide.Database className='size-4 text-muted' />
-                  <Text className='font-medium text-sm'>Data Storage</Text>
+                  <Lucide.Database className='text-muted size-4' />
+                  <Text className='text-sm font-medium'>Data Storage</Text>
                 </div>
                 <div className='text-right'>
                   <Text className={`text-sm font-medium ${getStorageStatusColor(dataPercentage)}`}>
                     {getStorageStatus(dataPercentage)}
                   </Text>
-                  <Text className='ml-2 text-muted text-sm'>
+                  <Text className='text-muted ml-2 text-sm'>
                     {usedDataStorage.toFixed(1)} GB / {totalDataStorage.toFixed(1)} GB
                   </Text>
                 </div>
@@ -213,7 +215,7 @@ function RouteComponent() {
                   style={{ width: `${Math.min(dataPercentage, 100)}%` }}
                 />
               </div>
-              <Text className='mt-1 text-muted text-xs'>
+              <Text className='text-muted mt-1 text-xs'>
                 {dataPercentage.toFixed(1)}% used ({clusterWide?.data || 'N/A'})
               </Text>
             </div>
@@ -221,14 +223,14 @@ function RouteComponent() {
             <div>
               <div className='mb-2 flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <Lucide.FileText className='size-4 text-muted' />
-                  <Text className='font-medium text-sm'>Metadata Storage</Text>
+                  <Lucide.FileText className='text-muted size-4' />
+                  <Text className='text-sm font-medium'>Metadata Storage</Text>
                 </div>
                 <div className='text-right'>
                   <Text className={`text-sm font-medium ${getStorageStatusColor(metaPercentage)}`}>
                     {getStorageStatus(metaPercentage)}
                   </Text>
-                  <Text className='ml-2 text-muted text-sm'>
+                  <Text className='text-muted ml-2 text-sm'>
                     {usedMetaStorage.toFixed(1)} GB / {totalMetaStorage.toFixed(1)} GB
                   </Text>
                 </div>
@@ -239,7 +241,7 @@ function RouteComponent() {
                   style={{ width: `${Math.min(metaPercentage, 100)}%` }}
                 />
               </div>
-              <Text className='mt-1 text-muted text-xs'>
+              <Text className='text-muted mt-1 text-xs'>
                 {metaPercentage.toFixed(1)}% used ({clusterWide?.metadata || 'N/A'})
               </Text>
             </div>
@@ -257,10 +259,10 @@ function RouteComponent() {
                   <div className='mb-3 flex items-start justify-between'>
                     <div>
                       <Text className='font-medium'>{node.hostname}</Text>
-                      <div className='flex items-center gap-2 text-xs text-muted'>
+                      <div className='text-muted flex items-center gap-2 text-xs'>
                         <span>{node.id}</span>
                         <span>•</span>
-                        <span className='rounded-full bg-primary/15 px-2 py-0.5 text-primary'>
+                        <span className='bg-primary/15 text-primary rounded-full px-2 py-0.5'>
                           {node.zone}
                         </span>
                         <span>•</span>
@@ -277,7 +279,7 @@ function RouteComponent() {
                     <div>
                       <div className='mb-1 flex items-center justify-between text-xs'>
                         <div className='flex items-center gap-1'>
-                          <Lucide.Database className='size-3 text-muted' />
+                          <Lucide.Database className='text-muted size-3' />
                           <Text className='text-muted'>Data</Text>
                         </div>
                         <Text
@@ -292,7 +294,7 @@ function RouteComponent() {
                           style={{ width: `${Math.min(node.dataAvailable.percentage, 100)}%` }}
                         />
                       </div>
-                      <Text className='mt-0.5 text-muted text-xs'>
+                      <Text className='text-muted mt-0.5 text-xs'>
                         {node.dataAvailable.used} / {node.dataAvailable.total}
                       </Text>
                     </div>
@@ -300,7 +302,7 @@ function RouteComponent() {
                     <div>
                       <div className='mb-1 flex items-center justify-between text-xs'>
                         <div className='flex items-center gap-1'>
-                          <Lucide.FileText className='size-3 text-muted' />
+                          <Lucide.FileText className='text-muted size-3' />
                           <Text className='text-muted'>Metadata</Text>
                         </div>
                         <Text
@@ -315,7 +317,7 @@ function RouteComponent() {
                           style={{ width: `${Math.min(node.metaAvailable.percentage, 100)}%` }}
                         />
                       </div>
-                      <Text className='mt-0.5 text-muted text-xs'>
+                      <Text className='text-muted mt-0.5 text-xs'>
                         {node.metaAvailable.used} / {node.metaAvailable.total}
                       </Text>
                     </div>
@@ -324,7 +326,7 @@ function RouteComponent() {
               ))
             ) : (
               <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-                <Lucide.Server className='mb-4 size-16 text-muted' />
+                <Lucide.Server className='text-muted mb-4 size-16' />
                 <Text className='font-medium'>No storage nodes available</Text>
               </div>
             )}

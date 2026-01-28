@@ -9,15 +9,23 @@ import { getSortedRowModel } from '@tanstack/react-table'
 import { getFilteredRowModel } from '@tanstack/react-table'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { getClusterStatus } from '~/app/services/cluster.service'
-import { getNodeInfo } from '~/app/services/node.service'
-import type { NodeResp } from '~/shared/schemas/cluster.schema'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
 import { Card, CardBody } from '~/app/components/card'
 import { Input } from '~/app/components/input'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '~/app/components/table'
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '~/app/components/table'
 import { Text } from '~/app/components/text'
+import { getClusterStatus } from '~/app/services/cluster.service'
+import { getNodeInfo } from '~/app/services/node.service'
+import type { NodeResp } from '~/shared/schemas/cluster.schema'
 import { ConnectNodesDialog } from './-partials/connect-nodes-dialog'
 
 export const Route = createFileRoute('/(app)/cluster/nodes/')({
@@ -165,10 +173,7 @@ function RouteComponent() {
             )}
           </div>
 
-          <Button
-            variant='primary'
-            onClick={() => setIsConnectDialogOpen(true)}
-          >
+          <Button variant='primary' onClick={() => setIsConnectDialogOpen(true)}>
             <Lucide.Plus className='size-4' />
             Connect Nodes
           </Button>
@@ -178,7 +183,7 @@ function RouteComponent() {
           <Card>
             <CardBody>
               <div className='flex items-center justify-center py-8'>
-                <Lucide.Loader2 className='size-6 animate-spin text-muted' />
+                <Lucide.Loader2 className='text-muted size-6 animate-spin' />
               </div>
             </CardBody>
           </Card>
@@ -186,9 +191,9 @@ function RouteComponent() {
           <Card>
             <CardBody>
               <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-                <Lucide.Search className='mb-4 size-16 text-muted' />
+                <Lucide.Search className='text-muted mb-4 size-16' />
                 <Text className='font-medium'>No nodes found</Text>
-                <Text className='text-muted text-sm mt-2'>
+                <Text className='text-muted mt-2 text-sm'>
                   Try adjusting your search or filters.
                 </Text>
               </div>
@@ -198,9 +203,9 @@ function RouteComponent() {
           <Card>
             <CardBody>
               <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-                <Lucide.Server className='mb-4 size-16 text-muted' />
+                <Lucide.Server className='text-muted mb-4 size-16' />
                 <Text className='font-medium'>No nodes found</Text>
-                <Text className='text-muted text-sm mt-2'>
+                <Text className='text-muted mt-2 text-sm'>
                   Connect nodes to your cluster to get started.
                 </Text>
               </div>

@@ -1,6 +1,21 @@
 import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { Badge } from '~/app/components/badge'
+import { Button } from '~/app/components/button'
+import { Card, CardBody } from '~/app/components/card'
+import { Field, FieldLabel } from '~/app/components/field'
+import { Input } from '~/app/components/input'
+import {
+  Select,
+  SelectList,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue
+} from '~/app/components/select'
+import { Spinner } from '~/app/components/spinner'
+import { Text } from '~/app/components/text'
 import { getClusterLayout } from '~/app/services/layout.service'
 import { getLayoutHistory } from '~/app/services/layout.service'
 import { previewLayoutChanges } from '~/app/services/layout.service'
@@ -8,14 +23,6 @@ import { applyClusterLayout } from '~/app/services/layout.service'
 import { updateClusterLayout } from '~/app/services/layout.service'
 import { revertClusterLayout } from '~/app/services/layout.service'
 import { skipDeadNodes } from '~/app/services/layout.service'
-import { Badge } from '~/app/components/badge'
-import { Button } from '~/app/components/button'
-import { Card, CardBody } from '~/app/components/card'
-import { Field, FieldLabel } from '~/app/components/field'
-import { Input } from '~/app/components/input'
-import { Select, SelectList, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '~/app/components/select'
-import { Spinner } from '~/app/components/spinner'
-import { Text } from '~/app/components/text'
 
 interface LayoutManagementProps {
   layoutVersion?: number
@@ -124,19 +131,20 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
     isStagedChangesArray(layout.stagedRoleChanges) &&
     layout.stagedRoleChanges.length > 0
 
-  const nodeOptions = layout?.roles?.map((role: { id: string }) => ({
+  const nodeOptions =
+    layout?.roles?.map((role: { id: string }) => ({
       value: role.id,
       label: role.id
-  })) || []
+    })) || []
 
   return (
     <div className='space-y-6'>
       <div className='mb-4 flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <Text className='font-semibold text-lg'>Layout Information</Text>
+          <Text className='text-lg font-semibold'>Layout Information</Text>
           <Badge variant='info'>v{layout?.version || layoutVersion || 0}</Badge>
         </div>
-        <Lucide.LayoutGrid className='size-5 text-muted' />
+        <Lucide.LayoutGrid className='text-muted size-5' />
       </div>
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
@@ -149,7 +157,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
                   {layout?.version || layoutVersion || 0}
                 </Text>
               </div>
-              <Lucide.Tag className='size-6 text-muted' />
+              <Lucide.Tag className='text-muted size-6' />
             </div>
           </CardBody>
         </Card>
@@ -165,7 +173,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
                     : 'N/A'}
                 </Text>
               </div>
-              <Lucide.HardDrive className='size-6 text-muted' />
+              <Lucide.HardDrive className='text-muted size-6' />
             </div>
           </CardBody>
         </Card>
@@ -183,9 +191,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
                   </Badge>
                 )}
               {layout.parameters.zoneRedundancy === 'maximum' && (
-                <Badge variant='primary'>
-                  Maximum
-                </Badge>
+                <Badge variant='primary'>Maximum</Badge>
               )}
             </div>
           </CardBody>
@@ -196,16 +202,16 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
         <Card>
           <CardBody className='border-warning/30 bg-warning/10'>
             <div className='flex items-start gap-3'>
-              <Lucide.AlertTriangle className='mt-0.5 size-6 shrink-0 text-warning' />
+              <Lucide.AlertTriangle className='text-warning mt-0.5 size-6 shrink-0' />
               <div className='flex-1'>
-                <Text className='font-semibold text-warning'>
+                <Text className='text-warning font-semibold'>
                   Staged Changes (
                   {isStagedChangesArray(layout.stagedRoleChanges)
                     ? layout.stagedRoleChanges.length
                     : 1}
                   )
                 </Text>
-                <Text className='mt-1 text-muted text-sm'>
+                <Text className='text-muted mt-1 text-sm'>
                   There are pending changes to the cluster layout. Preview and apply to make them
                   active.
                 </Text>
@@ -214,9 +220,9 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
                     layout.stagedRoleChanges.map((change: any, index: number) => (
                       <div
                         key={`${change.id}-${change.zone || 'no-zone'}-${index}`}
-                        className='flex items-center gap-2 rounded-lg border border-warning/30 bg-white p-3'
+                        className='border-warning/30 flex items-center gap-2 rounded-lg border bg-white p-3'
                       >
-                        <Lucide.Edit3 className='size-4 text-warning' />
+                        <Lucide.Edit3 className='text-warning size-4' />
                         <Text className='text-muted text-sm'>
                           {change.remove ? 'Remove' : 'Update'} node {change.id}
                           {change.zone && ` to zone ${change.zone}`}
@@ -307,18 +313,12 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
               )}
             </Button>
 
-            <Button
-              variant='outline'
-              onClick={() => setShowUpdateForm(!showUpdateForm)}
-            >
+            <Button variant='outline' onClick={() => setShowUpdateForm(!showUpdateForm)}>
               <Lucide.Edit className='size-4' />
               {showUpdateForm ? 'Hide' : 'Show'} Update Form
             </Button>
 
-            <Button
-              variant='outline'
-              onClick={() => setShowHistory(!showHistory)}
-            >
+            <Button variant='outline' onClick={() => setShowHistory(!showHistory)}>
               <Lucide.History className='size-4' />
               {showHistory ? 'Hide' : 'Show'} History
             </Button>
@@ -409,14 +409,10 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
                   <div className='flex items-center gap-3'>
                     <Text className='font-medium'>v{version.version}</Text>
                     {version.version === history.currentVersion && (
-                      <Badge variant='primary'>
-                        Current
-                      </Badge>
+                      <Badge variant='primary'>Current</Badge>
                     )}
                   </div>
-                  <Text className='text-muted text-sm'>
-                    Layout version {version.version}
-                  </Text>
+                  <Text className='text-muted text-sm'>Layout version {version.version}</Text>
                 </div>
               ))}
             </div>
@@ -428,9 +424,9 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
         <Card>
           <CardBody className='border-primary/30 bg-primary/10'>
             <div className='flex items-start gap-3'>
-              <Lucide.Eye className='mt-0.5 size-6 shrink-0 text-primary' />
+              <Lucide.Eye className='text-primary mt-0.5 size-6 shrink-0' />
               <div className='flex-1'>
-                <Text className='font-semibold text-primary'>Preview Results</Text>
+                <Text className='text-primary font-semibold'>Preview Results</Text>
                 <div className='mt-2 space-y-2'>
                   {previewMutation.data.data.message ? (
                     <Text className='text-muted text-sm'>{previewMutation.data.data.message}</Text>
@@ -441,11 +437,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
                   )}
                 </div>
               </div>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => setShowPreview(false)}
-              >
+              <Button variant='outline' size='sm' onClick={() => setShowPreview(false)}>
                 <Lucide.X className='size-4' />
               </Button>
             </div>

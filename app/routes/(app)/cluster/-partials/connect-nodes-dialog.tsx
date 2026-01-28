@@ -1,13 +1,21 @@
 import { QueryClient, useMutation } from '@tanstack/react-query'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { connectClusterNodes } from '~/app/services/cluster.service'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
-import { Dialog, DialogBody, DialogClose, DialogFooter, DialogHeader, DialogPopup, DialogTitle } from '~/app/components/dialog'
+import {
+  Dialog,
+  DialogBody,
+  DialogClose,
+  DialogFooter,
+  DialogHeader,
+  DialogPopup,
+  DialogTitle
+} from '~/app/components/dialog'
 import { Field, FieldLabel } from '~/app/components/field'
 import { Input } from '~/app/components/input'
 import { Text } from '~/app/components/text'
+import { connectClusterNodes } from '~/app/services/cluster.service'
 
 interface ConnectNodesDialogProps {
   isOpen: boolean
@@ -112,8 +120,8 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
       <DialogPopup>
         <DialogHeader>
           <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15'>
-              <Lucide.Plus className='size-5 text-primary' />
+            <div className='bg-primary/15 flex h-10 w-10 shrink-0 items-center justify-center rounded-full'>
+              <Lucide.Plus className='text-primary size-5' />
             </div>
             <div>
               <DialogTitle>Connect Cluster Nodes</DialogTitle>
@@ -122,15 +130,14 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
           </div>
         </DialogHeader>
         <DialogBody>
-          <div className='mb-4 rounded-lg border border-primary/30 bg-primary/10 p-3'>
+          <div className='border-primary/30 bg-primary/10 mb-4 rounded-lg border p-3'>
             <div className='flex items-start gap-2'>
-              <Lucide.Info className='mt-0.5 size-4 shrink-0 text-primary' />
+              <Lucide.Info className='text-primary mt-0.5 size-4 shrink-0' />
               <Text className='text-sm'>
                 Enter node addresses in the format:{' '}
                 <Badge variant='primary'>node_id@net_address</Badge>
                 <br />
-                Example:{' '}
-                <Badge variant='primary'>node1@192.168.1.10:3901</Badge>
+                Example: <Badge variant='primary'>node1@192.168.1.10:3901</Badge>
               </Text>
             </div>
           </div>
@@ -150,9 +157,7 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
                       disabled={connectMutation.isPending}
                     />
                   </Field>
-                  {errors[node] && (
-                    <Text className='text-danger mt-1 text-xs'>{errors[node]}</Text>
-                  )}
+                  {errors[node] && <Text className='text-danger mt-1 text-xs'>{errors[node]}</Text>}
                 </div>
                 {nodes.length > 1 && (
                   <Button
@@ -193,22 +198,27 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
 
         {connectMutation.data?.data && (
           <div className='mt-4 space-y-1 rounded-lg border border-gray-200 bg-gray-50 p-3'>
-            <Text className='font-semibold text-sm'>Connection Results</Text>
-            {connectMutation.data.data.map((result: { success: boolean; error?: string | null }, index: number) => (
-              <div key={`connection-result-${result.success}-${index}`} className='flex items-center gap-2 text-xs'>
-                {result.success ? (
-                  <>
-                    <Lucide.CheckCircle2 className='size-3.5 text-success' />
-                    <Text className='text-success'>Node connected successfully</Text>
-                  </>
-                ) : (
-                  <>
-                    <Lucide.XCircle className='size-3.5 text-danger' />
-                    <Text className='text-danger'>{result.error || 'Connection failed'}</Text>
-                  </>
-                )}
-              </div>
-            ))}
+            <Text className='text-sm font-semibold'>Connection Results</Text>
+            {connectMutation.data.data.map(
+              (result: { success: boolean; error?: string | null }, index: number) => (
+                <div
+                  key={`connection-result-${result.success}-${index}`}
+                  className='flex items-center gap-2 text-xs'
+                >
+                  {result.success ? (
+                    <>
+                      <Lucide.CheckCircle2 className='text-success size-3.5' />
+                      <Text className='text-success'>Node connected successfully</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Lucide.XCircle className='text-danger size-3.5' />
+                      <Text className='text-danger'>{result.error || 'Connection failed'}</Text>
+                    </>
+                  )}
+                </div>
+              )
+            )}
           </div>
         )}
       </DialogPopup>

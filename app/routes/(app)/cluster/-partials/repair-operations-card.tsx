@@ -1,10 +1,10 @@
 import * as Lucide from 'lucide-react'
-import type { RepairType } from '~/shared/schemas/node.schema'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Heading } from '~/app/components/heading'
 import { Text } from '~/app/components/text'
+import type { RepairType } from '~/shared/schemas/node.schema'
 
 interface RepairOperationsCardProps {
   repairMutation: {
@@ -152,7 +152,7 @@ export function RepairOperationsCard({
                       />
                     </div>
                     <div className='flex-1'>
-                      <Text className='font-semibold text-sm'>{op.name}</Text>
+                      <Text className='text-sm font-semibold'>{op.name}</Text>
                       <Text className='text-muted text-xs'>{op.summary}</Text>
                       {result && (
                         <Text
@@ -201,7 +201,7 @@ export function RepairOperationsCard({
                   <Lucide.Sparkles className='size-5 text-purple-600' />
                 </div>
                 <div>
-                  <Text className='font-semibold text-sm'>Scrub Operations</Text>
+                  <Text className='text-sm font-semibold'>Scrub Operations</Text>
                   <Text className='text-muted text-xs'>Control data scrubbing process</Text>
                 </div>
               </div>

@@ -2,10 +2,10 @@ import { queryOptions, useMutation, useSuspenseQuery } from '@tanstack/react-que
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { getNodeInfo, launchRepairOperation } from '~/app/services/node.service'
-import type { RepairType } from '~/shared/schemas/node.schema'
 import { Card } from '~/app/components/card'
 import { Text, TextLink } from '~/app/components/text'
+import { getNodeInfo, launchRepairOperation } from '~/app/services/node.service'
+import type { RepairType } from '~/shared/schemas/node.schema'
 
 const NodeInformationCard = React.lazy(() =>
   import('./-partials/node-information-card').then((m) => ({
@@ -139,12 +139,9 @@ function RouteComponent() {
       <div className='mx-auto max-w-screen-2xl space-y-6'>
         <Card>
           <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-            <Lucide.XCircle className='mb-4 size-16 text-muted' />
+            <Lucide.XCircle className='text-muted mb-4 size-16' />
             <Text className='font-medium'>Unable to load node information</Text>
-            <TextLink
-              render={<Link to='/cluster' />}
-              className='mt-2'
-            >
+            <TextLink render={<Link to='/cluster' />} className='mt-2'>
               Back to Cluster
             </TextLink>
           </div>
@@ -159,7 +156,7 @@ function RouteComponent() {
         fallback={
           <Card>
             <div className='flex items-center justify-center py-8'>
-              <Lucide.Loader2 className='size-6 animate-spin text-muted' />
+              <Lucide.Loader2 className='text-muted size-6 animate-spin' />
             </div>
           </Card>
         }
@@ -171,7 +168,7 @@ function RouteComponent() {
         fallback={
           <Card>
             <div className='flex items-center justify-center py-8'>
-              <Lucide.Loader2 className='size-6 animate-spin text-muted' />
+              <Lucide.Loader2 className='text-muted size-6 animate-spin' />
             </div>
           </Card>
         }
