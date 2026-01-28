@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '~/app/components/selia/button'
-import { Field, FieldError, FieldLabel } from '~/app/components/selia/field'
-import { Fieldset, FieldsetLegend } from '~/app/components/selia/fieldset'
-import { Form } from '~/app/components/selia/form'
-import { Input } from '~/app/components/selia/input'
-import { Text } from '~/app/components/selia/text'
+import { Button } from '~/app/components/button'
+import { Field, FieldError, FieldLabel } from '~/app/components/field'
+import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
+import { Form } from '~/app/components/form'
+import { Input } from '~/app/components/input'
+import { Text } from '~/app/components/text'
 
 const meta = {
   title: 'Components/Form',

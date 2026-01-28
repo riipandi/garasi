@@ -5,7 +5,7 @@ import {
   BreadcrumbItem,
   BreadcrumbButton,
   BreadcrumbSeparator
-} from '~/app/components/selia/breadcrumb'
+} from '~/app/components/breadcrumb'
 
 const meta = {
   title: 'Components/Breadcrumb',

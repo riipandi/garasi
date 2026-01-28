@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Toggle } from '~/app/components/selia/toggle'
+import { Toggle } from '~/app/components/toggle'
 
 const meta = {
   title: 'Components/Toggle',

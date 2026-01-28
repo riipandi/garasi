@@ -2,8 +2,7 @@ import { queryOptions, useMutation, useQuery, useSuspenseQuery } from '@tanstack
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/selia/alert'
-import { Button } from '~/app/components/selia/button'
+import { Alert } from '~/app/components/alert'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -13,7 +12,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle
-} from '~/app/components/selia/alert-dialog'
+} from '~/app/components/alert-dialog'
+import { Button } from '~/app/components/button'
 import { listBuckets, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
 import { getKeyInformation, updateAccessKey, deleteAccessKey } from '~/app/services/keys.service'
@@ -460,8 +460,17 @@ function RouteComponent() {
           <React.Suspense
             fallback={
               <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <div className='flex items-center justify-center py-8' role='status' aria-live='polite'>
-                  <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
+                <div
+                  className='flex items-center justify-center py-8'
+                  role='status'
+                  aria-live='polite'
+                >
+                  <svg
+                    className='size-6 animate-spin'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    aria-hidden='true'
+                  >
                     <circle
                       className='opacity-25'
                       cx='12'
@@ -539,7 +548,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete the access key "{accessKey.name}"? This action cannot be undone.
+              Are you sure you want to delete the access key "{accessKey.name}"? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>

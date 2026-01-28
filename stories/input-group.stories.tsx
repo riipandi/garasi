@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Input } from '~/app/components/selia/input'
-import { InputGroup, InputGroupAddon, InputGroupText } from '~/app/components/selia/input-group'
+import { Input } from '~/app/components/input'
+import { InputGroup, InputGroupAddon, InputGroupText } from '~/app/components/input-group'
 
 const meta = {
   title: 'Components/InputGroup',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Chip, ChipButton } from '~/app/components/selia/chip'
+import { Chip, ChipButton } from '~/app/components/chip'
 
 const meta = {
   title: 'Components/Chip',

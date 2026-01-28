@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '~/app/components/selia/button'
+import { Button } from '~/app/components/button'
 import {
   Dialog,
   DialogBody,
@@ -10,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '~/app/components/selia/dialog'
-import { Textarea } from '~/app/components/selia/textarea'
+} from '~/app/components/dialog'
+import { Textarea } from '~/app/components/textarea'
 
 const meta = {
   title: 'Components/Dialog',

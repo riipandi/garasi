@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Field, FieldLabel } from '~/app/components/selia/field'
+import { Field, FieldLabel } from '~/app/components/field'
 import {
   NumberField,
   NumberFieldDecrement,
@@ -8,7 +8,7 @@ import {
   NumberFieldIncrement,
   NumberFieldInput,
   NumberFieldScrubArea
-} from '~/app/components/selia/number-field'
+} from '~/app/components/number-field'
 
 const meta = {
   title: 'Components/NumberField',

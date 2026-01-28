@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '~/app/components/selia/button'
+import { Button } from '~/app/components/button'
 import {
   Item,
   ItemAction,
@@ -7,7 +7,7 @@ import {
   ItemDescription,
   ItemMedia,
   ItemTitle
-} from '~/app/components/selia/item'
+} from '~/app/components/item'
 
 const meta = {
   title: 'Components/Item',

@@ -8,7 +8,7 @@ import {
   ComboboxSearch,
   ComboboxTrigger,
   ComboboxValue
-} from '~/app/components/selia/combobox'
+} from '~/app/components/combobox'
 
 const meta = {
   title: 'Components/Combobox',

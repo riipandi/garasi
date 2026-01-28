@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Meter, MeterLabel, MeterValue } from '~/app/components/selia/meter'
+import { Meter, MeterLabel, MeterValue } from '~/app/components/meter'
 
 const meta = {
   title: 'Components/Meter',

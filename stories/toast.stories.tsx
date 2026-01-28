@@ -2,9 +2,9 @@
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
-import { Button } from '~/app/components/selia/button'
-import { toastManager, Toast } from '~/app/components/selia/toast'
-import { anchoredToastManager } from '~/app/components/selia/toast'
+import { Button } from '~/app/components/button'
+import { toastManager, Toast } from '~/app/components/toast'
+import { anchoredToastManager } from '~/app/components/toast'
 
 const meta = {
   title: 'Components/Toast',

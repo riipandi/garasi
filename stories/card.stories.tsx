@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '~/app/components/selia/button'
-import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/selia/card'
-import { Field, FieldLabel } from '~/app/components/selia/field'
-import { Fieldset } from '~/app/components/selia/fieldset'
-import { Input } from '~/app/components/selia/input'
+import { Button } from '~/app/components/button'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
+import { Field, FieldLabel } from '~/app/components/field'
+import { Fieldset } from '~/app/components/fieldset'
+import { Input } from '~/app/components/input'
 
 const meta = {
   title: 'Components/Card',

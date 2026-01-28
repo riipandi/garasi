@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Field, FieldLabel } from '~/app/components/selia/field'
-import { Fieldset, FieldsetLegend } from '~/app/components/selia/fieldset'
-import { Input } from '~/app/components/selia/input'
-import { Tabs, TabsItem, TabsList, TabsPanel } from '~/app/components/selia/tabs'
+import { Field, FieldLabel } from '~/app/components/field'
+import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
+import { Input } from '~/app/components/input'
+import { Tabs, TabsItem, TabsList, TabsPanel } from '~/app/components/tabs'
 
 const meta = {
   title: 'Components/Tabs',

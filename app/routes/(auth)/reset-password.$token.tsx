@@ -2,8 +2,8 @@ import { useForm } from '@tanstack/react-form'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
-import { Alert } from '~/app/components/selia/alert'
-import { Input } from '~/app/components/selia/input'
+import { Alert } from '~/app/components/alert'
+import { Input } from '~/app/components/input'
 import fetcher from '~/app/fetcher'
 
 interface ResetPasswordLoaderData {
@@ -113,7 +113,12 @@ function RouteComponent() {
             <div className='space-y-6'>
               <Alert variant='danger'>
                 <div className='flex items-start gap-3'>
-                  <svg className='mt-0.5 size-5 shrink-0' fill='currentColor' viewBox='0 0 20 20' aria-hidden='true'>
+                  <svg
+                    className='mt-0.5 size-5 shrink-0'
+                    fill='currentColor'
+                    viewBox='0 0 20 20'
+                    aria-hidden='true'
+                  >
                     <path
                       fillRule='evenodd'
                       d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
@@ -148,7 +153,12 @@ function RouteComponent() {
             <div className='space-y-6'>
               <Alert variant='success'>
                 <div className='flex items-start gap-3'>
-                  <svg className='mt-0.5 size-5 shrink-0' fill='currentColor' viewBox='0 0 20 20' aria-hidden='true'>
+                  <svg
+                    className='mt-0.5 size-5 shrink-0'
+                    fill='currentColor'
+                    viewBox='0 0 20 20'
+                    aria-hidden='true'
+                  >
                     <path
                       fillRule='evenodd'
                       d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
@@ -202,31 +212,35 @@ function RouteComponent() {
                       fieldApi.form.setFieldValue('confirmPassword', confirmPasswordValue)
                     }
                   }
-                }}>
-                  {(field) => (
-                    <div>
-                      <label htmlFor='password' className='mb-1 block text-sm font-medium text-gray-700'>
-                        New Password <span className='ml-1 text-red-500'>*</span>
-                      </label>
-                      <Input
-                        ref={passwordInputRef}
-                        id='password'
-                        name={field.name}
-                        type='password'
-                        autoComplete='new-password'
-                        strengthIndicator
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder='•••••••'
-                      />
-                      {field.state.meta.errors.length > 0 && (
-                        <p className='mt-1 text-sm text-red-600'>
-                          {String(field.state.meta.errors[0])}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                }}
+              >
+                {(field) => (
+                  <div>
+                    <label
+                      htmlFor='password'
+                      className='mb-1 block text-sm font-medium text-gray-700'
+                    >
+                      New Password <span className='ml-1 text-red-500'>*</span>
+                    </label>
+                    <Input
+                      ref={passwordInputRef}
+                      id='password'
+                      name={field.name}
+                      type='password'
+                      autoComplete='new-password'
+                      strengthIndicator
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder='•••••••'
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <p className='mt-1 text-sm text-red-600'>
+                        {String(field.state.meta.errors[0])}
+                      </p>
+                    )}
+                  </div>
+                )}
               </Form.Field>
 
               <Form.Field
@@ -248,34 +262,37 @@ function RouteComponent() {
 
                     return undefined
                   }
-                }}>
-                  {(field) => (
-                    <div>
-                      <label htmlFor='confirmPassword' className='mb-1 block text-sm font-medium text-gray-700'>
-                        Confirm New Password <span className='ml-1 text-red-500'>*</span>
-                      </label>
-                      <Input
-                        id='confirmPassword'
-                        name={field.name}
-                        type='password'
-                        autoComplete='new-password'
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder='•••••••'
-                      />
-                      {field.state.meta.errors.length > 0 && (
-                        <p className='mt-1 text-sm text-red-600'>
-                          {String(field.state.meta.errors[0])}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                }}
+              >
+                {(field) => (
+                  <div>
+                    <label
+                      htmlFor='confirmPassword'
+                      className='mb-1 block text-sm font-medium text-gray-700'
+                    >
+                      Confirm New Password <span className='ml-1 text-red-500'>*</span>
+                    </label>
+                    <Input
+                      id='confirmPassword'
+                      name={field.name}
+                      type='password'
+                      autoComplete='new-password'
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder='•••••••'
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <p className='mt-1 text-sm text-red-600'>
+                        {String(field.state.meta.errors[0])}
+                      </p>
+                    )}
+                  </div>
+                )}
               </Form.Field>
 
-              <Form.Subscribe
-                selector={(state) => [state.canSubmit, state.isSubmitting]}>
-                  {([canSubmit, isSubmitting]) => (
+              <Form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                {([canSubmit, isSubmitting]) => (
                   <div>
                     <button
                       type='submit'
@@ -284,7 +301,12 @@ function RouteComponent() {
                     >
                       {isSubmitting ? (
                         <span className='flex items-center gap-2'>
-                          <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
+                          <svg
+                            className='size-4 animate-spin'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            aria-hidden='true'
+                          >
                             <circle
                               className='opacity-25'
                               cx='12'
@@ -303,11 +325,11 @@ function RouteComponent() {
                         </span>
                       ) : (
                         'Reset Password'
-                  )}
-                </button>
-              </div>
-            )}
-          </Form.Subscribe>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </Form.Subscribe>
 
               <div className='text-center'>
                 <Link

@@ -2,8 +2,7 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/selia/alert'
-import { Button } from '~/app/components/selia/button'
+import { Alert } from '~/app/components/alert'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -13,7 +12,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle
-} from '~/app/components/selia/alert-dialog'
+} from '~/app/components/alert-dialog'
+import { Button } from '~/app/components/button'
 import {
   listAccessKeys,
   createAccessKey,
@@ -110,8 +110,6 @@ function RouteComponent() {
     }
   }
 
-
-
   const handleDeleteAllKeys = () => {
     setShowDeleteAllConfirm(true)
   }
@@ -120,8 +118,6 @@ function RouteComponent() {
     await Promise.all(keys.map((key) => deleteKeyMutation.mutateAsync(key.id)))
     setShowDeleteAllConfirm(false)
   }
-
-
 
   const handleRefreshKeys = async () => {
     setIsRefreshing(true)
@@ -249,7 +245,10 @@ function RouteComponent() {
           {/* Info Box */}
           <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
             <div className='flex gap-3'>
-              <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' aria-label='Information icon' />
+              <Lucide.Info
+                className='mt-0.5 size-5 shrink-0 text-blue-600'
+                aria-label='Information icon'
+              />
               <div>
                 <h4 className='text-sm font-medium text-blue-900'>Information</h4>
                 <p className='mt-1 text-xs text-blue-700'>
@@ -287,7 +286,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this access key? This action cannot be undone and will permanently remove the key from your account.
+              Are you sure you want to delete this access key? This action cannot be undone and will
+              permanently remove the key from your account.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -315,7 +315,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete all {keys.length} access keys? This action cannot be undone and will permanently remove all keys from your account.
+              Are you sure you want to delete all {keys.length} access keys? This action cannot be
+              undone and will permanently remove all keys from your account.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -334,8 +335,6 @@ function RouteComponent() {
           </AlertDialogFooter>
         </AlertDialogPopup>
       </AlertDialog>
-
-
     </div>
   )
 }

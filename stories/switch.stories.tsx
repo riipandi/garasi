@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Label } from '~/app/components/selia/label'
-import { Switch } from '~/app/components/selia/switch'
+import { Label } from '~/app/components/label'
+import { Switch } from '~/app/components/switch'
 
 const meta = {
   title: 'Components/Switch',

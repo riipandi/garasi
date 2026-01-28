@@ -1,6 +1,6 @@
 import * as Lucide from 'lucide-react'
-import { useAuth } from '~/app/guards'
-import { Alert, AlertTitle, AlertDescription, AlertAction } from '~/app/components/selia/alert'
+import { Alert, AlertTitle, AlertDescription, AlertAction } from '~/app/components/alert'
+import { useAuth } from './context'
 
 /**
  * SessionExpiredAlert component displays a notification when user's session has expired.
@@ -25,7 +25,7 @@ export function SessionExpiredAlert() {
           <button
             type='button'
             onClick={dismissSessionExpired}
-            className='rounded-md p-1 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500'
+            className='rounded-md p-1 hover:bg-white/20 focus:ring-2 focus:ring-amber-500 focus:outline-none'
             aria-label='Dismiss'
           >
             <Lucide.X className='size-4' aria-hidden='true' />

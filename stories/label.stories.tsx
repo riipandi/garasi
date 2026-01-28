@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Input } from '~/app/components/selia/input'
-import { Label } from '~/app/components/selia/label'
+import { Input } from '~/app/components/input'
+import { Label } from '~/app/components/label'
 
 const meta = {
   title: 'Components/Label',

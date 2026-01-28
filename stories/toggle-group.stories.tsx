@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Toggle } from '~/app/components/selia/toggle'
-import { ToggleGroup } from '~/app/components/selia/toggle-group'
+import { Toggle } from '~/app/components/toggle'
+import { ToggleGroup } from '~/app/components/toggle-group'
 
 const meta = {
   title: 'Components/ToggleGroup',

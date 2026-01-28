@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ScrollArea } from '~/app/components/selia/scroll-area'
-import { Text } from '~/app/components/selia/text'
+import { ScrollArea } from '~/app/components/scroll-area'
+import { Text } from '~/app/components/text'
 
 const meta = {
   title: 'Components/ScrollArea',

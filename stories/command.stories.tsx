@@ -10,8 +10,8 @@ import {
   AutocompleteGroupLabel,
   AutocompleteCollection,
   AutocompleteItem
-} from '~/app/components/selia/autocomplete'
-import { Button } from '~/app/components/selia/button'
+} from '~/app/components/autocomplete'
+import { Button } from '~/app/components/button'
 import {
   Command,
   CommandTrigger,
@@ -20,9 +20,9 @@ import {
   CommandFooter,
   CommandFooterItem,
   CommandFooterText
-} from '~/app/components/selia/command'
-import { InputGroup, InputGroupAddon } from '~/app/components/selia/input-group'
-import { Kbd, KbdGroup } from '~/app/components/selia/kbd'
+} from '~/app/components/command'
+import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
+import { Kbd, KbdGroup } from '~/app/components/kbd'
 
 const meta = {
   title: 'Components/Command',

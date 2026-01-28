@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: HIFGfea2ZZ
+  - enabled: true
+    name: Content-Type
+    value: application/json
+    id: HIFGfea2ZZ
 method: POST
 name: Create Bucket
 sortPriority: 5000.0

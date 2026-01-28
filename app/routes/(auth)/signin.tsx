@@ -3,8 +3,8 @@ import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-r
 import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
-import { Alert } from '~/app/components/selia/alert'
-import { Input } from '~/app/components/selia/input'
+import { Alert } from '~/app/components/alert'
+import { Input } from '~/app/components/input'
 import { useAuth } from '~/app/guards'
 import type { SigninRequest } from '~/app/types/api'
 
@@ -158,7 +158,10 @@ function RouteComponent() {
               }}
               children={(field) => (
                 <div>
-                  <label htmlFor='password' className='mb-1 block text-sm font-medium text-gray-700'>
+                  <label
+                    htmlFor='password'
+                    className='mb-1 block text-sm font-medium text-gray-700'
+                  >
                     Password
                   </label>
                   <Input
@@ -210,7 +213,12 @@ function RouteComponent() {
                   >
                     {isSubmitting ? (
                       <span className='flex items-center gap-2'>
-                        <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
+                        <svg
+                          className='size-4 animate-spin'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          aria-hidden='true'
+                        >
                           <circle
                             className='opacity-25'
                             cx='12'

@@ -3,7 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
-import { Alert } from '~/app/components/selia/alert'
+import { Alert } from '~/app/components/alert'
 import fetcher from '~/app/fetcher'
 
 // Zod schema for form validation

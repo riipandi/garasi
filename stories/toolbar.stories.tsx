@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Button } from '~/app/components/selia/button'
+import { Button } from '~/app/components/button'
 import {
   NumberField,
   NumberFieldDecrement,
   NumberFieldGroup,
   NumberFieldIncrement,
   NumberFieldInput
-} from '~/app/components/selia/number-field'
+} from '~/app/components/number-field'
 import {
   Select,
   SelectItem,
@@ -15,9 +15,9 @@ import {
   SelectPopup,
   SelectTrigger,
   SelectValue
-} from '~/app/components/selia/select'
-import { Toggle } from '~/app/components/selia/toggle'
-import { ToggleGroup } from '~/app/components/selia/toggle-group'
+} from '~/app/components/select'
+import { Toggle } from '~/app/components/toggle'
+import { ToggleGroup } from '~/app/components/toggle-group'
 import {
   Toolbar,
   ToolbarButton,
@@ -25,7 +25,7 @@ import {
   ToolbarInput,
   ToolbarLink,
   ToolbarSeparator
-} from '~/app/components/selia/toolbar'
+} from '~/app/components/toolbar'
 
 const meta = {
   title: 'Components/Toolbar',

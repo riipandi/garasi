@@ -5,7 +5,7 @@ import {
   PaginationList,
   PaginationItem,
   PaginationButton
-} from '~/app/components/selia/pagination'
+} from '~/app/components/pagination'
 
 const meta = {
   title: 'Components/Pagination',

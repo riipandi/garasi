@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { IconBox } from '~/app/components/selia/icon-box'
+import { IconBox } from '~/app/components/icon-box'
 
 const meta = {
   title: 'Components/IconBox',

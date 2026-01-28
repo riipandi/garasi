@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Badge } from '~/app/components/selia/badge'
+import { Badge } from '~/app/components/badge'
 
 const meta = {
   title: 'Components/Badge',

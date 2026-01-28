@@ -2,8 +2,7 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/selia/alert'
-import { Button } from '~/app/components/selia/button'
+import { Alert } from '~/app/components/alert'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -13,7 +12,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle
-} from '~/app/components/selia/alert-dialog'
+} from '~/app/components/alert-dialog'
+import { Button } from '~/app/components/button'
 import { createBucket, deleteBucket, listBuckets } from '~/app/services/bucket.service'
 import type { CreateBucketRequest } from '~/shared/schemas/bucket.schema'
 import { BucketCreate } from './-partials/bucket-create'
@@ -85,8 +85,6 @@ function RouteComponent() {
       setBucketToDelete(null)
     }
   }
-
-
 
   const handleCreateBucket = async (values: CreateBucketRequest) => {
     await createBucketMutation.mutateAsync(values)
@@ -193,7 +191,11 @@ function RouteComponent() {
           <BucketTable buckets={buckets} onDelete={handleDeleteBucket} isLoading={isRefreshing} />
 
           {/* Info Box */}
-          <div className='rounded-lg border border-blue-200 bg-blue-50 p-4' role='region' aria-label='Information'>
+          <div
+            className='rounded-lg border border-blue-200 bg-blue-50 p-4'
+            role='region'
+            aria-label='Information'
+          >
             <div className='flex gap-3'>
               <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' aria-hidden='true' />
               <div>
@@ -217,7 +219,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this bucket? This action cannot be undone and will permanently remove the bucket and all its contents.
+              Are you sure you want to delete this bucket? This action cannot be undone and will
+              permanently remove the bucket and all its contents.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>

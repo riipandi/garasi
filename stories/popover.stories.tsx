@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Button } from '~/app/components/selia/button'
+import { Button } from '~/app/components/button'
 import {
   Popover,
   PopoverPopup,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger
-} from '~/app/components/selia/popover'
+} from '~/app/components/popover'
 
 const meta = {
   title: 'Components/Popover',

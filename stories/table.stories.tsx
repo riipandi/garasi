@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Badge } from '~/app/components/selia/badge'
-import { Button } from '~/app/components/selia/button'
+import { Badge } from '~/app/components/badge'
+import { Button } from '~/app/components/button'
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '~/app/components/selia/table'
+} from '~/app/components/table'
 
 const meta = {
   title: 'Components/Table',

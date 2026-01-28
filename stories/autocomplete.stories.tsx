@@ -9,7 +9,7 @@ import {
   AutocompleteGroup,
   AutocompleteGroupLabel,
   AutocompleteCollection
-} from '~/app/components/selia/autocomplete'
+} from '~/app/components/autocomplete'
 
 const meta = {
   title: 'Components/Autocomplete',

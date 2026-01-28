@@ -6,7 +6,7 @@ import {
   SelectList,
   SelectTrigger,
   SelectValue
-} from '~/app/components/selia/select'
+} from '~/app/components/select'
 
 const meta = {
   title: 'Components/Select',

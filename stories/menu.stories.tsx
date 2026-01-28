@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Button } from '~/app/components/selia/button'
-import { Menu, MenuPopup, MenuItem, MenuTrigger, MenuSeparator } from '~/app/components/selia/menu'
+import { Button } from '~/app/components/button'
+import { Menu, MenuPopup, MenuItem, MenuTrigger, MenuSeparator } from '~/app/components/menu'
 
 const meta = {
   title: 'Components/Menu',

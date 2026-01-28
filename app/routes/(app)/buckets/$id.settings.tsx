@@ -2,8 +2,7 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/selia/alert'
-import { Button } from '~/app/components/selia/button'
+import { Alert } from '~/app/components/alert'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -13,7 +12,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle
-} from '~/app/components/selia/alert-dialog'
+} from '~/app/components/alert-dialog'
+import { Button } from '~/app/components/button'
 import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
 import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
@@ -326,8 +326,6 @@ function RouteComponent() {
     setShowDeleteConfirm(false)
   }
 
-
-
   const handleEditBucket = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -386,8 +384,6 @@ function RouteComponent() {
     }
   }
 
-
-
   const handleAddLocalAlias = async (data: { accessKeyId: string; alias: string }) => {
     const requestData: AddLocalBucketAliasRequest = {
       localAlias: data.alias,
@@ -412,8 +408,6 @@ function RouteComponent() {
       setLocalAliasToDelete(null)
     }
   }
-
-
 
   const handleAllowBucketKey = async (
     accessKeyId: string,
@@ -441,8 +435,6 @@ function RouteComponent() {
       setKeyToDelete(null)
     }
   }
-
-
 
   const handleCloseKeySelector = () => {
     setShowKeySelectorDialog(false)
@@ -592,7 +584,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this bucket? This action cannot be undone and will permanently remove bucket and all its contents.
+              Are you sure you want to delete this bucket? This action cannot be undone and will
+              permanently remove bucket and all its contents.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -621,14 +614,18 @@ function RouteComponent() {
       />
 
       {/* Delete Global Alias Confirmation Dialog */}
-      <AlertDialog open={showDeleteGlobalAliasConfirm} onOpenChange={setShowDeleteGlobalAliasConfirm}>
+      <AlertDialog
+        open={showDeleteGlobalAliasConfirm}
+        onOpenChange={setShowDeleteGlobalAliasConfirm}
+      >
         <AlertDialogPopup>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Global Alias</AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete global alias "{globalAliasToDelete}"? This action cannot be undone.
+              Are you sure you want to delete global alias "{globalAliasToDelete}"? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -684,7 +681,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete local alias "{localAliasToDelete?.alias}"? This action cannot be undone.
+              Are you sure you want to delete local alias "{localAliasToDelete?.alias}"? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>

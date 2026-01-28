@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '~/app/components/selia/button'
+import { Button } from '~/app/components/button'
 import {
   Menu,
   MenuItem,
@@ -9,8 +9,8 @@ import {
   MenuSubmenuTrigger,
   MenuSubmenuPopup,
   MenuTrigger
-} from '~/app/components/selia/menu'
-import { Menubar } from '~/app/components/selia/menubar'
+} from '~/app/components/menu'
+import { Menubar } from '~/app/components/menubar'
 
 const meta = {
   title: 'Components/Menubar',

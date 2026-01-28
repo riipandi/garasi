@@ -5,7 +5,7 @@ import {
   AvatarFallbackInitial,
   AvatarImage,
   AvatarIndicator
-} from '~/app/components/selia/avatar'
+} from '~/app/components/avatar'
 
 const meta = {
   title: 'Components/Avatar',

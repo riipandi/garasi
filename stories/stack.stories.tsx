@@ -1,14 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Avatar, AvatarFallback, AvatarImage } from '~/app/components/selia/avatar'
-import {
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemMedia,
-  ItemTitle
-} from '~/app/components/selia/item'
-import { Separator } from '~/app/components/selia/separator'
-import { Stack } from '~/app/components/selia/stack'
+import { Avatar, AvatarFallback, AvatarImage } from '~/app/components/avatar'
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '~/app/components/item'
+import { Separator } from '~/app/components/separator'
+import { Stack } from '~/app/components/stack'
 
 const meta = {
   title: 'Components/Stack',

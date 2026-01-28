@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Slider, SliderThumb } from '~/app/components/selia/slider'
+import { Slider, SliderThumb } from '~/app/components/slider'
 
 const meta = {
   title: 'Components/Slider',

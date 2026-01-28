@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Accordion, AccordionItem, AccordionHeader } from '~/app/components/selia/accordion'
-import { AccordionTrigger, AccordionPanel } from '~/app/components/selia/accordion'
-import { Text } from '~/app/components/selia/text'
+import { Accordion, AccordionItem, AccordionHeader } from '~/app/components/accordion'
+import { AccordionTrigger, AccordionPanel } from '~/app/components/accordion'
+import { Text } from '~/app/components/text'
 
 const meta = {
   title: 'Components/Accordion',

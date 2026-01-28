@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Field, FieldDescription, FieldError, FieldLabel } from '~/app/components/selia/field'
-import { Fieldset, FieldsetLegend } from '~/app/components/selia/fieldset'
-import { Input } from '~/app/components/selia/input'
-import { Text } from '~/app/components/selia/text'
+import { Field, FieldDescription, FieldError, FieldLabel } from '~/app/components/field'
+import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
+import { Input } from '~/app/components/input'
+import { Text } from '~/app/components/text'
 
 const meta = {
   title: 'Components/Fieldset',

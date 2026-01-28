@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Kbd } from '~/app/components/selia/kbd'
+import { Kbd } from '~/app/components/kbd'
 
 const meta = {
   title: 'Components/Kbd',

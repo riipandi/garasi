@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import {
-  PreviewCard,
-  PreviewCardPopup,
-  PreviewCardTrigger
-} from '~/app/components/selia/preview-card'
-import { Text } from '~/app/components/selia/text'
+import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from '~/app/components/preview-card'
+import { Text } from '~/app/components/text'
 
 const meta = {
   title: 'Components/PreviewCard',

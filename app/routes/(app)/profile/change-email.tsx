@@ -2,8 +2,8 @@ import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Alert } from '~/app/components/selia/alert'
-import { Input } from '~/app/components/selia/input'
+import { Alert } from '~/app/components/alert'
+import { Input } from '~/app/components/input'
 import fetcher from '~/app/fetcher'
 
 // Zod schema for form validation
@@ -162,35 +162,33 @@ function RouteComponent() {
                 }
                 return undefined
               }
-            }}>
-              {(field) => (
-                <div>
-                  <label htmlFor='password' className='mb-1 block text-sm font-medium text-gray-700'>
-                    Current Password <span className='ml-1 text-red-500'>*</span>
-                  </label>
-                  <Input
-                    id='password'
-                    name={field.name}
-                    type='password'
-                    autoComplete='current-password'
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder='••••••••'
-                    disabled={changeEmailMutation.isPending}
-                  />
-                  {field.state.meta.errors.length > 0 && (
-                    <p className='mt-1 text-sm text-red-600'>
-                      {String(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </div>
-              )}
+            }}
+          >
+            {(field) => (
+              <div>
+                <label htmlFor='password' className='mb-1 block text-sm font-medium text-gray-700'>
+                  Current Password <span className='ml-1 text-red-500'>*</span>
+                </label>
+                <Input
+                  id='password'
+                  name={field.name}
+                  type='password'
+                  autoComplete='current-password'
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder='••••••••'
+                  disabled={changeEmailMutation.isPending}
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className='mt-1 text-sm text-red-600'>{String(field.state.meta.errors[0])}</p>
+                )}
+              </div>
+            )}
           </Form.Field>
 
-          <Form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmitting]) => (
+          <Form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmitting]) => (
               <div className='flex justify-end gap-3'>
                 <button
                   type='button'
@@ -206,7 +204,12 @@ function RouteComponent() {
                 >
                   {isSubmitting || changeEmailMutation.isPending ? (
                     <span className='flex items-center gap-2'>
-                      <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
+                      <svg
+                        className='size-4 animate-spin'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                        aria-hidden='true'
+                      >
                         <circle
                           className='opacity-25'
                           cx='12'

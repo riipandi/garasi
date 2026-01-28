@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '~/app/components/selia/avatar'
-import { Menu, MenuPopup, MenuItem, MenuTrigger } from '~/app/components/selia/menu'
+import { Avatar, AvatarFallback, AvatarImage } from '~/app/components/avatar'
+import { Menu, MenuPopup, MenuItem, MenuTrigger } from '~/app/components/menu'
 import {
   Sidebar,
   SidebarCollapsible,
@@ -19,7 +19,7 @@ import {
   SidebarLogo,
   SidebarMenu,
   SidebarSubmenu
-} from '~/app/components/selia/sidebar'
+} from '~/app/components/sidebar'
 
 const meta = {
   title: 'Components/Sidebar',

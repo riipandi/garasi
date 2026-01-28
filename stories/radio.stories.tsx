@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Label } from '~/app/components/selia/label'
-import { Radio, RadioGroup, RadioGroupLabel } from '~/app/components/selia/radio'
+import { Label } from '~/app/components/label'
+import { Radio, RadioGroup, RadioGroupLabel } from '~/app/components/radio'
 
 const meta = {
   title: 'Components/Radio',

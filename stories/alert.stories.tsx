@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Alert, AlertTitle, AlertDescription } from '~/app/components/selia/alert'
+import { Alert, AlertTitle, AlertDescription } from '~/app/components/alert'
 
 const meta = {
   title: 'Components/Alert',

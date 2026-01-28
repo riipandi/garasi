@@ -9,8 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger
-} from '~/app/components/selia/alert-dialog'
-import { Button } from '~/app/components/selia/button'
+} from '~/app/components/alert-dialog'
+import { Button } from '~/app/components/button'
 
 const meta = {
   title: 'Components/AlertDialog',
