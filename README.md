@@ -69,8 +69,14 @@ See [`.env.example`](./.env.example) for all available options.
 
 ## License
 
-Licensed under the [Apache 2.0 license](https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0).
+Garasi is licensed under the [Apache License 2.0](https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0).
 See the [LICENSE](./LICENSE) file for more information.
+
+> Unless you explicitly state otherwise, any contribution intentionally submitted
+> for inclusion in this project by you shall be licensed under the Apache License 2.0,
+> without any additional terms or conditions.
+
+Copyrights in this project are retained by their contributors.
 
 ---
 
