@@ -3,7 +3,12 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
+import { Button } from '~/app/components/button'
+import { Field, FieldError, FieldLabel } from '~/app/components/field'
+import { Heading } from '~/app/components/heading'
 import { Input } from '~/app/components/input'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import fetcher from '~/app/fetcher'
 
 interface ResetPasswordLoaderData {
@@ -15,13 +20,11 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
   loader: async ({ params }) => {
     const { token } = params
 
-    // Check if token is empty
     if (!token || token.trim() === '') {
       return { isValidToken: false }
     }
 
     try {
-      // Validate token by calling the validation endpoint
       const response = await fetcher<{
         success: boolean
         message: string
@@ -30,17 +33,14 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
         method: 'GET'
       })
 
-      // Check if token is valid from the response
       return { isValidToken: response.success && response.data?.is_token_valid }
     } catch (error) {
       console.error(error)
-      // If we get an error, the token is invalid/expired
       return { isValidToken: false }
     }
   }
 })
 
-// Zod schema for form validation
 const resetPasswordSchema = z
   .object({
     password: z
@@ -64,7 +64,6 @@ function RouteComponent() {
   const [successMessage, setSuccessMessage] = useState('')
   const passwordInputRef = useRef<HTMLInputElement>(null)
 
-  // Auto-focus password input on mount
   useEffect(() => {
     if (loaderData?.isValidToken) {
       passwordInputRef.current?.focus()
@@ -94,255 +93,218 @@ function RouteComponent() {
     }
   })
 
-  // Check if token is invalid
   const isInvalidToken = !loaderData?.isValidToken
 
   return (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='w-full max-w-md space-y-8 p-8'>
-        <div className='text-center'>
-          <h2 className='mt-6 text-3xl font-extrabold text-gray-900'>Reset your password</h2>
-          <p className='mt-2 text-sm text-gray-600'>
-            {isInvalidToken ? 'Invalid or expired reset token' : 'Enter your new password below'}
-          </p>
-        </div>
+    <Stack spacing='lg' className='w-full max-w-md p-8'>
+      <Stack spacing='md'>
+        <Heading level={1} size='lg'>
+          Reset your password
+        </Heading>
+        <Text>
+          {isInvalidToken ? 'Invalid or expired reset token' : 'Enter your new password below'}
+        </Text>
+      </Stack>
 
-        <div className='rounded-lg bg-white p-6 shadow-md'>
-          {isInvalidToken ? (
-            // Show error for invalid token
-            <div className='space-y-6'>
-              <Alert variant='danger'>
-                <div className='flex items-start gap-3'>
-                  <svg
-                    className='mt-0.5 size-5 shrink-0'
-                    fill='currentColor'
-                    viewBox='0 0 20 20'
-                    aria-hidden='true'
-                  >
-                    <path
-                      fillRule='evenodd'
-                      d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
-                      clipRule='evenodd'
-                    />
-                  </svg>
-                  <div>
-                    <p className='font-medium'>Invalid or expired link</p>
-                    <p className='mt-1 text-sm opacity-90'>
-                      This password reset link is invalid or has expired. Please request a new one.
-                    </p>
-                  </div>
-                </div>
-              </Alert>
-              <div className='space-y-3'>
-                <Link
-                  to='/forgot-password'
-                  className='flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none'
+      <Stack>
+        {isInvalidToken ? (
+          <Stack>
+            <Alert variant='danger'>
+              <div className='flex items-start gap-3'>
+                <svg
+                  className='mt-0.5 size-5 shrink-0'
+                  fill='currentColor'
+                  viewBox='0 0 20 20'
+                  aria-hidden='true'
                 >
+                  <title>Error icon</title>
+                  <path
+                    fillRule='evenodd'
+                    d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                    clipRule='evenodd'
+                  />
+                </svg>
+                <div>
+                  <p className='font-medium'>Invalid or expired link</p>
+                  <p className='mt-1 text-sm opacity-90'>
+                    This password reset link is invalid or has expired. Please request a new one.
+                  </p>
+                </div>
+              </div>
+            </Alert>
+            <Stack>
+              <Button
+                block
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+              >
+                <Link to='/forgot-password' className='text-foreground hover:text-foreground/80'>
                   Request New Reset Link
                 </Link>
-                <Link
-                  to='/signin'
-                  className='flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none'
-                >
+              </Button>
+              <Button
+                variant='outline'
+                block
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+              >
+                <Link to='/signin' className='text-foreground hover:text-foreground/80'>
                   Back to Sign in
                 </Link>
-              </div>
-            </div>
-          ) : isSuccess ? (
-            // Success state
-            <div className='space-y-6'>
-              <Alert variant='success'>
-                <div className='flex items-start gap-3'>
-                  <svg
-                    className='mt-0.5 size-5 shrink-0'
-                    fill='currentColor'
-                    viewBox='0 0 20 20'
-                    aria-hidden='true'
-                  >
-                    <path
-                      fillRule='evenodd'
-                      d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
-                      clipRule='evenodd'
-                    />
-                  </svg>
-                  <div>
-                    <p className='font-medium'>Password reset successful</p>
-                    <p className='mt-1 text-sm opacity-90'>{successMessage}</p>
-                  </div>
+              </Button>
+            </Stack>
+          </Stack>
+        ) : isSuccess ? (
+          <Stack>
+            <Alert variant='success'>
+              <div className='flex items-start gap-3'>
+                <svg
+                  className='mt-0.5 size-5 shrink-0'
+                  fill='currentColor'
+                  viewBox='0 0 20 20'
+                  aria-hidden='true'
+                >
+                  <title>Success icon</title>
+                  <path
+                    fillRule='evenodd'
+                    d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+                    clipRule='evenodd'
+                  />
+                </svg>
+                <div>
+                  <p className='font-medium'>Password reset successful</p>
+                  <p className='mt-1 text-sm opacity-90'>{successMessage}</p>
                 </div>
-              </Alert>
+              </div>
+            </Alert>
 
-              <Link
-                to='/signin'
-                className='flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none'
-              >
-                Sign in with your new password
-              </Link>
-            </div>
-          ) : (
-            // Show reset form
-            <form
-              className='space-y-6'
-              onSubmit={(e) => {
+            <Button
+              block
+              onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                Form.handleSubmit()
               }}
             >
-              {Form.state.errors.length > 0 && (
-                <Alert variant='danger'>{Form.state.errors[0]}</Alert>
+              <Link to='/signin' className='text-foreground hover:text-foreground/80'>
+                Sign in with your new password
+              </Link>
+            </Button>
+          </Stack>
+        ) : (
+          <>
+            {Form.state.errors.length > 0 && (
+              <Alert variant='danger'>{Form.state.errors[0]}</Alert>
+            )}
+
+            <Form.Field
+              name='password'
+              validators={{
+                onChange: ({ value }) => {
+                  const result = resetPasswordSchema.shape.password.safeParse(value)
+                  if (!result.success) {
+                    const firstError = result.error.issues[0]
+                    return firstError ? firstError.message : undefined
+                  }
+                  return undefined
+                },
+                onChangeAsync: async ({ value, fieldApi }) => {
+                  const confirmPasswordValue = fieldApi.form.getFieldValue('confirmPassword')
+                  if (confirmPasswordValue && confirmPasswordValue !== value) {
+                    fieldApi.form.setFieldValue('confirmPassword', confirmPasswordValue)
+                  }
+                }
+              }}
+            >
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor='password'>New Password <span className='ml-1 text-red-500'>*</span></FieldLabel>
+                  <Input
+                    ref={passwordInputRef}
+                    id='password'
+                    name={field.name}
+                    type='password'
+                    autoComplete='new-password'
+                    strengthIndicator
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='•••••••'
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <FieldError>{String(field.state.meta.errors[0])}</FieldError>
+                  )}
+                </Field>
               )}
+            </Form.Field>
 
-              <Form.Field
-                name='password'
-                validators={{
-                  onChange: ({ value }) => {
-                    const result = resetPasswordSchema.shape.password.safeParse(value)
-                    if (!result.success) {
-                      const firstError = result.error.issues[0]
-                      return firstError ? firstError.message : undefined
-                    }
-                    return undefined
-                  },
-                  onChangeAsync: async ({ value, fieldApi }) => {
-                    // If confirmPassword has a value, re-validate it when password changes
-                    const confirmPasswordValue = fieldApi.form.getFieldValue('confirmPassword')
-                    if (confirmPasswordValue && confirmPasswordValue !== value) {
-                      // Trigger re-validation of confirmPassword field
-                      fieldApi.form.setFieldValue('confirmPassword', confirmPasswordValue)
-                    }
+            <Form.Field
+              name='confirmPassword'
+              validators={{
+                onChange: ({ value, fieldApi }) => {
+                  if (!value || value.trim() === '') {
+                    return 'Please confirm your password'
                   }
-                }}
-              >
-                {(field) => (
-                  <div>
-                    <label
-                      htmlFor='password'
-                      className='mb-1 block text-sm font-medium text-gray-700'
-                    >
-                      New Password <span className='ml-1 text-red-500'>*</span>
-                    </label>
-                    <Input
-                      ref={passwordInputRef}
-                      id='password'
-                      name={field.name}
-                      type='password'
-                      autoComplete='new-password'
-                      strengthIndicator
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder='•••••••'
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <p className='mt-1 text-sm text-red-600'>
-                        {String(field.state.meta.errors[0])}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </Form.Field>
 
-              <Form.Field
-                name='confirmPassword'
-                validators={{
-                  onChange: ({ value, fieldApi }) => {
-                    // Check if confirmPassword is not empty
-                    if (!value || value.trim() === '') {
-                      return 'Please confirm your password'
-                    }
+                  const passwordValue = fieldApi.form.getFieldValue('password')
 
-                    // Get the password field value
-                    const passwordValue = fieldApi.form.getFieldValue('password')
-
-                    // Check if passwords match
-                    if (value !== passwordValue) {
-                      return 'Passwords do not match'
-                    }
-
-                    return undefined
+                  if (value !== passwordValue) {
+                    return 'Passwords do not match'
                   }
-                }}
-              >
-                {(field) => (
-                  <div>
-                    <label
-                      htmlFor='confirmPassword'
-                      className='mb-1 block text-sm font-medium text-gray-700'
-                    >
-                      Confirm New Password <span className='ml-1 text-red-500'>*</span>
-                    </label>
-                    <Input
-                      id='confirmPassword'
-                      name={field.name}
-                      type='password'
-                      autoComplete='new-password'
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder='•••••••'
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <p className='mt-1 text-sm text-red-600'>
-                        {String(field.state.meta.errors[0])}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </Form.Field>
 
-              <Form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-                {([canSubmit, isSubmitting]) => (
-                  <div>
-                    <button
-                      type='submit'
-                      disabled={!canSubmit || isSubmitting}
-                      className='flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                    >
-                      {isSubmitting ? (
-                        <span className='flex items-center gap-2'>
-                          <svg
-                            className='size-4 animate-spin'
-                            fill='none'
-                            viewBox='0 0 24 24'
-                            aria-hidden='true'
-                          >
-                            <circle
-                              className='opacity-25'
-                              cx='12'
-                              cy='12'
-                              r='10'
-                              stroke='currentColor'
-                              strokeWidth='4'
-                            />
-                            <path
-                              className='opacity-75'
-                              fill='currentColor'
-                              d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.2 3 7.938l3-2.647z'
-                            />
-                          </svg>
-                          Resetting...
-                        </span>
-                      ) : (
-                        'Reset Password'
-                      )}
-                    </button>
-                  </div>
-                )}
-              </Form.Subscribe>
+                  return undefined
+                }
+              }}
+            >
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor='confirmPassword'>Confirm New Password <span className='ml-1 text-red-500'>*</span></FieldLabel>
+                  <Input
+                    id='confirmPassword'
+                    name={field.name}
+                    type='password'
+                    autoComplete='new-password'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='•••••••'
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <FieldError>{String(field.state.meta.errors[0])}</FieldError>
+                  )}
+                </Field>
+              )}
+            </Form.Field>
 
-              <div className='text-center'>
-                <Link
-                  to='/signin'
-                  className='text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-500'
+            <Form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
+                <Button
+                  type='submit'
+                  disabled={!canSubmit || isSubmitting}
+                  block
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    Form.handleSubmit()
+                  }}
+                  progress={isSubmitting}
                 >
-                  Back to Sign in
-                </Link>
-              </div>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
+                  {isSubmitting ? 'Resetting...' : 'Reset Password'}
+                </Button>
+              )}
+            </Form.Subscribe>
+
+            <Text className='text-center'>
+              <Link to='/signin' className='text-primary hover:text-primary/80 transition-colors'>
+                Back to Sign in
+              </Link>
+            </Text>
+          </>
+        )}
+      </Stack>
+    </Stack>
   )
 }

@@ -1,14 +1,18 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
+import { Button } from '~/app/components/button'
+import { Checkbox } from '~/app/components/checkbox'
+import { Field, FieldError, FieldLabel } from '~/app/components/field'
+import { Heading } from '~/app/components/heading'
 import { Input } from '~/app/components/input'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import { useAuth } from '~/app/guards'
 import type { SigninRequest } from '~/app/types/api'
 
-// Zod schema for form validation
 const signinSchema = z.object({
   email: z.email({ error: 'Please enter a valid email address' }),
   password: z.string().min(1, { error: 'Password is required' }),
@@ -35,7 +39,6 @@ function RouteComponent() {
     onSubmit: async ({ value }) => {
       setSubmitError(null)
 
-      // Validate with Zod before submitting
       const result = signinSchema.safeParse(value)
       if (!result.success) {
         const firstError = result.error.issues[0]
@@ -50,7 +53,6 @@ function RouteComponent() {
       const loginResult = await login(value.email, value.password)
 
       if (loginResult.success) {
-        // Redirect to the original URL if provided, otherwise go to home
         navigate({ to: search.redirect || '/' })
       } else {
         setSubmitError(loginResult.error || 'Invalid email or password. Please try again.')
@@ -58,202 +60,149 @@ function RouteComponent() {
     }
   })
 
-  // Auto-focus email input on mount
   useEffect(() => {
     emailInputRef.current?.focus()
   }, [])
 
-  // Show session expired message if redirected due to session expiry
   useEffect(() => {
     if (sessionExpired && search.redirect) {
       setSubmitError('Your session has expired. Please sign in again to continue.')
     }
   }, [sessionExpired, search.redirect])
 
-  // Redirect if already authenticated
   if (isAuthenticated) {
     navigate({ to: '/' })
     return null
   }
 
   return (
-    <div className='flex min-h-screen items-center justify-center'>
-      <div className='w-full max-w-md space-y-8 p-8'>
-        <div className='text-center'>
-          <h2 className='mt-6 text-3xl font-extrabold text-gray-900'>Sign in to your account</h2>
-          <p className='mt-2 text-sm text-gray-600'>
-            Enter your credentials to access your account
-          </p>
-        </div>
+    <Stack spacing='lg' className='w-full max-w-md p-8'>
+      <Stack spacing='md'>
+        <Heading level={1} size='lg'>
+          Sign in to your account
+        </Heading>
+        <Text>
+          Enter your credentials to access your account
+        </Text>
+      </Stack>
 
-        <div className='rounded-lg bg-white p-6 shadow-md'>
-          <form
-            className='space-y-6'
-            onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              Form.handleSubmit()
-            }}
-          >
-            {search.message && (
-              <Alert variant={search.type === 'success' ? 'success' : 'danger'}>
-                {search.message}
-              </Alert>
-            )}
+      <Stack>
+        {search.message && (
+          <Alert variant={search.type === 'success' ? 'success' : 'danger'}>
+            {search.message}
+          </Alert>
+        )}
 
-            {submitError && <Alert variant='danger'>{submitError}</Alert>}
+        {submitError && <Alert variant='danger'>{submitError}</Alert>}
 
-            <Form.Field
-              name='email'
-              validators={{
-                onChange: ({ value }) => {
-                  const result = signinSchema.shape.email.safeParse(value)
-                  if (!result.success) {
-                    const firstError = result.error.issues[0]
-                    return firstError ? firstError.message : undefined
-                  }
-                  return undefined
-                }
+        <Form.Field
+          name='email'
+          validators={{
+            onChange: ({ value }) => {
+              const result = signinSchema.shape.email.safeParse(value)
+              if (!result.success) {
+                const firstError = result.error.issues[0]
+                return firstError ? firstError.message : undefined
+              }
+              return undefined
+            }
+          }}
+        >
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor='email'>Email address</FieldLabel>
+              <Input
+                ref={emailInputRef}
+                id='email'
+                name={field.name}
+                type='email'
+                autoComplete='email'
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder='somebody@example.com'
+              />
+              {field.state.meta.errors.length > 0 && (
+                <FieldError>{String(field.state.meta.errors[0])}</FieldError>
+              )}
+            </Field>
+          )}
+        </Form.Field>
+
+        <Form.Field
+          name='password'
+          validators={{
+            onChange: ({ value }) => {
+              const result = signinSchema.shape.password.safeParse(value)
+              if (!result.success) {
+                const firstError = result.error.issues[0]
+                return firstError ? firstError.message : undefined
+              }
+              return undefined
+            }
+          }}
+        >
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor='password'>Password</FieldLabel>
+              <Input
+                id='password'
+                name={field.name}
+                type='password'
+                autoComplete='current-password'
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder='••••••'
+              />
+              {field.state.meta.errors.length > 0 && (
+                <FieldError>{String(field.state.meta.errors[0])}</FieldError>
+              )}
+            </Field>
+          )}
+        </Form.Field>
+
+        <Form.Field
+          name='remember'
+          validators={{}}
+        >
+          {(field) => (
+            <label htmlFor='remember' className='flex items-center gap-2 text-sm cursor-pointer'>
+              <Checkbox
+                id='remember'
+                name={field.name}
+                checked={field.state.value}
+                onCheckedChange={(checked) => field.handleChange(checked as any)}
+              />
+              <span>Remember me</span>
+            </label>
+          )}
+        </Form.Field>
+
+        <Form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+          {([canSubmit, isSubmitting]) => (
+            <Button
+              type='submit'
+              disabled={!canSubmit || isSubmitting}
+              block
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                Form.handleSubmit()
               }}
-              children={(field) => (
-                <div>
-                  <label htmlFor='email' className='mb-1 block text-sm font-medium text-gray-700'>
-                    Email address
-                  </label>
-                  <input
-                    ref={emailInputRef}
-                    id='email'
-                    name={field.name}
-                    type='email'
-                    autoComplete='email'
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className={clx(
-                      'block w-full rounded-md border px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none',
-                      field.state.meta.errors.length > 0 ? 'border-red-300' : 'border-gray-300'
-                    )}
-                    placeholder='somebody@example.com'
-                  />
-                  {field.state.meta.errors.length > 0 && (
-                    <p className='mt-1 text-sm text-red-600'>
-                      {String(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
+              progress={isSubmitting}
+            >
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
+            </Button>
+          )}
+        </Form.Subscribe>
 
-            <Form.Field
-              name='password'
-              validators={{
-                onChange: ({ value }) => {
-                  const result = signinSchema.shape.password.safeParse(value)
-                  if (!result.success) {
-                    const firstError = result.error.issues[0]
-                    return firstError ? firstError.message : undefined
-                  }
-                  return undefined
-                }
-              }}
-              children={(field) => (
-                <div>
-                  <label
-                    htmlFor='password'
-                    className='mb-1 block text-sm font-medium text-gray-700'
-                  >
-                    Password
-                  </label>
-                  <Input
-                    id='password'
-                    name={field.name}
-                    type='password'
-                    autoComplete='current-password'
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder='••••••'
-                  />
-                  {field.state.meta.errors.length > 0 && (
-                    <p className='mt-1 text-sm text-red-600'>
-                      {String(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-
-            <Form.Field
-              name='remember'
-              children={(field) => (
-                <div className='flex items-center'>
-                  <input
-                    id='remember'
-                    name={field.name}
-                    type='checkbox'
-                    checked={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.checked as any)}
-                    className='size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-                  />
-                  <label htmlFor='remember' className='ml-2 block text-sm text-gray-700'>
-                    Remember me
-                  </label>
-                </div>
-              )}
-            />
-
-            <Form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <div>
-                  <button
-                    type='submit'
-                    disabled={!canSubmit || isSubmitting}
-                    className='flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                  >
-                    {isSubmitting ? (
-                      <span className='flex items-center gap-2'>
-                        <svg
-                          className='size-4 animate-spin'
-                          fill='none'
-                          viewBox='0 0 24 24'
-                          aria-hidden='true'
-                        >
-                          <circle
-                            className='opacity-25'
-                            cx='12'
-                            cy='12'
-                            r='10'
-                            stroke='currentColor'
-                            strokeWidth='4'
-                          />
-                          <path
-                            className='opacity-75'
-                            fill='currentColor'
-                            d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                          />
-                        </svg>
-                        Signing in...
-                      </span>
-                    ) : (
-                      'Sign in'
-                    )}
-                  </button>
-                </div>
-              )}
-            />
-
-            <div className='flex w-full items-center justify-center text-center text-sm'>
-              <Link
-                to='/forgot-password'
-                className='font-medium text-gray-700 transition-colors hover:text-gray-900'
-              >
-                Forgot your password?
-              </Link>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+        <Text className='text-center'>
+          <Link to='/forgot-password' className='text-primary hover:text-primary/80 transition-colors'>
+            Forgot your password?
+          </Link>
+        </Text>
+      </Stack>
+    </Stack>
   )
 }
