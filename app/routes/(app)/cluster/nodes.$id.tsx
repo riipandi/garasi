@@ -4,8 +4,9 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { getNodeInfo, launchRepairOperation } from '~/app/services/node.service'
 import type { RepairType } from '~/shared/schemas/node.schema'
+import { Card } from '~/app/components/card'
+import { Text, TextLink } from '~/app/components/text'
 
-// Lazy load components for code splitting
 const NodeInformationCard = React.lazy(() =>
   import('./-partials/node-information-card').then((m) => ({
     default: m.NodeInformationCard
@@ -17,7 +18,6 @@ const RepairOperationsCard = React.lazy(() =>
   }))
 )
 
-// Local type for node info since shared schema uses any for success values
 interface NodeInfo {
   nodeId: string
   garageVersion: string
@@ -33,7 +33,6 @@ export const Route = createFileRoute('/(app)/cluster/nodes/$id')({
   }
 })
 
-// Query options
 const nodeInfoQuery = (nodeId: string) =>
   queryOptions({
     queryKey: ['cluster', 'node', 'info', nodeId],
@@ -47,13 +46,11 @@ function RouteComponent() {
   const { data: nodeInfoData } = useSuspenseQuery(nodeInfoQuery(id))
   const nodeInfo = nodeInfoData?.data?.success?.[id] as NodeInfo | undefined
 
-  // Track running operation and results
   const [runningOperation, setRunningOperation] = React.useState<RepairType | null>(null)
   const [operationResults, setOperationResults] = React.useState<
     Record<string, { success: boolean; message: string; timestamp: number }>
   >({})
 
-  // Reset operation results after 5 seconds
   React.useEffect(() => {
     const now = Date.now()
     Object.entries(operationResults).forEach(([opKey, result]) => {
@@ -67,7 +64,6 @@ function RouteComponent() {
     })
   }, [operationResults])
 
-  // Repair operation mutation
   const repairMutation = useMutation({
     mutationFn: ({ node, repairType }: { node: string; repairType: RepairType }) =>
       launchRepairOperation({ node }, { repairType }),
@@ -141,45 +137,43 @@ function RouteComponent() {
   if (!nodeInfo) {
     return (
       <div className='mx-auto max-w-screen-2xl space-y-6'>
-        <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'>
-          <div className='rounded border border-gray-200 bg-gray-50 px-3 py-8 text-center text-sm text-gray-700'>
-            <Lucide.XCircle className='mx-auto mb-2 size-8 text-gray-400' />
-            <p>Unable to load node information</p>
-            <Link
-              to='/cluster'
-              className='mt-2 inline-block text-sm text-blue-600 hover:text-blue-700'
+        <Card>
+          <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
+            <Lucide.XCircle className='mb-4 size-16 text-muted' />
+            <Text className='font-medium'>Unable to load node information</Text>
+            <TextLink
+              render={<Link to='/cluster' />}
+              className='mt-2'
             >
               Back to Cluster
-            </Link>
+            </TextLink>
           </div>
-        </div>
+        </Card>
       </div>
     )
   }
 
   return (
     <div className='mx-auto max-w-screen-2xl space-y-6'>
-      {/* Node Information Card */}
       <React.Suspense
         fallback={
-          <div className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm'>
+          <Card>
             <div className='flex items-center justify-center py-8'>
-              <div className='h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent' />
+              <Lucide.Loader2 className='size-6 animate-spin text-muted' />
             </div>
-          </div>
+          </Card>
         }
       >
         <NodeInformationCard nodeInfo={nodeInfo} />
       </React.Suspense>
 
-      {/* Repair Operations Card */}
       <React.Suspense
         fallback={
-          <div className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm'>
+          <Card>
             <div className='flex items-center justify-center py-8'>
-              <div className='h-6 w-6 animate-spin rounded-full border-2 border-orange-600 border-t-transparent' />
+              <Lucide.Loader2 className='size-6 animate-spin text-muted' />
             </div>
-          </div>
+          </Card>
         }
       >
         <RepairOperationsCard

@@ -8,6 +8,14 @@ import { applyClusterLayout } from '~/app/services/layout.service'
 import { updateClusterLayout } from '~/app/services/layout.service'
 import { revertClusterLayout } from '~/app/services/layout.service'
 import { skipDeadNodes } from '~/app/services/layout.service'
+import { Badge } from '~/app/components/badge'
+import { Button } from '~/app/components/button'
+import { Card, CardBody } from '~/app/components/card'
+import { Field, FieldLabel } from '~/app/components/field'
+import { Input } from '~/app/components/input'
+import { Select, SelectList, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '~/app/components/select'
+import { Spinner } from '~/app/components/spinner'
+import { Text } from '~/app/components/text'
 
 interface LayoutManagementProps {
   layoutVersion?: number
@@ -22,18 +30,15 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
   const [selectedZone, setSelectedZone] = React.useState<string>('')
   const [selectedCapacity, setSelectedCapacity] = React.useState<string>('')
 
-  // Helper function to check if stagedRoleChanges is an array
   const isStagedChangesArray = (changes: any): changes is any[] => {
     return Array.isArray(changes)
   }
 
-  // Get cluster layout
   const { data: layoutData, isLoading: isLoadingLayout } = useQuery({
     queryKey: ['cluster', 'layout'],
     queryFn: () => getClusterLayout()
   })
 
-  // Get layout history
   const { data: historyData } = useQuery({
     queryKey: ['cluster', 'layout', 'history'],
     queryFn: () => getLayoutHistory(),
@@ -43,7 +48,6 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
   const layout = layoutData?.data
   const history = historyData?.data
 
-  // Preview layout changes
   const previewMutation = useMutation({
     mutationFn: () => previewLayoutChanges(),
     onSuccess: () => {
@@ -51,7 +55,6 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
     }
   })
 
-  // Apply layout
   const applyMutation = useMutation({
     mutationFn: (version: number) => applyClusterLayout({ version }),
     onSuccess: () => {
@@ -61,7 +64,6 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
     }
   })
 
-  // Update layout
   const updateMutation = useMutation({
     mutationFn: (data: { roles: any[]; parameters: any }) => updateClusterLayout(data),
     onSuccess: () => {
@@ -75,7 +77,6 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
     }
   })
 
-  // Revert layout
   const revertMutation = useMutation({
     mutationFn: () => revertClusterLayout(),
     onSuccess: () => {
@@ -85,7 +86,6 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
     }
   })
 
-  // Skip dead nodes
   const skipDeadMutation = useMutation({
     mutationFn: (data: { version: number; allowMissingData: boolean }) => skipDeadNodes(data),
     onSuccess: () => {
@@ -124,390 +124,333 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
     isStagedChangesArray(layout.stagedRoleChanges) &&
     layout.stagedRoleChanges.length > 0
 
+  const nodeOptions = layout?.roles?.map((role: { id: string }) => ({
+      value: role.id,
+      label: role.id
+  })) || []
+
   return (
     <div className='space-y-6'>
-      {/* Layout Version Info */}
       <div className='mb-4 flex items-center justify-between'>
-        <h3 className='text-lg font-semibold text-gray-900'>Layout Information</h3>
-        <Lucide.LayoutGrid className='size-5 text-gray-400' />
+        <div className='flex items-center gap-3'>
+          <Text className='font-semibold text-lg'>Layout Information</Text>
+          <Badge variant='info'>v{layout?.version || layoutVersion || 0}</Badge>
+        </div>
+        <Lucide.LayoutGrid className='size-5 text-muted' />
       </div>
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-        {/* Current Version */}
-        <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <p className='text-sm font-medium text-gray-500'>Current Version</p>
-              <p className='mt-1 text-2xl font-semibold text-gray-900'>
-                {layout?.version || layoutVersion || 0}
-              </p>
+        <Card>
+          <CardBody>
+            <div className='flex items-center justify-between'>
+              <div>
+                <Text className='text-muted'>Current Version</Text>
+                <Text className='mt-1 text-2xl font-semibold'>
+                  {layout?.version || layoutVersion || 0}
+                </Text>
+              </div>
+              <Lucide.Tag className='size-6 text-muted' />
             </div>
-            <Lucide.Tag className='size-6 text-gray-400' />
-          </div>
-        </div>
+          </CardBody>
+        </Card>
 
-        {/* Partition Size */}
-        <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <p className='text-sm font-medium text-gray-500'>Partition Size</p>
-              <p className='mt-1 text-2xl font-semibold text-gray-900'>
-                {layout?.partitionSize
-                  ? `${(layout.partitionSize / 1024 / 1024).toFixed(2)} MB`
-                  : 'N/A'}
-              </p>
+        <Card>
+          <CardBody>
+            <div className='flex items-center justify-between'>
+              <div>
+                <Text className='text-muted'>Partition Size</Text>
+                <Text className='mt-1 text-2xl font-semibold'>
+                  {layout?.partitionSize
+                    ? `${(layout.partitionSize / 1024 / 1024).toFixed(2)} MB`
+                    : 'N/A'}
+                </Text>
+              </div>
+              <Lucide.HardDrive className='size-6 text-muted' />
             </div>
-            <Lucide.HardDrive className='size-6 text-gray-400' />
-          </div>
-        </div>
+          </CardBody>
+        </Card>
       </div>
 
-      {/* Zone Redundancy */}
       {layout?.parameters?.zoneRedundancy && (
-        <div className='mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4'>
-          <p className='text-sm font-medium text-gray-500'>Zone Redundancy</p>
-          <div className='mt-2 flex gap-2'>
-            {typeof layout.parameters.zoneRedundancy === 'object' &&
-              layout.parameters.zoneRedundancy.atLeast && (
-                <span className='rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800'>
-                  At least {layout.parameters.zoneRedundancy.atLeast}
-                </span>
+        <Card>
+          <CardBody>
+            <Text className='text-muted'>Zone Redundancy</Text>
+            <div className='mt-2 flex gap-2'>
+              {typeof layout.parameters.zoneRedundancy === 'object' &&
+                layout.parameters.zoneRedundancy.atLeast && (
+                  <Badge variant='primary'>
+                    At least {layout.parameters.zoneRedundancy.atLeast}
+                  </Badge>
+                )}
+              {layout.parameters.zoneRedundancy === 'maximum' && (
+                <Badge variant='primary'>
+                  Maximum
+                </Badge>
               )}
-            {layout.parameters.zoneRedundancy === 'maximum' && (
-              <span className='rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800'>
-                Max maximum
-              </span>
-            )}
-          </div>
-        </div>
+            </div>
+          </CardBody>
+        </Card>
       )}
 
-      {/* Staged Changes */}
       {hasStagedChanges && (
-        <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-6'>
-          <div className='flex items-start gap-3'>
-            <Lucide.AlertTriangle className='mt-0.5 size-6 shrink-0 text-yellow-600' />
-            <div className='flex-1'>
-              <p className='text-base font-medium text-yellow-800'>
-                Staged Changes (
-                {isStagedChangesArray(layout.stagedRoleChanges)
-                  ? layout.stagedRoleChanges.length
-                  : 1}
-                )
-              </p>
-              <p className='mt-1 text-sm text-yellow-700'>
-                There are pending changes to the cluster layout. Preview and apply to make them
-                active.
-              </p>
-              <div className='mt-3 space-y-2'>
-                {isStagedChangesArray(layout.stagedRoleChanges) &&
-                  layout.stagedRoleChanges.map((change: any, index: number) => (
-                    <div
-                      key={index}
-                      className='flex items-center gap-2 rounded-lg border border-yellow-200 bg-white p-3'
-                    >
-                      <Lucide.Edit3 className='size-4 text-yellow-600' />
-                      <span className='text-sm text-yellow-800'>
-                        {change.remove ? 'Remove' : 'Update'} node {change.id}
-                        {change.zone && ` to zone ${change.zone}`}
-                      </span>
-                    </div>
-                  ))}
+        <Card>
+          <CardBody className='border-warning/30 bg-warning/10'>
+            <div className='flex items-start gap-3'>
+              <Lucide.AlertTriangle className='mt-0.5 size-6 shrink-0 text-warning' />
+              <div className='flex-1'>
+                <Text className='font-semibold text-warning'>
+                  Staged Changes (
+                  {isStagedChangesArray(layout.stagedRoleChanges)
+                    ? layout.stagedRoleChanges.length
+                    : 1}
+                  )
+                </Text>
+                <Text className='mt-1 text-muted text-sm'>
+                  There are pending changes to the cluster layout. Preview and apply to make them
+                  active.
+                </Text>
+                <div className='mt-3 space-y-2'>
+                  {isStagedChangesArray(layout.stagedRoleChanges) &&
+                    layout.stagedRoleChanges.map((change: any, index: number) => (
+                      <div
+                        key={`${change.id}-${change.zone || 'no-zone'}-${index}`}
+                        className='flex items-center gap-2 rounded-lg border border-warning/30 bg-white p-3'
+                      >
+                        <Lucide.Edit3 className='size-4 text-warning' />
+                        <Text className='text-muted text-sm'>
+                          {change.remove ? 'Remove' : 'Update'} node {change.id}
+                          {change.zone && ` to zone ${change.zone}`}
+                        </Text>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
       )}
 
-      {/* Layout Actions */}
-      <div className='rounded-lg border border-gray-200 bg-white p-6'>
-        <h3 className='mb-4 text-lg font-semibold text-gray-900'>Layout Actions</h3>
+      <Card>
+        <CardBody>
+          <Text className='mb-4 font-semibold'>Layout Actions</Text>
 
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          {/* Apply Layout */}
-          <button
-            type='button'
-            onClick={handleApply}
-            disabled={!hasStagedChanges || applyMutation.isPending}
-            className='flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-          >
-            {applyMutation.isPending ? (
-              <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
-            ) : (
-              <Lucide.Check className='size-4' />
-            )}
-            Apply Layout
-          </button>
-
-          {/* Preview Changes */}
-          <button
-            type='button'
-            onClick={() => previewMutation.mutate()}
-            disabled={previewMutation.isPending || isLoadingLayout}
-            className='flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-          >
-            {previewMutation.isPending ? (
-              <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
-            ) : (
-              <Lucide.Eye className='size-4' />
-            )}
-            Preview Changes
-          </button>
-
-          {/* Revert Layout */}
-          <button
-            type='button'
-            onClick={() => revertMutation.mutate()}
-            disabled={revertMutation.isPending || !hasStagedChanges}
-            className='flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-          >
-            {revertMutation.isPending ? (
-              <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
-            ) : (
-              <Lucide.RotateCcw className='size-4' />
-            )}
-            Revert Layout
-          </button>
-
-          {/* Skip Dead Nodes */}
-          <button
-            type='button'
-            onClick={handleSkipDeadNodes}
-            disabled={skipDeadMutation.isPending}
-            className='flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-sm transition-all hover:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-          >
-            {skipDeadMutation.isPending ? (
-              <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
-            ) : (
-              <Lucide.SkipForward className='size-4' />
-            )}
-            Skip Dead Nodes
-          </button>
-
-          {/* Update Layout */}
-          <button
-            type='button'
-            onClick={() => setShowUpdateForm(!showUpdateForm)}
-            className='flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-          >
-            <Lucide.Edit className='size-4' />
-            {showUpdateForm ? 'Hide' : 'Show'} Update Form
-          </button>
-
-          {/* Show History */}
-          <button
-            type='button'
-            onClick={() => setShowHistory(!showHistory)}
-            className='flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-          >
-            <Lucide.History className='size-4' />
-            {showHistory ? 'Hide' : 'Show'} History
-          </button>
-        </div>
-      </div>
-
-      {/* Update Layout Form */}
-      {showUpdateForm && (
-        <div className='rounded-lg border border-gray-200 bg-white p-6'>
-          <h3 className='mb-4 text-lg font-semibold text-gray-900'>Update Cluster Layout</h3>
-
-          <div className='space-y-4'>
-            {/* Node Selection */}
-            <div>
-              <label htmlFor='node-select' className='block text-sm font-medium text-gray-700'>
-                Select Node
-              </label>
-              <select
-                id='node-select'
-                value={selectedNode}
-                onChange={(e) => setSelectedNode(e.target.value)}
-                className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none'
-              >
-                <option value=''>Select a node...</option>
-                {layout?.roles.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.id}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Zone Selection */}
-            <div>
-              <label htmlFor='zone-input' className='block text-sm font-medium text-gray-700'>
-                Zone
-              </label>
-              <input
-                id='zone-input'
-                type='text'
-                value={selectedZone}
-                onChange={(e) => setSelectedZone(e.target.value)}
-                placeholder='Enter zone (optional)'
-                className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none'
-              />
-            </div>
-
-            {/* Capacity Input */}
-            <div>
-              <label htmlFor='capacity-input' className='block text-sm font-medium text-gray-700'>
-                Capacity (GB)
-              </label>
-              <input
-                id='capacity-input'
-                type='number'
-                value={selectedCapacity}
-                onChange={(e) => setSelectedCapacity(e.target.value)}
-                placeholder='Enter capacity (optional)'
-                className='mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none'
-              />
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type='button'
-              onClick={handleUpdateLayout}
-              disabled={!selectedNode || updateMutation.isPending}
-              className='flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+            <Button
+              variant='primary'
+              onClick={handleApply}
+              disabled={!hasStagedChanges || applyMutation.isPending}
             >
-              {updateMutation.isPending ? (
-                <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                  <circle
-                    className='opacity-25'
-                    cx='12'
-                    cy='12'
-                    r='10'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                  />
-                  <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                  />
-                </svg>
+              {applyMutation.isPending ? (
+                <>
+                  <Spinner className='size-4' />
+                  Applying...
+                </>
               ) : (
-                <Lucide.Check className='size-4' />
+                <>
+                  <Lucide.Check className='size-4' />
+                  Apply Layout
+                </>
               )}
-              Update Layout
-            </button>
+            </Button>
+
+            <Button
+              variant='outline'
+              onClick={() => previewMutation.mutate()}
+              disabled={previewMutation.isPending || isLoadingLayout}
+            >
+              {previewMutation.isPending ? (
+                <>
+                  <Spinner className='size-4' />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Lucide.Eye className='size-4' />
+                  Preview Changes
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant='outline'
+              onClick={() => revertMutation.mutate()}
+              disabled={revertMutation.isPending || !hasStagedChanges}
+            >
+              {revertMutation.isPending ? (
+                <>
+                  <Spinner className='size-4' />
+                  Reverting...
+                </>
+              ) : (
+                <>
+                  <Lucide.RotateCcw className='size-4' />
+                  Revert Layout
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant='danger'
+              onClick={handleSkipDeadNodes}
+              disabled={skipDeadMutation.isPending}
+            >
+              {skipDeadMutation.isPending ? (
+                <>
+                  <Spinner className='size-4' />
+                  Skipping...
+                </>
+              ) : (
+                <>
+                  <Lucide.SkipForward className='size-4' />
+                  Skip Dead Nodes
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant='outline'
+              onClick={() => setShowUpdateForm(!showUpdateForm)}
+            >
+              <Lucide.Edit className='size-4' />
+              {showUpdateForm ? 'Hide' : 'Show'} Update Form
+            </Button>
+
+            <Button
+              variant='outline'
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              <Lucide.History className='size-4' />
+              {showHistory ? 'Hide' : 'Show'} History
+            </Button>
           </div>
-        </div>
+        </CardBody>
+      </Card>
+
+      {showUpdateForm && (
+        <Card>
+          <CardBody>
+            <Text className='mb-4 font-semibold'>Update Cluster Layout</Text>
+
+            <div className='space-y-4'>
+              <Field>
+                <FieldLabel>Select Node</FieldLabel>
+                <Select items={nodeOptions}>
+                  <SelectTrigger className='w-full'>
+                    <SelectValue placeholder='Select a node...' />
+                  </SelectTrigger>
+                  <SelectPopup>
+                    <SelectList>
+                      {nodeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectList>
+                  </SelectPopup>
+                </Select>
+              </Field>
+
+              <Field>
+                <FieldLabel>Zone</FieldLabel>
+                <Input
+                  value={selectedZone}
+                  onChange={(e) => setSelectedZone(e.target.value)}
+                  placeholder='Enter zone (optional)'
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel>Capacity (GB)</FieldLabel>
+                <Input
+                  type='number'
+                  value={selectedCapacity}
+                  onChange={(e) => setSelectedCapacity(e.target.value)}
+                  placeholder='Enter capacity (optional)'
+                />
+              </Field>
+
+              <Button
+                variant='primary'
+                block
+                onClick={handleUpdateLayout}
+                disabled={!selectedNode || updateMutation.isPending}
+              >
+                {updateMutation.isPending ? (
+                  <>
+                    <Spinner className='size-4' />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Lucide.Check className='size-4' />
+                    Update Layout
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
       )}
 
-      {/* Layout History */}
       {showHistory && history && (
-        <div className='rounded-lg border border-gray-200 bg-white p-6'>
-          <h3 className='mb-4 text-lg font-semibold text-gray-900'>Layout History</h3>
-          <div className='max-h-96 space-y-2 overflow-y-auto'>
-            {history.versions.map((version) => (
-              <div
-                key={version.version}
-                className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
-                  version.version === history.currentVersion
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 bg-white'
-                }`}
-              >
-                <div className='flex items-center gap-3'>
-                  <span className='font-medium text-gray-900'>v{version.version}</span>
-                  {version.version === history.currentVersion && (
-                    <span className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800'>
-                      Current
-                    </span>
+        <Card>
+          <CardBody>
+            <Text className='mb-4 font-semibold'>Layout History</Text>
+            <div className='max-h-96 space-y-2 overflow-y-auto'>
+              {history.versions.map((version: { version: number }) => (
+                <div
+                  key={version.version}
+                  className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
+                    version.version === history.currentVersion
+                      ? 'border-primary/30 bg-primary/10'
+                      : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <div className='flex items-center gap-3'>
+                    <Text className='font-medium'>v{version.version}</Text>
+                    {version.version === history.currentVersion && (
+                      <Badge variant='primary'>
+                        Current
+                      </Badge>
+                    )}
+                  </div>
+                  <Text className='text-muted text-sm'>
+                    Layout version {version.version}
+                  </Text>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {showPreview && previewMutation.data?.data && (
+        <Card>
+          <CardBody className='border-primary/30 bg-primary/10'>
+            <div className='flex items-start gap-3'>
+              <Lucide.Eye className='mt-0.5 size-6 shrink-0 text-primary' />
+              <div className='flex-1'>
+                <Text className='font-semibold text-primary'>Preview Results</Text>
+                <div className='mt-2 space-y-2'>
+                  {previewMutation.data.data.message ? (
+                    <Text className='text-muted text-sm'>{previewMutation.data.data.message}</Text>
+                  ) : (
+                    <Text className='text-danger text-sm'>
+                      Error: {previewMutation.data.data.error || 'Unknown error'}
+                    </Text>
                   )}
                 </div>
-                <span className='text-sm text-gray-500'>
-                  {/* Version timestamp not available in shared schema */}
-                  Layout version {version.version}
-                </span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Preview Results */}
-      {showPreview && previewMutation.data?.data && (
-        <div className='rounded-lg border border-blue-200 bg-blue-50 p-6'>
-          <div className='flex items-start gap-3'>
-            <Lucide.Eye className='mt-0.5 size-6 shrink-0 text-blue-600' />
-            <div className='flex-1'>
-              <p className='text-base font-medium text-blue-800'>Preview Results</p>
-              <div className='mt-2 space-y-2'>
-                {previewMutation.data.data.message ? (
-                  <p className='text-sm text-blue-700'>{previewMutation.data.data.message}</p>
-                ) : (
-                  <p className='text-sm text-red-700'>
-                    Error: {previewMutation.data.data.error || 'Unknown error'}
-                  </p>
-                )}
-              </div>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setShowPreview(false)}
+              >
+                <Lucide.X className='size-4' />
+              </Button>
             </div>
-            <button
-              type='button'
-              onClick={() => setShowPreview(false)}
-              className='rounded-full p-1 text-blue-600 hover:bg-blue-200'
-            >
-              <Lucide.X className='size-4' />
-            </button>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
       )}
     </div>
   )

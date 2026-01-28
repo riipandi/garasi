@@ -1,6 +1,10 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
+import { Badge } from '~/app/components/badge'
+import { Card, CardBody } from '~/app/components/card'
+import { Heading } from '~/app/components/heading'
+import { Text, TextLink } from '~/app/components/text'
 import { getClusterHealth, getClusterStatus } from '~/app/services/cluster.service'
 
 export const Route = createFileRoute('/(app)/cluster/')({
@@ -11,7 +15,6 @@ export const Route = createFileRoute('/(app)/cluster/')({
   }
 })
 
-// Query options
 const clusterHealthQuery = queryOptions({
   queryKey: ['cluster', 'health'],
   queryFn: () => getClusterHealth()
@@ -33,31 +36,31 @@ function RouteComponent() {
     switch (status) {
       case 'healthy':
         return {
-          bg: 'bg-green-50',
-          border: 'border-green-200',
-          text: 'text-green-600',
-          icon: 'text-green-600'
+          bg: 'bg-success/10',
+          border: 'border-success/30',
+          text: 'text-success',
+          icon: 'text-success'
         }
       case 'degraded':
         return {
-          bg: 'bg-yellow-50',
-          border: 'border-yellow-200',
-          text: 'text-yellow-600',
-          icon: 'text-yellow-600'
+          bg: 'bg-warning/10',
+          border: 'border-warning/30',
+          text: 'text-warning',
+          icon: 'text-warning'
         }
       case 'unavailable':
         return {
-          bg: 'bg-red-50',
-          border: 'border-red-200',
-          text: 'text-red-600',
-          icon: 'text-red-600'
+          bg: 'bg-danger/10',
+          border: 'border-danger/30',
+          text: 'text-danger',
+          icon: 'text-danger'
         }
       default:
         return {
           bg: 'bg-gray-50',
           border: 'border-gray-200',
-          text: 'text-gray-600',
-          icon: 'text-gray-600'
+          text: 'text-muted',
+          icon: 'text-muted'
         }
     }
   }
@@ -74,179 +77,162 @@ function RouteComponent() {
 
   return (
     <div className='space-y-6'>
-      {/* Summary Cards */}
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        {/* Overall Status */}
-        <div className={`rounded-lg border ${statusColor.border} ${statusColor.bg} p-4`}>
-          <div className='flex items-center justify-between'>
-            <div>
-              <p className='text-sm font-medium text-gray-500'>Overall Status</p>
-              <p className={`mt-1 text-lg font-semibold ${statusColor.text}`}>
-                {health?.status || 'Unknown'}
-              </p>
+        <Card className={`${statusColor.bg} ${statusColor.border}`}>
+          <CardBody>
+            <div className='flex items-center justify-between'>
+              <div>
+                <Text className='text-muted'>Overall Status</Text>
+                <Text className={`mt-1 text-lg font-semibold ${statusColor.text}`}>
+                  {health?.status || 'Unknown'}
+                </Text>
+              </div>
+              {health?.status === 'healthy' && (
+                <Lucide.CheckCircle2 className={`size-6 ${statusColor.icon}`} />
+              )}
+              {health?.status === 'degraded' && (
+                <Lucide.AlertTriangle className={`size-6 ${statusColor.icon}`} />
+              )}
+              {health?.status === 'unavailable' && (
+                <Lucide.XCircle className={`size-6 ${statusColor.icon}`} />
+              )}
+              {!health?.status && <Lucide.HelpCircle className={`size-6 ${statusColor.icon}`} />}
             </div>
-            {health?.status === 'healthy' && (
-              <Lucide.CheckCircle2 className={`size-6 ${statusColor.icon}`} />
-            )}
-            {health?.status === 'degraded' && (
-              <Lucide.AlertTriangle className={`size-6 ${statusColor.icon}`} />
-            )}
-            {health?.status === 'unavailable' && (
-              <Lucide.XCircle className={`size-6 ${statusColor.icon}`} />
-            )}
-            {!health?.status && <Lucide.HelpCircle className={`size-6 ${statusColor.icon}`} />}
-          </div>
-        </div>
+          </CardBody>
+        </Card>
 
-        {/* Known Nodes */}
-        <div className='rounded-lg border border-gray-200 bg-white p-4'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <p className='text-sm font-medium text-gray-500'>Known Nodes</p>
-              <p className='mt-1 text-lg font-semibold text-gray-900'>{health?.knownNodes || 0}</p>
+        <Card>
+          <CardBody>
+            <div className='flex items-center justify-between'>
+              <div>
+                <Text className='text-muted'>Known Nodes</Text>
+                <Text className='mt-1 text-lg font-semibold'>{health?.knownNodes || 0}</Text>
+              </div>
+              <Lucide.Server className='text-muted size-6' />
             </div>
-            <Lucide.Server className='size-6 text-gray-400' />
-          </div>
-        </div>
+          </CardBody>
+        </Card>
 
-        {/* Connected Nodes */}
-        <div className='rounded-lg border border-gray-200 bg-white p-4'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <p className='text-sm font-medium text-gray-500'>Connected Nodes</p>
-              <p className='mt-1 text-lg font-semibold text-gray-900'>
-                {health?.connectedNodes || 0}
-              </p>
+        <Card>
+          <CardBody>
+            <div className='flex items-center justify-between'>
+              <div>
+                <Text className='text-muted'>Connected Nodes</Text>
+                <Text className='mt-1 text-lg font-semibold'>{health?.connectedNodes || 0}</Text>
+              </div>
+              <Lucide.Wifi className='text-muted size-6' />
             </div>
-            <Lucide.Wifi className='size-6 text-gray-400' />
-          </div>
-        </div>
+          </CardBody>
+        </Card>
 
-        {/* Storage Nodes */}
-        <div className='rounded-lg border border-gray-200 bg-white p-4'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <p className='text-sm font-medium text-gray-500'>Storage Nodes</p>
-              <p className='mt-1 text-lg font-semibold text-gray-900'>
-                {health?.storageNodes || 0}
-              </p>
+        <Card>
+          <CardBody>
+            <div className='flex items-center justify-between'>
+              <div>
+                <Text className='text-muted'>Storage Nodes</Text>
+                <Text className='mt-1 text-lg font-semibold'>{health?.storageNodes || 0}</Text>
+              </div>
+              <Lucide.HardDrive className='text-muted size-6' />
             </div>
-            <Lucide.HardDrive className='size-6 text-gray-400' />
-          </div>
-        </div>
+          </CardBody>
+        </Card>
       </div>
 
-      {/* Partition Status */}
-      <div className='rounded-lg border border-gray-200 bg-white p-6'>
-        <h3 className='text-lg font-semibold text-gray-900'>Partition Status</h3>
-        <div className='mt-4 grid grid-cols-3 gap-4'>
-          <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-            <p className='text-sm font-medium text-gray-500'>Total Partitions</p>
-            <p className='mt-2 text-2xl font-semibold text-gray-900'>{health?.partitions || 0}</p>
+      <Card>
+        <CardBody>
+          <Heading size='md'>Partition Status</Heading>
+          <div className='mt-4 grid grid-cols-3 gap-4'>
+            <div className='rounded-lg bg-gray-50 p-4'>
+              <Text className='text-muted'>Total Partitions</Text>
+              <Text className='mt-2 text-2xl font-semibold'>{health?.partitions || 0}</Text>
+            </div>
+            <div className='rounded-lg bg-gray-50 p-4'>
+              <Text className='text-muted'>Quorum Required</Text>
+              <Text className='mt-2 text-2xl font-semibold'>{health?.partitionsQuorum || 0}</Text>
+            </div>
+            <div className='rounded-lg bg-gray-50 p-4'>
+              <Text className='text-muted'>All OK</Text>
+              <Text className='mt-2 text-2xl font-semibold'>{health?.partitionsAllOk || 0}</Text>
+            </div>
           </div>
-          <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-            <p className='text-sm font-medium text-gray-500'>Quorum Required</p>
-            <p className='mt-2 text-2xl font-semibold text-gray-900'>
-              {health?.partitionsQuorum || 0}
-            </p>
-          </div>
-          <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-            <p className='text-sm font-medium text-gray-500'>All OK</p>
-            <p className='mt-2 text-2xl font-semibold text-gray-900'>
-              {health?.partitionsAllOk || 0}
-            </p>
-          </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
 
-      {/* Node Status */}
-      <div className='rounded-lg border border-gray-200 bg-white p-0'>
-        <div className='flex items-center justify-between px-6 py-4'>
-          <div>
-            <h3 className='text-lg font-semibold text-gray-900'>Node Status</h3>
-            <p className='text-sm text-gray-500'>Layout Version: {status?.layoutVersion || 0}</p>
+      <Card>
+        <CardBody className='p-0'>
+          <div className='flex items-center justify-between px-6 py-4'>
+            <div>
+              <Heading size='md'>Node Status</Heading>
+              <Text className='text-muted text-sm'>
+                Layout Version: {status?.layoutVersion || 0}
+              </Text>
+            </div>
+            <TextLink render={<Link to='/cluster/nodes' />}>
+              View All
+              <Lucide.ArrowRight className='size-4' />
+            </TextLink>
           </div>
-          <Link
-            to='/cluster/nodes'
-            className='flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700'
-          >
-            View All
-            <Lucide.ArrowRight className='size-4' />
-          </Link>
-        </div>
 
-        {status?.nodes && status.nodes.length > 0 ? (
-          <div className='overflow-x-auto'>
-            <table className='min-w-full divide-y divide-gray-200 border-t border-gray-200'>
-              <thead className='bg-gray-50'>
-                <tr>
-                  <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Node
-                  </th>
-                  <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Address
-                  </th>
-                  <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Status
-                  </th>
-                  <th className='px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Last Seen
-                  </th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-gray-200'>
-                {status.nodes.slice(0, 5).map((node) => (
-                  <tr
-                    key={node.id}
-                    className='cursor-pointer transition-colors hover:bg-gray-50'
-                    onClick={() => (window.location.href = `/cluster/nodes/${node.id}`)}
-                  >
-                    <td className='px-4 py-3'>
-                      <div className='flex items-center gap-2'>
-                        <Link
-                          to='/cluster/nodes/$id'
-                          params={{ id: node.id }}
-                          className='font-medium text-gray-900 hover:text-blue-600'
-                        >
-                          {node.hostname || node.id}
-                        </Link>
-                        {node.draining && (
-                          <span className='rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800'>
-                            Draining
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className='px-4 py-3 text-sm text-gray-500'>{node.addr || 'N/A'}</td>
-                    <td className='px-4 py-3'>
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
-                          node.isUp ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {node.isUp ? (
-                          <Lucide.CheckCircle2 className='h-3 w-3' />
-                        ) : (
-                          <Lucide.XCircle className='h-3 w-3' />
-                        )}
-                        {node.isUp ? 'Online' : 'Offline'}
-                      </span>
-                    </td>
-                    <td className='px-4 py-3 text-sm text-gray-500'>
-                      {formatTimeAgo(node.lastSeenSecsAgo)}
-                    </td>
+          {status?.nodes && status.nodes.length > 0 ? (
+            <div className='overflow-x-auto border-t border-gray-200'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
+                  <tr>
+                    <th className='text-muted px-4 py-3 text-left text-xs font-medium uppercase'>
+                      Node
+                    </th>
+                    <th className='text-muted px-4 py-3 text-left text-xs font-medium uppercase'>
+                      Address
+                    </th>
+                    <th className='text-muted px-4 py-3 text-left text-xs font-medium uppercase'>
+                      Status
+                    </th>
+                    <th className='text-muted px-4 py-3 text-left text-xs font-medium uppercase'>
+                      Last Seen
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className='rounded border border-gray-200 bg-gray-50 px-3 py-8 text-center text-sm text-gray-700'>
-            <Lucide.Server className='mx-auto mb-2 size-8 text-gray-400' />
-            <p>No nodes found in cluster</p>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody className='divide-y divide-gray-200'>
+                  {status.nodes.slice(0, 5).map((node) => (
+                    <tr key={node.id} className='transition-colors hover:bg-gray-50'>
+                      <td className='px-4 py-3'>
+                        <div className='flex items-center gap-2'>
+                          <TextLink
+                            render={<Link to='/cluster/nodes/$id' params={{ id: node.id }} />}
+                            className='font-medium'
+                          >
+                            {node.hostname || node.id}
+                          </TextLink>
+                          {node.draining && <Badge variant='warning'>Draining</Badge>}
+                        </div>
+                      </td>
+                      <td className='text-muted px-4 py-3 text-sm'>{node.addr || 'N/A'}</td>
+                      <td className='px-4 py-3'>
+                        <Badge variant={node.isUp ? 'success' : 'danger'} pill>
+                          {node.isUp ? (
+                            <Lucide.CheckCircle2 className='size-3' />
+                          ) : (
+                            <Lucide.XCircle className='size-3' />
+                          )}
+                          {node.isUp ? 'Online' : 'Offline'}
+                        </Badge>
+                      </td>
+                      <td className='text-muted px-4 py-3 text-sm'>
+                        {formatTimeAgo(node.lastSeenSecsAgo)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
+              <Lucide.Server className='text-muted mb-4 size-16' />
+              <Text className='font-medium'>No nodes found in cluster</Text>
+            </div>
+          )}
+        </CardBody>
+      </Card>
     </div>
   )
 }

@@ -12,6 +12,12 @@ import * as React from 'react'
 import { getClusterStatus } from '~/app/services/cluster.service'
 import { getNodeInfo } from '~/app/services/node.service'
 import type { NodeResp } from '~/shared/schemas/cluster.schema'
+import { Badge } from '~/app/components/badge'
+import { Button } from '~/app/components/button'
+import { Card, CardBody } from '~/app/components/card'
+import { Input } from '~/app/components/input'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '~/app/components/table'
+import { Text } from '~/app/components/text'
 import { ConnectNodesDialog } from './-partials/connect-nodes-dialog'
 
 export const Route = createFileRoute('/(app)/cluster/nodes/')({
@@ -22,7 +28,6 @@ export const Route = createFileRoute('/(app)/cluster/nodes/')({
   }
 })
 
-// Query options
 const clusterStatusQuery = queryOptions({
   queryKey: ['cluster', 'status'],
   queryFn: () => getClusterStatus()
@@ -61,18 +66,18 @@ function RouteComponent() {
       header: 'Node ID',
       cell: (info) => (
         <div className='flex items-center gap-2'>
-          <code className='font-mono text-sm'>{info.getValue()}</code>
-          <button
-            type='button'
+          <Text className='font-mono text-sm'>{info.getValue()}</Text>
+          <Button
+            variant='plain'
+            size='sm-icon'
             onClick={(e) => {
               e.stopPropagation()
               navigator.clipboard.writeText(info.getValue())
             }}
-            className='text-gray-400 transition-colors hover:text-gray-600'
             title='Copy Node ID'
           >
-            <Lucide.Copy className='h-3.5 w-3.5' />
-          </button>
+            <Lucide.Copy className='size-3.5' />
+          </Button>
         </div>
       ),
       filterFn: (row, value) => {
@@ -96,18 +101,14 @@ function RouteComponent() {
       cell: (info) => {
         const node = info.row.original
         return (
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
-              node.isUp ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}
-          >
+          <Badge variant={node.isUp ? 'success' : 'danger'} pill>
             {node.isUp ? (
-              <Lucide.CheckCircle2 className='h-3 w-3' />
+              <Lucide.CheckCircle2 className='size-3' />
             ) : (
-              <Lucide.XCircle className='h-3 w-3' />
+              <Lucide.XCircle className='size-3' />
             )}
             {node.isUp ? 'Online' : 'Offline'}
-          </span>
+          </Badge>
         )
       }
     }),
@@ -140,164 +141,108 @@ function RouteComponent() {
     getFilteredRowModel: getFilteredRowModel()
   })
 
-  // Skeleton loader for table rows
-  const TableSkeleton = () => (
-    <div className='overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
-      <table className='min-w-full divide-y divide-gray-200'>
-        <thead className='bg-gray-50'>
-          <tr>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Node ID
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Hostname
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Address
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Status
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Last Seen
-            </th>
-            <th className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
-              Version
-            </th>
-          </tr>
-        </thead>
-        <tbody className='divide-y divide-gray-200'>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <tr key={index} className='animate-pulse'>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-40 rounded bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-32 rounded bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-48 rounded bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-6 w-20 rounded-full bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-24 rounded bg-gray-200' />
-              </td>
-              <td className='px-4 py-3'>
-                <div className='h-4 w-32 rounded bg-gray-200' />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-
   return (
     <div className='space-y-4'>
-      {/* Node Table */}
       <div className='space-y-4'>
-        {/* Connect Nodes Button - Aligned with Search Filter */}
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          {/* Search/Filter Input */}
           <div className='relative flex-1'>
-            <div className='pointer-events-none absolute left-3 flex h-full items-center'>
-              <Lucide.Search className='size-4 text-gray-400' />
-            </div>
-            <input
-              type='text'
+            <Input
               value={filtering}
               onChange={(e) => setFiltering(e.target.value)}
               placeholder='Search nodes by ID or hostname...'
               disabled={isLoading}
-              className='w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
             />
             {filtering && !isLoading && (
-              <button
-                type='button'
+              <Button
+                variant='plain'
+                size='sm-icon'
                 onClick={() => setFiltering('')}
-                className='absolute top-1.5 right-2 rounded p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none'
+                className='absolute top-1.5 right-2'
                 title='Clear search'
               >
                 <Lucide.X className='size-4' />
-              </button>
+              </Button>
             )}
           </div>
 
-          <button
-            type='button'
+          <Button
+            variant='primary'
             onClick={() => setIsConnectDialogOpen(true)}
-            className='flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
           >
             <Lucide.Plus className='size-4' />
-            <span>Connect Nodes</span>
-          </button>
+            Connect Nodes
+          </Button>
         </div>
 
-        {/* Table */}
         {isLoading ? (
-          <TableSkeleton />
+          <Card>
+            <CardBody>
+              <div className='flex items-center justify-center py-8'>
+                <Lucide.Loader2 className='size-6 animate-spin text-muted' />
+              </div>
+            </CardBody>
+          </Card>
         ) : table.getRowModel().rows.length === 0 && nodes.length > 0 ? (
-          <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-            <Lucide.Search className='mb-4 h-16 w-16 text-gray-400' />
-            <h3 className='text-lg font-medium text-gray-900'>No nodes found</h3>
-            <p className='text-normal mt-2 text-gray-500'>Try adjusting your search or filters.</p>
-          </div>
+          <Card>
+            <CardBody>
+              <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
+                <Lucide.Search className='mb-4 size-16 text-muted' />
+                <Text className='font-medium'>No nodes found</Text>
+                <Text className='text-muted text-sm mt-2'>
+                  Try adjusting your search or filters.
+                </Text>
+              </div>
+            </CardBody>
+          </Card>
         ) : nodes.length === 0 ? (
-          <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
-            <Lucide.Server className='mb-4 h-16 w-16 text-gray-400' />
-            <h3 className='text-lg font-medium text-gray-900'>No nodes found</h3>
-            <p className='text-normal mt-2 text-gray-500'>
-              Connect nodes to your cluster to get started.
-            </p>
-          </div>
+          <Card>
+            <CardBody>
+              <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
+                <Lucide.Server className='mb-4 size-16 text-muted' />
+                <Text className='font-medium'>No nodes found</Text>
+                <Text className='text-muted text-sm mt-2'>
+                  Connect nodes to your cluster to get started.
+                </Text>
+              </div>
+            </CardBody>
+          </Card>
         ) : (
-          <div className='overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
-            <table className='min-w-full divide-y divide-gray-200'>
-              <thead className='bg-gray-50'>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        className='px-4 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
+          <Card>
+            <CardBody>
+              <div className='overflow-x-auto'>
+                <Table>
+                  <TableHeader>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <TableHead key={header.id}>
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHead>
+                        ))}
+                      </TableRow>
                     ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className='divide-y divide-gray-200'>
-                {table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className='cursor-pointer transition-colors hover:bg-gray-50'
-                    onClick={() => {
-                      const nodeId = row.original.id
-                      window.location.href = `/cluster/nodes/${nodeId}`
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td
-                        key={cell.id}
-                        className='px-4 py-3 text-sm whitespace-nowrap text-gray-900'
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
+                  </TableHeader>
+                  <TableBody>
+                    {table.getRowModel().rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
                     ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  </TableBody>
+                  <TableCaption>
+                    {nodes.length} {nodes.length === 1 ? 'node' : 'nodes'} in cluster
+                  </TableCaption>
+                </Table>
+              </div>
+            </CardBody>
+          </Card>
         )}
       </div>
 
-      {/* Connect Nodes Dialog */}
       <ConnectNodesDialog
         queryClient={queryClient}
         isOpen={isConnectDialogOpen}
