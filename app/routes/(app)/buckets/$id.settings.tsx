@@ -2,8 +2,18 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { ConfirmDialog } from '~/app/components/confirm-dialog'
 import { Alert } from '~/app/components/selia/alert'
+import { Button } from '~/app/components/selia/button'
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogClose,
+  AlertDialogPopup,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '~/app/components/selia/alert-dialog'
 import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
 import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
@@ -316,9 +326,7 @@ function RouteComponent() {
     setShowDeleteConfirm(false)
   }
 
-  const handleCancelDelete = () => {
-    setShowDeleteConfirm(false)
-  }
+
 
   const handleEditBucket = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -378,10 +386,7 @@ function RouteComponent() {
     }
   }
 
-  const handleCancelDeleteGlobalAlias = () => {
-    setShowDeleteGlobalAliasConfirm(false)
-    setGlobalAliasToDelete(null)
-  }
+
 
   const handleAddLocalAlias = async (data: { accessKeyId: string; alias: string }) => {
     const requestData: AddLocalBucketAliasRequest = {
@@ -408,10 +413,7 @@ function RouteComponent() {
     }
   }
 
-  const handleCancelDeleteLocalAlias = () => {
-    setShowDeleteLocalAliasConfirm(false)
-    setLocalAliasToDelete(null)
-  }
+
 
   const handleAllowBucketKey = async (
     accessKeyId: string,
@@ -440,10 +442,7 @@ function RouteComponent() {
     }
   }
 
-  const handleCancelDeleteKey = () => {
-    setShowDeleteKeyConfirm(false)
-    setKeyToDelete(null)
-  }
+
 
   const handleCloseKeySelector = () => {
     setShowKeySelectorDialog(false)
@@ -487,7 +486,7 @@ function RouteComponent() {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='flex flex-col items-center'>
-          <svg className='size-12 animate-spin' fill='none' viewBox='0 0 24 24'>
+          <svg className='size-12 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
             <circle
               className='opacity-25'
               cx='12'
@@ -586,14 +585,32 @@ function RouteComponent() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteConfirm}
-        title='Delete Bucket'
-        message='Are you sure you want to delete this bucket? This action cannot be undone and will permanently remove bucket and all its contents.'
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-        isConfirming={deleteBucketMutation.isPending}
-      />
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Bucket</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete this bucket? This action cannot be undone and will permanently remove bucket and all its contents.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDelete}
+                  disabled={deleteBucketMutation.isPending}
+                >
+                  {deleteBucketMutation.isPending ? 'Deleting...' : 'Delete'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
 
       {/* Add Global Alias Dialog */}
       <AddGlobalAlias
@@ -604,34 +621,88 @@ function RouteComponent() {
       />
 
       {/* Delete Global Alias Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteGlobalAliasConfirm}
-        title='Delete Global Alias'
-        message={`Are you sure you want to delete the global alias "${globalAliasToDelete}"? This action cannot be undone.`}
-        onConfirm={handleConfirmDeleteGlobalAlias}
-        onCancel={handleCancelDeleteGlobalAlias}
-        isConfirming={removeGlobalAliasMutation.isPending}
-      />
+      <AlertDialog open={showDeleteGlobalAliasConfirm} onOpenChange={setShowDeleteGlobalAliasConfirm}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Global Alias</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete global alias "{globalAliasToDelete}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDeleteGlobalAlias}
+                  disabled={removeGlobalAliasMutation.isPending}
+                >
+                  {removeGlobalAliasMutation.isPending ? 'Deleting...' : 'Delete'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
 
       {/* Delete Key Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteKeyConfirm}
-        title='Delete Key'
-        message={`Are you sure you want to delete the key "${keyToDelete}"? This action cannot be undone.`}
-        onConfirm={handleConfirmDeleteKey}
-        onCancel={handleCancelDeleteKey}
-        isConfirming={denyBucketKeyMutation.isPending}
-      />
+      <AlertDialog open={showDeleteKeyConfirm} onOpenChange={setShowDeleteKeyConfirm}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Key</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete key "{keyToDelete}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDeleteKey}
+                  disabled={denyBucketKeyMutation.isPending}
+                >
+                  {denyBucketKeyMutation.isPending ? 'Deleting...' : 'Delete'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
 
       {/* Delete Local Alias Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteLocalAliasConfirm}
-        title='Delete Local Alias'
-        message={`Are you sure you want to delete local alias "${localAliasToDelete?.alias}"? This action cannot be undone.`}
-        onConfirm={handleConfirmDeleteLocalAlias}
-        onCancel={handleCancelDeleteLocalAlias}
-        isConfirming={removeLocalAliasMutation.isPending}
-      />
+      <AlertDialog open={showDeleteLocalAliasConfirm} onOpenChange={setShowDeleteLocalAliasConfirm}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Local Alias</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete local alias "{localAliasToDelete?.alias}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDeleteLocalAlias}
+                  disabled={removeLocalAliasMutation.isPending}
+                >
+                  {removeLocalAliasMutation.isPending ? 'Deleting...' : 'Delete'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
 
       {/* Key Selector Dialog */}
       <KeySelectorDialog

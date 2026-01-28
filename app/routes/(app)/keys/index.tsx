@@ -2,8 +2,18 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { ConfirmDialog } from '~/app/components/confirm-dialog'
 import { Alert } from '~/app/components/selia/alert'
+import { Button } from '~/app/components/selia/button'
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogClose,
+  AlertDialogPopup,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '~/app/components/selia/alert-dialog'
 import {
   listAccessKeys,
   createAccessKey,
@@ -30,9 +40,6 @@ function RouteComponent() {
   const [showKeyImport, setShowKeyImport] = React.useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = React.useState(false)
-  const [showCreateConfirm, setShowCreateConfirm] = React.useState(false)
-  const [pendingCreateValues, setPendingCreateValues] =
-    React.useState<CreateAccessKeyRequest | null>(null)
   const [keyToDelete, setKeyToDelete] = React.useState<string | null>(null)
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
@@ -87,26 +94,7 @@ function RouteComponent() {
   })
 
   const handleCreateKey = async (values: CreateAccessKeyRequest) => {
-    const createValues = values as CreateAccessKeyRequest
-    if (createValues.neverExpires) {
-      setPendingCreateValues(createValues)
-      setShowCreateConfirm(true)
-    } else {
-      await createKeyMutation.mutateAsync(createValues)
-    }
-  }
-
-  const handleConfirmCreate = async () => {
-    if (pendingCreateValues) {
-      await createKeyMutation.mutateAsync(pendingCreateValues)
-    }
-    setShowCreateConfirm(false)
-    setPendingCreateValues(null)
-  }
-
-  const handleCancelCreate = () => {
-    setShowCreateConfirm(false)
-    setPendingCreateValues(null)
+    await createKeyMutation.mutateAsync(values as CreateAccessKeyRequest)
   }
 
   const handleDeleteKey = (keyId: string) => {
@@ -122,10 +110,7 @@ function RouteComponent() {
     }
   }
 
-  const handleCancelDelete = () => {
-    setShowDeleteConfirm(false)
-    setKeyToDelete(null)
-  }
+
 
   const handleDeleteAllKeys = () => {
     setShowDeleteAllConfirm(true)
@@ -136,9 +121,7 @@ function RouteComponent() {
     setShowDeleteAllConfirm(false)
   }
 
-  const handleCancelDeleteAll = () => {
-    setShowDeleteAllConfirm(false)
-  }
+
 
   const handleRefreshKeys = async () => {
     setIsRefreshing(true)
@@ -266,7 +249,7 @@ function RouteComponent() {
           {/* Info Box */}
           <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
             <div className='flex gap-3'>
-              <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' />
+              <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' aria-label='Information icon' />
               <div>
                 <h4 className='text-sm font-medium text-blue-900'>Information</h4>
                 <p className='mt-1 text-xs text-blue-700'>
@@ -297,34 +280,62 @@ function RouteComponent() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteConfirm}
-        title='Delete Access Key'
-        message='Are you sure you want to delete this access key? This action cannot be undone and will permanently remove the key from your account.'
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-        isConfirming={deleteKeyMutation.isPending}
-      />
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Access Key</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete this access key? This action cannot be undone and will permanently remove the key from your account.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDelete}
+                  disabled={deleteKeyMutation.isPending}
+                >
+                  {deleteKeyMutation.isPending ? 'Deleting...' : 'Delete'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
 
       {/* Delete All Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteAllConfirm}
-        title='Delete All Access Keys'
-        message={`Are you sure you want to delete all ${keys.length} access keys? This action cannot be undone and will permanently remove all keys from your account.`}
-        onConfirm={handleConfirmDeleteAll}
-        onCancel={handleCancelDeleteAll}
-        isConfirming={deleteKeyMutation.isPending}
-      />
+      <AlertDialog open={showDeleteAllConfirm} onOpenChange={setShowDeleteAllConfirm}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete All Access Keys</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete all {keys.length} access keys? This action cannot be undone and will permanently remove all keys from your account.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDeleteAll}
+                  disabled={deleteKeyMutation.isPending}
+                >
+                  {deleteKeyMutation.isPending ? 'Deleting...' : 'Delete All'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
 
-      {/* Create Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showCreateConfirm}
-        title='Create Access Key'
-        message='Are you sure you want to create an access key that never expires? This key will not have an expiration date and will remain active indefinitely.'
-        onConfirm={handleConfirmCreate}
-        onCancel={handleCancelCreate}
-        isConfirming={createKeyMutation.isPending}
-      />
+
     </div>
   )
 }

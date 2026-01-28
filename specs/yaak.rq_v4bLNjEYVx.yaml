@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_v4bLNjEYVx
 createdAt: 2026-01-19T20:20:50.780394
-updatedAt: 2026-01-24T04:58:25.146772
+updatedAt: 2026-01-28T10:15:05.251481
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -10,16 +10,16 @@ authenticationType: null
 body:
   text: |-
     {
-      "globalAlias": "demo",
+      "globalAlias": "demo2",
       "localAlias": null
     }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: HIFGfea2ZZ
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: HIFGfea2ZZ
 method: POST
 name: Create Bucket
 sortPriority: 5000.0

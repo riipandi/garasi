@@ -3,8 +3,8 @@ import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-r
 import { useEffect, useRef, useState } from 'react'
 import { cn as clx } from 'tailwind-variants'
 import { z } from 'zod'
-import { PasswordInput } from '~/app/components/password-input'
 import { Alert } from '~/app/components/selia/alert'
+import { Input } from '~/app/components/selia/input'
 import { useAuth } from '~/app/guards'
 import type { SigninRequest } from '~/app/types/api'
 
@@ -29,24 +29,6 @@ function RouteComponent() {
   }
   const emailInputRef = useRef<HTMLInputElement>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
-
-  // Auto-focus email input on mount
-  useEffect(() => {
-    emailInputRef.current?.focus()
-  }, [])
-
-  // Show session expired message if redirected due to session expiry
-  useEffect(() => {
-    if (sessionExpired && search.redirect) {
-      setSubmitError('Your session has expired. Please sign in again to continue.')
-    }
-  }, [sessionExpired, search.redirect])
-
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    navigate({ to: '/' })
-    return null
-  }
 
   const Form = useForm({
     defaultValues: { email: '', password: '', remember: false } satisfies SigninRequest,
@@ -75,6 +57,24 @@ function RouteComponent() {
       }
     }
   })
+
+  // Auto-focus email input on mount
+  useEffect(() => {
+    emailInputRef.current?.focus()
+  }, [])
+
+  // Show session expired message if redirected due to session expiry
+  useEffect(() => {
+    if (sessionExpired && search.redirect) {
+      setSubmitError('Your session has expired. Please sign in again to continue.')
+    }
+  }, [sessionExpired, search.redirect])
+
+  // Redirect if already authenticated
+  if (isAuthenticated) {
+    navigate({ to: '/' })
+    return null
+  }
 
   return (
     <div className='flex min-h-screen items-center justify-center'>
@@ -157,19 +157,26 @@ function RouteComponent() {
                 }
               }}
               children={(field) => (
-                <PasswordInput
-                  id='password'
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(value) => field.handleChange(value)}
-                  placeholder='****************'
-                  autoComplete='current-password'
-                  error={
-                    field.state.meta.errors[0] ? String(field.state.meta.errors[0]) : undefined
-                  }
-                  label='Password'
-                />
+                <div>
+                  <label htmlFor='password' className='mb-1 block text-sm font-medium text-gray-700'>
+                    Password
+                  </label>
+                  <Input
+                    id='password'
+                    name={field.name}
+                    type='password'
+                    autoComplete='current-password'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='••••••'
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </p>
+                  )}
+                </div>
               )}
             />
 
@@ -203,7 +210,7 @@ function RouteComponent() {
                   >
                     {isSubmitting ? (
                       <span className='flex items-center gap-2'>
-                        <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                        <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
                           <circle
                             className='opacity-25'
                             cx='12'

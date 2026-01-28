@@ -2,8 +2,18 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { ConfirmDialog } from '~/app/components/confirm-dialog'
 import { Alert } from '~/app/components/selia/alert'
+import { Button } from '~/app/components/selia/button'
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogClose,
+  AlertDialogPopup,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '~/app/components/selia/alert-dialog'
 import { createBucket, deleteBucket, listBuckets } from '~/app/services/bucket.service'
 import type { CreateBucketRequest } from '~/shared/schemas/bucket.schema'
 import { BucketCreate } from './-partials/bucket-create'
@@ -76,10 +86,7 @@ function RouteComponent() {
     }
   }
 
-  const handleCancelDelete = () => {
-    setShowDeleteConfirm(false)
-    setBucketToDelete(null)
-  }
+
 
   const handleCreateBucket = async (values: CreateBucketRequest) => {
     await createBucketMutation.mutateAsync(values)
@@ -186,9 +193,9 @@ function RouteComponent() {
           <BucketTable buckets={buckets} onDelete={handleDeleteBucket} isLoading={isRefreshing} />
 
           {/* Info Box */}
-          <div className='rounded-lg border border-blue-200 bg-blue-50 p-4'>
+          <div className='rounded-lg border border-blue-200 bg-blue-50 p-4' role='region' aria-label='Information'>
             <div className='flex gap-3'>
-              <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' />
+              <Lucide.Info className='mt-0.5 size-5 shrink-0 text-blue-600' aria-hidden='true' />
               <div>
                 <h4 className='text-sm font-medium text-blue-900'>Information</h4>
                 <p className='mt-1 text-xs text-blue-700'>
@@ -203,14 +210,32 @@ function RouteComponent() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteConfirm}
-        title='Delete Bucket'
-        message='Are you sure you want to delete this bucket? This action cannot be undone and will permanently remove the bucket and all its contents.'
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-        isConfirming={deleteBucketMutation.isPending}
-      />
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Bucket</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete this bucket? This action cannot be undone and will permanently remove the bucket and all its contents.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDelete}
+                  disabled={deleteBucketMutation.isPending}
+                >
+                  {deleteBucketMutation.isPending ? 'Deleting...' : 'Delete'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
 
       {/* Bucket Create Dialog */}
       <BucketCreate

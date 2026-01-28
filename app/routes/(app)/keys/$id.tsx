@@ -2,8 +2,18 @@ import { queryOptions, useMutation, useQuery, useSuspenseQuery } from '@tanstack
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { ConfirmDialog } from '~/app/components/confirm-dialog'
 import { Alert } from '~/app/components/selia/alert'
+import { Button } from '~/app/components/selia/button'
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogClose,
+  AlertDialogPopup,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '~/app/components/selia/alert-dialog'
 import { listBuckets, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
 import { getKeyInformation, updateAccessKey, deleteAccessKey } from '~/app/services/keys.service'
@@ -244,10 +254,6 @@ function RouteComponent() {
     await deleteKeyMutation.mutateAsync()
   }
 
-  const handleCancelDelete = () => {
-    setShowDeleteDialog(false)
-  }
-
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A'
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -318,7 +324,7 @@ function RouteComponent() {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='flex flex-col items-center'>
-          <svg className='size-8 animate-spin' fill='none' viewBox='0 0 24 24'>
+          <svg className='size-8 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
             <circle
               className='opacity-25'
               cx='12'
@@ -356,17 +362,17 @@ function RouteComponent() {
               {/* Status Badge */}
               {accessKey.deleted ? (
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700'>
-                  <Lucide.Trash2 className='size-3.5' />
+                  <Lucide.Trash2 className='size-3.5' aria-hidden='true' />
                   Deleted
                 </span>
               ) : expired ? (
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800'>
-                  <Lucide.XCircle className='size-3.5' />
+                  <Lucide.XCircle className='size-3.5' aria-hidden='true' />
                   Expired
                 </span>
               ) : (
                 <span className='inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800'>
-                  <Lucide.CheckCircle2 className='size-3.5' />
+                  <Lucide.CheckCircle2 className='size-3.5' aria-hidden='true' />
                   Active
                 </span>
               )}
@@ -454,8 +460,8 @@ function RouteComponent() {
           <React.Suspense
             fallback={
               <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <div className='flex items-center justify-center py-8'>
-                  <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24'>
+                <div className='flex items-center justify-center py-8' role='status' aria-live='polite'>
+                  <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
                     <circle
                       className='opacity-25'
                       cx='12'
@@ -526,14 +532,32 @@ function RouteComponent() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={showDeleteDialog}
-        title='Delete Access Key'
-        message={`Are you sure you want to delete the access key "${accessKey.name}"? This action cannot be undone.`}
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-        isConfirming={deleteKeyMutation.isPending}
-      />
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Access Key</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <AlertDialogDescription>
+              Are you sure you want to delete the access key "{accessKey.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <AlertDialogClose>Cancel</AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant='danger'
+                  onClick={handleConfirmDelete}
+                  disabled={deleteKeyMutation.isPending}
+                >
+                  {deleteKeyMutation.isPending ? 'Deleting...' : 'Delete'}
+                </Button>
+              }
+            />
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
     </div>
   )
 }

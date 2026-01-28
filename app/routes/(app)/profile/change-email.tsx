@@ -2,8 +2,8 @@ import { useForm } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { PasswordInput } from '~/app/components/password-input'
 import { Alert } from '~/app/components/selia/alert'
+import { Input } from '~/app/components/selia/input'
 import fetcher from '~/app/fetcher'
 
 // Zod schema for form validation
@@ -162,27 +162,35 @@ function RouteComponent() {
                 }
                 return undefined
               }
-            }}
-            children={(field) => (
-              <PasswordInput
-                id='password'
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(value) => field.handleChange(value)}
-                placeholder='••••••••'
-                autoComplete='current-password'
-                error={field.state.meta.errors[0] ? String(field.state.meta.errors[0]) : undefined}
-                label='Current Password'
-                required
-                disabled={changeEmailMutation.isPending}
-              />
-            )}
-          />
+            }}>
+              {(field) => (
+                <div>
+                  <label htmlFor='password' className='mb-1 block text-sm font-medium text-gray-700'>
+                    Current Password <span className='ml-1 text-red-500'>*</span>
+                  </label>
+                  <Input
+                    id='password'
+                    name={field.name}
+                    type='password'
+                    autoComplete='current-password'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='••••••••'
+                    disabled={changeEmailMutation.isPending}
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <p className='mt-1 text-sm text-red-600'>
+                      {String(field.state.meta.errors[0])}
+                    </p>
+                  )}
+                </div>
+              )}
+          </Form.Field>
 
           <Form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-            children={([canSubmit, isSubmitting]) => (
+            selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
               <div className='flex justify-end gap-3'>
                 <button
                   type='button'
@@ -198,7 +206,7 @@ function RouteComponent() {
                 >
                   {isSubmitting || changeEmailMutation.isPending ? (
                     <span className='flex items-center gap-2'>
-                      <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24'>
+                      <svg className='size-4 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
                         <circle
                           className='opacity-25'
                           cx='12'
@@ -221,7 +229,7 @@ function RouteComponent() {
                 </button>
               </div>
             )}
-          />
+          </Form.Subscribe>
         </form>
 
         <div className='mt-6 rounded-md border border-blue-200 bg-blue-50 p-4'>
@@ -230,6 +238,7 @@ function RouteComponent() {
               className='mt-0.5 size-5 shrink-0 text-blue-600'
               fill='currentColor'
               viewBox='0 0 20 20'
+              aria-hidden='true'
             >
               <path
                 fillRule='evenodd'
