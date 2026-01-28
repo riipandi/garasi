@@ -13,7 +13,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
+import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
+import { Heading } from '~/app/components/heading'
+import { Spinner } from '~/app/components/spinner'
+import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import { listBuckets, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
 import { getKeyInformation, updateAccessKey, deleteAccessKey } from '~/app/services/keys.service'
@@ -324,22 +329,8 @@ function RouteComponent() {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='flex flex-col items-center'>
-          <svg className='size-8 animate-spin' fill='none' viewBox='0 0 24 24' aria-hidden='true'>
-            <circle
-              className='opacity-25'
-              cx='12'
-              cy='12'
-              r='10'
-              stroke='currentColor'
-              strokeWidth='4'
-            />
-            <path
-              className='opacity-75'
-              fill='currentColor'
-              d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-            />
-          </svg>
-          <p className='mt-4 text-sm text-gray-600'>Loading key details...</p>
+          <Spinner />
+          <Text className='mt-4 text-sm text-gray-600'>Loading key details...</Text>
         </div>
       </div>
     )
@@ -347,8 +338,7 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
-      {/* Page Header */}
-      <div className='flex items-start gap-4'>
+      <Stack direction='row' className='items-start gap-4'>
         <Link
           to='/keys'
           className='rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
@@ -358,178 +348,108 @@ function RouteComponent() {
         <div className='min-w-0 flex-1'>
           <div className='flex items-center justify-between gap-3'>
             <div className='flex items-center gap-3'>
-              <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>{accessKey.name}</h1>
-              {/* Status Badge */}
+              <Heading level={1} size='lg'>
+                {accessKey.name}
+              </Heading>
               {accessKey.deleted ? (
-                <span className='inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700'>
+                <Badge variant='secondary' pill className='px-3 py-1'>
                   <Lucide.Trash2 className='size-3.5' aria-hidden='true' />
                   Deleted
-                </span>
+                </Badge>
               ) : expired ? (
-                <span className='inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800'>
+                <Badge variant='danger' pill className='px-3 py-1'>
                   <Lucide.XCircle className='size-3.5' aria-hidden='true' />
                   Expired
-                </span>
+                </Badge>
               ) : (
-                <span className='inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800'>
+                <Badge variant='success' pill className='px-3 py-1'>
                   <Lucide.CheckCircle2 className='size-3.5' aria-hidden='true' />
                   Active
-                </span>
+                </Badge>
               )}
             </div>
-            {/* Action Buttons */}
             <div className='flex items-center gap-2'>
-              {/* Edit Button */}
-              <button
-                type='button'
-                onClick={handleEditKey}
-                className='flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
-              >
+              <Button variant='outline' onClick={handleEditKey}>
                 <Lucide.Edit2 className='size-4' />
                 Edit Key
-              </button>
-              {/* Delete Button */}
-              <button
-                type='button'
-                onClick={handleDeleteKey}
-                className='flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors hover:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none'
-              >
+              </Button>
+              <Button variant='danger' onClick={handleDeleteKey}>
                 <Lucide.Trash2 className='size-4' />
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
-          <p className='text-normal mt-1 text-sm text-gray-500'>
+          <Text className='text-normal mt-1 text-sm text-gray-500'>
             Access Key ID: <code className='font-mono'>{accessKey.accessKeyId}</code>
-          </p>
+          </Text>
         </div>
-      </div>
+      </Stack>
 
-      {/* Alerts */}
-      {successMessage && (
-        <div className='mx-auto w-full'>
-          <Alert variant='success'>{successMessage}</Alert>
-        </div>
-      )}
-      {errorMessage && (
-        <div className='mx-auto w-full'>
-          <Alert variant='danger'>{errorMessage}</Alert>
-        </div>
-      )}
+      {successMessage && <Alert variant='success'>{successMessage}</Alert>}
+      {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
 
-      {/* Key Details */}
-      <div className='space-y-5'>
-        {/* Key Information Card */}
-        <React.Suspense
-          fallback={
-            <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-              <div className='flex items-center justify-center py-8'>
-                <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24'>
-                  <circle
-                    className='opacity-25'
-                    cx='12'
-                    cy='12'
-                    r='10'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                  />
-                  <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                  />
-                </svg>
-              </div>
-            </div>
-          }
-        >
-          <KeyInformationCard
-            accessKey={accessKey}
-            showSecretKey={showSecretKey}
-            onToggleSecretKey={() => setShowSecretKey(!showSecretKey)}
-            onCopyAccessKey={handleCopyAccessKey}
-            onCopySecretKey={handleCopySecretKey}
-            formatDate={formatDate}
-            formatExpiration={formatExpiration}
-            expired={expired}
-          />
-        </React.Suspense>
-
-        {/* Permissions Section */}
-        {accessKey.permissions && (
+        <Stack direction='column' spacing='lg'>
           <React.Suspense
             fallback={
               <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <div
-                  className='flex items-center justify-center py-8'
-                  role='status'
-                  aria-live='polite'
-                >
-                  <svg
-                    className='size-6 animate-spin'
-                    fill='none'
-                    viewBox='0 0 24 24'
-                    aria-hidden='true'
-                  >
-                    <circle
-                      className='opacity-25'
-                      cx='12'
-                      cy='12'
-                      r='10'
-                      stroke='currentColor'
-                      strokeWidth='4'
-                    />
-                    <path
-                      className='opacity-75'
-                      fill='currentColor'
-                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                    />
-                  </svg>
+                <div className='flex items-center justify-center py-8'>
+                  <Spinner />
                 </div>
               </div>
             }
           >
-            <PermissionsSection accessKey={accessKey} />
+            <KeyInformationCard
+              accessKey={accessKey}
+              showSecretKey={showSecretKey}
+              onToggleSecretKey={() => setShowSecretKey(!showSecretKey)}
+              onCopyAccessKey={handleCopyAccessKey}
+              onCopySecretKey={handleCopySecretKey}
+              formatDate={formatDate}
+              formatExpiration={formatExpiration}
+              expired={expired}
+            />
           </React.Suspense>
-        )}
 
-        {/* Bucket Access Section */}
-        <React.Suspense
-          fallback={
-            <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-              <div className='flex items-center justify-center py-8'>
-                <svg className='size-6 animate-spin' fill='none' viewBox='0 0 24 24'>
-                  <circle
-                    className='opacity-25'
-                    cx='12'
-                    cy='12'
-                    r='10'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                  />
-                  <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                  />
-                </svg>
+          {accessKey.permissions && (
+            <React.Suspense
+              fallback={
+                <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                  <div
+                    className='flex items-center justify-center py-8'
+                    role='status'
+                    aria-live='polite'
+                  >
+                    <Spinner />
+                  </div>
+                </div>
+              }
+            >
+              <PermissionsSection accessKey={accessKey} />
+            </React.Suspense>
+          )}
+
+          <React.Suspense
+            fallback={
+              <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
+                <div className='flex items-center justify-center py-8'>
+                  <Spinner />
+                </div>
               </div>
-            </div>
-          }
-        >
-          <BucketAccessSection
-            buckets={buckets}
-            selectedBuckets={selectedBuckets}
-            bucketPermissions={bucketPermissions}
-            isLoadingPermissions={isLoadingPermissions}
-            isLoadingBuckets={isLoadingBuckets}
-            isSaving={allowBucketKeyMutation.isPending || denyBucketKeyMutation.isPending}
-            onBucketToggle={handleBucketToggle}
-            onPermissionChange={handlePermissionChange}
-            onSavePermissions={handleSavePermissions}
-          />
-        </React.Suspense>
-      </div>
+            }
+          >
+            <BucketAccessSection
+              buckets={buckets}
+              selectedBuckets={selectedBuckets}
+              bucketPermissions={bucketPermissions}
+              isLoadingPermissions={isLoadingPermissions}
+              isLoadingBuckets={isLoadingBuckets}
+              isSaving={allowBucketKeyMutation.isPending || denyBucketKeyMutation.isPending}
+              onBucketToggle={handleBucketToggle}
+              onPermissionChange={handlePermissionChange}
+              onSavePermissions={handleSavePermissions}
+            />
+          </React.Suspense>
+        </Stack>
 
       {/* Edit Key Dialog */}
       <KeyEdit

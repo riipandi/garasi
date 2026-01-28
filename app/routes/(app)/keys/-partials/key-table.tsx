@@ -9,6 +9,18 @@ import {
 } from '@tanstack/react-table'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { Badge } from '~/app/components/badge'
+import { Input } from '~/app/components/input'
+import { Stack } from '~/app/components/stack'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '~/app/components/table'
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
 // Extend to add deleted property for UI
@@ -73,17 +85,17 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
         const key = info.row.original
         if (key.deleted) {
           return (
-            <span className='inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700'>
+            <Badge variant='secondary' pill className='h-5 px-2'>
               <Lucide.Trash2 className='h-3 w-3' />
               Deleted
-            </span>
+            </Badge>
           )
         }
         return (
-          <span className='inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800'>
+          <Badge variant='success' pill className='h-5 px-2'>
             <Lucide.CheckCircle2 className='h-3 w-3' />
             Active
-          </span>
+          </Badge>
         )
       }
     }),
@@ -147,7 +159,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
         </thead>
         <tbody className='divide-y divide-gray-200'>
           {Array.from({ length: 5 }).map((_, index) => (
-            <tr key={index} className='animate-pulse'>
+            <tr key={`skeleton-${index}`} className='animate-pulse'>
               <td className='px-4 py-3'>
                 <div className='h-4 w-32 rounded bg-gray-200' />
               </td>
@@ -173,19 +185,18 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
   )
 
   return (
-    <div className='space-y-4'>
-      {/* Search/Filter Input */}
+    <Stack direction='column' spacing='md'>
       <div className='relative'>
         <div className='pointer-events-none absolute left-3 flex h-full items-center'>
           <Lucide.Search className='size-4 text-gray-400' />
         </div>
-        <input
+        <Input
           type='text'
           value={filtering}
           onChange={(e) => setFiltering(e.target.value)}
           placeholder='Search access keys by name...'
           disabled={isLoading}
-          className='w-full rounded-md border border-gray-300 bg-white py-2 pr-4 pl-10 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+          className='pl-10'
         />
         {filtering && !isLoading && (
           <button
@@ -199,7 +210,6 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
         )}
       </div>
 
-      {/* Table */}
       {isLoading ? (
         <TableSkeleton />
       ) : table.getRowModel().rows.length === 0 && keys.length > 0 ? (
@@ -217,52 +227,48 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
           </p>
         </div>
       ) : (
-        <div className='overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
-          <table className='min-w-full divide-y divide-gray-200'>
-            <thead className='bg-gray-50'>
+        <TableContainer>
+          <Table>
+            <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
+                <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <th
+                    <TableHead
                       key={header.id}
-                      className={`px-4 py-3 text-xs font-medium tracking-wider text-gray-500 uppercase ${
-                        header.id === 'delete' ? 'w-16 text-right' : 'text-left'
-                      }`}
+                      className={header.id === 'delete' ? 'w-16 text-right' : ''}
                     >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
+                    </TableHead>
                   ))}
-                </tr>
+                </TableRow>
               ))}
-            </thead>
-            <tbody className='divide-y divide-gray-200'>
+            </TableHeader>
+            <TableBody>
               {table.getRowModel().rows.map((row) => (
-                <tr
+                <TableRow
                   key={row.id}
-                  className='cursor-pointer transition-colors hover:bg-gray-50'
+                  className='cursor-pointer'
                   onClick={() => {
                     const keyId = row.original.id
                     window.location.href = `/keys/${keyId}`
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td
+                    <TableCell
                       key={cell.id}
-                      className={`px-4 py-2 text-sm whitespace-nowrap text-gray-900 ${
-                        cell.column.id === 'delete' ? 'text-right' : ''
-                      }`}
+                      className={cell.column.id === 'delete' ? 'text-right' : ''}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
+                    </TableCell>
                   ))}
-                </tr>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+    </Stack>
   )
 }
