@@ -85,7 +85,7 @@ export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) 
   return (
     <Sidebar
       size='default'
-      className='bg-background border-border max-lg:border-r xl:bg-neutral-50 dark:xl:bg-neutral-950'
+      className='bg-background border-border/50 border-r xl:bg-neutral-50 dark:xl:bg-neutral-950'
     >
       <SidebarHeader className='inline-flex items-center justify-between'>
         <SidebarLogo className='flex-1 p-1'>

@@ -30,7 +30,7 @@ export function TabsList({
     <BaseTabs.List
       data-slot='tabs-list'
       className={clx(
-        'bg-tabs relative z-0 flex items-center rounded p-1',
+        'bg-tabs relative z-0 flex items-center rounded-lg p-1',
         'inset-shadow-xs inset-shadow-black/10 dark:inset-shadow-none',
         className
       )}
@@ -58,7 +58,7 @@ export function TabsItem({ className, ...props }: React.ComponentProps<typeof Ba
       data-slot='tabs-item'
       className={clx(
         'flex cursor-pointer items-center justify-center gap-2.5 rounded',
-        'text-muted hover:not-[[data-disabled]]:text-foreground h-8 flex-1 px-3 py-1 font-medium',
+        'text-muted hover:not-data-disabled:text-foreground h-8 flex-1 px-3 py-1 font-medium',
         'data-active:text-foreground transition-colors',
         'focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2',
         '[&_svg:not([class*=size-])]:size-4',
