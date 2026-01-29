@@ -2,7 +2,7 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { Badge } from '~/app/components/badge'
-import { Card, CardBody } from '~/app/components/card'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Heading } from '~/app/components/heading'
 import { Text, TextLink } from '~/app/components/text'
 import { getClusterHealth, getClusterStatus } from '~/app/services/cluster.service'
@@ -139,20 +139,31 @@ function RouteComponent() {
       </div>
 
       <Card>
+        <CardHeader hidden>
+          <CardTitle>Cluster Overview</CardTitle>
+        </CardHeader>
         <CardBody>
-          <Heading size='md'>Partition Status</Heading>
-          <div className='mt-4 grid grid-cols-3 gap-4'>
-            <div className='rounded-lg bg-gray-50 p-4'>
-              <Text className='text-muted'>Total Partitions</Text>
-              <Text className='mt-2 text-2xl font-semibold'>{health?.partitions || 0}</Text>
+          <div className='grid grid-cols-3 gap-4'>
+            <div className='bg-accent/70 rounded-lg p-4'>
+              <Text className='text-muted'>Nodes</Text>
+              <Text className='text-dimmed text-xs'>connected / known</Text>
+              <Text className='mt-2 text-2xl font-semibold'>
+                {health?.connectedNodes || 0} / {health?.knownNodes || 0}
+              </Text>
             </div>
-            <div className='rounded-lg bg-gray-50 p-4'>
-              <Text className='text-muted'>Quorum Required</Text>
-              <Text className='mt-2 text-2xl font-semibold'>{health?.partitionsQuorum || 0}</Text>
+            <div className='bg-accent/70 rounded-lg p-4'>
+              <Text className='text-muted'>Partitions</Text>
+              <Text className='text-dimmed text-xs'>healthy / total</Text>
+              <Text className='mt-2 text-2xl font-semibold'>
+                {health?.partitionsAllOk || 0} / {health?.partitions || 0}
+              </Text>
             </div>
-            <div className='rounded-lg bg-gray-50 p-4'>
-              <Text className='text-muted'>All OK</Text>
-              <Text className='mt-2 text-2xl font-semibold'>{health?.partitionsAllOk || 0}</Text>
+            <div className='bg-accent/70 rounded-lg p-4'>
+              <Text className='text-muted'>Partitions</Text>
+              <Text className='text-dimmed text-xs'>quorum / all ok</Text>
+              <Text className='mt-2 text-2xl font-semibold'>
+                {health?.partitionsQuorum || 0} / {health?.partitionsAllOk || 0}
+              </Text>
             </div>
           </div>
         </CardBody>

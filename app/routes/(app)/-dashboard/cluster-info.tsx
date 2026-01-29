@@ -1,5 +1,4 @@
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
-import { Text } from '~/app/components/text'
 import type { ClusterHealthResponse, ClusterStatistics } from './types'
 
 interface ClusterInfoProps {
@@ -13,29 +12,45 @@ export function ClusterInfo({ health, statistics }: ClusterInfoProps) {
       <CardHeader>
         <CardTitle>Cluster Overview</CardTitle>
       </CardHeader>
-      <CardBody className='grid grid-cols-2 gap-x-4 gap-y-5'>
-        <div>
-          <Text className='text-dimmed mb-1 text-xs tracking-wide uppercase'>Nodes</Text>
-          <Text className='text-xl font-semibold'>
-            {health?.connectedNodes || 0}/{health?.knownNodes || 0}
-          </Text>
-          <Text className='text-dimmed text-xs'>connected/known</Text>
-        </div>
-        <div>
-          <Text className='text-dimmed mb-1 text-xs tracking-wide uppercase'>Partitions</Text>
-          <Text className='text-xl font-semibold'>
-            {health?.partitionsAllOk || 0} / {health?.partitions || 0}
-          </Text>
-          <Text className='text-dimmed text-xs'>healthy / total</Text>
-        </div>
-        <div>
-          <Text className='text-dimmed mb-1 text-xs tracking-wide uppercase'>Data Storage</Text>
-          <Text className='text-base font-medium'>{statistics?.clusterWide.data || 'N/A'}</Text>
-        </div>
-        <div>
-          <Text className='text-dimmed mb-1 text-xs tracking-wide uppercase'>Metadata</Text>
-          <Text className='text-base font-medium'>{statistics?.clusterWide.metadata || 'N/A'}</Text>
-        </div>
+      <CardBody>
+        <dl className='divide-border divide-y'>
+          <div className='px-4 py-2.5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0'>
+            <dt className='text-foreground text-base font-medium'>Known Nodes</dt>
+            <dd className='text-muted mt-1 text-base sm:col-span-2 sm:mt-0'>
+              {health?.knownNodes || 0}
+            </dd>
+          </div>
+          <div className='px-4 py-2.5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0'>
+            <dt className='text-foreground text-base font-medium'>Connected Nodes</dt>
+            <dd className='text-muted mt-1 text-base sm:col-span-2 sm:mt-0'>
+              {health?.connectedNodes || 0}
+            </dd>
+          </div>
+          <div className='px-4 py-2.5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0'>
+            <dt className='text-foreground text-base font-medium'>Total Partitions</dt>
+            <dd className='text-muted mt-1 text-base sm:col-span-2 sm:mt-0'>
+              {health?.partitions || 0}
+            </dd>
+          </div>
+          <div className='px-4 py-2.5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0'>
+            <dt className='text-foreground text-base font-medium'>Healthy Partitions</dt>
+            <dd className='text-muted mt-1 text-base sm:col-span-2 sm:mt-0'>
+              {health?.partitionsAllOk || 0}
+            </dd>
+          </div>
+          <div className='px-4 py-2.5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0'>
+            <dt className='text-foreground text-base font-medium'>Storage Data</dt>
+            <dd className='text-muted mt-1 text-base sm:col-span-2 sm:mt-0'>
+              {statistics?.clusterWide.data || 'N/A'}
+            </dd>
+          </div>
+          <div className='px-4 py-2.5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0'>
+            <dt className='text-foreground text-base font-medium'>Storage Metadata</dt>
+            <dd className='text-muted mt-1 text-base sm:col-span-2 sm:mt-0'>
+              {statistics?.clusterWide.metadata || 'N/A'}
+            </dd>
+          </div>
+        </dl>
       </CardBody>
     </Card>
   )

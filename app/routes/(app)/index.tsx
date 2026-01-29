@@ -7,7 +7,6 @@ import fetcher from '~/app/fetcher'
 import { ClusterInfo } from './-dashboard/cluster-info'
 import { DashboardError } from './-dashboard/error-boundary'
 import { DashboardSkeleton } from './-dashboard/loading-skeleton'
-import { RecentBuckets } from './-dashboard/recent-buckets'
 import { StatCard } from './-dashboard/stat-card'
 import { StorageNodes } from './-dashboard/storage-nodes'
 import type { BucketResponse, KeyResponse, WhoamiResponse } from './-dashboard/types'
@@ -133,7 +132,6 @@ function RouteComponent() {
       </div>
 
       <StorageNodes statistics={statistics} />
-      <RecentBuckets buckets={buckets} />
     </div>
   )
 }
