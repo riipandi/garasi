@@ -10,7 +10,14 @@ export default definePlugin(({ hooks }) => {
   const requestId = typeid('req').toString()
 
   // Define paths to ignore for logging
-  const ignoredPaths = ['/favicon.ico', '/api/health', '/api/metrics']
+  const ignoredPaths = [
+    '/favicon.ico',
+    '/favicon.png',
+    '/favicon.svg',
+    '/robots.txt',
+    '/api/health',
+    '/api/metrics'
+  ]
 
   // Initialize the wide event with request context (https://loggingsucks.com)
   const buildWideEvent = (event: H3Event): Record<string, unknown> => {
@@ -42,7 +49,7 @@ export default definePlugin(({ hooks }) => {
 
     // Send the request log with wide event context
     // Optional detailed log: .withContext(buildWideEvent(event))
-    logger.withPrefix('REQ').info('Incoming request', pathname, requestId)
+    logger.withPrefix('REQ').info('Incoming request', requestId, pathname)
   })
 
   hooks.hook('response', (res: Response, event: H3Event) => {
@@ -64,7 +71,7 @@ export default definePlugin(({ hooks }) => {
     logger
       .withPrefix('RES')
       .withContext(buildWideEvent(event))
-      .info('Outgoing response', pathname, request_id, status_code, response_time)
+      .info('Outgoing response', request_id, pathname, status_code, response_time)
   })
 })
 

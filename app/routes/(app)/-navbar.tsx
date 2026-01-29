@@ -32,6 +32,8 @@ interface NavGroup {
 interface NavbarProps {
   user: User | null
   logoutFn: () => void
+  sidebarOpen: boolean
+  sidebarFn: () => void
 }
 
 function renderNavItem(item: NavItem) {
@@ -59,7 +61,7 @@ function renderNavGroup(group: NavGroup, index: number) {
   )
 }
 
-export function Navbar({ user, logoutFn }: NavbarProps) {
+export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) {
   const overviewGroup: NavGroup = {
     items: [{ to: '/', label: 'Overview', icon: Lucide.Warehouse, exact: true }]
   }
@@ -85,11 +87,14 @@ export function Navbar({ user, logoutFn }: NavbarProps) {
       size='loose'
       className='bg-background border-border max-lg:border-r xl:bg-neutral-50 dark:xl:bg-neutral-950'
     >
-      <SidebarHeader>
-        <SidebarLogo className='-mx-4 -mt-2 px-6 pt-4'>
+      <SidebarHeader className='inline-flex items-center justify-between'>
+        <SidebarLogo className='flex-1 p-1'>
           <img src='/images/vite.svg' alt='Garasi' className='size-6' />
-          <span className='font-semibold'>Garage S3 Console</span>
+          <span className='font-semibold'>Garage Console</span>
         </SidebarLogo>
+        <Button variant='plain' size='sm-icon' className='hidden lg:flex' onClick={sidebarFn}>
+          {sidebarOpen ? <Lucide.SidebarCloseIcon /> : <Lucide.SidebarOpenIcon />}
+        </Button>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>{navGroups.map((group, index) => renderNavGroup(group, index))}</SidebarMenu>

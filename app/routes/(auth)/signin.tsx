@@ -34,7 +34,7 @@ function RouteComponent() {
   const emailInputRef = useRef<HTMLInputElement>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const Form = useForm({
+  const form = useForm({
     defaultValues: { email: '', password: '', remember: false } satisfies SigninRequest,
     onSubmit: async ({ value }) => {
       setSubmitError(null)
@@ -91,7 +91,7 @@ function RouteComponent() {
 
         {submitError && <Alert variant='danger'>{submitError}</Alert>}
 
-        <Form.Field
+        <form.Field
           name='email'
           validators={{
             onChange: ({ value }) => {
@@ -123,9 +123,9 @@ function RouteComponent() {
               )}
             </Field>
           )}
-        </Form.Field>
+        </form.Field>
 
-        <Form.Field
+        <form.Field
           name='password'
           validators={{
             onChange: ({ value }) => {
@@ -156,9 +156,9 @@ function RouteComponent() {
               )}
             </Field>
           )}
-        </Form.Field>
+        </form.Field>
 
-        <Form.Field name='remember' validators={{}}>
+        <form.Field name='remember' validators={{}}>
           {(field) => (
             <label htmlFor='remember' className='flex cursor-pointer items-center gap-2 text-sm'>
               <Checkbox
@@ -170,9 +170,9 @@ function RouteComponent() {
               <span>Remember me</span>
             </label>
           )}
-        </Form.Field>
+        </form.Field>
 
-        <Form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) => (
             <Button
               type='submit'
@@ -181,14 +181,14 @@ function RouteComponent() {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                Form.handleSubmit()
+                form.handleSubmit()
               }}
               progress={isSubmitting}
             >
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
           )}
-        </Form.Subscribe>
+        </form.Subscribe>
 
         <Text className='text-center'>
           <Link
