@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { Heading } from '~/app/components/heading'
 import { Stack } from '~/app/components/stack'
+import { Text } from '~/app/components/text'
 import fetcher from '~/app/fetcher'
 import { ClusterInfo } from './-dashboard/cluster-info'
 import { DashboardError } from './-dashboard/error-boundary'
@@ -87,13 +88,15 @@ function RouteComponent() {
   const storagePercentage = totalDataStorage > 0 ? (usedDataStorage / totalDataStorage) * 100 : 0
 
   return (
-    <Stack spacing='lg'>
-      <div className='min-w-0 flex-1'>
-        <Heading size='md'>Dashboard</Heading>
-        <p className='text-dimmed mt-1 text-sm'>
+    <div className='mx-auto space-y-6'>
+      <div className='min-w-0 flex-1 space-y-1.5'>
+        <Heading level={1} size='lg'>
+          Dashboard
+        </Heading>
+        <Text className='text-muted'>
           Welcome back, {whoamiData?.data?.name || 'User'}! Here's an overview of your S3 storage
           cluster.
-        </p>
+        </Text>
       </div>
 
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
@@ -152,6 +155,6 @@ function RouteComponent() {
         <StorageNodes statistics={statistics} />
         <RecentBuckets buckets={buckets} />
       </div>
-    </Stack>
+    </div>
   )
 }

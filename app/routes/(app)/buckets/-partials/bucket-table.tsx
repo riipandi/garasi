@@ -6,6 +6,7 @@ import * as React from 'react'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
+import { Input } from '~/app/components/input'
 import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
 import { Stack } from '~/app/components/stack'
 import {
@@ -187,13 +188,12 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
         <InputGroupAddon align='start'>
           <Lucide.Search className='text-dimmed size-4' />
         </InputGroupAddon>
-        <input
+        <Input
           type='text'
           value={filtering}
           onChange={(e) => setFiltering(e.target.value)}
           placeholder='Search buckets by ID or alias...'
           disabled={isLoading}
-          className='text-foreground flex-1 bg-transparent py-2 pr-4 pl-2 text-sm ring-0 outline-none disabled:cursor-not-allowed disabled:opacity-50'
         />
         {filtering && !isLoading && (
           <InputGroupAddon align='end'>

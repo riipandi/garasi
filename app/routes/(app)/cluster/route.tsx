@@ -1,6 +1,8 @@
 import { createFileRoute, Outlet, useLocation, useRouter } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
+import { Heading } from '~/app/components/heading'
 import { Tabs, TabsItem, TabsList } from '~/app/components/tabs'
+import { Text } from '~/app/components/text'
 
 export const Route = createFileRoute('/(app)/cluster')({
   component: RouteComponent
@@ -36,12 +38,12 @@ function RouteComponent() {
   }
 
   return (
-    <div className='mx-auto max-w-screen-2xl space-y-6'>
-      <div className='min-w-0 flex-1'>
-        <div>
-          <h1 className='text-2xl font-bold text-gray-900 sm:text-3xl'>Cluster</h1>
-          <p className='text-normal mt-2 text-gray-500'>Manage and monitor your Garage cluster</p>
-        </div>
+    <div className='mx-auto space-y-6'>
+      <div className='min-w-0 flex-1 space-y-1.5'>
+        <Heading level={1} size='lg'>
+          Cluster
+        </Heading>
+        <Text className='text-muted'>Manage and monitor your Garage cluster</Text>
       </div>
 
       <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as TabType)}>

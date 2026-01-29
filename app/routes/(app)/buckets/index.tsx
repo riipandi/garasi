@@ -124,11 +124,13 @@ function RouteComponent() {
   }, [errorMessage])
 
   return (
-    <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
-      <Stack>
-        <Heading size='lg'>Buckets</Heading>
-        <Text>Manage your S3 buckets</Text>
-      </Stack>
+    <div className='mx-auto space-y-6'>
+      <div className='min-w-0 flex-1 space-y-1.5'>
+        <Heading level={1} size='lg'>
+          Buckets
+        </Heading>
+        <Text className='text-muted'>Manage your S3 buckets</Text>
+      </div>
 
       <Stack>
         <div className='flex flex-wrap gap-2'>

@@ -160,15 +160,15 @@ function RouteComponent() {
   }, [errorMessage])
 
   return (
-    <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
-      <Stack direction='column' spacing='lg'>
-        <div className='min-w-0 flex-1'>
-          <Heading level={1} size='lg'>
-            Access Keys
-          </Heading>
-          <Text className='text-muted mt-2'>Manage access keys for S3 API authentication</Text>
-        </div>
+    <div className='mx-auto space-y-6'>
+      <div className='min-w-0 flex-1 space-y-1.5'>
+        <Heading level={1} size='lg'>
+          Access Keys
+        </Heading>
+        <Text className='text-muted'>Manage access keys for S3 API authentication</Text>
+      </div>
 
+      <Stack direction='column' spacing='lg'>
         <Stack direction='row' className='flex-wrap gap-2'>
           <Button onClick={handleShowCreateForm}>
             <Lucide.Plus className='size-4' />
