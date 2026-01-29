@@ -81,7 +81,7 @@ function RouteComponent() {
         <div className='min-h-[calc(100vh-4rem)] lg:-mt-12'>
           <div
             className={clx(
-              'mx-auto h-full w-full max-w-7xl flex-1 overflow-auto pt-2 pb-8 lg:block lg:py-8',
+              'mx-auto h-full w-full flex-1 overflow-auto pt-2 pb-8 lg:block lg:py-8',
               sidebarOpen ? 'px-8' : 'px-4 lg:px-8'
             )}
           >

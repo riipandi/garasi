@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { Card, CardBody } from '~/app/components/card'
 import { IconBox } from '~/app/components/icon-box'
 
@@ -8,7 +7,6 @@ interface StatCardProps {
   icon: React.ComponentType<{ className?: string }>
   color: 'green' | 'yellow' | 'red' | 'blue' | 'purple' | 'indigo'
   subtitle: string
-  to?: string
 }
 
 const iconBoxSubtleVariant = {
@@ -20,9 +18,9 @@ const iconBoxSubtleVariant = {
   indigo: 'secondary-subtle' as const
 }
 
-export function StatCard({ title, value, icon: Icon, color, subtitle, to }: StatCardProps) {
-  const cardContent = (
-    <Card className={to ? 'cursor-pointer transition-shadow hover:shadow-md' : ''}>
+export function StatCard({ title, value, icon: Icon, color, subtitle }: StatCardProps) {
+  return (
+    <Card>
       <CardBody>
         <div className='flex items-start justify-between gap-4'>
           <div className='flex-1 space-y-1'>
@@ -37,10 +35,4 @@ export function StatCard({ title, value, icon: Icon, color, subtitle, to }: Stat
       </CardBody>
     </Card>
   )
-
-  if (to) {
-    return <Link to={to}>{cardContent}</Link>
-  }
-
-  return cardContent
 }

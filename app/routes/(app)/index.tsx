@@ -7,7 +7,6 @@ import fetcher from '~/app/fetcher'
 import { ClusterInfo } from './-dashboard/cluster-info'
 import { DashboardError } from './-dashboard/error-boundary'
 import { DashboardSkeleton } from './-dashboard/loading-skeleton'
-import { QuickLinks } from './-dashboard/quick-links'
 import { RecentBuckets } from './-dashboard/recent-buckets'
 import { StatCard } from './-dashboard/stat-card'
 import { StorageNodes } from './-dashboard/storage-nodes'
@@ -87,7 +86,7 @@ function RouteComponent() {
   const storagePercentage = totalDataStorage > 0 ? (usedDataStorage / totalDataStorage) * 100 : 0
 
   return (
-    <div className='mx-auto space-y-6'>
+    <div className='mx-auto max-w-7xl space-y-8'>
       <div className='min-w-0 flex-1 space-y-1.5'>
         <Heading level={1} size='lg'>
           Dashboard
@@ -98,62 +97,43 @@ function RouteComponent() {
         </Text>
       </div>
 
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        <StatCard
-          title='Cluster Status'
-          value={health?.status || 'Unknown'}
-          icon={Lucide.Activity}
-          color={
-            health?.status === 'healthy'
-              ? 'green'
-              : health?.status === 'degraded'
-                ? 'yellow'
-                : 'red'
-          }
-          subtitle={`${health?.connectedNodes || 0}/${health?.knownNodes || 0} nodes connected`}
-          to='/cluster'
-        />
-
-        <StatCard
-          title='Storage Used'
-          value={`${storagePercentage.toFixed(1)}%`}
-          icon={Lucide.HardDrive}
-          color={storagePercentage > 80 ? 'red' : storagePercentage > 60 ? 'yellow' : 'blue'}
-          subtitle={`${usedDataStorage.toFixed(1)} GB of ${totalDataStorage.toFixed(1)} GB`}
-        />
-
-        <StatCard
-          title='Buckets'
-          value={buckets.length.toString()}
-          icon={Lucide.Database}
-          color='purple'
-          subtitle={`${buckets.filter((b) => b.globalAliases.length > 0).length} with aliases`}
-          to='/buckets'
-        />
-
-        <StatCard
-          title='AccessKeys'
-          value={keys.filter((k) => !k.deleted).length.toString()}
-          icon={Lucide.KeyRound}
-          color='indigo'
-          subtitle={`${keys.filter((k) => k.deleted).length} deleted`}
-          to='/keys'
-        />
-      </div>
-
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
-        <div className='lg:col-span-2'>
-          <ClusterInfo health={health} statistics={statistics} />
-        </div>
-        <div>
-          <QuickLinks />
-        </div>
-      </div>
-
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-        <StorageNodes statistics={statistics} />
-        <RecentBuckets buckets={buckets} />
+        <ClusterInfo health={health} statistics={statistics} />
+        <div className='flex flex-col gap-4'>
+          <StatCard
+            title='Cluster Status'
+            value={health?.status || 'Unknown'}
+            icon={Lucide.Activity}
+            color={
+              health?.status === 'healthy'
+                ? 'green'
+                : health?.status === 'degraded'
+                  ? 'yellow'
+                  : 'red'
+            }
+            subtitle={`${health?.connectedNodes || 0}/${health?.knownNodes || 0} nodes connected`}
+          />
+
+          <StatCard
+            title='Storage Used'
+            value={`${storagePercentage.toFixed(1)}%`}
+            icon={Lucide.HardDrive}
+            color={storagePercentage > 80 ? 'red' : storagePercentage > 60 ? 'yellow' : 'blue'}
+            subtitle={`${usedDataStorage.toFixed(1)} GB of ${totalDataStorage.toFixed(1)} GB`}
+          />
+
+          <StatCard
+            title='Resources'
+            value={`${buckets.length} Buckets`}
+            icon={Lucide.Database}
+            color='purple'
+            subtitle={`${keys.filter((k) => !k.deleted).length} active keys`}
+          />
+        </div>
       </div>
+
+      <StorageNodes statistics={statistics} />
+      <RecentBuckets buckets={buckets} />
     </div>
   )
 }

@@ -1,10 +1,7 @@
-import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { Badge } from '~/app/components/badge'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
-import { IconBox } from '~/app/components/icon-box'
-import { Progress, ProgressLabel, ProgressValue } from '~/app/components/progress'
-import { Stack } from '~/app/components/stack'
+import { Progress } from '~/app/components/progress'
 import { Text } from '~/app/components/text'
 import type { ClusterStatistics } from './types'
 
@@ -19,76 +16,52 @@ export function StorageNodes({ statistics }: StorageNodesProps) {
     <Card>
       <CardHeader>
         <CardTitle>Storage Nodes</CardTitle>
-        <Link
-          to='/cluster'
-          className='text-primary hover:text-primary/80 inline-flex items-center gap-1 text-sm font-medium'
-        >
-          View All
-          <Lucide.ArrowRight className='size-4' />
-        </Link>
       </CardHeader>
       <CardBody>
-        <Stack spacing='sm'>
-          {nodes.length > 0 ? (
-            nodes.map((node) => (
-              <div key={node.id} className='border-border bg-accent rounded-lg border p-4'>
-                <div className='mb-3 flex items-center justify-between'>
-                  <div className='flex items-center gap-2'>
-                    <IconBox variant='primary-subtle' size='sm' circle>
-                      <Lucide.Server className='size-4' />
-                    </IconBox>
-                    <p className='font-medium'>{node.hostname}</p>
+        {nodes.length > 0 ? (
+          nodes.map((node) => (
+            <div
+              key={node.id}
+              className='border-border bg-accent/60 rounded-lg border p-4 transition-colors'
+            >
+              <div className='mb-3 flex items-start justify-between gap-3'>
+                <div className='flex min-w-0 flex-1 items-start gap-3'>
+                  <div className='bg-primary/10 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg'>
+                    <Lucide.Server className='text-primary size-4' />
                   </div>
-                  <Badge variant='primary' pill size='sm'>
-                    {node.zone}
-                  </Badge>
-                </div>
-
-                <Stack spacing='md'>
-                  <div>
-                    <Progress value={node.dataAvailable.percentage} className='mb-1.5'>
-                      <ProgressLabel>Data Storage</ProgressLabel>
-                      <ProgressValue />
-                    </Progress>
-                    <Text className='text-dimmed text-xs'>
-                      {node.dataAvailable.used} of {node.dataAvailable.total}
-                    </Text>
-                  </div>
-
-                  <div>
-                    <Progress value={node.metaAvailable.percentage} className='mb-1.5'>
-                      <ProgressLabel>Metadata Storage</ProgressLabel>
-                      <ProgressValue />
-                    </Progress>
-                    <Text className='text-dimmed text-xs'>
-                      {node.metaAvailable.used} of {node.metaAvailable.total}
-                    </Text>
-                  </div>
-                </Stack>
-
-                <div className='bg-card mt-3 grid grid-cols-2 gap-2 rounded-lg p-2'>
-                  <div className='flex items-center gap-1.5'>
-                    <Lucide.Layers className='text-dimmed size-3.5' />
-                    <Text className='text-dimmed text-xs'>Partitions:</Text>
-                    <Text className='text-xs'>{node.partitions}</Text>
-                  </div>
-                  <div className='flex items-center gap-1.5'>
-                    <Lucide.Database className='text-dimmed size-3.5' />
-                    <Text className='text-dimmed text-xs'>Capacity:</Text>
-                    <Text className='text-xs'>{node.capacity}</Text>
+                  <div className='min-w-0 flex-1'>
+                    <Text className='mb-1 font-medium'>{node.hostname}</Text>
+                    <div className='flex items-center gap-4 text-xs'>
+                      <span className='text-dimmed'>{node.id}</span>
+                      <span className='text-border'>•</span>
+                      <span className='text-dimmed'>
+                        {node.partitions} partition{node.partitions !== 1 ? 's' : ''}
+                      </span>
+                      <span className='text-border'>•</span>
+                      <span className='text-dimmed'>
+                        {node.capacity} / {node.dataAvailable.percentage}% used
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <Badge variant='primary' pill size='sm'>
+                  {node.zone}
+                </Badge>
               </div>
-            ))
-          ) : (
-            <div className='border-border bg-accent flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center'>
-              <IconBox variant='secondary-subtle' size='lg' circle className='mb-2'>
-                <Lucide.HardDrive className='size-5.5' />
-              </IconBox>
-              <p className='font-medium'>No storage nodes available</p>
+              <Progress value={node.dataAvailable.percentage} className='mb-1.5' />
             </div>
-          )}
-        </Stack>
+          ))
+        ) : (
+          <div className='border-border bg-accent flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center'>
+            <div className='bg-primary/10 mb-3 flex size-12 items-center justify-center rounded-full'>
+              <Lucide.HardDrive className='text-primary size-6' />
+            </div>
+            <Text className='mb-1 text-sm font-medium'>No storage nodes available</Text>
+            <Text className='text-dimmed text-xs'>
+              Add storage nodes to your cluster to get started
+            </Text>
+          </div>
+        )}
       </CardBody>
     </Card>
   )
