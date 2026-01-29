@@ -337,7 +337,7 @@ export function SidebarCollapsiblePanel({
       className={clx(
         'transition-all duration-100',
         'h-(--collapsible-panel-height) overflow-hidden',
-        'data-[ending-style]:h-0 data-[starting-style]:h-0',
+        'data-ending-style:h-0 data-starting-style:h-0',
         className
       )}
     />

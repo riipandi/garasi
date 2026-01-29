@@ -84,13 +84,13 @@ export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) 
 
   return (
     <Sidebar
-      size='default'
+      size='loose'
       className='bg-background border-border/50 border-r xl:bg-neutral-50 dark:xl:bg-neutral-950'
     >
       <SidebarHeader className='inline-flex items-center justify-between'>
         <SidebarLogo className='flex-1 p-1'>
-          <img src='/images/vite.svg' alt='Garasi' className='size-6' />
-          <span className='font-semibold'>Garage Console</span>
+          <img src='/logo.png' alt='Garasi' className='h-8 w-auto' />
+          <span className='sr-only'>Garage Console</span>
         </SidebarLogo>
         <Button variant='plain' size='sm-icon' className='hidden lg:flex' onClick={sidebarFn}>
           {sidebarOpen ? <Lucide.SidebarCloseIcon /> : <Lucide.SidebarOpenIcon />}
