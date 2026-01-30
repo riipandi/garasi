@@ -3,16 +3,40 @@
 name: garasi
 
 services:
-  garage:
+  garage-1:
     image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
     restart: unless-stopped
     hostname: garage-node1
-    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data:/var/lib/garage:rw']
+    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data1:/var/lib/garage:rw']
     ports: ['3900:3900', '3901:3901', '3902:3902', '3903:3903', '3904:3904']
     env_file: '.env.local'
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.
-    extra_hosts: ['host.docker.internal:host-gateway']
+    # extra_hosts: ['host.docker.internal:host-gateway']
+    networks: ['garasi_network']
+
+  garage-2:
+    image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
+    restart: unless-stopped
+    hostname: garage-node2
+    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data2:/var/lib/garage:rw']
+    ports: ['4900:3900', '4901:3901', '4902:3902', '4903:3903', '4904:3904']
+    env_file: '.env.local'
+    environment:
+      RUST_LOG: garage=info # error, warn, info (default), debug, trace.
+    # extra_hosts: ['host.docker.internal:host-gateway']
+    networks: ['garasi_network']
+
+  garage-3:
+    image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
+    restart: unless-stopped
+    hostname: garage-node2
+    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data3:/var/lib/garage:rw']
+    ports: ['5900:3900', '5901:3901', '5902:3902', '5903:3903', '5904:3904']
+    env_file: '.env.local'
+    environment:
+      RUST_LOG: garage=info # error, warn, info (default), debug, trace.
+    # extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['garasi_network']
 
   mailpit:
@@ -30,11 +54,15 @@ services:
       MP_SMTP_BIND_ADDR: 0.0.0.0:1025
       MP_SMTP_AUTH_ALLOW_INSECURE: true
       MP_SMTP_AUTH: 'maileruser1:mailerpass1 maileruser2:mailerpass2'
-    extra_hosts: ['host.docker.internal:host-gateway']
+    # extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['garasi_network']
 
 volumes:
-  garage_data:
+  garage_data1:
+    driver: local
+  garage_data2:
+    driver: local
+  garage_data3:
     driver: local
   mailpit_data:
     driver: local
