@@ -18,7 +18,7 @@ export function Autocomplete({ ...props }: React.ComponentProps<typeof BaseAutoc
 
 export const autocompleteInputStyles = cva(
   [
-    'text-foreground placeholder:text-dimmed h-9.5 w-full px-2.5 transition-all',
+    'text-foreground placeholder:text-dimmed h-9 w-full px-3 transition-all',
     'disabled:cursor-not-allowed disabled:opacity-70'
   ],
   {
@@ -33,7 +33,7 @@ export const autocompleteInputStyles = cva(
       {
         variant: ['default', 'subtle'],
         className:
-          'ring-input-border hover:not-[[data-disabled]]:not-[:focus]:ring-input-accent-border focus:ring-primary shadow-input rounded ring focus:ring-2 focus:outline-0'
+          'ring-input-border hover:not-data-disabled:not-focus:ring-input-accent-border focus:ring-primary shadow-input rounded ring focus:ring-2 focus:outline-0'
       }
     ],
     defaultVariants: {
@@ -96,8 +96,8 @@ export function AutocompletePopup({
             'bg-popover ring-popover-border shadow-popover rounded ring',
             'transition-[transform,scale,opacity] outline-none',
             'max-h-[min(var(---available-height),23rem)] w-(--anchor-width)',
-            'data-[ending-style]:scale-90 data-[ending-style]:opacity-0',
-            'data-[starting-style]:scale-90 data-[starting-style]:opacity-0',
+            'data-ending-style:scale-90 data-ending-style:opacity-0',
+            'data-starting-style:scale-90 data-starting-style:opacity-0',
             className
           )}
         >
@@ -139,7 +139,7 @@ export function AutocompleteEmpty({
       data-slot='autocomplete-empty'
       {...props}
       className={clx(
-        'text-muted flex items-center justify-center px-3 py-2.5 text-center',
+        'text-muted flex items-center justify-center px-2.5 py-2 text-center',
         'empty:hidden empty:h-0 empty:p-0',
         className
       )}
@@ -156,7 +156,7 @@ export function AutocompleteList({
       data-slot='autocomplete-list'
       {...props}
       className={clx(
-        'space-y-0.5 overflow-auto outline-none empty:hidden empty:h-0 empty:p-0 dark:scheme-dark',
+        'space-y-0 overflow-auto outline-none empty:hidden empty:h-0 empty:p-0 dark:scheme-dark',
         'max-h-[min(23rem,var(--available-height))] overflow-y-auto p-1 dark:scheme-dark',
         className
       )}
@@ -172,7 +172,7 @@ export function AutocompleteGroup({
     <BaseAutocomplete.Group
       data-slot='autocomplete-group'
       {...props}
-      className={clx('pb-2 last:pb-0', className)}
+      className={clx('pb-1.5 last:pb-0', className)}
     />
   )
 }
@@ -185,7 +185,7 @@ export function AutocompleteGroupLabel({
     <BaseAutocomplete.GroupLabel
       data-slot='autocomplete-group-label'
       {...props}
-      className={clx('text-dimmed px-3 py-1.5 text-sm font-medium', className)}
+      className={clx('text-dimmed px-2.5 py-1 text-base font-medium', className)}
     />
   )
 }
@@ -212,10 +212,10 @@ export function AutocompleteItem({
       data-slot='autocomplete-item'
       {...props}
       className={clx(
-        'text-foreground flex cursor-pointer items-center gap-3.5 rounded px-3 py-2.5',
-        'data-[highlighted]:not-[[data-disabled]]:bg-popover-accent data-[selected]:not-[[data-disabled]]:bg-popover-accent',
+        'text-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2',
+        'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
         'focus-visible:outline-none',
-        '[&_svg:not([class*=text-])]:text-foreground [&_svg:not([class*=size-])]:size-4',
+        '[&_svg:not([class*=text-])]:text-foreground [&_svg:not([class*=size-])]:size-3.5',
         'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         className
       )}

@@ -19,7 +19,7 @@ export function Meter({
     <BaseMeter.Root
       data-slot='meter'
       {...props}
-      className={clx('flex flex-wrap justify-between gap-1.5', className)}
+      className={clx('flex flex-wrap justify-between gap-1', className)}
     >
       {children}
       <BaseMeter.Track className='bg-track h-1.5 w-full rounded-full'>
@@ -44,7 +44,7 @@ export function MeterValue({ className, ...props }: React.ComponentProps<typeof 
     <BaseMeter.Value
       data-slot='meter-value'
       {...props}
-      className={clx('text-dimmed text-sm', className)}
+      className={clx('text-dimmed text-base', className)}
     />
   )
 }

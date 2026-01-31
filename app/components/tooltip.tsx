@@ -10,8 +10,29 @@
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip'
 import { clx } from '~/app/utils'
 
-export function Tooltip({ ...props }: React.ComponentProps<typeof BaseTooltip.Root>) {
-  return <BaseTooltip.Root data-slot='tooltip' {...props} />
+interface TooltipProps extends React.ComponentProps<typeof BaseTooltip.Root> {
+  /**
+   * How long to wait before opening a tooltip. Specified in milliseconds.
+   */
+  delay?: number
+  /**
+   * How long to wait before closing a tooltip. Specified in milliseconds.
+   */
+  closeDelay?: number
+  /**
+   * Another tooltip will open instantly if the previous tooltip
+   * is closed within this timeout. Specified in milliseconds.
+   * @default 400
+   */
+  timeout?: number
+}
+
+export function Tooltip({ delay = 100, closeDelay = 150, timeout, ...props }: TooltipProps) {
+  return (
+    <BaseTooltip.Provider delay={delay} closeDelay={closeDelay} timeout={timeout}>
+      <BaseTooltip.Root data-slot='tooltip' {...props} />
+    </BaseTooltip.Provider>
+  )
 }
 
 export function TooltipTrigger({ ...props }: React.ComponentProps<typeof BaseTooltip.Trigger>) {
@@ -53,17 +74,17 @@ export function TooltipPopup({
           data-slot='tooltip-popup'
           {...props}
           className={clx(
-            'bg-tertiary text-tertiary-foreground rounded shadow',
-            'p-2 text-sm transition-[transform,scale,opacity] outline-none',
-            'data-[ending-style]:scale-90 data-[ending-style]:opacity-0',
-            'data-[starting-style]:scale-90 data-[starting-style]:opacity-0',
+            'bg-tertiary text-tertiary-foreground rounded-sm shadow outline-none',
+            'px-2 pt-0.5 pb-1 text-base transition-[transform,scale,opacity]',
+            'data-ending-style:scale-90 data-ending-style:opacity-0',
+            'data-starting-style:scale-90 data-starting-style:opacity-0',
             className
           )}
         >
           {children}
           <BaseTooltip.Arrow
             className={clx(
-              'data-[side=bottom]:top-[-7px] data-[side=left]:right-[-10px] data-[side=left]:rotate-90 data-[side=right]:left-[-10px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-7px] data-[side=top]:rotate-180'
+              'data-[side=bottom]:-top-1.75 data-[side=left]:-right-2.5 data-[side=left]:rotate-90 data-[side=right]:-left-2.5 data-[side=right]:-rotate-90 data-[side=top]:-bottom-1.75 data-[side=top]:rotate-180'
             )}
           >
             <svg width='20' height='10' viewBox='0 0 20 10' fill='none'>

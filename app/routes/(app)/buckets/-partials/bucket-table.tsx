@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow
 } from '~/app/components/table'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
 
 interface BucketTableProps {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ScrollArea } from '~/app/components/scroll-area'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 
 const meta = {
   title: 'Components/ScrollArea',
@@ -24,7 +24,10 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <ScrollArea className='border-border h-52 w-full rounded border shadow lg:w-8/12'>
+    <ScrollArea
+      scrollbar='both'
+      className='border-border h-80 w-full max-w-xl rounded border shadow'
+    >
       <div className='space-y-6 p-4'>
         <Text>
           Biocentrism is a philosophical worldview that places biological life at the center of its

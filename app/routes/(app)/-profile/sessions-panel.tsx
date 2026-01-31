@@ -26,7 +26,7 @@ import {
   CardTitle
 } from '~/app/components/card'
 import { Spinner } from '~/app/components/spinner'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import fetcher from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 import { clx } from '~/app/utils'

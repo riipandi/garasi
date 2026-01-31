@@ -2,8 +2,8 @@ import * as Lucide from 'lucide-react'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
-import { Heading } from '~/app/components/heading'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import type { RepairType } from '~/shared/schemas/node.schema'
 
 interface RepairOperationsCardProps {

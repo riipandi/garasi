@@ -17,9 +17,8 @@ export function Fieldset({ className, ...props }: React.ComponentProps<typeof Ba
       data-slot='fieldset'
       className={clx(
         'flex flex-col gap-0',
-        '*:data-[slot=text]:text-muted',
-        '*:data-[slot=text]:mb-6',
-        '[&_[data-slot="field"]:not([data-layout="inline"])]:not-last:mb-6',
+        '*:data-[slot=text]:text-muted *:data-[slot=text]:mb-4',
+        '[&_[data-slot="field"]:not([data-layout="inline"])]:not-last:mb-4',
         className
       )}
       {...props}
@@ -34,7 +33,7 @@ export function FieldsetLegend({
   return (
     <BaseFieldset.Legend
       data-slot='fieldset-legend'
-      className={clx('text-foreground mb-2 text-lg font-semibold', className)}
+      className={clx('text-foreground mb-1.5 text-lg font-semibold', className)}
       {...props}
     />
   )

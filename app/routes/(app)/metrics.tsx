@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
-import { Heading } from '~/app/components/heading'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 
 export const Route = createFileRoute('/(app)/metrics')({
   component: RouteComponent

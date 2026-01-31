@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, useLocation, useRouter } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import { Heading } from '~/app/components/heading'
 import { Tabs, TabsItem, TabsList } from '~/app/components/tabs'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 
 export const Route = createFileRoute('/(app)/cluster')({
   component: RouteComponent

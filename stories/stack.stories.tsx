@@ -77,3 +77,41 @@ export const Example: Story = {
     </Stack>
   )
 }
+
+export const DirectionRow: Story = {
+  args: {},
+  render: () => (
+    <Stack direction='row' className='w-full min-w-md items-center justify-center xl:w-6/12'>
+      <Item direction='column'>
+        <ItemMedia>
+          <Avatar>
+            <AvatarImage
+              src='https://images.unsplash.com/photo-1628157588553-5eeea00af15c?q=80&w=880'
+              alt='Avatar'
+            />
+            <AvatarFallback>JR</AvatarFallback>
+          </Avatar>
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>Jane Randy</ItemTitle>
+          <ItemDescription>jane@example.com</ItemDescription>
+        </ItemContent>
+      </Item>
+      <Item direction='column'>
+        <ItemMedia>
+          <Avatar>
+            <AvatarImage
+              src='https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&h=200&fit=crop&crop=top'
+              alt='Avatar'
+            />
+            <AvatarFallback>AD</AvatarFallback>
+          </Avatar>
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>Andy Daniel</ItemTitle>
+          <ItemDescription>andy@example.com</ItemDescription>
+        </ItemContent>
+      </Item>
+    </Stack>
+  )
+}

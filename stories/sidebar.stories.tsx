@@ -46,7 +46,7 @@ export const Example: Story = {
     <Sidebar className='lg:w-72'>
       <SidebarHeader>
         <SidebarLogo>
-          <img src='https://selia.earth/selia.png' alt='Selia' className='size-8' />
+          <img src='https://selia.earth/selia.png' alt='Selia' className='size-6' />
           <span className='font-semibold'>Selia</span>
         </SidebarLogo>
       </SidebarHeader>
@@ -169,6 +169,183 @@ export const Example: Story = {
           </SidebarList>
         </SidebarMenu>
       </SidebarFooter>
+    </Sidebar>
+  )
+}
+
+export const Compact: Story = {
+  args: {},
+  render: () => (
+    <Sidebar className='border-border rounded-2xl border lg:w-72' size='compact'>
+      <SidebarHeader>
+        <SidebarLogo>
+          <img src='https://selia.earth/selia.png' alt='Selia' className='size-6' />
+          <span className='font-semibold'>Selia</span>
+        </SidebarLogo>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupTitle>Prologue</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton active>Introduction</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Installation</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Customization</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Upgrade Guide</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupTitle>Components</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>Button</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Card</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Input</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Select</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Table</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Tabs</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+        </SidebarMenu>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
+
+export const Loose: Story = {
+  args: {},
+  render: () => (
+    <Sidebar className='border-border rounded-2xl border lg:w-72' size='loose'>
+      <SidebarHeader>
+        <SidebarLogo>
+          <img src='https://selia.earth/selia.png' alt='Selia' className='size-6' />
+          <span className='font-semibold'>Selia</span>
+        </SidebarLogo>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupTitle>Prologue</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>Introduction</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Installation</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Customization</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Upgrade Guide</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupTitle>Components</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>Button</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Card</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Input</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Select</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Table</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Tabs</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+        </SidebarMenu>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
+
+export const Background: Story = {
+  args: {},
+  render: () => (
+    <Sidebar className='border-border shadow-card bg-card rounded-2xl border lg:w-72'>
+      <SidebarHeader>
+        <SidebarLogo>
+          <img src='https://selia.earth/selia.png' alt='Selia' className='size-6' />
+          <span className='font-semibold'>Selia</span>
+        </SidebarLogo>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupTitle>Prologue</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>Introduction</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Installation</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Customization</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Upgrade Guide</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupTitle>Components</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>Button</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Card</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Input</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Select</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton active>Sidebar</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Table</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Tabs</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+        </SidebarMenu>
+      </SidebarContent>
     </Sidebar>
   )
 }

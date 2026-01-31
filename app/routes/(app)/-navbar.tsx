@@ -14,7 +14,7 @@ import {
   SidebarLogo,
   SidebarMenu
 } from '~/app/components/sidebar'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import type { User } from '~/shared/schemas/user.schema'
 
 interface NavItem {

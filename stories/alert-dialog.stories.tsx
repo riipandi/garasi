@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import * as Lucide from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -11,6 +12,7 @@ import {
   AlertDialogTrigger
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
+import { IconBox } from '~/app/components/icon-box'
 
 const meta = {
   title: 'Components/AlertDialog',
@@ -48,6 +50,30 @@ export const Example: Story = {
         <AlertDialogFooter>
           <AlertDialogClose>Cancel</AlertDialogClose>
           <AlertDialogClose render={<Button variant='danger'>Delete File</Button>} />
+        </AlertDialogFooter>
+      </AlertDialogPopup>
+    </AlertDialog>
+  )
+}
+
+export const WithIconHeader: Story = {
+  args: {},
+  render: () => (
+    <AlertDialog>
+      <AlertDialogTrigger render={<Button variant='danger'>Delete</Button>} />
+      <AlertDialogPopup>
+        <AlertDialogHeader>
+          <IconBox variant='danger' size='sm'>
+            <Lucide.Trash2Icon />
+          </IconBox>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+        </AlertDialogHeader>
+        <AlertDialogBody>
+          <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+        </AlertDialogBody>
+        <AlertDialogFooter>
+          <AlertDialogClose>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant='danger'>Delete</Button>} />
         </AlertDialogFooter>
       </AlertDialogPopup>
     </AlertDialog>

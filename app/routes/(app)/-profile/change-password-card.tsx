@@ -10,9 +10,9 @@ import {
   CardDescription
 } from '~/app/components/card'
 import { Field, FieldLabel } from '~/app/components/field'
-import { Input } from '~/app/components/input'
+import { InputPassword } from '~/app/components/input-password'
 import { Spinner } from '~/app/components/spinner'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 
 interface ChangePasswordCardProps {
   changePasswordForm: any
@@ -87,10 +87,9 @@ export function ChangePasswordCard({
             {(field: any) => (
               <Field>
                 <FieldLabel htmlFor='currentPassword'>Current Password</FieldLabel>
-                <Input
+                <InputPassword
                   id='currentPassword'
                   name={field.name}
-                  type='password'
                   autoComplete='current-password'
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -129,10 +128,9 @@ export function ChangePasswordCard({
             {(field: any) => (
               <Field>
                 <FieldLabel htmlFor='newPassword'>New Password</FieldLabel>
-                <Input
+                <InputPassword
                   id='newPassword'
                   name={field.name}
-                  type='password'
                   autoComplete='new-password'
                   strengthIndicator
                   value={field.state.value}
@@ -171,10 +169,9 @@ export function ChangePasswordCard({
             {(field: any) => (
               <Field>
                 <FieldLabel htmlFor='confirmPassword'>Confirm New Password</FieldLabel>
-                <Input
+                <InputPassword
                   id='confirmPassword'
                   name={field.name}
-                  type='password'
                   autoComplete='new-password'
                   value={field.state.value}
                   onBlur={field.handleBlur}

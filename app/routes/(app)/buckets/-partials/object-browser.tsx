@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow
 } from '~/app/components/table'
-import { Text, TextLink } from '~/app/components/text'
+import { Text, TextLink } from '~/app/components/typography'
 import { createFolder, listBucketObjects, uploadFile } from '~/app/services/objects.service'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 import { CreateFolderDialog } from './create-folder-dialog'

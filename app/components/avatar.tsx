@@ -18,9 +18,9 @@ export const avatarStyles = cva(
   {
     variants: {
       size: {
-        sm: 'size-8',
-        md: 'size-11',
-        lg: 'size-13'
+        sm: 'size-7.5',
+        md: 'size-10.5',
+        lg: 'size-12.5'
       }
     },
     defaultVariants: {
@@ -70,7 +70,7 @@ export function AvatarFallback({
 }
 
 export const avatarIndicatorStyles = cva(
-  'absolute flex size-2.5 items-center justify-center rounded-full text-xs',
+  'absolute flex size-2.5 items-center justify-center rounded-full text-sm',
   {
     variants: {
       position: {
@@ -140,7 +140,7 @@ export function AvatarFallbackInitial({
   return (
     <BaseAvatar.Fallback
       data-slot='avatar-fallback'
-      className={clx('flex size-full items-center justify-center rounded-full text-lg', className)}
+      className={clx('flex size-full items-center justify-center rounded-full text-xl', className)}
       {...props}
     >
       <React.Activity mode={initials ? 'visible' : 'hidden'}>{initials}</React.Activity>

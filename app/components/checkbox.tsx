@@ -19,7 +19,7 @@ export function CheckboxGroup({
   return (
     <BaseCheckboxGroup
       data-slot='checkbox-group'
-      className={clx('flex flex-col gap-2.5', className)}
+      className={clx('flex flex-col gap-2', className)}
       {...props}
     />
   )

@@ -15,8 +15,8 @@ export function Toolbar({ className, ...props }: React.ComponentProps<typeof Bas
     <BaseToolbar.Root
       data-slot='toolbar'
       className={clx(
-        'bg-background ring-card-border flex items-center rounded-lg p-1 ring',
-        '*:data-[slot=toggle-group]:p-0',
+        'bg-background ring-card-border flex items-center rounded-lg ring',
+        'px-1.5 py-1 *:data-[slot=toggle-group]:p-0',
         className
       )}
       {...props}
@@ -52,7 +52,7 @@ export function ToolbarGroup({
   return (
     <BaseToolbar.Group
       data-slot='toolbar-group'
-      className={clx('flex gap-0.5', className)}
+      className={clx('flex gap-1', className)}
       {...props}
     />
   )
@@ -65,7 +65,7 @@ export function ToolbarSeparator({
   return (
     <BaseToolbar.Separator
       data-slot='toolbar-separator'
-      className={clx('bg-separator mx-4 h-4 w-px', className)}
+      className={clx('bg-separator mx-1.5 h-5 w-px', className)}
       {...props}
     />
   )

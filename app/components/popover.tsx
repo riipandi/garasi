@@ -54,17 +54,17 @@ export function PopoverPopup({
           {...props}
           className={clx(
             'text-popover-foreground flex flex-col items-start gap-1.5',
-            'bg-popover ring-popover-border shadow-popover rounded ring',
+            'bg-popover ring-popover-border shadow-popover rounded-lg ring',
             'p-4 transition-[transform,scale,opacity] outline-none',
-            'data-[ending-style]:scale-90 data-[ending-style]:opacity-0',
-            'data-[starting-style]:scale-90 data-[starting-style]:opacity-0',
+            'data-ending-style:scale-90 data-ending-style:opacity-0',
+            'data-starting-style:scale-90 data-starting-style:opacity-0',
             className
           )}
         >
           {children}
           <BasePopover.Arrow
             className={clx(
-              'data-[side=bottom]:top-[-8px] data-[side=left]:right-[-12px] data-[side=left]:rotate-90 data-[side=right]:left-[-12px] data-[side=right]:-rotate-90 data-[side=top]:bottom-[-8px] data-[side=top]:rotate-180'
+              'data-[side=bottom]:-top-2 data-[side=left]:-right-3 data-[side=left]:rotate-90 data-[side=right]:-left-3 data-[side=right]:-rotate-90 data-[side=top]:-bottom-2 data-[side=top]:rotate-180'
             )}
           >
             <svg width='20' height='10' viewBox='0 0 20 10' fill='none'>
@@ -93,7 +93,7 @@ export function PopoverTitle({
     <BasePopover.Title
       data-slot='popover-title'
       {...props}
-      className={clx('font-semibold', className)}
+      className={clx('text-lg font-semibold', className)}
     />
   )
 }

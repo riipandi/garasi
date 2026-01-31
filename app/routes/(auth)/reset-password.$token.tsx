@@ -5,10 +5,10 @@ import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
 import { Button } from '~/app/components/button'
 import { Field, FieldError, FieldLabel } from '~/app/components/field'
-import { Heading } from '~/app/components/heading'
-import { Input } from '~/app/components/input'
+import { InputPassword } from '~/app/components/input-password'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import fetcher from '~/app/fetcher'
 
 interface ResetPasswordLoaderData {
@@ -222,11 +222,10 @@ function RouteComponent() {
                   <FieldLabel htmlFor='password'>
                     New Password <span className='ml-1 text-red-500'>*</span>
                   </FieldLabel>
-                  <Input
+                  <InputPassword
                     ref={passwordInputRef}
                     id='password'
                     name={field.name}
-                    type='password'
                     autoComplete='new-password'
                     strengthIndicator
                     value={field.state.value}
@@ -264,10 +263,9 @@ function RouteComponent() {
                   <FieldLabel htmlFor='confirmPassword'>
                     Confirm New Password <span className='ml-1 text-red-500'>*</span>
                   </FieldLabel>
-                  <Input
+                  <InputPassword
                     id='confirmPassword'
                     name={field.name}
-                    type='password'
                     autoComplete='new-password'
                     value={field.state.value}
                     onBlur={field.handleBlur}

@@ -15,7 +15,7 @@ export const separatorStyles = cva('bg-separator', {
   variants: {
     orientation: {
       horizontal: 'h-px w-full',
-      vertical: 'min-h-5 w-px'
+      vertical: 'min-h-4.5 w-px'
     }
   },
   defaultVariants: {

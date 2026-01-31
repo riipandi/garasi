@@ -23,15 +23,53 @@ export function useSidebar() {
   return useContext(SidebarContext)
 }
 
-export const sidebarStyles = cva('flex flex-col gap-2.5', {
+export const sidebarStyles = cva('flex flex-col gap-2', {
   variants: {
     size: {
       default: [
-        '**:data-[slot=sidebar-item-button]:min-h-8.5',
-        '**:data-[slot=sidebar-item-button]:px-2.5',
-        '**:data-[slot=sidebar-item-button]:py-2',
+        '**:data-[slot=sidebar-item-button]:min-h-8',
+        '**:data-[slot=sidebar-item-button]:px-2',
+        '**:data-[slot=sidebar-item-button]:py-1.5',
         '**:data-[slot=sidebar-item-button]:rounded',
-        '**:data-[slot=sidebar-item-action]:size-8.5',
+        '**:data-[slot=sidebar-item-action]:size-8',
+        '[&_[data-slot=sidebar-item-button]:has(+[data-slot=sidebar-item-action])]:pr-6.5',
+        '**:data-[slot=sidebar-header]:px-3.5',
+        '**:data-[slot=sidebar-header]:pt-3.5',
+        '**:data-[slot=sidebar-content]:px-3.5',
+        '**:data-[slot=sidebar-content]:pb-3.5',
+        'has-[>[data-slot=sidebar-header]]:**:data-[slot=sidebar-content]:pt-3.5',
+        '**:data-[slot=sidebar-group-title]:px-2',
+        '**:data-[slot=sidebar-group-action]:px-2',
+        '**:data-[slot=sidebar-footer]:px-3.5',
+        '**:data-[slot=sidebar-footer]:pb-3.5',
+        '**:data-[slot=sidebar-submenu]:pl-1.5',
+        '**:data-[slot=sidebar-submenu]:ml-4'
+      ],
+      compact: [
+        '**:data-[slot=sidebar-item-button]:min-h-7.5',
+        '**:data-[slot=sidebar-item-button]:px-2',
+        '**:data-[slot=sidebar-item-button]:py-1',
+        '**:data-[slot=sidebar-item-button]:rounded',
+        '**:data-[slot=sidebar-item-action]:size-7.5',
+        '[&_[data-slot=sidebar-item-button]:has(+[data-slot=sidebar-item-action])]:pr-6.5',
+        '**:data-[slot=sidebar-header]:px-3',
+        '**:data-[slot=sidebar-header]:pt-3',
+        '**:data-[slot=sidebar-content]:px-3',
+        '**:data-[slot=sidebar-content]:pb-3',
+        'has-[>[data-slot=sidebar-header]]:**:data-[slot=sidebar-content]:pt-3',
+        '**:data-[slot=sidebar-group-title]:px-2',
+        '**:data-[slot=sidebar-group-action]:px-2',
+        '**:data-[slot=sidebar-footer]:px-3',
+        '**:data-[slot=sidebar-footer]:pb-3',
+        '**:data-[slot=sidebar-submenu]:pl-1',
+        '**:data-[slot=sidebar-submenu]:ml-4'
+      ],
+      loose: [
+        '**:data-[slot=sidebar-item-button]:min-h-9.5',
+        '**:data-[slot=sidebar-item-button]:px-2.5',
+        '**:data-[slot=sidebar-item-button]:py-1.5',
+        '**:data-[slot=sidebar-item-button]:rounded',
+        '**:data-[slot=sidebar-item-action]:size-9.5',
         '[&_[data-slot=sidebar-item-button]:has(+[data-slot=sidebar-item-action])]:pr-7',
         '**:data-[slot=sidebar-header]:px-4',
         '**:data-[slot=sidebar-header]:pt-4',
@@ -42,46 +80,8 @@ export const sidebarStyles = cva('flex flex-col gap-2.5', {
         '**:data-[slot=sidebar-group-action]:px-2.5',
         '**:data-[slot=sidebar-footer]:px-4',
         '**:data-[slot=sidebar-footer]:pb-4',
-        '**:data-[slot=sidebar-submenu]:pl-2',
-        '**:data-[slot=sidebar-submenu]:ml-4.5'
-      ],
-      compact: [
-        '**:data-[slot=sidebar-item-button]:min-h-8',
-        '**:data-[slot=sidebar-item-button]:px-2.5',
-        '**:data-[slot=sidebar-item-button]:py-1.5',
-        '**:data-[slot=sidebar-item-button]:rounded',
-        '**:data-[slot=sidebar-item-action]:size-8',
-        '[&_[data-slot=sidebar-item-button]:has(+[data-slot=sidebar-item-action])]:pr-7',
-        '**:data-[slot=sidebar-header]:px-3.5',
-        '**:data-[slot=sidebar-header]:pt-3.5',
-        '**:data-[slot=sidebar-content]:px-3.5',
-        '**:data-[slot=sidebar-content]:pb-3.5',
-        'has-[>[data-slot=sidebar-header]]:**:data-[slot=sidebar-content]:pt-3.5',
-        '**:data-[slot=sidebar-group-title]:px-2.5',
-        '**:data-[slot=sidebar-group-action]:px-2.5',
-        '**:data-[slot=sidebar-footer]:px-3.5',
-        '**:data-[slot=sidebar-footer]:pb-3.5',
         '**:data-[slot=sidebar-submenu]:pl-1.5',
         '**:data-[slot=sidebar-submenu]:ml-4.5'
-      ],
-      loose: [
-        '**:data-[slot=sidebar-item-button]:min-h-10',
-        '**:data-[slot=sidebar-item-button]:px-3',
-        '**:data-[slot=sidebar-item-button]:py-2',
-        '**:data-[slot=sidebar-item-button]:rounded',
-        '**:data-[slot=sidebar-item-action]:size-10',
-        '[&_[data-slot=sidebar-item-button]:has(+[data-slot=sidebar-item-action])]:pr-7.5',
-        '**:data-[slot=sidebar-header]:px-4.5',
-        '**:data-[slot=sidebar-header]:pt-4.5',
-        '**:data-[slot=sidebar-content]:px-4.5',
-        '**:data-[slot=sidebar-content]:pb-4.5',
-        'has-[>[data-slot=sidebar-header]]:**:data-[slot=sidebar-content]:pt-4.5',
-        '**:data-[slot=sidebar-group-title]:px-3',
-        '**:data-[slot=sidebar-group-action]:px-3',
-        '**:data-[slot=sidebar-footer]:px-4.5',
-        '**:data-[slot=sidebar-footer]:pb-4.5',
-        '**:data-[slot=sidebar-submenu]:pl-1.5',
-        '**:data-[slot=sidebar-submenu]:ml-5'
       ]
     }
   },
@@ -114,7 +114,7 @@ export function SidebarContent({ className, render, ...props }: useRender.Compon
     render,
     props: {
       'data-slot': 'sidebar-content',
-      className: clx('flex h-full flex-col gap-2.5 overflow-y-auto dark:scheme-dark', className),
+      className: clx('flex h-full flex-col gap-2 overflow-y-auto dark:scheme-dark', className),
       ...props
     }
   })
@@ -124,7 +124,7 @@ export function SidebarLogo({ className, children, ...props }: React.ComponentPr
   return (
     <div
       data-slot='sidebar-logo'
-      className={clx('text-foreground flex items-center gap-2.5 text-lg select-none', className)}
+      className={clx('text-foreground flex items-center gap-2 text-lg select-none', className)}
       {...props}
     >
       {children}
@@ -142,7 +142,7 @@ export function SidebarFooter({ className, children, ...props }: React.Component
 
 export function SidebarMenu({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
-    <nav data-slot='sidebar-menu' className={clx('flex flex-col gap-4.5', className)} {...props} />
+    <nav data-slot='sidebar-menu' className={clx('flex flex-col gap-3.5', className)} {...props} />
   )
 }
 
@@ -150,7 +150,7 @@ export function SidebarList({ className, children, ...props }: React.ComponentPr
   return (
     <ul
       data-slot='sidebar-list'
-      className={clx('mt-1.5 flex w-full flex-col gap-1', className)}
+      className={clx('flex w-full flex-col gap-0.5', className)}
       {...props}
     >
       {children}
@@ -263,7 +263,7 @@ export function SidebarGroupTitle({ className, children, ...props }: React.Compo
     <span
       data-slot='sidebar-group-title'
       className={clx(
-        'text-dimmed inline-flex items-center text-sm font-medium',
+        'text-dimmed mb-1 inline-flex items-center text-base font-medium',
         '**:[svg]:size-3.5',
         className
       )}
@@ -278,7 +278,7 @@ export function SidebarGroupAction({ className, children, ...props }: React.Comp
   return (
     <div
       data-slot='sidebar-group-action'
-      className={clx('ml-auto flex items-center gap-1.5 **:[svg]:size-3.5', className)}
+      className={clx('ml-auto flex items-center gap-1 **:[svg]:size-3', className)}
       {...props}
     >
       {children}

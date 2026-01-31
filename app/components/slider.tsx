@@ -48,8 +48,8 @@ export function SliderThumb({
     <BaseSlider.Thumb
       data-slot='slider-thumb'
       className={clx(
-        'ring-primary size-4 cursor-grab rounded-full bg-white shadow ring data-dragging:cursor-grabbing',
-        'has-[:focus-visible]:outline-foreground has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2',
+        'ring-primary size-3.5 cursor-grab rounded-full bg-white shadow ring data-dragging:cursor-grabbing',
+        'has-focus-visible:outline-foreground has-focus-visible:outline-2 has-focus-visible:outline-offset-2',
         'data-disabled:cursor-not-allowed',
         className
       )}

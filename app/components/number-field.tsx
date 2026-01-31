@@ -66,11 +66,11 @@ export function NumberFieldScrubAreaCursor({
 
 export const numberFieldGroupStyles = cva(
   [
-    'flex h-9.5 rounded',
-    'hover:not-[:focus-within]:not-[[data-disabled]]:ring-input-accent-border',
+    'flex h-9 rounded',
+    'hover:not-focus-within:not-data-disabled:ring-input-accent-border',
     'focus-within:ring-primary focus-within:ring-2 focus-within:outline-0',
-    '[&_svg:not([class*=size-])]:size-4.5',
-    '*:[button]:flex *:[button]:size-9.5 *:[button]:items-center *:[button]:justify-center',
+    '[&_svg:not([class*=size-])]:size-4',
+    '*:[button]:flex *:[button]:size-9 *:[button]:items-center *:[button]:justify-center',
     '*:[button]:transition-all *:[button]:duration-100',
     '*:[button]:text-foreground *:[button]:cursor-pointer',
     '*:[button]:disabled:cursor-not-allowed *:[button]:disabled:opacity-70',
@@ -112,8 +112,8 @@ export function NumberFieldDecrement({
   return (
     <BaseNumberField.Decrement
       data-slot='number-field-decrement'
-      {...props}
       className={clx(className)}
+      {...props}
     />
   )
 }
@@ -125,8 +125,8 @@ export function NumberFieldIncrement({
   return (
     <BaseNumberField.Increment
       data-slot='number-field-increment'
-      {...props}
       className={clx(className)}
+      {...props}
     />
   )
 }
@@ -140,7 +140,7 @@ export function NumberFieldInput({
       data-slot='number-field-input'
       {...props}
       className={clx(
-        'z-10 w-20 px-2.5 text-center outline-none',
+        'z-10 w-16 px-2 text-center outline-none',
         'text-foreground placeholder:text-dimmed transition-all',
         'disabled:pointer-events-none disabled:opacity-70',
         className

@@ -1,8 +1,8 @@
 import * as Lucide from 'lucide-react'
 import { Button } from '~/app/components/button'
-import { Heading } from '~/app/components/heading'
 import { IconBox } from '~/app/components/icon-box'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 
 interface DeleteBucketSectionProps {
   onDeleteBucket: () => void

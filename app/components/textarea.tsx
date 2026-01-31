@@ -12,8 +12,8 @@ import { clx } from '~/app/utils'
 
 export const textareaStyles = cva(
   [
-    'text-foreground placeholder:text-dimmed shadow-input w-full rounded px-3.5 py-3.5 transition-[border-color,box-shadow]',
-    'ring-input-border hover:not-[[disabled],[data-disabled]]:not-[:focus]:ring-input-accent-border focus:ring-primary min-h-24 ring focus:ring-2 focus:outline-0',
+    'text-foreground placeholder:text-dimmed shadow-input w-full rounded px-3 py-3 transition-[border-color,box-shadow] placeholder:tracking-wide',
+    'ring-input-border hover:not-[[disabled],[data-disabled]]:not-focus:ring-input-accent-border focus:ring-primary min-h-20 ring focus:ring-2 focus:outline-0',
     'disabled:cursor-not-allowed disabled:opacity-70'
   ],
   {

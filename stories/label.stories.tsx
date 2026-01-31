@@ -24,7 +24,7 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <div className='w-full space-y-2.5 xl:w-10/12 2xl:w-8/12'>
+    <div className='w-full space-y-1.5'>
       <Label htmlFor='name'>Name</Label>
       <Input id='name' placeholder='Enter your name' />
     </div>

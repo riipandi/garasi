@@ -59,7 +59,7 @@ export const Example: Story = {
 
     return (
       <Autocomplete items={items}>
-        <AutocompleteInput placeholder='Search for bands...' className='w-full lg:w-64' />
+        <AutocompleteInput placeholder='Search for bands...' className='w-full lg:w-72' />
         <AutocompletePopup>
           <AutocompleteEmpty>No results found</AutocompleteEmpty>
           <AutocompleteList>

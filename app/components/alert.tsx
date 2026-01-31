@@ -13,14 +13,14 @@ import { clx } from '~/app/utils'
 
 export const alertStyles = cva(
   [
-    'min-h-11 w-full rounded px-3.5 py-1.5 font-medium',
-    '[&_svg:not([class*=size-])]:size-4.5 *:[svg]:shrink-0',
-    'text-foreground flex items-center gap-x-2.5 gap-y-1',
+    'min-h-10 w-full rounded px-2.5 py-1 font-medium',
+    '[&_svg:not([class*=size-])]:size-4 *:[svg]:shrink-0',
+    'text-foreground flex items-center gap-x-2 gap-y-0.5',
     'has-[>[data-slot=alert-description]]:grid',
-    'has-[>[data-slot=alert-description]]:py-3',
+    'has-[>[data-slot=alert-description]]:py-2',
     'has-[>svg]:grid-cols-[calc(var(--spacing)*4.5)_1fr_auto]',
     'not-[:has(>svg)]:grid-cols-[1fr_auto]',
-    'not-[:has(>svg)]:[&>[data-slot=alert-description]]:col-start-1'
+    'not-[:has(>svg)]:*:data-[slot=alert-description]:col-start-1'
   ],
   {
     variants: {
@@ -30,7 +30,7 @@ export const alertStyles = cva(
         info: 'bg-info/7 ring-info/30 [&_svg:not([class*=text-])]:text-info ring',
         success: 'bg-success/7 ring-success/30 [&_svg:not([class*=text-])]:text-success ring',
         warning: 'bg-warning/7 ring-warning/30 [&_svg:not([class*=text-])]:text-warning ring',
-        tertiary: 'bg-tertiary/7 ring-tertiary/30 [&_svg:not([class*=text-])]:text-tertiary ring'
+        tertiary: 'bg-tertiary/5 ring-tertiary/20 [&_svg:not([class*=text-])]:text-tertiary ring'
       }
     },
     defaultVariants: {
@@ -66,7 +66,7 @@ export function AlertAction({ className, ...props }: React.ComponentProps<'div'>
     <div
       data-slot='alert-action'
       className={clx(
-        'col-start-3 row-span-2 row-start-1 ml-auto flex items-center gap-1.5 self-center',
+        'col-start-3 row-span-2 row-start-1 ml-auto flex items-center gap-1 self-center',
         className
       )}
       {...props}

@@ -15,7 +15,7 @@ import {
   SelectValue
 } from '~/app/components/select'
 import { Spinner } from '~/app/components/spinner'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import { getClusterLayout } from '~/app/services/layout.service'
 import { getLayoutHistory } from '~/app/services/layout.service'
 import { previewLayoutChanges } from '~/app/services/layout.service'

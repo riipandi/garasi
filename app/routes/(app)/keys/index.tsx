@@ -14,9 +14,9 @@ import {
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
-import { Heading } from '~/app/components/heading'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import {
   listAccessKeys,
   createAccessKey,

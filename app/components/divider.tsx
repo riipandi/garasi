@@ -11,7 +11,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 import { clx } from '~/app/utils'
 
-export const dividerStyles = cva('flex items-center gap-2.5', {
+export const dividerStyles = cva('flex items-center gap-2', {
   variants: {
     variant: {
       default: 'before:bg-separator before:h-px before:w-full',
@@ -34,7 +34,7 @@ export function Divider({
 }: React.ComponentProps<'div'> & VariantProps<typeof dividerStyles>) {
   return (
     <div data-slot='divider' className={clx(dividerStyles({ variant, className }))} {...props}>
-      <span className='text-dimmed text-sm text-nowrap'>{children}</span>
+      <span className='text-dimmed text-base text-nowrap'>{children}</span>
     </div>
   )
 }

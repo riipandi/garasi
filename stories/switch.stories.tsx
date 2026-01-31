@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Label } from '~/app/components/label'
 import { Switch } from '~/app/components/switch'
+import { Text } from '~/app/components/typography'
 
 const meta = {
   title: 'Components/Switch',
@@ -26,7 +27,7 @@ export const Example: Story = {
   render: () => (
     <Label>
       <Switch />
-      <span>Turn on notifications</span>
+      <Text>Turn on notifications</Text>
     </Label>
   )
 }

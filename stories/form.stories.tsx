@@ -4,7 +4,7 @@ import { Field, FieldError, FieldLabel } from '~/app/components/field'
 import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
 import { Form } from '~/app/components/form'
 import { Input } from '~/app/components/input'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 
 const meta = {
   title: 'Components/Form',

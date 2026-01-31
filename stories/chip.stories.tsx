@@ -24,7 +24,7 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <div className='flex space-x-4'>
+    <div className='flex items-center space-x-3'>
       <Chip>
         Software Engineering
         <ChipButton>
@@ -36,6 +36,45 @@ export const Example: Story = {
         <ChipButton>
           <Lucide.XIcon />
         </ChipButton>
+      </Chip>
+    </div>
+  )
+}
+
+export const VariantShowcase: Story = {
+  args: {},
+  render: () => (
+    <div className='flex items-center space-x-3'>
+      <Chip>Default</Chip>
+      <Chip variant='primary'>Primary</Chip>
+      <Chip variant='outline'>Outline</Chip>
+      <Chip variant='plain'>Plain</Chip>
+    </div>
+  )
+}
+
+export const SizeShowcase: Story = {
+  args: {},
+  render: () => (
+    <div className='flex items-center space-x-3'>
+      <Chip size='sm'>Small</Chip>
+      <Chip size='md'>Medium</Chip>
+      <Chip size='lg'>Large</Chip>
+    </div>
+  )
+}
+
+export const WithIcon: Story = {
+  args: {},
+  render: () => (
+    <div className='flex items-center space-x-3'>
+      <Chip>
+        <Lucide.Code2Icon />
+        Software Engineering
+      </Chip>
+      <Chip>
+        <Lucide.Code2Icon />
+        Machine Learning
       </Chip>
     </div>
   )

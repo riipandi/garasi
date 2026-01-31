@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Input } from '~/app/components/input'
+import { InputPassword } from '~/app/components/input-password'
 
 const meta = {
-  title: 'Components/Input',
-  component: Input,
+  title: 'Components/InputPassword',
+  component: InputPassword,
   parameters: { layout: 'centered' },
   argTypes: {},
   tags: [], // ['autodocs']
@@ -15,7 +15,7 @@ const meta = {
       </div>
     )
   ]
-} satisfies Meta<typeof Input>
+} satisfies Meta<typeof InputPassword>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -24,10 +24,18 @@ export const Example: Story = {
   args: {},
   render: () => (
     <div className='flex flex-col gap-3'>
-      <Input placeholder='Default input' className='w-full min-w-sm' />
-      <Input placeholder='Sublte variant' variant='subtle' className='w-full min-w-sm' />
-      <Input disabled placeholder='Disabled input' className='w-full min-w-sm' />
-      <Input type='file' className='w-full min-w-sm' />
+      <InputPassword placeholder='Enter your password' className='w-full min-w-sm' />
     </div>
+  )
+}
+
+export const StrengthIndicator: Story = {
+  args: {},
+  render: () => (
+    <InputPassword
+      placeholder='Enter your password'
+      className='w-full min-w-sm'
+      strengthIndicator
+    />
   )
 }

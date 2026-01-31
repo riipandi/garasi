@@ -36,7 +36,7 @@ export function AlertDialogPopup({
       <BaseAlertDialog.Backdrop
         className={clx(
           'fixed inset-0 min-h-dvh bg-black/60 backdrop-blur-sm transition-[color,opacity]',
-          'data-[ending-style]:opacity-0 data-[starting-style]:opacity-0'
+          'data-ending-style:opacity-0 data-starting-style:opacity-0'
         )}
       />
       <BaseAlertDialog.Popup
@@ -49,13 +49,13 @@ export function AlertDialogPopup({
           'ring-dialog-border rounded-xl shadow ring',
           'scale-[calc(1-0.1*var(--nested-dialogs))]',
           'w-md max-w-[calc(100%-2rem)] transition-all outline-none',
-          'data-[nested-dialog-open]:after:absolute',
-          'data-[nested-dialog-open]:after:inset-0',
-          'data-[nested-dialog-open]:after:rounded-xl',
-          'data-[nested-dialog-open]:after:bg-black/20',
-          'data-[nested-dialog-open]:after:z-10',
-          'data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
-          'data-[ending-style]:scale-90 data-[starting-style]:scale-90',
+          'data-nested-dialog-open:after:absolute',
+          'data-nested-dialog-open:after:inset-0',
+          'data-nested-dialog-open:after:rounded-xl',
+          'data-nested-dialog-open:after:bg-black/20',
+          'data-nested-dialog-open:after:z-10',
+          'data-ending-style:opacity-0 data-starting-style:opacity-0',
+          'data-ending-style:scale-90 data-starting-style:scale-90',
           className
         )}
       >
@@ -74,7 +74,7 @@ export function AlertDialogHeader({
     <header
       data-slot='alert-dialog-header'
       {...props}
-      className={clx('flex items-center gap-3.5 px-6 pt-4.5', className)}
+      className={clx('flex items-center gap-2.5 px-5 pt-4', className)}
     >
       {children}
     </header>
@@ -99,7 +99,7 @@ export function AlertDialogTitle({
 
 export function AlertDialogBody({ className, children, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot='alert-dialog-body' {...props} className={clx('px-6 py-4.5', className)}>
+    <div data-slot='alert-dialog-body' {...props} className={clx('px-5 py-4', className)}>
       {children}
     </div>
   )
@@ -131,8 +131,8 @@ export function AlertDialogFooter({
       data-slot='alert-dialog-footer'
       {...props}
       className={clx(
-        'flex items-center justify-end gap-1.5',
-        'bg-dialog-footer border-dialog-border rounded-b-xl border-t px-6 py-3.5',
+        'flex items-center justify-end gap-2',
+        'bg-dialog-footer border-dialog-border rounded-b-xl border-t px-5 py-3',
         className
       )}
     >

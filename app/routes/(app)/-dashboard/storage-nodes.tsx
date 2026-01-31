@@ -2,7 +2,7 @@ import * as Lucide from 'lucide-react'
 import { Badge } from '~/app/components/badge'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Progress } from '~/app/components/progress'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import type { ClusterStatistics } from './types'
 
 interface StorageNodesProps {

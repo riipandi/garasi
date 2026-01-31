@@ -19,7 +19,7 @@ export function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol
   return (
     <ol
       data-slot='breadcrumb-list'
-      className={clx('flex flex-wrap items-center gap-1.5 break-words', className)}
+      className={clx('flex flex-wrap items-center gap-1 wrap-break-word', className)}
       {...props}
     />
   )
@@ -29,7 +29,7 @@ export function BreadcrumbItem({ className, ...props }: React.ComponentProps<'li
   return (
     <li
       data-slot='breadcrumb-item'
-      className={clx('group/breadcrumb-item inline-flex items-center gap-1.5', className)}
+      className={clx('group/breadcrumb-item inline-flex items-center gap-1', className)}
       {...props}
     />
   )
@@ -54,7 +54,7 @@ export function BreadcrumbButton({
       type: render ? undefined : 'button',
       tabIndex: active ? -1 : undefined,
       className: clx(
-        'hover:not-[[data-disabled]]:text-foreground transition-colors',
+        'hover:not-data-disabled:text-foreground transition-colors',
         'outline-primary focus:outline-0 focus-visible:outline-2 focus-visible:outline-offset-2',
         active ? 'text-foreground pointer-events-none font-medium' : 'text-muted cursor-pointer',
         className
@@ -97,7 +97,7 @@ export function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps
       role='presentation'
       aria-hidden='true'
       className={clx(
-        'flex size-8.5 items-center justify-center',
+        'flex size-8 items-center justify-center',
         'text-muted group-hover/breadcrumb-item:text-foreground',
         className
       )}
@@ -111,7 +111,7 @@ export function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps
         strokeWidth='2'
         strokeLinecap='round'
         strokeLinejoin='round'
-        className='size-4.5'
+        className='size-4'
       >
         <circle cx='12' cy='12' r='1' />
         <circle cx='19' cy='12' r='1' />

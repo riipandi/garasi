@@ -15,7 +15,7 @@ import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 
 interface AddLocalAliasProps {
   isOpen: boolean

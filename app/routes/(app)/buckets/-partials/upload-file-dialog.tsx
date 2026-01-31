@@ -11,7 +11,7 @@ import {
 } from '~/app/components/dialog'
 import { IconBox } from '~/app/components/icon-box'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 
 interface UploadFileDialogProps {
   isOpen: boolean

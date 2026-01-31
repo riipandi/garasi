@@ -58,7 +58,7 @@ export function CommandFooter({ className, ...props }: React.ComponentProps<'foo
     <footer
       data-slot='command-footer'
       {...props}
-      className={clx('flex items-center gap-6 px-5 pt-3 pb-2.5', className)}
+      className={clx('flex items-center gap-5 px-4 pt-2.5 pb-2', className)}
     />
   )
 }
@@ -68,7 +68,7 @@ export function CommandFooterItem({ className, ...props }: React.ComponentProps<
     <div
       data-slot='command-footer-item'
       {...props}
-      className={clx('flex items-center gap-2.5', className)}
+      className={clx('flex items-center gap-2', className)}
     />
   )
 }
@@ -78,7 +78,7 @@ export function CommandFooterText({ className, ...props }: React.ComponentProps<
     <span
       data-slot='command-footer-text'
       {...props}
-      className={clx('text-muted text-sm font-medium', className)}
+      className={clx('text-muted text-base font-medium', className)}
     />
   )
 }

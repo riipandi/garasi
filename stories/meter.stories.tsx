@@ -21,7 +21,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Example: Story = {
-  args: { value: 50 },
+  args: { value: 69 },
   render: (args) => (
     <Meter {...args} className='w-full'>
       <MeterLabel>Storage</MeterLabel>

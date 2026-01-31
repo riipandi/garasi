@@ -13,11 +13,7 @@ import { clx } from '~/app/utils'
 
 export function Tabs({ className, ...props }: React.ComponentProps<typeof BaseTabs.Root>) {
   return (
-    <BaseTabs.Root
-      data-slot='tabs'
-      className={clx('flex flex-col gap-2.5', className)}
-      {...props}
-    />
+    <BaseTabs.Root data-slot='tabs' className={clx('flex flex-col gap-4', className)} {...props} />
   )
 }
 
@@ -30,7 +26,7 @@ export function TabsList({
     <BaseTabs.List
       data-slot='tabs-list'
       className={clx(
-        'bg-tabs relative z-0 flex items-center rounded-lg p-1',
+        'bg-tabs relative z-0 flex items-center rounded-lg px-1 py-1.5',
         'inset-shadow-xs inset-shadow-black/10 dark:inset-shadow-none',
         className
       )}
@@ -42,10 +38,8 @@ export function TabsList({
         className={clx(
           'absolute top-1/2 left-0 h-8 w-(--active-tab-width)',
           'translate-x-(--active-tab-left) -translate-y-1/2',
-          'duration-100',
-          'z-[-1] rounded transition-all',
-          'bg-tabs-accent shadow inset-shadow-2xs inset-shadow-white/15 dark:inset-shadow-black/15',
-          'ring-tabs-border ring'
+          'ring-tabs-border z-[-1] rounded ring transition-all duration-100',
+          'bg-tabs-accent shadow inset-shadow-2xs inset-shadow-white/15 dark:inset-shadow-black/15'
         )}
       />
     </BaseTabs.List>
@@ -57,11 +51,11 @@ export function TabsItem({ className, ...props }: React.ComponentProps<typeof Ba
     <BaseTabs.Tab
       data-slot='tabs-item'
       className={clx(
-        'flex cursor-pointer items-center justify-center gap-2.5 rounded',
-        'text-muted hover:not-data-disabled:text-foreground h-8 flex-1 px-3 py-1 font-medium',
+        'flex cursor-pointer items-center justify-center gap-2 rounded',
+        'text-muted hover:not-data-disabled:text-foreground h-7 flex-1 px-2.5 py-1 font-medium',
         'data-active:text-foreground transition-colors',
         'focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2',
-        '[&_svg:not([class*=size-])]:size-4',
+        '[&_svg:not([class*=size-])]:size-3.5',
         'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         className
       )}
@@ -72,6 +66,10 @@ export function TabsItem({ className, ...props }: React.ComponentProps<typeof Ba
 
 export function TabsPanel({ className, ...props }: React.ComponentProps<typeof BaseTabs.Panel>) {
   return (
-    <BaseTabs.Panel data-slot='tabs-panel' className={clx('outline-none', className)} {...props} />
+    <BaseTabs.Panel
+      data-slot='tabs-panel'
+      className={clx('px-1 outline-none', className)}
+      {...props}
+    />
   )
 }

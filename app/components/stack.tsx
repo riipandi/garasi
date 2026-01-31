@@ -10,16 +10,17 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { clx } from '~/app/utils'
 
-export const stackStyles = cva('flex flex-col flex-wrap gap-2.5 *:data-[slot=separator]:-my-2.5', {
+export const stackStyles = cva('flex flex-col flex-wrap gap-2 *:data-[slot=separator]:-my-2', {
   variants: {
     direction: {
       row: 'flex-row',
       column: 'flex-col'
     },
     spacing: {
-      sm: 'gap-2.5',
-      md: 'gap-4',
-      lg: 'gap-6'
+      none: 'gap-0',
+      sm: 'gap-1.5',
+      md: 'gap-3',
+      lg: 'gap-4.5'
     }
   },
   defaultVariants: {

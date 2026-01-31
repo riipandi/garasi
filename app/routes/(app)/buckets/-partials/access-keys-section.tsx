@@ -1,9 +1,9 @@
 import * as Lucide from 'lucide-react'
 import { Button } from '~/app/components/button'
-import { Heading } from '~/app/components/heading'
 import { IconBox } from '~/app/components/icon-box'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 interface AccessKeysSectionProps {

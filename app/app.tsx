@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type AnyRouter, RouterProvider } from '@tanstack/react-router'
 import type { LogType } from 'consola'
 import { Suspense, useEffect, useState } from 'react'
+import { Toast } from '~/app/components/toast'
 import { AuthProvider, SessionExpiredAlert } from '~/app/guards'
 import type { GlobalContext } from '~/app/routes/__root'
 import { authStore, uiStore } from '~/app/stores'
@@ -50,6 +51,7 @@ export default function App(props: AppProps) {
         <Suspense fallback={<div>Loading...</div>}>
           <RouterProvider router={props.routes} context={routerContext} basepath={props.basePath} />
         </Suspense>
+        <Toast />
         <TanStackDevtools {...props.devTools} />
       </AuthProvider>
     </QueryClientProvider>

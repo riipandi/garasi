@@ -22,5 +22,10 @@ type Story = StoryObj<typeof meta>
 
 export const Example: Story = {
   args: {},
-  render: () => <Textarea className='w-full min-w-md lg:w-6/12' placeholder='Enter your message' />
+  render: () => (
+    <div className='flex w-full flex-col gap-6'>
+      <Textarea variant='default' placeholder='Textarea variant default' />
+      <Textarea variant='subtle' placeholder='Textarea variant subtle' />
+    </div>
+  )
 }

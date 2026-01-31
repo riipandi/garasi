@@ -14,7 +14,7 @@ export function Label({ className, ...props }: React.ComponentProps<'label'>) {
     <label
       data-slot='label'
       className={clx(
-        'text-foreground flex items-center gap-3',
+        'text-foreground flex items-center gap-2.5',
         'cursor-pointer has-[>[disabled],>[data-disabled]]:cursor-not-allowed',
         className
       )}

@@ -11,5 +11,5 @@ import { Form as BaseForm } from '@base-ui/react/form'
 import { clx } from '~/app/utils'
 
 export function Form({ className, ...props }: React.ComponentProps<typeof BaseForm>) {
-  return <BaseForm data-slot='form' className={clx('flex flex-col gap-6', className)} {...props} />
+  return <BaseForm data-slot='form' className={clx('flex flex-col gap-4', className)} {...props} />
 }

@@ -11,8 +11,9 @@ import {
 } from '~/app/components/card'
 import { Field, FieldLabel } from '~/app/components/field'
 import { Input } from '~/app/components/input'
+import { InputPassword } from '~/app/components/input-password'
 import { Spinner } from '~/app/components/spinner'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import type { UserProfileResponse } from '~/app/types/api'
 
 interface ChangeEmailCardProps {
@@ -134,10 +135,9 @@ export function ChangeEmailCard({
             {(field: any) => (
               <Field>
                 <FieldLabel htmlFor='password'>Current Password</FieldLabel>
-                <Input
+                <InputPassword
                   id='password'
                   name={field.name}
-                  type='password'
                   autoComplete='current-password'
                   value={field.state.value}
                   onBlur={field.handleBlur}

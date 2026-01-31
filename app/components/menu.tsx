@@ -23,36 +23,36 @@ export function MenuTrigger({ ...props }: React.ComponentProps<typeof BaseMenu.T
 export const menuPopupStyles = cva(
   [
     'bg-popover ring-popover-border shadow-popover origin-(--transform-origin) rounded ring',
-    'space-y-0.5 p-1 transition-[transform,scale,opacity] outline-none',
-    'data-[ending-style]:scale-90 data-[ending-style]:opacity-0',
-    'data-[starting-style]:scale-90 data-[starting-style]:opacity-0',
+    'space-y-0 p-1 transition-[transform,scale,opacity] outline-none',
+    'data-ending-style:scale-90 data-ending-style:opacity-0',
+    'data-starting-style:scale-90 data-starting-style:opacity-0',
     'min-w-32 **:data-[slot=item]:p-0'
   ],
   {
     variants: {
       size: {
         compact: [
-          '**:data-[slot$=item]:gap-2.5',
-          '**:data-[slot$=item]:px-2',
-          '**:data-[slot$=item]:py-1.5',
-          '**:data-[slot=menu-checkbox-item]:pl-8.5',
-          '**:data-[slot=menu-checkbox-item]:data-[checked]:pl-2',
+          '**:data-[slot$=item]:gap-2',
+          '**:data-[slot$=item]:px-1.5',
+          '**:data-[slot$=item]:py-1',
+          '**:data-[slot=menu-checkbox-item]:pl-7.5',
+          '**:data-[slot=menu-checkbox-item]:data-checked:pl-1.5',
           '**:data-[slot$=item]:rounded-sm',
-          '**:data-[slot=menu-submenu-trigger]:gap-2.5',
-          '**:data-[slot=menu-submenu-trigger]:px-2',
-          '**:data-[slot=menu-submenu-trigger]:py-1.5',
+          '**:data-[slot=menu-submenu-trigger]:gap-2',
+          '**:data-[slot=menu-submenu-trigger]:px-1.5',
+          '**:data-[slot=menu-submenu-trigger]:py-1',
           '**:data-[slot=menu-submenu-trigger]:rounded-sm'
         ],
         default: [
-          '**:data-[slot$=item]:gap-3.5',
-          '**:data-[slot$=item]:px-3',
-          '**:data-[slot$=item]:py-2.5',
-          '**:data-[slot=menu-checkbox-item]:pl-10',
-          '**:data-[slot=menu-checkbox-item]:data-[checked]:pl-2.5',
+          '**:data-[slot$=item]:gap-2.5',
+          '**:data-[slot$=item]:px-2.5',
+          '**:data-[slot$=item]:py-2',
+          '**:data-[slot=menu-checkbox-item]:pl-9',
+          '**:data-[slot=menu-checkbox-item]:data-checked:pl-2',
           '**:data-[slot$=item]:rounded',
-          '**:data-[slot=menu-submenu-trigger]:gap-3.5',
-          '**:data-[slot=menu-submenu-trigger]:px-3',
-          '**:data-[slot=menu-submenu-trigger]:py-2.5',
+          '**:data-[slot=menu-submenu-trigger]:gap-2.5',
+          '**:data-[slot=menu-submenu-trigger]:px-2.5',
+          '**:data-[slot=menu-submenu-trigger]:py-2',
           '**:data-[slot=menu-submenu-trigger]:rounded'
         ]
       }
@@ -111,10 +111,10 @@ export function MenuPopup({
 const menuItemClassName = [
   'flex items-center text-popover-foreground',
   'cursor-pointer select-none',
-  'data-[highlighted]:not-[[data-disabled]]:bg-popover-accent data-[selected]:not-[[data-disabled]]:bg-popover-accent',
-  'data-[popup-open]:bg-popover-accent',
+  'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
+  'data-popup-open:bg-popover-accent',
   'focus-visible:outline-none',
-  '[&_svg:not([class*=size-])]:size-4 [&_svg:not([class*=text-])]:text-popover-foreground',
+  '[&_svg:not([class*=size-])]:size-3.5 [&_svg:not([class*=text-])]:text-popover-foreground',
   '*:data-[slot=switch]:ml-auto',
   'data-disabled:cursor-not-allowed data-disabled:opacity-70'
 ]
@@ -152,7 +152,7 @@ export function MenuSubmenuTrigger({
       {...props}
       className={clx(
         menuItemClassName,
-        'after:bg-chevron-right-dark dark:after:bg-chevron-right after:ml-auto after:size-4',
+        'after:bg-chevron-right-dark dark:after:bg-chevron-right after:ml-auto after:size-3.5',
         props.className
       )}
     />
@@ -200,7 +200,7 @@ export function MenuGroupLabel({ ...props }: React.ComponentProps<typeof BaseMen
   return (
     <BaseMenu.GroupLabel
       data-slot='menu-group-label'
-      className={clx('text-dimmed px-3 py-1.5 text-sm font-medium', props.className)}
+      className={clx('text-dimmed px-2.5 py-1 text-base font-medium', props.className)}
       {...props}
     />
   )
@@ -226,7 +226,7 @@ export function MenuCheckboxItem({
           strokeLinecap='round'
           strokeLinejoin='round'
           strokeWidth='3'
-          className='text-primary size-4'
+          className='text-primary size-3.5'
           viewBox='0 0 24 24'
         >
           <path d='M20 6 9 17l-5-5'></path>
@@ -244,7 +244,7 @@ export function MenuRadioGroup({ ...props }: React.ComponentProps<typeof BaseMen
 export const menuRadioItemStyles = cva(menuItemClassName, {
   variants: {
     variant: {
-      default: 'data-[checked]:pl-3',
+      default: 'data-checked:pl-3',
       alternate: [
         '*:data-[slot=menu-radio-item-indicator]:order-last',
         '*:data-[slot=menu-radio-item-indicator]:ml-auto',
@@ -284,7 +284,7 @@ export function MenuRadioItem({
             strokeWidth='2'
             strokeLinecap='round'
             strokeLinejoin='round'
-            className='fill-primary stroke-primary mx-auto !w-2'
+            className='fill-primary stroke-primary mx-auto w-2!'
           >
             <circle cx='12' cy='12' r='10' />
           </svg>

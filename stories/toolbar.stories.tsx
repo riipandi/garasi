@@ -115,10 +115,10 @@ export const Example: Story = {
         </ToggleGroup>
         <ToolbarSeparator />
         <Select defaultValue='Arial'>
-          <SelectTrigger variant='plain'>
+          <SelectTrigger variant='plain' className='w-24'>
             <SelectValue placeholder='Font' className='max-w-24 truncate' />
           </SelectTrigger>
-          <SelectPopup>
+          <SelectPopup className='min-w-44'>
             <SelectList>
               <SelectItem value='Arial'>Arial</SelectItem>
               <SelectItem value='Times New Roman'>Times New Roman</SelectItem>
@@ -142,9 +142,11 @@ export const Example: Story = {
           </NumberFieldGroup>
         </NumberField>
         <ToolbarSeparator />
-        <ToolbarLink className='text-muted text-nowrap'>Saved 5 min ago</ToolbarLink>
-        <ToolbarSeparator />
-        <Button>Save</Button>
+        <ToolbarLink className='text-muted px-1.5 text-nowrap'>Saved 5 min ago</ToolbarLink>
+        <ToolbarSeparator className='mr-3' />
+        <Button variant='tertiary' size='sm'>
+          Save
+        </Button>
       </Toolbar>
     </div>
   )

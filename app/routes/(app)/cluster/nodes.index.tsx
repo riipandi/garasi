@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow
 } from '~/app/components/table'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import { getClusterStatus } from '~/app/services/cluster.service'
 import { getNodeInfo } from '~/app/services/node.service'
 import type { NodeResp } from '~/shared/schemas/cluster.schema'

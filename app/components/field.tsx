@@ -26,9 +26,9 @@ export function FieldItem({ className, ...props }: React.ComponentProps<typeof B
     <BaseField.Item
       data-slot='field-item'
       className={clx(
-        'grid items-center gap-x-3 gap-y-1 not-last:mb-2.5',
+        'grid items-center gap-x-2.5 gap-y-1 not-last:mb-2',
         'grid-cols-[auto_1fr]',
-        '[&_[data-slot=field-description]]:col-start-2',
+        '**:data-[slot=field-description]:col-start-2',
         className
       )}
       {...props}
@@ -40,7 +40,7 @@ export function FieldLabel({ className, ...props }: React.ComponentProps<typeof 
   return (
     <BaseField.Label
       data-slot='field-label'
-      className={clx('text-foreground flex items-center gap-3', className)}
+      className={clx('text-foreground flex items-center gap-2.5', className)}
       {...props}
     />
   )
@@ -53,7 +53,7 @@ export function FieldDescription({
   return (
     <BaseField.Description
       data-slot='field-description'
-      className={clx('text-muted text-sm leading-relaxed', className)}
+      className={clx('text-muted text-base leading-relaxed', className)}
       {...props}
     />
   )

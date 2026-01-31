@@ -52,52 +52,25 @@ export const Example: Story = {
       {
         label: 'Suggestions',
         items: [
-          {
-            label: 'Figma',
-            value: 'figma'
-          },
-          {
-            label: 'Adobe XD',
-            value: 'adobe-xd'
-          },
-          {
-            label: 'Sketch',
-            value: 'sketch'
-          }
+          { label: 'Figma', value: 'figma' },
+          { label: 'Adobe XD', value: 'adobe-xd' },
+          { label: 'Sketch', value: 'sketch' }
         ]
       },
       {
         label: 'File Management',
         items: [
-          {
-            label: 'File Explorer',
-            value: 'file-explorer'
-          },
-          {
-            label: 'File Search',
-            value: 'file-search'
-          },
-          {
-            label: 'File Transfer',
-            value: 'file-transfer'
-          }
+          { label: 'File Explorer', value: 'file-explorer' },
+          { label: 'File Search', value: 'file-search' },
+          { label: 'File Transfer', value: 'file-transfer' }
         ]
       },
       {
         label: 'Settings',
         items: [
-          {
-            label: 'General',
-            value: 'general'
-          },
-          {
-            label: 'Appearance',
-            value: 'appearance'
-          },
-          {
-            label: 'Accessibility',
-            value: 'accessibility'
-          }
+          { label: 'General', value: 'general' },
+          { label: 'Appearance', value: 'appearance' },
+          { label: 'Accessibility', value: 'accessibility' }
         ]
       }
     ]

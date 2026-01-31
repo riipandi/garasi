@@ -25,19 +25,19 @@ export function Select({ ...props }: React.ComponentProps<typeof BaseSelect.Root
 
 export const selectTriggerStyles = cva(
   [
-    'bg-input placeholder:text-dimmed h-9.5 w-full rounded px-3.5 transition-all',
+    'bg-input placeholder:text-dimmed h-9 w-full rounded px-3 transition-all',
     'focus:ring-primary focus:ring-2 focus:outline-0',
-    'flex cursor-pointer items-center gap-2.5',
+    'flex cursor-pointer items-center gap-2',
     'data-disabled:cursor-not-allowed data-disabled:opacity-70'
   ],
   {
     variants: {
       variant: {
         default:
-          'bg-input ring-input-border hover:not-[[data-disabled]]:not-[:focus]:ring-input-accent-border shadow-input ring',
+          'bg-input ring-input-border hover:not-data-disabled:not-focus:ring-input-accent-border shadow-input ring',
         subtle:
-          'bg-input/60 ring-input-border hover:not-[[data-disabled]]:not-[:focus]:ring-input-accent-border shadow-input ring',
-        plain: 'hover:not-[[data-disabled]]:bg-accent bg-transparent'
+          'bg-input/60 ring-input-border hover:not-data-disabled:not-focus:ring-input-accent-border shadow-input ring',
+        plain: 'hover:not-data-disabled:bg-accent bg-transparent'
       }
     },
     defaultVariants: {
@@ -60,7 +60,7 @@ export function SelectTrigger({
     >
       {children}
 
-      <BaseSelect.Icon className='text-muted pointer-events-none ml-auto size-4'>
+      <BaseSelect.Icon className='text-muted pointer-events-none ml-auto size-3.5'>
         <svg
           xmlns='http://www.w3.org/2000/svg'
           viewBox='0 0 24 24'
@@ -126,7 +126,7 @@ function SelectRenderValue({
 
   if (typeof value === 'object') {
     return (
-      <div className='[&_svg:not([class*=text-])]:text-popover-foreground flex items-center gap-2.5 select-none [&_svg:not([class*=size-])]:size-4'>
+      <div className='[&_svg:not([class*=text-])]:text-popover-foreground flex items-center gap-2 select-none [&_svg:not([class*=size-])]:size-3.5'>
         {value.icon}
         <span className='text-popover-foreground'>{value.label}</span>
       </div>
@@ -158,7 +158,7 @@ export function SelectPopup({
     positionMethod?: BaseSelect.Positioner.Props['positionMethod']
   }) {
   return (
-    <BaseSelect.Portal>
+    <BaseSelect.Portal className='z-20'>
       <BaseSelect.Backdrop />
       <BaseSelect.Positioner
         align={align}
@@ -209,21 +209,21 @@ export function SelectItem({
       data-slot='select-item'
       value={typeof value === 'object' ? value : { value, label: children }}
       className={clx(
-        'text-popover-foreground flex cursor-pointer items-center gap-3.5 rounded px-3 py-2.5 select-none',
-        'group-data-[side=none]:min-w-[calc(var(--anchor-width))]',
-        'data-[highlighted]:not-[[data-disabled]]:bg-popover-accent data-[selected]:not-[[data-disabled]]:bg-popover-accent',
-        'focus-visible:outline-none',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-70',
+        // FIXME: right border radius not rounded if enabled
+        // 'group-data-[side=none]:min-w-[calc(var(--anchor-width))]',
+        'text-popover-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2 select-none',
+        'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
+        'data-disabled:text-dimmed/80 focus-visible:outline-none data-disabled:cursor-not-allowed',
         className
       )}
       {...props}
     >
-      <BaseSelect.ItemText className='flex items-center gap-2.5 [&_svg:not([class*=size-])]:size-4'>
+      <BaseSelect.ItemText className='flex items-center gap-2 [&_svg:not([class*=size-])]:size-3.5'>
         {children}
       </BaseSelect.ItemText>
       <BaseSelect.ItemIndicator className='ml-auto'>
         <svg
-          className='text-primary size-4'
+          className='text-primary size-3.5'
           xmlns='http://www.w3.org/2000/svg'
           viewBox='0 0 24 24'
           fill='none'
@@ -244,11 +244,7 @@ export function SelectGroup({
   ...props
 }: React.ComponentProps<typeof BaseSelect.Group>) {
   return (
-    <BaseSelect.Group
-      data-slot='select-group'
-      className={clx('space-y-0.5', className)}
-      {...props}
-    />
+    <BaseSelect.Group data-slot='select-group' className={clx('space-y-0', className)} {...props} />
   )
 }
 
@@ -259,7 +255,7 @@ export function SelectGroupLabel({
   return (
     <BaseSelect.GroupLabel
       data-slot='select-group-label'
-      className={clx('text-dimmed px-3 py-1.5 text-sm font-medium', className)}
+      className={clx('text-dimmed px-2.5 py-1 text-sm font-medium', className)}
       {...props}
     />
   )

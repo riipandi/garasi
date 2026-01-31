@@ -24,7 +24,7 @@ export function Pagination({ ...props }: React.ComponentProps<'nav'>) {
 
 export function PaginationList({ children, ...props }: React.ComponentProps<'ul'>) {
   return (
-    <ul data-slot='pagination-list' className='flex items-center gap-1' {...props}>
+    <ul data-slot='pagination-list' className='flex items-center gap-1.5' {...props}>
       {children}
     </ul>
   )
@@ -57,7 +57,7 @@ export function PaginationButton({
       'data-disabled': disabled ? true : undefined,
       className: clx(
         buttonStyles({
-          variant: active ? 'secondary' : 'plain'
+          variant: active ? 'outline' : 'plain'
         }),
         active && 'pointer-events-none',
         props.className

@@ -14,10 +14,10 @@ import {
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
-import { Heading } from '~/app/components/heading'
 import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
 import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
 import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'

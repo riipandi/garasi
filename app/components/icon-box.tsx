@@ -13,8 +13,7 @@ import { clx } from '~/app/utils'
 export const iconBoxStyles = cva(
   [
     'relative flex shrink-0 items-center justify-center',
-    // 0.0616rem is just a fix for my monitor, feel free to delete it
-    'before:absolute before:h-[calc(100%-0.1rem)] before:w-[calc(100%-0.0616rem)] before:bg-white',
+    'before:absolute before:h-[calc(100%-0.1rem)] before:bg-white',
     'after:absolute after:size-full after:bg-linear-to-b',
     '*:[svg]:relative *:[svg]:z-10'
   ],
@@ -37,9 +36,9 @@ export const iconBoxStyles = cva(
         'warning-subtle': 'bg-warning/10 text-warning before:hidden'
       },
       size: {
-        sm: 'size-7 rounded-sm before:rounded-sm after:rounded-sm [&_svg:not([class*=size-])]:size-3.5',
-        md: 'size-9 rounded before:rounded after:rounded [&_svg:not([class*=size-])]:size-4.5',
-        lg: 'size-13 rounded-lg before:rounded-lg after:rounded-lg [&_svg:not([class*=size-])]:size-5.5'
+        sm: 'size-6.5 rounded-xs before:rounded-sm after:rounded-sm [&_svg:not([class*=size-])]:size-3.5',
+        md: 'size-8.5 rounded before:rounded after:rounded [&_svg:not([class*=size-])]:size-4',
+        lg: 'size-12 rounded-lg before:rounded-lg after:rounded-lg [&_svg:not([class*=size-])]:size-5'
       },
       circle: {
         true: 'rounded-full before:rounded-full after:rounded-full'

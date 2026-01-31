@@ -10,11 +10,11 @@ import {
   BreadcrumbSeparator
 } from '~/app/components/breadcrumb'
 import { Button } from '~/app/components/button'
-import { Heading } from '~/app/components/heading'
 import { IconBox } from '~/app/components/icon-box'
 import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import { getBucketInfo } from '~/app/services/bucket.service'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 

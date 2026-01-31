@@ -35,17 +35,17 @@ export function CollapsibleTrigger({
       data-slot='collapsible-trigger'
       data-expandable={expandableIndicator ? true : undefined}
       className={clx(
-        'flex cursor-pointer items-center gap-2.5 select-none',
-        'text-foreground py-2 transition-colors duration-100',
+        'flex cursor-pointer items-center gap-2 select-none',
+        'text-foreground py-1.5 transition-colors duration-100',
         'focus-visible:outline-primary focus:outline-0 focus-visible:outline-2 focus-visible:outline-offset-2',
-        'w-full text-left leading-relaxed font-medium [&_svg:not([class*=size-])]:size-4',
+        'w-full text-left leading-relaxed font-medium [&_svg:not([class*=size-])]:size-3.5',
         '**:data-[slot=expandable-indicator]:transition-all',
         '**:data-[slot=expandable-indicator]:duration-100',
         'disabled:cursor-not-allowed disabled:opacity-70',
         expandableIndicator && [
-          'data-expandable:after:bg-chevron-down-dark dark:data-expandable:after:bg-chevron-down data-expandable:after:ml-auto data-expandable:after:size-4',
+          'data-expandable:after:bg-chevron-down-dark dark:data-expandable:after:bg-chevron-down data-expandable:after:ml-auto data-expandable:after:size-3.5',
           'data-expandable:after:shrink-0 data-expandable:after:transition-transform data-expandable:after:duration-100',
-          'data-expandable:data-[panel-open]:after:rotate-180'
+          'data-expandable:data-panel-open:after:rotate-180'
         ],
         className
       )}
@@ -63,10 +63,10 @@ export function CollapsiblePanel({
     <BaseCollapsible.Panel
       data-slot='collapsible-panel'
       className={clx(
-        'flex flex-col gap-2.5',
+        'flex flex-col gap-2',
         'overflow-hidden transition-all ease-out',
-        'h-[var(--collapsible-panel-height)] [&[hidden]:not([hidden=until-found])]:hidden',
-        'data-[ending-style]:h-0 data-[starting-style]:h-0',
+        'h-(--collapsible-panel-height) [&[hidden]:not([hidden=until-found])]:hidden',
+        'data-ending-style:h-0 data-starting-style:h-0',
         className
       )}
       {...props}

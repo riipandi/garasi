@@ -55,10 +55,10 @@ function ScrollAreaScrollbar({
       className={clx(
         'm-1 flex touch-none select-none',
         'pointer-events-none opacity-0 transition-opacity delay-300',
-        'data-[hovering]:opacity-100 data-[hovering]:delay-0',
-        'data-[hovering]:pointer-events-auto data-[hovering]:duration-75',
-        'data-[scrolling]:opacity-100 data-[scrolling]:delay-0',
-        'data-[scrolling]:pointer-events-auto data-[scrolling]:duration-75',
+        'data-hovering:opacity-100 data-hovering:delay-0',
+        'data-hovering:pointer-events-auto data-hovering:duration-75',
+        'data-scrolling:opacity-100 data-scrolling:delay-0',
+        'data-scrolling:pointer-events-auto data-scrolling:duration-75',
         orientation === 'vertical' ? 'w-1.5 justify-center' : 'h-1.5 justify-start',
         className
       )}

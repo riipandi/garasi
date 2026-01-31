@@ -32,21 +32,40 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <Field>
-      <NumberField defaultValue={1} min={1} max={1000}>
-        <NumberFieldScrubArea>
-          <FieldLabel>Instances</FieldLabel>
-        </NumberFieldScrubArea>
-        <NumberFieldGroup>
-          <NumberFieldDecrement>
-            <Lucide.MinusIcon />
-          </NumberFieldDecrement>
-          <NumberFieldInput />
-          <NumberFieldIncrement>
-            <Lucide.PlusIcon />
-          </NumberFieldIncrement>
-        </NumberFieldGroup>
-      </NumberField>
-    </Field>
+    <div className='flex flex-col gap-6'>
+      <Field>
+        <NumberField defaultValue={10000} min={1} max={10000}>
+          <NumberFieldScrubArea>
+            <FieldLabel>Default variant</FieldLabel>
+          </NumberFieldScrubArea>
+          <NumberFieldGroup variant='default'>
+            <NumberFieldDecrement>
+              <Lucide.MinusIcon />
+            </NumberFieldDecrement>
+            <NumberFieldInput />
+            <NumberFieldIncrement>
+              <Lucide.PlusIcon />
+            </NumberFieldIncrement>
+          </NumberFieldGroup>
+        </NumberField>
+      </Field>
+
+      <Field>
+        <NumberField defaultValue={10000} min={1} max={10000}>
+          <NumberFieldScrubArea>
+            <FieldLabel>Plain variant</FieldLabel>
+          </NumberFieldScrubArea>
+          <NumberFieldGroup variant='plain'>
+            <NumberFieldDecrement>
+              <Lucide.MinusIcon />
+            </NumberFieldDecrement>
+            <NumberFieldInput />
+            <NumberFieldIncrement>
+              <Lucide.PlusIcon />
+            </NumberFieldIncrement>
+          </NumberFieldGroup>
+        </NumberField>
+      </Field>
+    </div>
   )
 }

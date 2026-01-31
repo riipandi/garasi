@@ -39,7 +39,7 @@ export function TableHead({ ...props }: React.ComponentProps<'th'>) {
       data-slot='table-head'
       {...props}
       className={clx(
-        'text-muted bg-table-head border-table-separator border-y px-6 py-2 font-medium',
+        'text-muted bg-table-head border-table-separator border-y px-5 py-1.5 font-medium',
         props.className
       )}
     />
@@ -69,8 +69,8 @@ export function TableCell({ ...props }: React.ComponentProps<'td'>) {
       data-slot='table-cell'
       {...props}
       className={clx(
-        'px-6 py-4',
-        'has-[a]:p-0 *:[a]:inline-flex *:[a]:w-full *:[a]:px-6 *:[a]:py-4',
+        'px-5 py-3',
+        'has-[a]:p-0 *:[a]:inline-flex *:[a]:w-full *:[a]:px-5 *:[a]:py-3',
         props.className
       )}
     />
@@ -82,7 +82,7 @@ export function TableFooter({ ...props }: React.ComponentProps<'tfoot'>) {
     <tfoot
       data-slot='table-footer'
       {...props}
-      className={clx('text-muted-foreground text-xs', props.className)}
+      className={clx('text-muted-foreground text-sm', props.className)}
     />
   )
 }
@@ -98,7 +98,7 @@ export function TableCaption({
       data-slot='table-caption'
       {...props}
       className={clx(
-        'text-muted my-4 text-sm',
+        'text-muted my-3',
         side === 'top' ? 'caption-top' : 'caption-bottom',
         props.className
       )}

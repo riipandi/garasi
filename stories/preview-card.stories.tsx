@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from '~/app/components/preview-card'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 
 const meta = {
   title: 'Components/PreviewCard',
@@ -35,9 +35,9 @@ export const Example: Story = {
       <PreviewCardPopup className='max-w-72'>
         <img
           src='https://images.unsplash.com/photo-1731931594172-2e96a6a9acbf?q=80&w=500'
-          className='mb-2 h-auto w-full rounded'
+          className='mb-2 h-auto w-full rounded-sm'
         />
-        <Text className='text-sm/loose'>
+        <Text className='text-base/relaxed'>
           In association football, a football club is a sports club that acts as an entity through
           which association football teams organise their sporting activities. The club can exist
           either as an independent unit or as part of a larger sports organization as a subsidiary

@@ -3,8 +3,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
 import { Button } from '~/app/components/button'
-import { toastManager, Toast } from '~/app/components/toast'
-import { anchoredToastManager } from '~/app/components/toast'
+import { anchoredToast, toast, Toast } from '~/app/components/toast'
 
 const meta = {
   title: 'Components/Toast',
@@ -17,6 +16,7 @@ const meta = {
     (Story) => (
       <div className='flex w-full min-w-md items-center justify-center'>
         <Story />
+        <Toast />
       </div>
     )
   ]
@@ -32,11 +32,11 @@ export const Example: Story = {
     const [copied, setCopied] = React.useState(false)
 
     return (
-      <div className='flex space-x-4'>
+      <div className='flex items-center space-x-3'>
         <Button
-          variant='primary'
+          variant='tertiary'
           onClick={() =>
-            toastManager.add({
+            toast.add({
               title: 'Added to cart',
               description: 'Item has been added to your cart',
               type: 'success',
@@ -57,7 +57,7 @@ export const Example: Story = {
           variant='secondary'
           onClick={() => {
             setCopied(true)
-            anchoredToastManager.add({
+            anchoredToast.add({
               description: 'Copied',
               positionerProps: {
                 anchor: buttonRef.current,
@@ -73,6 +73,116 @@ export const Example: Story = {
           disabled={copied}
         >
           Copy Link
+        </Button>
+      </div>
+    )
+  }
+}
+
+export const VartiantShowcase: Story = {
+  args: {},
+  render: () => {
+    return (
+      <div className='flex items-center space-x-3'>
+        <Button
+          variant='outline'
+          onClick={() =>
+            toast.add({
+              title: 'Default Toast',
+              description: 'This is a default toast'
+            })
+          }
+        >
+          Default
+        </Button>
+        <Button
+          variant='outline'
+          onClick={() =>
+            toast.add({
+              title: 'Info Toast',
+              description: 'This is a info toast',
+              type: 'info'
+            })
+          }
+        >
+          Info
+        </Button>
+        <Button
+          variant='outline'
+          onClick={() =>
+            toast.add({
+              title: 'Success Toast',
+              description: 'This is a success toast',
+              type: 'success'
+            })
+          }
+        >
+          Success
+        </Button>
+        <Button
+          variant='outline'
+          onClick={() =>
+            toast.add({
+              title: 'Warning Toast',
+              description: 'This is a warning toast',
+              type: 'warning'
+            })
+          }
+        >
+          Warning
+        </Button>
+        <Button
+          variant='outline'
+          onClick={() =>
+            toast.add({
+              title: 'Error Toast',
+              description: 'This is a error toast',
+              type: 'error'
+            })
+          }
+        >
+          Error
+        </Button>
+      </div>
+    )
+  }
+}
+
+export const WithPromise: Story = {
+  args: {},
+  render: () => {
+    return (
+      <div className='flex items-center space-x-3'>
+        <Button
+          variant='primary'
+          onClick={() => {
+            toast.promise(
+              new Promise<string>((_, reject) => {
+                setTimeout(() => {
+                  reject(new Error('Failed to add item to cart'))
+                }, 2000)
+              }),
+              {
+                loading: 'Adding to cart...',
+                success: () => ({
+                  title: 'Item Added',
+                  description: 'Item has been added to your cart',
+                  actionProps: {
+                    children: 'View Cart',
+                    onClick: () => {
+                      console.log('View Cart')
+                    }
+                  }
+                }),
+                error: () => ({
+                  title: 'Error',
+                  description: 'Failed to add item to cart'
+                })
+              }
+            )
+          }}
+        >
+          Add to cart
         </Button>
       </div>
     )

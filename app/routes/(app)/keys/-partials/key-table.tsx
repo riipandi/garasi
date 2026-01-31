@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow
 } from '~/app/components/table'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
 // Extend to add deleted property for UI

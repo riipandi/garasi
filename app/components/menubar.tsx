@@ -14,7 +14,7 @@ export function Menubar({ className, ...props }: React.ComponentProps<typeof Bas
   return (
     <BaseMenubar
       className={clx(
-        'bg-background ring-card-border flex items-center rounded p-1 ring',
+        'bg-background ring-card-border flex items-center rounded p-0.5 ring',
         className
       )}
       {...props}

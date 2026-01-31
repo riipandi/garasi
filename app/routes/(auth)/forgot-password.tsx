@@ -5,10 +5,10 @@ import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
 import { Button } from '~/app/components/button'
 import { Field, FieldError, FieldLabel } from '~/app/components/field'
-import { Heading } from '~/app/components/heading'
 import { Input } from '~/app/components/input'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import fetcher from '~/app/fetcher'
 
 const forgotPasswordSchema = z.object({

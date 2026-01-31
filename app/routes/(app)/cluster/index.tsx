@@ -3,8 +3,8 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { Badge } from '~/app/components/badge'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
-import { Heading } from '~/app/components/heading'
-import { Text, TextLink } from '~/app/components/text'
+import { Text, TextLink } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 import { getClusterHealth, getClusterStatus } from '~/app/services/cluster.service'
 
 export const Route = createFileRoute('/(app)/cluster/')({

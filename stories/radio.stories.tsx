@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Item, ItemAction, ItemContent, ItemDescription, ItemTitle } from '~/app/components/item'
 import { Label } from '~/app/components/label'
 import { Radio, RadioGroup, RadioGroupLabel } from '~/app/components/radio'
 
@@ -38,6 +39,32 @@ export const Example: Story = {
         <Radio value='led-zeppelin' />
         Led Zeppelin
       </Label>
+    </RadioGroup>
+  )
+}
+
+export const WithItem: Story = {
+  args: { value: null },
+  render: () => (
+    <RadioGroup className='w-full gap-4'>
+      <Item render={<Label />}>
+        <ItemContent className='px-1'>
+          <ItemTitle>Standard Plan</ItemTitle>
+          <ItemDescription>You will get 1000 credits per month</ItemDescription>
+        </ItemContent>
+        <ItemAction className='p-2'>
+          <Radio value='standard' />
+        </ItemAction>
+      </Item>
+      <Item render={<Label />}>
+        <ItemContent className='px-1'>
+          <ItemTitle>Premium Plan</ItemTitle>
+          <ItemDescription>You will get 10000 credits per month</ItemDescription>
+        </ItemContent>
+        <ItemAction className='p-2'>
+          <Radio value='premium' />
+        </ItemAction>
+      </Item>
     </RadioGroup>
   )
 }

@@ -32,13 +32,13 @@ export const Example: Story = {
   args: {},
   render: () => (
     <Popover>
-      <PopoverTrigger render={<Button>Upgrade</Button>} />
+      <PopoverTrigger render={<Button variant='tertiary' />}>Upgrade</PopoverTrigger>
       <PopoverPopup className='w-72'>
         <PopoverTitle>Upgrade to Pro</PopoverTitle>
         <PopoverDescription>
           Upgrade to Pro to get more features and access to exclusive content.
         </PopoverDescription>
-        <Button size='sm' variant='tertiary' pill>
+        <Button variant='tertiary' size='xs' className='mt-1'>
           Upgrade
           <Lucide.ArrowRightIcon />
         </Button>

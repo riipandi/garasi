@@ -2,7 +2,6 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Alert } from '~/app/components/alert'
 import { Button } from '~/app/components/button'
-import { Heading } from '~/app/components/heading'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
@@ -15,7 +14,8 @@ import {
   SelectItem
 } from '~/app/components/select'
 import { Switch } from '~/app/components/switch'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
+import { Heading } from '~/app/components/typography'
 
 type SizeUnit = 'MB' | 'GB' | 'TB'
 

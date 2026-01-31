@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import {
   Table,
   TableBody,
@@ -50,10 +51,12 @@ export const Example: Story = {
             <TableCell>John Doe</TableCell>
             <TableCell>john.doe@example.com</TableCell>
             <TableCell>
-              <Badge variant='success'>Active</Badge>
+              <Badge variant='success' size='sm'>
+                Active
+              </Badge>
             </TableCell>
             <TableCell>
-              <Button variant='secondary' size='sm'>
+              <Button variant='secondary' size='xs'>
                 Edit
               </Button>
             </TableCell>
@@ -62,10 +65,12 @@ export const Example: Story = {
             <TableCell>Jane Doe</TableCell>
             <TableCell>jane.doe@example.com</TableCell>
             <TableCell>
-              <Badge variant='danger'>Blocked</Badge>
+              <Badge variant='danger' size='sm'>
+                Blocked
+              </Badge>
             </TableCell>
             <TableCell>
-              <Button variant='secondary' size='sm'>
+              <Button variant='secondary' size='xs'>
                 Edit
               </Button>
             </TableCell>
@@ -74,10 +79,12 @@ export const Example: Story = {
             <TableCell>Jim Beam</TableCell>
             <TableCell>jim.beam@example.com</TableCell>
             <TableCell>
-              <Badge variant='warning'>Suspended</Badge>
+              <Badge variant='warning' size='sm'>
+                Suspended
+              </Badge>
             </TableCell>
             <TableCell>
-              <Button variant='secondary' size='sm'>
+              <Button variant='secondary' size='xs'>
                 Edit
               </Button>
             </TableCell>
@@ -86,10 +93,12 @@ export const Example: Story = {
             <TableCell>Jill Smith</TableCell>
             <TableCell>jill.smith@example.com</TableCell>
             <TableCell>
-              <Badge variant='info'>Pending</Badge>
+              <Badge variant='info' size='sm'>
+                Pending
+              </Badge>
             </TableCell>
             <TableCell>
-              <Button variant='secondary' size='sm'>
+              <Button variant='secondary' size='xs'>
                 Edit
               </Button>
             </TableCell>
@@ -97,5 +106,89 @@ export const Example: Story = {
         </TableBody>
       </Table>
     </TableContainer>
+  )
+}
+
+export const InsideCard: Story = {
+  args: {},
+  render: () => (
+    <Card className='w-full'>
+      <CardHeader>
+        <CardTitle>Users</CardTitle>
+      </CardHeader>
+      <CardBody>
+        <TableContainer>
+          <Table>
+            <TableCaption>A list of users in the workspace.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>John Doe</TableCell>
+                <TableCell>john.doe@example.com</TableCell>
+                <TableCell>
+                  <Badge variant='success' size='sm'>
+                    Active
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Button variant='secondary' size='xs'>
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Jane Doe</TableCell>
+                <TableCell>jane.doe@example.com</TableCell>
+                <TableCell>
+                  <Badge variant='danger' size='sm'>
+                    Blocked
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Button variant='secondary' size='xs'>
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Jim Beam</TableCell>
+                <TableCell>jim.beam@example.com</TableCell>
+                <TableCell>
+                  <Badge variant='warning' size='sm'>
+                    Suspended
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Button variant='secondary' size='xs'>
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Jill Smith</TableCell>
+                <TableCell>jill.smith@example.com</TableCell>
+                <TableCell>
+                  <Badge variant='info' size='sm'>
+                    Pending
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Button variant='secondary' size='xs'>
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </CardBody>
+    </Card>
   )
 }

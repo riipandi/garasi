@@ -33,3 +33,51 @@ export const Example: Story = {
     </div>
   )
 }
+
+export const VariantShowcase: Story = {
+  args: {},
+  render: () => (
+    <div className='inline-flex space-x-2'>
+      <Badge variant='primary'>Primary</Badge>
+      <Badge variant='secondary'>Secondary</Badge>
+      <Badge variant='tertiary'>Tertiary</Badge>
+      <Badge variant='success'>Success</Badge>
+      <Badge variant='info'>Info</Badge>
+      <Badge variant='warning'>Warning</Badge>
+      <Badge variant='danger'>Danger</Badge>
+    </div>
+  )
+}
+
+export const SizeShowcase: Story = {
+  args: {},
+  render: () => (
+    <div className='inline-flex items-center space-x-2'>
+      <Badge variant='primary' size='sm'>
+        Small
+      </Badge>
+      <Badge variant='primary' size='md'>
+        Medium
+      </Badge>
+      <Badge variant='primary' size='lg'>
+        Large
+      </Badge>
+    </div>
+  )
+}
+
+export const VariousShowcase: Story = {
+  args: {},
+  render: () => (
+    <div className='inline-flex items-center space-x-2'>
+      <Badge pill>Default</Badge>
+      <Badge pill variant='primary'>
+        Primary
+      </Badge>
+      <Badge>
+        <Lucide.InfoIcon />
+        Default
+      </Badge>
+    </div>
+  )
+}

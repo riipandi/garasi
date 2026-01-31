@@ -12,6 +12,7 @@ import {
   DialogTitle
 } from '~/app/components/dialog'
 import { Input } from '~/app/components/input'
+import { InputPassword } from '~/app/components/input-password'
 import { Label } from '~/app/components/label'
 import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
@@ -127,10 +128,9 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                   <Label htmlFor='secretKeyId'>
                     Secret Key ID <span className='text-red-500'>*</span>
                   </Label>
-                  <Input
+                  <InputPassword
                     id='secretKeyId'
                     name={field.name}
-                    type='password'
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}

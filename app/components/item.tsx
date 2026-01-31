@@ -22,13 +22,13 @@ export const itemStyles = cva(
       variant: {
         default: [
           'bg-item border-card-border rounded-(--item-rounded) border',
-          'has-[[data-checked]]:ring-primary has-[[data-checked]]:ring-2',
-          'has-[[data-checked]]:bg-primary/10'
+          'has-data-checked:ring-primary has-data-checked:ring-2',
+          'has-data-checked:bg-primary/10'
         ],
         outline: [
           'ring-item-border rounded-(--item-rounded) ring',
-          'has-[[data-checked]]:ring-primary has-[[data-checked]]:ring-2',
-          'has-[[data-checked]]:bg-primary/10'
+          'has-data-checked:ring-primary has-data-checked:ring-2',
+          'has-data-checked:bg-primary/10'
         ],
         plain: 'bg-transparent',
         primary: 'bg-primary/10 rounded-(--item-rounded)',
@@ -45,9 +45,9 @@ export const itemStyles = cva(
         'tertiary-outline': 'border-tertiary/20 rounded-(--item-rounded) border'
       },
       size: {
-        sm: 'gap-2.5 p-3.5 [--item-rounded:var(--radius)]',
-        md: 'gap-3 p-4 [--item-rounded:var(--radius-lg)]',
-        lg: 'gap-3.5 p-4.5 [--item-rounded:var(--radius-xl)]'
+        sm: 'gap-2 p-3 [--item-rounded:var(--radius)]',
+        md: 'gap-2.5 p-3.5 [--item-rounded:var(--radius-lg)]',
+        lg: 'gap-3 p-4 [--item-rounded:var(--radius-xl)]'
       },
       direction: {
         row: 'flex-row',
@@ -114,7 +114,7 @@ export function ItemMeta({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot='item-meta'
-      className={clx('text-dimmed text-sm leading-relaxed', className)}
+      className={clx('text-dimmed text-base leading-relaxed', className)}
       {...props}
     />
   )
@@ -125,7 +125,7 @@ export function ItemMedia({ className, ...props }: React.ComponentProps<'div'>) 
     <div
       data-slot='item-media'
       className={clx(
-        'shrink-0 [&_svg:not([class*=size-])]:size-4.5 *:[[data-slot=iconbox]]:size-9',
+        'shrink-0 *:data-[slot=iconbox]:size-8 [&_svg:not([class*=size-])]:size-4',
         className
       )}
       {...props}
@@ -138,7 +138,7 @@ export function ItemAction({ className, ...props }: React.ComponentProps<'div'>)
     <div
       data-slot='item-action'
       className={clx(
-        'ml-auto flex items-center gap-2.5 [&_svg:not([class*=size-])]:size-4',
+        'ml-auto flex items-center gap-2 [&_svg:not([class*=size-])]:size-3.5',
         className
       )}
       {...props}

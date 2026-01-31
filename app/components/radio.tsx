@@ -41,7 +41,7 @@ export function Radio({ className, ...props }: React.ComponentProps<typeof BaseR
       className={clx(
         'border-input-border bg-input shadow-input flex size-4 cursor-pointer items-center justify-center rounded-full border',
         'outline-primary focus:outline-0 focus-visible:outline-2 focus-visible:outline-offset-2',
-        'data-[checked]:bg-primary data-[checked]:border-primary',
+        'data-checked:bg-primary data-checked:border-primary',
         'hover:border-input-accent-border transition-colors duration-75',
         'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-70',
         className

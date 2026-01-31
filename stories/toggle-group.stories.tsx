@@ -25,8 +25,8 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <div className='flex space-x-4'>
-      <ToggleGroup defaultValue={['start']} size='md-icon'>
+    <div className='flex items-center space-x-6'>
+      <ToggleGroup defaultValue={['start']} size='md-icon' orientation='vertical'>
         <Toggle value='left' aria-label='Left'>
           <Lucide.AlignLeftIcon />
         </Toggle>
@@ -37,7 +37,8 @@ export const Example: Story = {
           <Lucide.AlignRightIcon />
         </Toggle>
       </ToggleGroup>
-      <ToggleGroup multiple size='md-icon'>
+
+      <ToggleGroup multiple size='md-icon' orientation='horizontal'>
         <Toggle value='bold' aria-label='Bold'>
           <Lucide.BoldIcon />
         </Toggle>

@@ -2,7 +2,7 @@ import * as Lucide from 'lucide-react'
 import { Alert } from '~/app/components/alert'
 import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
-import { Text, Strong } from '~/app/components/text'
+import { Text, Strong } from '~/app/components/typography'
 
 interface ErrorStateProps {
   title: string

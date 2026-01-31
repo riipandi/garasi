@@ -11,7 +11,7 @@ import {
 import { Field, FieldLabel } from '~/app/components/field'
 import { Input } from '~/app/components/input'
 import { Spinner } from '~/app/components/spinner'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import type { UserProfileResponse } from '~/app/types/api'
 
 interface ProfileInfoCardProps {

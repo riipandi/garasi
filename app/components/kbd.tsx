@@ -12,8 +12,8 @@ import { clx } from '~/app/utils'
 
 export const kbdStyles = cva(
   [
-    'inline-flex h-5.5 min-w-5.5 items-center justify-center gap-1 px-1.5',
-    'ring-kbd-border rounded-sm text-sm/8 font-medium ring'
+    'inline-flex h-5 min-w-5 items-center justify-center gap-0.5 px-1.5',
+    'ring-kbd-border rounded-sm text-base font-medium ring'
   ],
   {
     variants: {
@@ -39,6 +39,6 @@ export function Kbd({
 
 export function KbdGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot='kbd-group' {...props} className={clx('flex items-center gap-1.5', className)} />
+    <div data-slot='kbd-group' {...props} className={clx('flex items-center gap-1', className)} />
   )
 }

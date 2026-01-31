@@ -3,7 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Card } from '~/app/components/card'
-import { Text, TextLink } from '~/app/components/text'
+import { Text, TextLink } from '~/app/components/typography'
 import { getNodeInfo, launchRepairOperation } from '~/app/services/node.service'
 import type { RepairType } from '~/shared/schemas/node.schema'
 

@@ -18,8 +18,8 @@ export function Progress({
   return (
     <BaseProgress.Root
       data-slot='progress'
+      className={clx('flex flex-wrap justify-between gap-1', className)}
       {...props}
-      className={clx('flex flex-wrap justify-between gap-1.5', className)}
     >
       {children}
       <BaseProgress.Track className='bg-track h-1.5 w-full rounded-full'>
@@ -36,8 +36,8 @@ export function ProgressLabel({
   return (
     <BaseProgress.Label
       data-slot='progress-label'
-      {...props}
       className={clx('text-foreground font-medium', className)}
+      {...props}
     />
   )
 }
@@ -49,8 +49,8 @@ export function ProgressValue({
   return (
     <BaseProgress.Value
       data-slot='progress-value'
+      className={clx('text-muted text-base', className)}
       {...props}
-      className={clx('text-dimmed text-sm', className)}
     />
   )
 }

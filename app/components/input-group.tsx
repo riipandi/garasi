@@ -65,20 +65,20 @@ export function InputGroup({
 
 export const inputGroupAddonStyles = cva(
   [
-    'flex shrink-0 items-center gap-1.5',
-    '[&_svg:not([class*=text-])]:text-dimmed [&_svg:not([class*=size-])]:size-4',
+    'flex shrink-0 items-center gap-1',
+    '[&_svg:not([class*=text-])]:text-dimmed [&_svg:not([class*=size-])]:size-3.5',
     '[&_[role="combobox"]]:not-focus:ring-0',
     '[&_[role="combobox"]]:not-focus:ring-transparent',
     '[&_[role="combobox"]]:shadow-none',
-    '[&.items-start,&.items-end]:py-3'
+    '[&.items-start,&.items-end]:py-2.5'
   ],
   {
     variants: {
       align: {
-        start: 'not-[:has(>[role="combobox"])]:pl-2.5',
-        end: 'not-[:has(>[role="combobox"])]:pr-2.5',
-        'block-start': 'px-3.5 pt-3.5',
-        'block-end': 'px-3.5 pb-3.5'
+        start: 'not-[:has(>[role="combobox"])]:pl-3 [&>button]:-ml-1',
+        end: 'not-[:has(>[role="combobox"])]:pr-3 [&>button]:-mr-1',
+        'block-start': 'px-3 pt-2.5',
+        'block-end': 'px-3 pb-2.5'
       }
     },
     compoundVariants: [
@@ -119,8 +119,8 @@ export function InputGroupText({ className, children, ...props }: React.Componen
     <span
       data-slot='input-group-text'
       className={clx(
-        'text-muted inline-flex items-center gap-1.5 select-none',
-        '[&_svg:not([class*=text-])]:text-dimmed [&_svg:not([class*=size-])]:size-4',
+        'text-muted inline-flex items-center gap-1 select-none',
+        '[&_svg:not([class*=text-])]:text-dimmed [&_svg:not([class*=size-])]:size-3.5',
         className
       )}
       {...props}

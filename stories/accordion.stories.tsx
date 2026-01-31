@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Accordion, AccordionItem, AccordionHeader } from '~/app/components/accordion'
 import { AccordionTrigger, AccordionPanel } from '~/app/components/accordion'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 
 const meta = {
   title: 'Components/Accordion',
@@ -24,35 +24,33 @@ type Story = StoryObj<typeof meta>
 
 export const Example: Story = {
   render: () => (
-    <div className='flex w-full items-center justify-center'>
-      <Accordion className='w-96'>
-        <AccordionItem>
-          <AccordionHeader>
-            <AccordionTrigger>What is Liverpool Football Club?</AccordionTrigger>
-          </AccordionHeader>
-          <AccordionPanel>
-            <Text className='text-muted'>
-              Liverpool Football Club is the biggest football club in the world.
-            </Text>
-          </AccordionPanel>
-        </AccordionItem>
-        <AccordionItem>
-          <AccordionHeader>
-            <AccordionTrigger>How many titles has Liverpool Football Club won?</AccordionTrigger>
-          </AccordionHeader>
-          <AccordionPanel>
-            <Text className='text-muted'>Liverpool Football Club has won 20 titles.</Text>
-          </AccordionPanel>
-        </AccordionItem>
-        <AccordionItem>
-          <AccordionHeader>
-            <AccordionTrigger>Will Jurgen Klopp manage Liverpool again?</AccordionTrigger>
-          </AccordionHeader>
-          <AccordionPanel>
-            <Text className='text-muted'>We will be there.</Text>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-    </div>
+    <Accordion className='w-md'>
+      <AccordionItem>
+        <AccordionHeader>
+          <AccordionTrigger>What is Liverpool Football Club?</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionPanel>
+          <Text className='text-muted'>
+            Liverpool Football Club is the biggest football club in the world.
+          </Text>
+        </AccordionPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionHeader>
+          <AccordionTrigger>How many titles has Liverpool Football Club won?</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionPanel>
+          <Text className='text-muted'>Liverpool Football Club has won 20 titles.</Text>
+        </AccordionPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionHeader>
+          <AccordionTrigger>Will Jurgen Klopp manage Liverpool again?</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionPanel>
+          <Text className='text-muted'>We will be there.</Text>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   )
 }

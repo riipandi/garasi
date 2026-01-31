@@ -14,7 +14,7 @@ import {
 } from '~/app/components/dialog'
 import { Field, FieldLabel } from '~/app/components/field'
 import { Input } from '~/app/components/input'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import { connectClusterNodes } from '~/app/services/cluster.service'
 
 interface ConnectNodesDialogProps {

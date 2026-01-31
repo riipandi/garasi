@@ -15,7 +15,7 @@ import {
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
 import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/text'
+import { Text } from '~/app/components/typography'
 import type { CreateBucketRequest } from '~/shared/schemas/bucket.schema'
 
 interface BucketCreateProps {

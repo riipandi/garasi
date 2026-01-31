@@ -19,20 +19,20 @@ export function Combobox({ ...props }: React.ComponentProps<typeof BaseCombobox.
 
 export const comboboxTriggerStyles = cva(
   [
-    'bg-input placeholder:text-dimmed w-full rounded px-2.5 transition-all',
+    'bg-input placeholder:text-dimmed w-full rounded px-2 transition-all',
     'focus:ring-primary focus:ring-2 focus:outline-0',
     'has-focus:ring-primary has-focus:ring-2',
-    'flex cursor-pointer items-center gap-2.5',
+    'flex cursor-pointer items-center gap-2',
     'data-disabled:cursor-not-allowed data-disabled:opacity-70'
   ],
   {
     variants: {
       variant: {
         default:
-          'bg-input ring-input-border hover:not-[[data-disabled]]:not-[:focus]:ring-input-accent-border shadow-input ring',
+          'bg-input ring-input-border hover:not-data-disabled:not-focus:ring-input-accent-border shadow-input ring',
         subtle:
-          'bg-input/60 ring-input-border hover:not-[[data-disabled]]:not-[:focus]:ring-input-accent-border shadow-input ring',
-        plain: 'hover:not-[[data-disabled]]:bg-accent bg-transparent'
+          'bg-input/60 ring-input-border hover:not-data-disabled:not-focus:ring-input-accent-border shadow-input ring',
+        plain: 'hover:not-data-disabled:bg-accent bg-transparent'
       },
       pill: {
         true: 'rounded-full'
@@ -56,7 +56,7 @@ export function ComboboxTrigger({
       data-slot='combobox-trigger'
       {...props}
       role='combobox'
-      className={clx('h-9.5', comboboxTriggerStyles({ variant, className }))}
+      className={clx('h-9', comboboxTriggerStyles({ variant, className }))}
     >
       {children}
       <BaseCombobox.Icon className='text-muted ml-auto'>
@@ -111,7 +111,7 @@ function ComboboxRenderValue({
 
   if (typeof value === 'object') {
     return (
-      <div className='[&_svg:not([class*=text-])]:text-popover-foreground flex items-center gap-2.5 [&_svg:not([class*=size-])]:size-4'>
+      <div className='[&_svg:not([class*=text-])]:text-popover-foreground flex items-center gap-2 [&_svg:not([class*=size-])]:size-3.5'>
         {value.icon}
         <span className='text-popover-foreground'>{value.label}</span>
       </div>
@@ -138,7 +138,7 @@ export function ComboboxInput({
       role='combobox'
       className={clx(
         comboboxTriggerStyles({ variant, pill, className }),
-        'flex min-h-9.5 flex-wrap items-center gap-1.5 py-1'
+        'flex min-h-9 flex-wrap items-center gap-1.5 py-1'
       )}
       ref={ref}
     >
@@ -164,7 +164,7 @@ export function ComboboxInput({
                     strokeWidth='2'
                     strokeLinecap='round'
                     strokeLinejoin='round'
-                    className='size-3.5 opacity-60 transition-colors hover:opacity-100'
+                    className='size-3 opacity-60 transition-colors hover:opacity-100'
                   >
                     <path d='M18 6 6 18' />
                     <path d='m6 6 12 12' />
@@ -223,9 +223,9 @@ export function ComboboxPopup({
             'max-h-[min(var(---available-height),23rem)] w-(--anchor-width)',
             'max-w-(--available-width) origin-(--transform-origin)',
             'transition-[transform,scale,opacity] outline-none',
-            'data-[ending-style]:scale-90 data-[ending-style]:opacity-0',
-            'data-[starting-style]:scale-90 data-[starting-style]:opacity-0',
-            'has-[>[data-slot=input-group]]:[&_[data-slot=combobox-search]]:border-none',
+            'data-ending-style:scale-90 data-ending-style:opacity-0',
+            'data-starting-style:scale-90 data-starting-style:opacity-0',
+            'has-[>[data-slot=input-group]]:**:data-[slot=combobox-search]:border-none',
             '*:data-[slot=input-group]:border-popover-separator *:data-[slot=input-group]:border-b',
             className
           )}
@@ -248,7 +248,7 @@ export function ComboboxSearch({
         placeholder='Search item'
         {...props}
         className={clx(
-          'border-input-border h-10 w-full border-b px-2.5 outline-none',
+          'border-input-border h-9 w-full border-b px-2 outline-none',
           'disabled:cursor-not-allowed disabled:opacity-70',
           className
         )}
@@ -265,7 +265,7 @@ export function ComboboxEmpty({
     <BaseCombobox.Empty
       data-slot='combobox-empty'
       {...props}
-      className={clx('text-dimmed px-3 py-2.5 text-center empty:p-0', className)}
+      className={clx('text-dimmed px-2.5 pt-2 pb-2.5 text-center empty:p-0', className)}
     />
   )
 }
@@ -296,9 +296,9 @@ export function ComboboxItem({
       data-slot='combobox-item'
       {...props}
       className={clx(
-        'text-popover-foreground flex cursor-pointer items-center gap-3.5 rounded px-3 py-2.5 select-none',
+        'text-popover-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2 select-none',
         'group-data-[side=none]:min-w-[calc(var(--anchor-width))]',
-        'data-[highlighted]:not-[[data-disabled]]:bg-popover-accent data-[selected]:not-[[data-disabled]]:bg-popover-accent',
+        'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
         'focus-visible:outline-none',
         'data-disabled:cursor-not-allowed data-disabled:opacity-70',
         className
@@ -344,7 +344,7 @@ export function ComboboxGroupLabel({
     <BaseCombobox.GroupLabel
       data-slot='combobox-group-label'
       {...props}
-      className={clx('text-dimmed px-2.5 py-1.5 text-sm font-medium', className)}
+      className={clx('text-dimmed px-2 py-1 text-base font-medium', className)}
     />
   )
 }

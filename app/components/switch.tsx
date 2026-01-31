@@ -15,7 +15,7 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Base
     <BaseSwitch.Root
       data-slot='switch'
       className={clx(
-        'flex h-5 w-9 cursor-pointer items-center rounded-full px-0.5',
+        'flex h-4.5 w-8 cursor-pointer items-center rounded-full px-0.5',
         'ring-input-border bg-track ring inset-shadow-xs inset-shadow-black/10 dark:inset-shadow-none',
         'data-checked:bg-primary data-checked:ring-primary',
         'transition-colors duration-75',
@@ -28,8 +28,8 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Base
       <BaseSwitch.Thumb
         data-slot='switch-thumb'
         className={clx(
-          'size-4 rounded-full bg-white shadow',
-          'transition-transform duration-75 data-checked:translate-x-4'
+          'size-3.5 rounded-full bg-white shadow',
+          'transition-transform duration-75 data-checked:translate-x-3.5'
         )}
       />
     </BaseSwitch.Root>

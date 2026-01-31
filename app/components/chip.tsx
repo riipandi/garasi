@@ -11,7 +11,7 @@ import { useRender } from '@base-ui/react/use-render'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { clx } from '~/app/utils'
 
-export const chipStyles = cva('inline-flex items-center font-medium ring', {
+export const chipStyles = cva('inline-flex items-center text-base font-medium ring', {
   variants: {
     variant: {
       default: 'bg-chip ring-chip-border text-foreground',
@@ -20,9 +20,9 @@ export const chipStyles = cva('inline-flex items-center font-medium ring', {
       plain: 'text-foreground bg-transparent ring-transparent'
     },
     size: {
-      sm: 'h-5 gap-1 rounded-sm px-1.5 text-sm [&_svg:not([class*=size-])]:size-3.5',
-      md: 'h-6.5 gap-2 rounded-sm px-2 [&_svg:not([class*=size-])]:size-4',
-      lg: 'h-7.5 gap-3 rounded-sm px-2.5 [&_svg:not([class*=size-])]:size-4.5'
+      sm: 'h-4.5 gap-1 rounded-sm px-1.5 text-sm [&_svg:not([class*=size-])]:size-3',
+      md: 'h-6 gap-1.5 rounded-sm px-1.5 [&_svg:not([class*=size-])]:size-3.5',
+      lg: 'h-7 gap-2 rounded-sm px-2 [&_svg:not([class*=size-])]:size-4'
     },
     pill: {
       true: 'rounded-full'

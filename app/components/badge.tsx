@@ -10,7 +10,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { clx } from '~/app/utils'
 
-export const badgeStyles = cva('inline-flex items-center gap-1.5 border border-transparent', {
+export const badgeStyles = cva('inline-flex items-center gap-1 border border-transparent', {
   variants: {
     variant: {
       primary: 'bg-primary/15 text-primary',
@@ -29,9 +29,9 @@ export const badgeStyles = cva('inline-flex items-center gap-1.5 border border-t
       'danger-outline': 'border-danger text-danger'
     },
     size: {
-      sm: 'h-5 rounded-sm px-1 text-xs [&_svg:not([class*=size-])]:size-3',
-      md: 'h-5.5 rounded-sm px-1.5 text-sm [&_svg:not([class*=size-])]:size-3.5',
-      lg: 'h-6 rounded-sm px-2 [&_svg:not([class*=size-])]:size-4'
+      sm: 'h-5 rounded-xs px-1.5 text-sm [&_svg:not([class*=size-])]:size-2.5',
+      md: 'h-5.6 rounded-sm px-2 text-base [&_svg:not([class*=size-])]:size-3',
+      lg: 'h-6 rounded px-2 [&_svg:not([class*=size-])]:size-3.5'
     },
     pill: {
       true: 'rounded-full'
