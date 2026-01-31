@@ -1,8 +1,10 @@
 import { createMessage } from '@upyo/core'
 import { SmtpTransport } from '@upyo/smtp'
+import { convert } from 'html-to-text'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { protectedEnv } from '~/shared/envars'
 
-// Check if SMTP auth credentials are provided and valid
 const smtpUsername = protectedEnv.MAILER_SMTP_USERNAME
 const smtpPassword = protectedEnv.MAILER_SMTP_PASSWORD
 const hasValidAuth =
@@ -24,6 +26,12 @@ const smtpTransport = new SmtpTransport({
     : undefined
 })
 
+/** Template variables for email rendering */
+export interface TemplateVars {
+  [key: string]: string | number
+}
+
+/** Email payload with raw HTML content */
 export interface EmailPayload {
   to: string
   subject: string
@@ -31,7 +39,35 @@ export interface EmailPayload {
   text?: string
 }
 
-// Replace verbose sendMail with simpler implementation
+/** Email payload using template file */
+export interface TemplateEmailPayload {
+  to: string
+  subject: string
+  template: string
+  vars: TemplateVars
+  text?: string
+}
+
+/** Render HTML template from templates/ directory */
+export function renderTemplate(templateName: string, vars: TemplateVars): string {
+  const templatesDir = join(process.cwd(), 'templates')
+  const templatePath = join(templatesDir, `${templateName}.html`)
+
+  try {
+    let html = readFileSync(templatePath, 'utf-8')
+
+    for (const [key, value] of Object.entries(vars)) {
+      const regex = new RegExp(`{{${key}}}`, 'g')
+      html = html.replace(regex, String(value))
+    }
+
+    return html
+  } catch (error) {
+    throw new Error(`Failed to render template "${templateName}": ${error}`)
+  }
+}
+
+/** Error thrown when email sending fails */
 class MailSendError extends Error {
   public override cause?: Error
   constructor(message: string, cause?: Error) {
@@ -41,19 +77,20 @@ class MailSendError extends Error {
   }
 }
 
-async function sendMail(payload: EmailPayload): Promise<string> {
+/** Send email via SMTP. Returns message ID on success */
+async function sendMail(payload: EmailPayload | TemplateEmailPayload): Promise<string> {
   const senderName = protectedEnv.MAILER_FROM_NAME
   const senderEmail = protectedEnv.MAILER_FROM_EMAIL
   const mailFrom = `${senderName} <${senderEmail}>`
+
+  const html = 'template' in payload ? renderTemplate(payload.template, payload.vars) : payload.html
+  const text = 'text' in payload ? payload.text : convert(html, { wordwrap: 80 })
 
   const message = createMessage({
     from: mailFrom,
     to: payload.to,
     subject: payload.subject,
-    content: {
-      html: payload.html,
-      text: payload.text
-    }
+    content: { html, text }
   })
 
   try {

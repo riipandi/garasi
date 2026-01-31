@@ -9,14 +9,14 @@ export default defineHandler((event) => {
 
   // Attach some parameter and services to be used in handler
   event.context.baseURL = reqUrl.origin
-  event.context.db = dbClient
   event.context.logger = logger
+  event.context.db = dbClient
 })
 
 declare module 'nitro/h3' {
   interface H3EventContext {
     baseURL: string
-    db: DBContext
     logger: ILogLayer
+    db: DBContext
   }
 }
