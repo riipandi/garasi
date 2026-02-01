@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, getQuery, HTTPError } from 'h3'
+import { defineEventHandler, readBody, HTTPError } from 'h3'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
 import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
@@ -11,14 +11,11 @@ export default defineEventHandler(async (event) => {
   const { db, logger } = event.context
 
   try {
-    // Get token from query string
-    const { token } = getQuery<{ token: string }>(event)
-
     // Parse request body
     const body = await readBody<ResetPasswordBody>(event)
 
     // Validate required fields
-    if (!token || !body || !body.password) {
+    if (!body || !body.token || !body.password) {
       logger.warn('Token and password are required')
       throw new HTTPError({ status: 400, statusText: 'Token and password are required' })
     }
@@ -30,14 +27,14 @@ export default defineEventHandler(async (event) => {
     }
 
     logger
-      .withMetadata({ token: token.substring(0, 8) + '...' })
+      .withMetadata({ token: body.token.substring(0, 8) + '...' })
       .debug('Validating password reset token')
 
     // Find the reset token
     const resetToken = await db
       .selectFrom('password_reset_tokens')
       .selectAll()
-      .where('token', '=', token)
+      .where('token', '=', body.token)
       .executeTakeFirst()
 
     // Check if token exists

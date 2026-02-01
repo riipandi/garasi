@@ -9,19 +9,19 @@ interface BeforeLoadParams {
 }
 
 export const Route = createFileRoute('/(auth)')({
-  component: AuthLayoutComponent,
+  component: RouteComponent,
   notFoundComponent: NotFound,
   beforeLoad: ({ search, context }: BeforeLoadParams) => {
     if (context.auth.atoken) {
-      const redirectTo = search?.redirect || '/'
+      const redirectTo = search?.redirect ?? '/'
       throw redirect({ href: redirectTo })
     }
   }
 })
 
-function AuthLayoutComponent() {
+function RouteComponent() {
   return (
-    <div className='flex min-h-screen items-center justify-center px-4'>
+    <div className='bg-background flex min-h-screen items-center justify-center'>
       <Outlet />
     </div>
   )
