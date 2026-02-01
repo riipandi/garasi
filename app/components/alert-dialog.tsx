@@ -99,7 +99,7 @@ export function AlertDialogTitle({
 
 export function AlertDialogBody({ className, children, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot='alert-dialog-body' {...props} className={clx('px-5 py-4', className)}>
+    <div data-slot='alert-dialog-body' {...props} className={clx('px-5 pt-4 pb-5', className)}>
       {children}
     </div>
   )

@@ -133,18 +133,23 @@ export function DialogFooter({ className, children, ...props }: React.ComponentP
   )
 }
 
+interface DialogCloseProps extends React.ComponentProps<typeof BaseDialog.Close> {
+  block?: boolean
+}
+
 export function DialogClose({
   className,
   children,
   render,
+  block = false,
   ...props
-}: React.ComponentProps<typeof BaseDialog.Close>) {
+}: DialogCloseProps) {
   return (
     <BaseDialog.Close
       data-slot='dialog-close'
       render={render}
       {...props}
-      className={clx(!render && buttonStyles({ variant: 'plain' }), className)}
+      className={clx(!render && buttonStyles({ variant: 'plain', block }), className)}
     >
       {children}
     </BaseDialog.Close>

@@ -1,6 +1,8 @@
 import { useForm } from '@tanstack/react-form'
+import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { z } from 'zod'
+import { Button } from '~/app/components/button'
 import {
   Dialog,
   DialogBody,
@@ -11,11 +13,13 @@ import {
   DialogPopup,
   DialogTitle
 } from '~/app/components/dialog'
+import { Field, FieldLabel, FieldError } from '~/app/components/field'
+import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
+import { Form } from '~/app/components/form'
+import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { InputPassword } from '~/app/components/input-password'
-import { Label } from '~/app/components/label'
 import { Spinner } from '~/app/components/spinner'
-import { Stack } from '~/app/components/stack'
 import type { ImportKeyRequest } from '~/shared/schemas/keys.schema'
 
 interface KeyImportProps {
@@ -32,7 +36,7 @@ const importKeySchema = z.object({
 })
 
 export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImportProps) {
-  const Form = useForm({
+  const form = useForm({
     defaultValues: {
       accessKeyId: '',
       secretAccessKey: '',
@@ -58,23 +62,67 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
 
   React.useEffect(() => {
     if (isOpen) {
-      Form.reset()
+      form.reset()
     }
-  }, [isOpen, Form])
+  }, [isOpen, form])
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    form.handleSubmit()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogPopup>
+      <DialogPopup render={<Form onSubmit={handleSubmit} />}>
         <DialogHeader>
+          <IconBox variant='primary' size='sm'>
+            <Lucide.Download className='size-4' />
+          </IconBox>
           <DialogTitle>Import Access Key</DialogTitle>
-          <DialogClose />
+
+          <DialogClose className='ml-auto'>
+            <Lucide.X className='size-4' strokeWidth={2.0} />
+          </DialogClose>
         </DialogHeader>
         <DialogBody>
-          <DialogDescription>
-            Import an existing access key from another Garage instance
-          </DialogDescription>
-          <Stack direction='column' spacing='md' className='mt-4'>
-            <Form.Field
+          <DialogDescription>Import an existing access key</DialogDescription>
+
+          <form.Field
+            name='name'
+            validators={{
+              onChange: ({ value }) => {
+                if (value) {
+                  const result = importKeySchema.shape.name.safeParse(value)
+                  if (!result.success) {
+                    const firstError = result.error.issues[0]
+                    return firstError ? firstError.message : undefined
+                  }
+                }
+                return undefined
+              }
+            }}
+          >
+            {(field) => (
+              <Field className='mt-4'>
+                <FieldLabel htmlFor='name'>Name</FieldLabel>
+                <Input
+                  id='name'
+                  type='text'
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder='e.g., Imported Key from Production'
+                  disabled={isSubmitting}
+                />
+                <FieldError>{field.state.meta.errors[0]}</FieldError>
+              </Field>
+            )}
+          </form.Field>
+
+          <Fieldset>
+            <FieldsetLegend>Credentials</FieldsetLegend>
+            <form.Field
               name='accessKeyId'
               validators={{
                 onChange: ({ value }) => {
@@ -86,14 +134,12 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                   return undefined
                 }
               }}
-              children={(field) => (
-                <div>
-                  <Label htmlFor='accessKeyId'>
-                    Access Key ID <span className='text-red-500'>*</span>
-                  </Label>
+            >
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor='accessKeyId'>Access Key ID</FieldLabel>
                   <Input
                     id='accessKeyId'
-                    name={field.name}
                     type='text'
                     value={field.state.value}
                     onBlur={field.handleBlur}
@@ -102,16 +148,12 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                     className='font-mono'
                     disabled={isSubmitting}
                   />
-                  {field.state.meta.errors[0] && (
-                    <p className='mt-1 text-xs text-red-600'>
-                      {String(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </div>
+                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                </Field>
               )}
-            />
+            </form.Field>
 
-            <Form.Field
+            <form.Field
               name='secretAccessKey'
               validators={{
                 onChange: ({ value }) => {
@@ -123,14 +165,12 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                   return undefined
                 }
               }}
-              children={(field) => (
-                <div>
-                  <Label htmlFor='secretKeyId'>
-                    Secret Key ID <span className='text-red-500'>*</span>
-                  </Label>
+            >
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor='secretKeyId'>Secret Key ID</FieldLabel>
                   <InputPassword
                     id='secretKeyId'
-                    name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
@@ -138,80 +178,37 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                     className='font-mono'
                     disabled={isSubmitting}
                   />
-                  {field.state.meta.errors[0] && (
-                    <p className='mt-1 text-xs text-red-600'>
-                      {String(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </div>
+                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                </Field>
               )}
-            />
-
-            <Form.Field
-              name='name'
-              validators={{
-                onChange: ({ value }) => {
-                  if (value) {
-                    const result = importKeySchema.shape.name.safeParse(value)
-                    if (!result.success) {
-                      const firstError = result.error.issues[0]
-                      return firstError ? firstError.message : undefined
-                    }
-                  }
-                  return undefined
-                }
-              }}
-              children={(field) => (
-                <div>
-                  <Label htmlFor='name'>Name (optional)</Label>
-                  <Input
-                    id='name'
-                    name={field.name}
-                    type='text'
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder='e.g., Imported Key from Production'
-                    disabled={isSubmitting}
-                  />
-                  {field.state.meta.errors[0] && (
-                    <p className='mt-1 text-xs text-red-600'>
-                      {String(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </div>
-              )}
-            />
-          </Stack>
+            </form.Field>
+          </Fieldset>
         </DialogBody>
         <DialogFooter>
-          <Form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-            children={([canSubmit, isSubmittingForm]) => (
-              <Stack direction='row' className='flex justify-end gap-3'>
-                <DialogClose>Cancel</DialogClose>
-                <DialogClose
-                  render={
-                    <button
-                      type='submit'
-                      onClick={() => Form.handleSubmit()}
-                      disabled={!canSubmit || isSubmittingForm || isSubmitting}
-                      className='flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                    >
-                      {isSubmitting || isSubmittingForm ? (
-                        <>
-                          <Spinner />
-                          Importing...
-                        </>
-                      ) : (
-                        'Import Key'
-                      )}
-                    </button>
-                  }
-                />
-              </Stack>
+          <DialogClose block>Cancel</DialogClose>
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmittingForm]) => (
+              <DialogClose
+                render={
+                  <Button
+                    size='sm'
+                    type='submit'
+                    disabled={!canSubmit || isSubmittingForm || isSubmitting}
+                    block
+                  >
+                    {isSubmitting || isSubmittingForm ? (
+                      <span className='flex items-center gap-2'>
+                        <Spinner className='size-4' strokeWidth={2.0} />
+                        Importing...
+                      </span>
+                    ) : (
+                      'Import Key'
+                    )}
+                  </Button>
+                }
+              />
             )}
-          />
+          </form.Subscribe>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

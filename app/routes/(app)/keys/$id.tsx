@@ -16,7 +16,6 @@ import {
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
 import { Spinner } from '~/app/components/spinner'
-import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import { listBuckets, getBucketInfo } from '~/app/services/bucket.service'
@@ -338,7 +337,7 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
-      <Stack direction='row' className='items-start gap-4'>
+      <div className='flex items-start gap-4'>
         <Link
           to='/keys'
           className='rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
@@ -383,18 +382,16 @@ function RouteComponent() {
             Access Key ID: <code className='font-mono'>{accessKey.accessKeyId}</code>
           </Text>
         </div>
-      </Stack>
+      </div>
 
       {successMessage && <Alert variant='success'>{successMessage}</Alert>}
       {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
 
-      <Stack direction='column' spacing='lg'>
+      <div className='space-y-6'>
         <React.Suspense
           fallback={
-            <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-              <div className='flex items-center justify-center py-8'>
-                <Spinner />
-              </div>
+            <div className='flex items-center justify-center py-8'>
+              <Spinner />
             </div>
           }
         >
@@ -413,14 +410,8 @@ function RouteComponent() {
         {accessKey.permissions && (
           <React.Suspense
             fallback={
-              <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                <div
-                  className='flex items-center justify-center py-8'
-                  role='status'
-                  aria-live='polite'
-                >
-                  <Spinner />
-                </div>
+              <div className='flex items-center justify-center py-8'>
+                <Spinner />
               </div>
             }
           >
@@ -430,10 +421,8 @@ function RouteComponent() {
 
         <React.Suspense
           fallback={
-            <div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
-              <div className='flex items-center justify-center py-8'>
-                <Spinner />
-              </div>
+            <div className='flex items-center justify-center py-8'>
+              <Spinner />
             </div>
           }
         >
@@ -449,7 +438,7 @@ function RouteComponent() {
             onSavePermissions={handleSavePermissions}
           />
         </React.Suspense>
-      </Stack>
+      </div>
 
       {/* Edit Key Dialog */}
       <KeyEdit

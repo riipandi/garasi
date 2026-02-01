@@ -2,6 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { z } from 'zod'
+import { Button } from '~/app/components/button'
 import { Checkbox } from '~/app/components/checkbox'
 import {
   Dialog,
@@ -13,11 +14,13 @@ import {
   DialogPopup,
   DialogTitle
 } from '~/app/components/dialog'
+import { Field, FieldLabel, FieldError } from '~/app/components/field'
+import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
+import { Form } from '~/app/components/form'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
 import { Spinner } from '~/app/components/spinner'
-import { Stack } from '~/app/components/stack'
 import type {
   GetKeyInformationResponse,
   UpdateAccessKeyRequest
@@ -51,7 +54,7 @@ const updateKeySchema = z.object({
 })
 
 export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: KeyEditProps) {
-  const Form = useForm({
+  const form = useForm({
     defaultValues: {
       name: accessKey.name || '',
       neverExpires: accessKey.neverExpires || false,
@@ -82,31 +85,39 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
 
   React.useEffect(() => {
     if (isOpen) {
-      Form.reset({
+      form.reset({
         name: accessKey.name || '',
         neverExpires: accessKey.neverExpires || false,
         expiration: accessKey.expiration || '',
         allowCreateBucket: accessKey.permissions?.createBucket ?? false
       })
     }
-  }, [isOpen, accessKey, Form])
+  }, [isOpen, accessKey, form])
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    form.handleSubmit()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogPopup>
-        <DialogHeader>
-          <div className='flex items-center gap-3'>
+      <Form onSubmit={handleSubmit}>
+        <DialogPopup>
+          <DialogHeader>
             <IconBox variant='primary' size='sm'>
               <Lucide.KeyRound className='size-4' />
             </IconBox>
             <DialogTitle>Edit Access Key</DialogTitle>
-          </div>
-          <DialogClose />
-        </DialogHeader>
-        <DialogBody>
-          <DialogDescription>Update the access key details</DialogDescription>
-          <Stack direction='column' spacing='md' className='mt-4'>
-            <Form.Field
+
+            <DialogClose className='ml-auto'>
+              <Lucide.X className='size-4' strokeWidth={2.0} />
+            </DialogClose>
+          </DialogHeader>
+          <DialogBody>
+            <DialogDescription>Update the access key details</DialogDescription>
+
+            <form.Field
               name='name'
               validators={{
                 onChange: ({ value }) => {
@@ -118,14 +129,12 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
                   return undefined
                 }
               }}
-              children={(field) => (
-                <div>
-                  <Label htmlFor='name'>
-                    Name <span className='text-red-500'>*</span>
-                  </Label>
+            >
+              {(field) => (
+                <Field className='mt-4'>
+                  <FieldLabel htmlFor='name'>Name</FieldLabel>
                   <Input
                     id='name'
-                    name={field.name}
                     type='text'
                     value={field.state.value}
                     onBlur={field.handleBlur}
@@ -135,123 +144,96 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
                     placeholder='e.g., production-api-key'
                     disabled={isSubmitting}
                   />
-                  {field.state.meta.errors[0] && (
-                    <p className='mt-1 text-xs text-red-600'>
-                      {String(field.state.meta.errors[0])}
-                    </p>
-                  )}
-                </div>
+                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                </Field>
               )}
-            />
+            </form.Field>
 
-            <Form.Subscribe
-              selector={(state) => state.values.neverExpires}
-              children={(neverExpires) => (
-                <Form.Field
+            <form.Subscribe selector={(state) => state.values.neverExpires}>
+              {(neverExpires) => (
+                <form.Field
                   name='expiration'
                   validators={{
                     onChange: ({ value }) => {
                       if (!neverExpires) {
                         if (!value || value.trim() === '') {
-                          return 'Expiration Date is required when "Never expires" is unchecked'
+                          return 'Expiration Date is required'
                         }
                       }
                       return undefined
                     }
                   }}
-                  children={(field) => (
-                    <div>
-                      <Label htmlFor='expiration'>
-                        Expiration Date{!neverExpires && <span className='text-red-500'> *</span>}
-                      </Label>
+                >
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor='expiration'>Expiration Date</FieldLabel>
                       <Input
                         id='expiration'
-                        name={field.name}
                         type='datetime-local'
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         disabled={isSubmitting || neverExpires}
                       />
-                      {field.state.meta.errors[0] && (
-                        <p className='mt-1 text-xs text-red-600'>
-                          {String(field.state.meta.errors[0])}
-                        </p>
-                      )}
-                    </div>
+                      <FieldError>{field.state.meta.errors[0]}</FieldError>
+                    </Field>
                   )}
-                />
+                </form.Field>
               )}
-            />
+            </form.Subscribe>
 
-            <Form.Field
-              name='neverExpires'
-              children={(field) => (
-                <div className='flex items-center gap-2'>
-                  <Checkbox
-                    id='neverExpires'
-                    name={field.name}
-                    checked={field.state.value}
-                    onCheckedChange={(checked) => field.handleChange(checked === true)}
-                    disabled={isSubmitting}
-                  />
-                  <Label htmlFor='neverExpires'>Never expires</Label>
-                </div>
+            <form.Field name='neverExpires'>
+              {(field) => (
+                <Field>
+                  <Label>
+                    <Checkbox name={field.name} />
+                    <span>Never expires</span>
+                  </Label>
+                </Field>
               )}
-            />
+            </form.Field>
 
-            <div className='rounded-md bg-gray-50 p-4'>
-              <h3 className='mb-3 text-sm font-medium text-gray-900'>Permissions</h3>
-              <div className='space-y-3'>
-                <Form.Field
-                  name='allowCreateBucket'
-                  children={(field) => (
-                    <div className='flex items-center gap-2'>
-                      <Checkbox
-                        id='allowCreateBucket'
-                        name={field.name}
-                        checked={field.state.value}
-                        onCheckedChange={(checked) => field.handleChange(checked === true)}
-                        disabled={isSubmitting}
-                      />
-                      <Label htmlFor='allowCreateBucket'>Allow creating buckets</Label>
-                    </div>
-                  )}
-                />
-              </div>
-            </div>
-          </Stack>
-        </DialogBody>
-        <DialogFooter>
-          <Form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-            children={([canSubmit, isSubmittingForm]) => (
-              <Stack direction='row' className='flex justify-end gap-3'>
-                <DialogClose>Cancel</DialogClose>
+            <Fieldset>
+              <FieldsetLegend>Permissions</FieldsetLegend>
+              <form.Field name='allowCreateBucket'>
+                {(field) => (
+                  <Field>
+                    <Label>
+                      <Checkbox name={field.name} />
+                      <span>Allow creating buckets</span>
+                    </Label>
+                  </Field>
+                )}
+              </form.Field>
+            </Fieldset>
+          </DialogBody>
+          <DialogFooter>
+            <DialogClose>Cancel</DialogClose>
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmittingForm]) => (
                 <DialogClose
                   render={
-                    <button
+                    <Button
                       type='submit'
-                      onClick={() => Form.handleSubmit()}
+                      size='sm'
                       disabled={!canSubmit || isSubmittingForm || isSubmitting}
-                      className='flex items-center gap-2 rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
                     >
                       {isSubmitting || isSubmittingForm ? (
-                        <>
-                          <Spinner />
+                        <span className='flex items-center gap-2'>
+                          <Spinner className='size-4' strokeWidth={2.0} />
                           Updating...
-                        </>
+                        </span>
                       ) : (
-                        'Update Access Key'
+                        'Update Key'
                       )}
-                    </button>
+                    </Button>
                   }
                 />
-              </Stack>
-            )}
-          />
-        </DialogFooter>
-      </DialogPopup>
+              )}
+            </form.Subscribe>
+          </DialogFooter>
+        </DialogPopup>
+      </Form>
     </Dialog>
   )
 }

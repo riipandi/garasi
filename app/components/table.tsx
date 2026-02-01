@@ -39,7 +39,7 @@ export function TableHead({ ...props }: React.ComponentProps<'th'>) {
       data-slot='table-head'
       {...props}
       className={clx(
-        'text-muted bg-table-head border-table-separator border-y px-5 py-1.5 font-medium',
+        'text-muted bg-table-head border-table-separator border-y px-5 py-2.5 font-medium',
         props.className
       )}
     />
@@ -69,8 +69,8 @@ export function TableCell({ ...props }: React.ComponentProps<'td'>) {
       data-slot='table-cell'
       {...props}
       className={clx(
-        'px-5 py-3',
-        'has-[a]:p-0 *:[a]:inline-flex *:[a]:w-full *:[a]:px-5 *:[a]:py-3',
+        'px-5 py-2.5',
+        'has-[a]:p-0 *:[a]:inline-flex *:[a]:w-full *:[a]:px-5 *:[a]:py-2.5',
         props.className
       )}
     />

@@ -2,7 +2,7 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/alert'
+import { Alert, AlertDescription } from '~/app/components/alert'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -14,7 +14,6 @@ import {
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
-import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import {
@@ -168,47 +167,43 @@ function RouteComponent() {
         <Text className='text-muted'>Manage access keys for S3 API authentication</Text>
       </div>
 
-      <Stack direction='column' spacing='lg'>
-        <Stack direction='row' className='flex-wrap gap-2'>
-          <Button onClick={handleShowCreateForm}>
-            <Lucide.Plus className='size-4' />
-            Create Key
-          </Button>
-          <Button variant='outline' onClick={() => setShowKeyImport(true)}>
-            <Lucide.Download className='size-4' />
-            Import Key
-          </Button>
-          <Button variant='outline' onClick={handleDeleteAllKeys} disabled={keys.length === 0}>
-            <Lucide.Trash2 className='size-4' />
-            Delete All
-          </Button>
-          <Button
-            variant='outline'
-            onClick={handleRefreshKeys}
-            disabled={isRefreshing}
-            progress={isRefreshing}
-          >
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
-        </Stack>
+      <div className='flex flex-wrap gap-2.5'>
+        <Button onClick={handleShowCreateForm}>
+          <Lucide.Plus className='size-4' />
+          Create Key
+        </Button>
+        <Button variant='outline' onClick={() => setShowKeyImport(true)}>
+          <Lucide.Download className='size-4' />
+          Import Key
+        </Button>
+        <Button variant='outline' onClick={handleDeleteAllKeys} disabled={keys.length === 0}>
+          <Lucide.Trash2 className='size-4' />
+          Delete All
+        </Button>
+        <Button
+          variant='outline'
+          onClick={handleRefreshKeys}
+          disabled={isRefreshing}
+          progress={isRefreshing}
+        >
+          <Lucide.RefreshCcw className='size-4' />
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
+        </Button>
+      </div>
 
-        {successMessage && <Alert variant='success'>{successMessage}</Alert>}
-        {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
+      {successMessage && <Alert variant='success'>{successMessage}</Alert>}
+      {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
 
-        <KeyTable keys={keys} onDelete={handleDeleteKey} isLoading={isRefreshing} />
+      <KeyTable keys={keys} onDelete={handleDeleteKey} isLoading={isRefreshing} />
 
-        <Alert variant='info'>
-          <Lucide.Info className='size-4' />
-          <div>
-            <h4 className='text-sm font-medium'>Information</h4>
-            <p className='mt-1 text-xs'>
-              Access keys are used to authenticate with the Garage S3 API. Each key consists of an
-              Access Key ID and a Secret Key ID. Keep your secret keys secure and never share them
-              publicly.
-            </p>
-          </div>
-        </Alert>
-      </Stack>
+      <Alert variant='info'>
+        <Lucide.Info className='size-4' />
+        <AlertDescription>
+          Access keys are used to authenticate with the Garage S3 API. Each key consists of an
+          Access Key ID and a Secret Key ID. Keep your secret keys secure and never share them
+          publicly.
+        </AlertDescription>
+      </Alert>
 
       {/* Import Modal */}
       <KeyImport
