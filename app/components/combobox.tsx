@@ -23,7 +23,7 @@ export const comboboxTriggerStyles = cva(
     'focus:ring-primary focus:ring-2 focus:outline-0',
     'has-focus:ring-primary has-focus:ring-2',
     'flex cursor-pointer items-center gap-2',
-    'data-disabled:cursor-not-allowed data-disabled:opacity-70'
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50'
   ],
   {
     variants: {
@@ -300,7 +300,7 @@ export function ComboboxItem({
         'group-data-[side=none]:min-w-[calc(var(--anchor-width))]',
         'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
         'focus-visible:outline-none',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-70',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         className
       )}
     >

@@ -21,7 +21,7 @@ export function NumberField({
       {...props}
       className={clx(
         'flex flex-col items-start gap-2',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-70',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         className
       )}
     />

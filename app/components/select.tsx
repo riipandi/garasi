@@ -28,7 +28,7 @@ export const selectTriggerStyles = cva(
     'bg-input placeholder:text-dimmed h-9 w-full rounded px-3 transition-all',
     'focus:ring-primary focus:ring-2 focus:outline-0',
     'flex cursor-pointer items-center gap-2',
-    'data-disabled:cursor-not-allowed data-disabled:opacity-70'
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50'
   ],
   {
     variants: {

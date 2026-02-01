@@ -116,7 +116,7 @@ const menuItemClassName = [
   'focus-visible:outline-none',
   '[&_svg:not([class*=size-])]:size-3.5 [&_svg:not([class*=text-])]:text-popover-foreground',
   '*:data-[slot=switch]:ml-auto',
-  'data-disabled:cursor-not-allowed data-disabled:opacity-70'
+  'data-disabled:cursor-not-allowed data-disabled:opacity-50'
 ]
 
 export function MenuItem({ ...props }: React.ComponentProps<typeof BaseMenu.Item>) {

@@ -7,14 +7,12 @@ import {
   Dialog,
   DialogBody,
   DialogClose,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogPopup,
   DialogTitle
 } from '~/app/components/dialog'
 import { Field, FieldLabel, FieldError } from '~/app/components/field'
-import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
 import { Form } from '~/app/components/form'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
@@ -74,7 +72,7 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogPopup render={<Form onSubmit={handleSubmit} />}>
+      <DialogPopup className='w-sm'>
         <DialogHeader>
           <IconBox variant='primary' size='sm'>
             <Lucide.Download className='size-4' />
@@ -82,46 +80,43 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
           <DialogTitle>Import Access Key</DialogTitle>
 
           <DialogClose className='ml-auto'>
-            <Lucide.X className='size-4' strokeWidth={2.0} />
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
           </DialogClose>
         </DialogHeader>
-        <DialogBody>
-          <DialogDescription>Import an existing access key</DialogDescription>
-
-          <form.Field
-            name='name'
-            validators={{
-              onChange: ({ value }) => {
-                if (value) {
-                  const result = importKeySchema.shape.name.safeParse(value)
-                  if (!result.success) {
-                    const firstError = result.error.issues[0]
-                    return firstError ? firstError.message : undefined
+        <DialogBody className='border-border mt-3 border-t pt-0'>
+          <Form onSubmit={handleSubmit}>
+            <form.Field
+              name='name'
+              validators={{
+                onChange: ({ value }) => {
+                  if (value) {
+                    const result = importKeySchema.shape.name.safeParse(value)
+                    if (!result.success) {
+                      const firstError = result.error.issues[0]
+                      return firstError ? firstError.message : undefined
+                    }
                   }
+                  return undefined
                 }
-                return undefined
-              }
-            }}
-          >
-            {(field) => (
-              <Field className='mt-4'>
-                <FieldLabel htmlFor='name'>Name</FieldLabel>
-                <Input
-                  id='name'
-                  type='text'
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder='e.g., Imported Key from Production'
-                  disabled={isSubmitting}
-                />
-                <FieldError>{field.state.meta.errors[0]}</FieldError>
-              </Field>
-            )}
-          </form.Field>
+              }}
+            >
+              {(field) => (
+                <Field className='mt-4'>
+                  <FieldLabel htmlFor='name'>Name</FieldLabel>
+                  <Input
+                    id='name'
+                    type='text'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='e.g., Imported Key from Production'
+                    disabled={isSubmitting}
+                  />
+                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                </Field>
+              )}
+            </form.Field>
 
-          <Fieldset>
-            <FieldsetLegend>Credentials</FieldsetLegend>
             <form.Field
               name='accessKeyId'
               validators={{
@@ -182,31 +177,28 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                 </Field>
               )}
             </form.Field>
-          </Fieldset>
+          </Form>
         </DialogBody>
         <DialogFooter>
           <DialogClose block>Cancel</DialogClose>
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmittingForm]) => (
-              <DialogClose
-                render={
-                  <Button
-                    size='sm'
-                    type='submit'
-                    disabled={!canSubmit || isSubmittingForm || isSubmitting}
-                    block
-                  >
-                    {isSubmitting || isSubmittingForm ? (
-                      <span className='flex items-center gap-2'>
-                        <Spinner className='size-4' strokeWidth={2.0} />
-                        Importing...
-                      </span>
-                    ) : (
-                      'Import Key'
-                    )}
-                  </Button>
-                }
-              />
+              <Button
+                type='button'
+                size='sm'
+                disabled={!canSubmit || isSubmittingForm || isSubmitting}
+                onClick={() => form.handleSubmit()}
+                block
+              >
+                {isSubmitting || isSubmittingForm ? (
+                  <span className='flex items-center gap-2'>
+                    <Spinner className='size-4' strokeWidth={2.0} />
+                    Importing...
+                  </span>
+                ) : (
+                  'Import Key'
+                )}
+              </Button>
             )}
           </form.Subscribe>
         </DialogFooter>

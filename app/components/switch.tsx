@@ -20,7 +20,7 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Base
         'data-checked:bg-primary data-checked:ring-primary',
         'transition-colors duration-75',
         'focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-70',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         className
       )}
       {...props}

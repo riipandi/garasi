@@ -15,12 +15,10 @@ import {
   DialogTitle
 } from '~/app/components/dialog'
 import { Field, FieldLabel, FieldError } from '~/app/components/field'
-import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
 import { Form } from '~/app/components/form'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
-import { Radio, RadioGroup } from '~/app/components/radio'
 import { Spinner } from '~/app/components/spinner'
 import type { CreateAccessKeyRequest } from '~/shared/schemas/keys.schema'
 
@@ -53,7 +51,7 @@ const EXPIRATION_PRESETS: {
   { value: '7d', label: '7 Days', days: 7 },
   { value: '30d', label: '30 Days', days: 30 },
   { value: '90d', label: '90 Days', days: 90 },
-  { value: 'never', label: 'Never Expires' },
+  { value: 'never', label: 'Never' },
   { value: 'custom', label: 'Custom Date' }
 ]
 
@@ -90,7 +88,14 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
         deny: value.allowCreateBucket ? null : { createBucket: true }
       }
 
-      await onSubmit(submitValue)
+      try {
+        await onSubmit(submitValue)
+        onClose()
+      } catch (error) {
+        // Error is handled by parent component
+        console.error(error)
+        throw error
+      }
     }
   })
 
@@ -121,22 +126,20 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogPopup className='w-sm'>
-          <DialogHeader>
-            <IconBox variant='primary' size='sm'>
-              <Lucide.KeyRound className='size-4' />
-            </IconBox>
-            <DialogTitle>Create New Access Key</DialogTitle>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogPopup>
+        <DialogHeader>
+          <IconBox variant='primary' size='sm'>
+            <Lucide.KeyRound className='size-4' />
+          </IconBox>
+          <DialogTitle>Create New Access Key</DialogTitle>
 
-            <DialogClose className='ml-auto'>
-              <Lucide.XIcon className='size-4' strokeWidth={2.0} />
-            </DialogClose>
-          </DialogHeader>
-          <DialogBody className='space-y-4 pt-2'>
-            <DialogDescription>Create a new access key for bucket access.</DialogDescription>
-
+          <DialogClose className='ml-auto'>
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
+          </DialogClose>
+        </DialogHeader>
+        <DialogBody className='border-border mt-3 border-t pt-0'>
+          <Form onSubmit={handleSubmit}>
             <form.Field
               name='name'
               validators={{
@@ -173,48 +176,50 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
               {(field) => (
                 <Field>
                   <FieldLabel>Expiration</FieldLabel>
-                  <RadioGroup
-                    className='gap-2'
-                    value={field.state.value}
-                    onChange={(e) => {
-                      const target = e.target as HTMLInputElement
-                      handlePresetChange(target.value as ExpirationPreset)
-                    }}
-                    disabled={isSubmitting}
-                  >
+                  <div className='space-y-2'>
                     {/* Top row: 7d, 30d, 90d */}
-                    <div className='grid grid-cols-3 gap-2'>
-                      {EXPIRATION_PRESETS.slice(0, 3).map((preset) => (
-                        <Label
+                    <div className='grid grid-cols-4 gap-2'>
+                      {EXPIRATION_PRESETS.slice(0, 4).map((preset) => (
+                        <button
                           key={preset.value}
-                          className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all ${
+                          type='button'
+                          onClick={() => {
+                            field.handleChange(preset.value)
+                            handlePresetChange(preset.value)
+                          }}
+                          disabled={isSubmitting}
+                          className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                             field.state.value === preset.value
                               ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                               : 'border-input-border bg-input hover:border-primary/50'
                           } `}
                         >
-                          <Radio value={preset.value} className='sr-only' />
                           <span className='text-xs font-medium'>{preset.label}</span>
-                        </Label>
+                        </button>
                       ))}
                     </div>
                     {/* Bottom row: never, custom */}
-                    <div className='grid grid-cols-2 gap-2'>
-                      {EXPIRATION_PRESETS.slice(3).map((preset) => (
-                        <Label
+                    <div className='grid grid-cols-1 gap-2'>
+                      {EXPIRATION_PRESETS.slice(4).map((preset) => (
+                        <button
                           key={preset.value}
-                          className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all ${
+                          type='button'
+                          onClick={() => {
+                            field.handleChange(preset.value)
+                            handlePresetChange(preset.value)
+                          }}
+                          disabled={isSubmitting}
+                          className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                             field.state.value === preset.value
                               ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                               : 'border-input-border bg-input hover:border-primary/50'
                           } `}
                         >
-                          <Radio value={preset.value} className='sr-only' />
                           <span className='text-xs font-medium'>{preset.label}</span>
-                        </Label>
+                        </button>
                       ))}
                     </div>
-                  </RadioGroup>
+                  </div>
                   <FieldError>{field.state.meta.errors[0]}</FieldError>
                 </Field>
               )}
@@ -263,43 +268,40 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
             <form.Field name='allowCreateBucket'>
               {(field) => (
                 <Field>
-                  <FieldLabel htmlFor='expiration'>Permissions</FieldLabel>
-                  <Label>
+                  <FieldLabel htmlFor='allowCreateBucket'>Permissions</FieldLabel>
+                  <Label className='flex cursor-pointer items-center gap-2'>
                     <Checkbox name={field.name} />
                     <span>Allow creating buckets</span>
                   </Label>
                 </Field>
               )}
             </form.Field>
-          </DialogBody>
-          <DialogFooter>
-            <DialogClose block>Cancel</DialogClose>
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmittingForm]) => (
-                <DialogClose
-                  render={
-                    <Button
-                      size='sm'
-                      type='submit'
-                      disabled={!canSubmit || isSubmittingForm || isSubmitting}
-                      block
-                    >
-                      {isSubmitting || isSubmittingForm ? (
-                        <span className='flex items-center gap-2'>
-                          <Spinner className='size-4' strokeWidth={2.0} />
-                          Creating...
-                        </span>
-                      ) : (
-                        'Create Key'
-                      )}
-                    </Button>
-                  }
-                />
-              )}
-            </form.Subscribe>
-          </DialogFooter>
-        </DialogPopup>
-      </Dialog>
-    </Form>
+          </Form>
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose block>Cancel</DialogClose>
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmittingForm]) => (
+              <Button
+                type='button'
+                size='sm'
+                disabled={!canSubmit || isSubmittingForm || isSubmitting}
+                onClick={() => form.handleSubmit()}
+                block
+              >
+                {isSubmitting || isSubmittingForm ? (
+                  <span className='flex items-center gap-2'>
+                    <Spinner className='size-4' strokeWidth={2.0} />
+                    Creating...
+                  </span>
+                ) : (
+                  'Create Key'
+                )}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
+      </DialogPopup>
+    </Dialog>
   )
 }

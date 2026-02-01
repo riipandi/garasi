@@ -21,7 +21,7 @@ export const buttonStyles = cva(
     'focus:outline-0 focus-visible:outline-2 focus-visible:outline-offset-2',
     'before:bg-spinner before:-mr-6 before:size-4 before:scale-20 before:opacity-0 before:transition-[opacity,scale,margin-right]',
     '[&>svg]:opacity-100 [&>svg]:transition-[opacity,scale,margin-right] [&>svg:not([class*=text-])]:text-current',
-    'data-disabled:cursor-not-allowed data-disabled:opacity-70'
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50'
   ],
   {
     variants: {

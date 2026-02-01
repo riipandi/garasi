@@ -27,7 +27,7 @@ export function Slider({
   return (
     <BaseSlider.Root
       data-slot='slider'
-      className={clx('data-disabled:opacity-70', className)}
+      className={clx('data-disabled:opacity-50', className)}
       {...props}
     >
       <BaseSlider.Control className='touch-none select-none'>

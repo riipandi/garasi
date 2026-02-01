@@ -13,7 +13,7 @@ export const inputStyles = cva(
     'ring-input-border hover:not-data-disabled:not-focus:ring-input-accent-border focus:ring-primary ring focus:ring-2 focus:outline-0',
     '[&[type="file"]]:text-dimmed file:-ml-1 [&[type="file"]]:py-2',
     'file:text-secondary-foreground file:ring-input-accent-border file:bg-secondary file:mr-1.5 file:h-5 file:rounded-sm file:px-1 file:text-base file:ring',
-    'data-disabled:cursor-not-allowed data-disabled:opacity-70'
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50'
   ],
   {
     variants: {
