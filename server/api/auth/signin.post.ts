@@ -1,7 +1,7 @@
 import { readBody, defineHandler, getRequestIP, HTTPError } from 'nitro/h3'
 import { storeCookie } from '~/server/platform/guards'
 import { generateTokenPair } from '~/server/platform/jwt'
-import { createErrorResonse } from '~/server/platform/responder'
+import { createResponse, createErrorResonse } from '~/server/platform/responder'
 import { createSession, storeRefreshToken } from '~/server/services/session.service'
 import { cleanupExpiredSessions } from '~/server/services/session.service'
 import { cleanupExpiredRefreshTokens } from '~/server/services/session.service'
@@ -88,10 +88,8 @@ export default defineHandler(async (event) => {
 
     logger.withMetadata({ userId: user.id, sessionId }).info('User signed in successfully')
 
-    // Return user data with JWT tokens and session info
-    return {
-      success: true,
-      message: null,
+    return createResponse(event, 'Signed in successfully', {
+      statusCode: 200,
       data: {
         user_id: user.id,
         email: user.email,
@@ -102,7 +100,7 @@ export default defineHandler(async (event) => {
         access_token_expiry: tokens.accessTokenExpiry,
         refresh_token_expiry: tokens.refreshTokenExpiry
       }
-    }
+    })
   } catch (error) {
     return createErrorResonse(event, error)
   }

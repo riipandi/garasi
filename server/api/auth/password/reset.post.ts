@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody, getQuery, HTTPError } from 'h3'
-import { createErrorResonse } from '~/server/platform/responder'
+import { createResponse, createErrorResonse } from '~/server/platform/responder'
 import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
 interface ResetPasswordBody {
@@ -86,12 +86,14 @@ export default defineEventHandler(async (event) => {
       .withMetadata({ userId: resetToken.userId, revokedCount, deactivatedCount })
       .info('Password reset successful')
 
-    return {
-      success: true,
-      message:
-        'Password has been reset successfully. All sessions have been terminated for security.',
-      data: null
-    }
+    return createResponse(
+      event,
+      'Password has been reset successfully. All sessions have been terminated for security.',
+      {
+        statusCode: 200,
+        data: null
+      }
+    )
   } catch (error) {
     logger.withError(error).error('Error processing password reset')
     return createErrorResonse(event, error)

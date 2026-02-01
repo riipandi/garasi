@@ -1,19 +1,13 @@
-// User interface for dummy authentication
+import type { ApiResponse } from './common.schema'
+
 export interface User {
   id: string
   email: string
   name: string
 }
 
-/**
- * User information response from whoami endpoint
- */
-export interface WhoamiResponse {
-  success: boolean
-  message: string | null
-  data: {
-    user_id: string
-    email: string
-    name: string
-  } | null
-}
+export interface WhoamiResponse extends ApiResponse<{
+  user_id: string
+  email: string
+  name: string
+}> {}

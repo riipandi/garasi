@@ -1,5 +1,6 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 
 interface UpdateProfileBody {
   name?: string
@@ -58,14 +59,12 @@ export default defineProtectedHandler(async (event) => {
     .withMetadata({ userId: auth.userId, name: updatedUser.name })
     .info('Profile updated successfully')
 
-  // Return success message
-  return {
-    success: true,
-    message: 'Profile updated successfully',
+  return createResponse(event, 'Profile updated successfully', {
+    statusCode: 200,
     data: {
       user_id: updatedUser.id,
       email: updatedUser.email,
       name: updatedUser.name
     }
-  }
+  })
 })

@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { fetcher } from '~/app/fetcher'
 import { logout as logoutApi } from '~/app/services/auth.service'
 import { authStore } from '~/app/stores'
@@ -29,19 +29,20 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   /**
    * Fetch user information from /auth/whoami endpoint
    */
-  const fetchUser = async (): Promise<User | null> => {
+  const fetchUser = useCallback(async (): Promise<User | null> => {
     try {
       const response = await fetcher<{
-        success: boolean
-        message: string | null
+        status: 'success' | 'error'
+        message: string
         data: {
           user_id: string
           email: string
           name: string
         } | null
+        error: any
       }>('/auth/whoami')
 
-      if (response.success && response.data) {
+      if (response.status === 'success' && response.data) {
         return {
           id: response.data.user_id,
           email: response.data.email,
@@ -53,7 +54,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       console.error('Failed to fetch user info:', error)
       return null
     }
-  }
+  }, [])
 
   // Fetch user data when authenticated
   useEffect(() => {
@@ -66,7 +67,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     } else {
       setUser(null)
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, fetchUser])
 
   // Listen to session expired events and redirect to signin
   useEffect(() => {
@@ -96,10 +97,9 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     password: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Call the signin API endpoint
       const response = await fetcher<{
-        success: boolean
-        message: string | null
+        status: 'success' | 'error'
+        message: string
         data: {
           user_id: string
           email: string
@@ -109,17 +109,17 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
           refresh_token: string
           access_token_expiry: number | null
           refresh_token_expiry: number | null
-        }
+        } | null
+        error: any
       }>('/auth/signin', {
         method: 'POST',
         body: { email, password }
       })
 
-      if (!response.success || !response.data) {
+      if (response.status !== 'success' || !response.data) {
         return { success: false, error: response.message || 'Invalid email or password' }
       }
 
-      // Update auth store with session ID and tokens from backend (user info will be fetched from whoami)
       authStore.setKey('atoken', response.data.access_token)
       authStore.setKey('atokenexp', response.data.access_token_expiry)
       authStore.setKey('rtoken', response.data.refresh_token)

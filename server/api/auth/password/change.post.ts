@@ -1,5 +1,6 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
 interface ChangePasswordBody {
@@ -80,14 +81,15 @@ export default defineProtectedHandler(async (event) => {
     .withMetadata({ userId: auth.userId, revokedCount, deactivatedCount })
     .info('Password changed successfully')
 
-  // Return success message
-  return {
-    success: true,
-    message:
-      'Password changed successfully. All sessions have been terminated for security. Please sign in again.',
-    data: {
-      revoked_tokens: revokedCount,
-      deactivated_sessions: deactivatedCount
+  return createResponse(
+    event,
+    'Password changed successfully. All sessions have been terminated for security. Please sign in again.',
+    {
+      statusCode: 200,
+      data: {
+        revoked_tokens: revokedCount,
+        deactivated_sessions: deactivatedCount
+      }
     }
-  }
+  )
 })

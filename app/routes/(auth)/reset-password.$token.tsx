@@ -26,14 +26,15 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
 
     try {
       const response = await fetcher<{
-        success: boolean
+        status: 'success' | 'error'
         message: string
-        data: { is_token_valid: boolean }
+        data: { is_token_valid: boolean } | null
+        error: any
       }>(`/auth/validate-token?token=${token}`, {
         method: 'GET'
       })
 
-      return { isValidToken: response.success && response.data?.is_token_valid }
+      return { isValidToken: response.status === 'success' && response.data?.is_token_valid }
     } catch (error) {
       console.error(error)
       return { isValidToken: false }
@@ -75,15 +76,16 @@ function RouteComponent() {
     onSubmit: async ({ value }) => {
       try {
         const response = await fetcher<{
-          success: boolean
+          status: 'success' | 'error'
           message: string
           data: null
+          error: any
         }>(`/auth/password/reset?token=${token}`, {
           method: 'POST',
           body: { password: value.password }
         })
 
-        if (response.success) {
+        if (response.status === 'success') {
           setIsSuccess(true)
           setSuccessMessage(response.message)
         }

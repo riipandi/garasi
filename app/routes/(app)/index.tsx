@@ -31,22 +31,46 @@ const whoamiQuery = queryOptions({
 
 const clusterHealthQuery = queryOptions({
   queryKey: ['cluster', 'health'],
-  queryFn: () => fetcher<{ success: boolean; data: ClusterHealthResponse }>('/cluster/health')
+  queryFn: () =>
+    fetcher<{
+      status: 'success' | 'error'
+      message: string
+      data: ClusterHealthResponse | null
+      error: any
+    }>('/cluster/health')
 })
 
 const clusterStatisticsQuery = queryOptions({
   queryKey: ['cluster', 'statistics'],
-  queryFn: () => fetcher<{ success: boolean; data: ClusterStatistics }>('/cluster/statistics')
+  queryFn: () =>
+    fetcher<{
+      status: 'success' | 'error'
+      message: string
+      data: ClusterStatistics | null
+      error: any
+    }>('/cluster/statistics')
 })
 
 const bucketsQuery = queryOptions({
   queryKey: ['buckets'],
-  queryFn: () => fetcher<{ success: boolean; data: BucketResponse[] }>('/bucket')
+  queryFn: () =>
+    fetcher<{
+      status: 'success' | 'error'
+      message: string
+      data: BucketResponse[] | null
+      error: any
+    }>('/bucket')
 })
 
 const keysQuery = queryOptions({
   queryKey: ['keys'],
-  queryFn: () => fetcher<{ success: boolean; data: KeyResponse[] }>('/keys')
+  queryFn: () =>
+    fetcher<{
+      status: 'success' | 'error'
+      message: string
+      data: KeyResponse[] | null
+      error: any
+    }>('/keys')
 })
 
 function RouteComponent() {
@@ -63,10 +87,10 @@ function RouteComponent() {
     return <DashboardSkeleton />
   }
 
-  const health = healthData?.data
-  const statistics = statisticsData?.data
-  const buckets = bucketsData?.data || []
-  const keys = keysData?.data || []
+  const health = healthData?.data ?? undefined
+  const statistics = statisticsData?.data ?? undefined
+  const buckets = bucketsData?.data ?? []
+  const keys = keysData?.data ?? []
 
   const totalDataStorage =
     statistics?.nodes.reduce((acc: number, node) => {

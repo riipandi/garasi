@@ -2,6 +2,7 @@ import { HTTPError, readBody } from 'nitro/h3'
 import { typeid } from 'typeid-js'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { sendMail } from '~/server/platform/mailer'
+import { createResponse } from '~/server/platform/responder'
 import { protectedEnv } from '~/shared/envars'
 
 interface ChangeEmailBody {
@@ -127,10 +128,12 @@ export default defineProtectedHandler(async (event) => {
       `
   })
 
-  return {
-    success: true,
-    message:
-      'A confirmation email has been sent to your new email address. Please check your inbox and click the link to confirm the email change.',
-    data: isDev ? { token, confirm_link: confirmLink, expires_at: expiresAt } : null
-  }
+  return createResponse(
+    event,
+    'A confirmation email has been sent to your new email address. Please check your inbox and click the link to confirm the email change.',
+    {
+      statusCode: 200,
+      data: isDev ? { token, confirm_link: confirmLink, expires_at: expiresAt } : null
+    }
+  )
 })

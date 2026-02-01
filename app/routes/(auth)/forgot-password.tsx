@@ -33,19 +33,20 @@ function RouteComponent() {
     onSubmit: async ({ value }) => {
       try {
         const response = await fetcher<{
-          success: boolean
+          status: 'success' | 'error'
           message: string
           data: {
             token?: string
             reset_link?: string
             expires_at?: number
           } | null
+          error: any
         }>('/auth/password/forgot', {
           method: 'POST',
           body: { email: value.email }
         })
 
-        if (response.success) {
+        if (response.status === 'success') {
           setIsSuccess(true)
           setSuccessMessage(response.message)
         }

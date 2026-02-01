@@ -1,7 +1,7 @@
 import { defineEventHandler, readBody, HTTPError } from 'h3'
 import { typeid } from 'typeid-js'
 import { sendMail } from '~/server/platform/mailer'
-import { createErrorResonse } from '~/server/platform/responder'
+import { createResponse, createErrorResonse } from '~/server/platform/responder'
 import { protectedEnv } from '~/shared/envars'
 
 interface ForgotPasswordBody {
@@ -30,16 +30,18 @@ export default defineEventHandler(async (event) => {
       .where('email', '=', body.email)
       .executeTakeFirst()
 
-    // Always return success to prevent email enumeration
-    // Even if user doesn't exist, we don't want to reveal that
     if (!user) {
       logger
         .withMetadata({ email: body.email })
         .warn('User not found, but returning success for security')
-      return {
-        success: true,
-        message: 'If an account exists with this email, a password reset link has been sent.'
-      }
+      return createResponse(
+        event,
+        'If an account exists with this email, a password reset link has been sent.',
+        {
+          statusCode: 200,
+          data: null
+        }
+      )
     }
 
     // Generate a secure token and set expiry to 1 hour from now (in seconds)
@@ -76,11 +78,14 @@ export default defineEventHandler(async (event) => {
       `
     })
 
-    return {
-      success: true,
-      message: 'If an account exists with this email, a password reset link has been sent.',
-      data: isDev ? { token, reset_link: resetLink, expires_at: expiresAt } : null
-    }
+    return createResponse(
+      event,
+      'If an account exists with this email, a password reset link has been sent.',
+      {
+        statusCode: 200,
+        data: isDev ? { token, reset_link: resetLink, expires_at: expiresAt } : null
+      }
+    )
   } catch (error) {
     logger.withError(error).error('Error processing forgot password request')
     return createErrorResonse(event, error)

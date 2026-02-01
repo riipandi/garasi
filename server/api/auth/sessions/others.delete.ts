@@ -1,4 +1,5 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { deactivateOtherSessions } from '~/server/services/session.service'
 import { revokeSessionRefreshTokens } from '~/server/services/session.service'
 
@@ -9,10 +10,8 @@ export default defineProtectedHandler(async (event) => {
     .withMetadata({ userId: auth.userId, currentSessionId: auth.sessionId })
     .debug('Signing out from other devices')
 
-  // Deactivate all other sessions for the user
   const deactivatedCount = await deactivateOtherSessions(db, auth.userId, auth.sessionId)
 
-  // Get all sessions for the user to find the ones we just deactivated
   const allSessions = await db
     .selectFrom('sessions')
     .select(['id'])
@@ -21,7 +20,6 @@ export default defineProtectedHandler(async (event) => {
     .where('isActive', '=', 0)
     .execute()
 
-  // Revoke refresh tokens for all deactivated sessions
   for (const session of allSessions) {
     await revokeSessionRefreshTokens(db, session.id)
   }
@@ -30,12 +28,10 @@ export default defineProtectedHandler(async (event) => {
     .withMetadata({ userId: auth.userId, deactivatedCount })
     .info('Signed out from other devices')
 
-  // Return success message
-  return {
-    success: true,
-    message: `Signed out from ${deactivatedCount} other device(s)`,
+  return createResponse(event, `Signed out from ${deactivatedCount} other device(s)`, {
+    statusCode: 200,
     data: {
       deactivated_count: deactivatedCount
     }
-  }
+  })
 })

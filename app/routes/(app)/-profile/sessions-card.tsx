@@ -1,6 +1,4 @@
-import { useStore } from '@nanostores/react'
 import { useNavigate } from '@tanstack/react-router'
-import { decodeJwt } from 'jose'
 import * as Lucide from 'lucide-react'
 import { Activity, useEffect, useState } from 'react'
 import {
@@ -37,7 +35,6 @@ import {
   revokeOtherSessions,
   revokeSession
 } from '~/app/services/auth.service'
-import { authStore } from '~/app/stores'
 import { clx } from '~/app/utils'
 
 interface Session {
@@ -47,6 +44,7 @@ interface Session {
   last_activity_at: number
   expires_at: number
   created_at: number
+  is_current: boolean
 }
 
 interface SessionsCardProps {
@@ -56,38 +54,25 @@ interface SessionsCardProps {
 export function SessionsCard({ onNotification }: SessionsCardProps) {
   const { logout } = useAuth()
   const navigate = useNavigate()
-  const authState = useStore(authStore)
   const [sessions, setSessions] = useState<Session[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const fetchSessions = async () => {
       setIsLoading(true)
-      const token = authState?.atoken
-
-      if (token) {
-        try {
-          const payload = decodeJwt<{ sid?: string }>(token)
-          setCurrentSessionId(payload?.sid || null)
-        } catch (error) {
-          console.error('Failed to decode token:', error)
-        }
-      }
-
       const fetchedSessions = await getUserSessions()
       setSessions(fetchedSessions)
       setIsLoading(false)
     }
 
     fetchSessions()
-  }, [authState?.atoken])
+  }, [])
 
-  const handleRevokeSession = async (sessionId: string) => {
+  const handleRevokeSession = async (sessionId: string, isCurrent: boolean) => {
     const success = await revokeSession(sessionId)
     if (success) {
-      if (sessionId === currentSessionId) {
+      if (isCurrent) {
         onNotification('success', 'Current session revoked. Please sign in again.')
         await logout()
         navigate({ to: '/signin' })
@@ -103,7 +88,7 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
   const handleRevokeOthers = async () => {
     const success = await revokeOtherSessions()
     if (success) {
-      setSessions(sessions.filter((s) => s.id === currentSessionId))
+      setSessions(sessions.filter((s) => s.is_current))
       onNotification('success', 'Other sessions revoked successfully')
     } else {
       onNotification('error', 'Failed to revoke other sessions')
@@ -177,12 +162,11 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
           ) : (
             <Stack spacing='md'>
               {filteredSessions.map((session) => {
-                const isCurrent = session.id === currentSessionId
                 return (
-                  <Item key={session.id} variant={isCurrent ? 'info-outline' : 'default'}>
+                  <Item key={session.id} variant={session.is_current ? 'info-outline' : 'default'}>
                     <ItemMedia className='flex items-center'>
                       <Lucide.Laptop
-                        className={clx('size-8', isCurrent ? 'text-info' : 'text-dimmed')}
+                        className={clx('size-8', session.is_current ? 'text-info' : 'text-dimmed')}
                       />
                     </ItemMedia>
                     <ItemContent>
@@ -192,12 +176,12 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
                       </ItemDescription>
                     </ItemContent>
                     <ItemAction>
-                      {isCurrent && (
+                      {session.is_current && (
                         <Badge variant='info-outline' size='sm'>
                           Current
                         </Badge>
                       )}
-                      {!isCurrent && (
+                      {!session.is_current && (
                         <AlertDialog>
                           <AlertDialogTrigger
                             render={
@@ -221,7 +205,9 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
                                 render={
                                   <Button
                                     variant='danger'
-                                    onClick={() => handleRevokeSession(session.id)}
+                                    onClick={() =>
+                                      handleRevokeSession(session.id, session.is_current)
+                                    }
                                   >
                                     Revoke
                                   </Button>
@@ -232,7 +218,7 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
                         </AlertDialog>
                       )}
 
-                      <Activity mode={isCurrent ? 'visible' : 'hidden'}>
+                      <Activity mode={session.is_current ? 'visible' : 'hidden'}>
                         <AlertDialog>
                           <AlertDialogTrigger
                             render={
@@ -257,7 +243,9 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
                                 render={
                                   <Button
                                     variant='danger'
-                                    onClick={() => handleRevokeSession(session.id)}
+                                    onClick={() =>
+                                      handleRevokeSession(session.id, session.is_current)
+                                    }
                                   >
                                     Sign Out
                                   </Button>

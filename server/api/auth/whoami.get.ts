@@ -1,8 +1,8 @@
 import { HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-import type { WhoamiResponse } from '~/shared/schemas/user.schema'
+import { createResponse } from '~/server/platform/responder'
 
-export default defineProtectedHandler(async (event): Promise<WhoamiResponse> => {
+export default defineProtectedHandler(async (event) => {
   const { db, auth, logger } = event.context
 
   // Fetch user from database
@@ -22,14 +22,11 @@ export default defineProtectedHandler(async (event): Promise<WhoamiResponse> => 
     .withMetadata({ userId: auth.userId, email: user.email })
     .debug('User information retrieved')
 
-  // Return user information
-  return {
-    success: true,
-    message: 'User information retrieved',
+  return createResponse(event, 'User information retrieved', {
     data: {
       user_id: user.id,
       email: user.email,
       name: user.name
     }
-  }
+  })
 })
