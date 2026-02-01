@@ -326,7 +326,7 @@ function RouteComponent() {
 
   if (isLoadingKey || !accessKey) {
     return (
-      <div className='flex min-h-screen items-center justify-center'>
+      <div className='mx-auto w-full max-w-7xl space-y-6'>
         <div className='flex flex-col items-center'>
           <Spinner />
           <Text className='mt-4 text-sm text-gray-600'>Loading key details...</Text>
@@ -336,7 +336,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
+    <div className='mx-auto w-full max-w-7xl space-y-6'>
       <div className='flex items-start gap-4'>
         <Link
           to='/keys'

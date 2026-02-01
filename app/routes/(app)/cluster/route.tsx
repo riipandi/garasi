@@ -38,7 +38,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className='mx-auto space-y-6'>
+    <div className='mx-auto w-full max-w-7xl space-y-6'>
       <div className='min-w-0 flex-1 space-y-1.5'>
         <Heading level={1} size='lg'>
           Cluster

@@ -109,7 +109,7 @@ function RouteComponent() {
   const storagePercentage = totalDataStorage > 0 ? (usedDataStorage / totalDataStorage) * 100 : 0
 
   return (
-    <div className='mx-auto max-w-7xl space-y-8'>
+    <div className='mx-auto w-full max-w-7xl space-y-6'>
       <div className='min-w-0 flex-1 space-y-1.5'>
         <Heading level={1} size='lg'>
           Dashboard

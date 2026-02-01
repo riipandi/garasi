@@ -136,7 +136,7 @@ function RouteComponent() {
 
   if (!nodeInfo) {
     return (
-      <div className='mx-auto max-w-screen-2xl space-y-6'>
+      <div className='mx-auto w-full max-w-7xl space-y-6'>
         <Card>
           <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-16 text-center'>
             <Lucide.XCircle className='text-muted mb-4 size-16' />
@@ -151,7 +151,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className='mx-auto max-w-screen-2xl space-y-6'>
+    <div className='mx-auto w-full max-w-7xl space-y-6'>
       <React.Suspense
         fallback={
           <Card>
