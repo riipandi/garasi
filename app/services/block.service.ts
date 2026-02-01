@@ -5,7 +5,7 @@ import type { PurgeBlocksParams, PurgeBlocksResponse } from '~/shared/schemas/bl
 import type { RetryBlockResyncParams, RetryBlockResyncRequest } from '~/shared/schemas/block.schema'
 import type { RetryBlockResyncResponse } from '~/shared/schemas/block.schema'
 import type { ApiResponse } from '~/shared/schemas/common.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function listBlockErrors(params: ListBlockErrorsParams) {
   return await fetcher<ApiResponse<ListBlockErrorsResponse>>('/block/errors', {

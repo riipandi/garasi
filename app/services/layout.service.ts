@@ -8,7 +8,7 @@ import type { RevertClusterLayoutResponse } from '~/shared/schemas/layout.schema
 import type { SkipDeadNodesRequest, SkipDeadNodesResponse } from '~/shared/schemas/layout.schema'
 import type { UpdateClusterLayoutResponse } from '~/shared/schemas/layout.schema'
 import type { UpdateClusterLayoutRequest } from '~/shared/schemas/layout.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function getClusterLayout() {
   return await fetcher<ApiResponse<GetClusterLayoutResponse>>('/layout', {

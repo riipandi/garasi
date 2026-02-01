@@ -10,6 +10,7 @@ export interface AuthContextType {
   dismissSessionExpired: () => void
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
+  refetchUser: () => Promise<void>
 }
 
 // Create auth context

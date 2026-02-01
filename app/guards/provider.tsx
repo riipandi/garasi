@@ -1,10 +1,11 @@
 import { useRouter } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { fetcher, onSessionExpired } from '~/app/fetcher'
+import { fetcher } from '~/app/fetcher'
 import { logout as logoutApi } from '~/app/services/auth.service'
 import { authStore } from '~/app/stores'
 import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'
+import { onSessionExpired } from './procedures'
 
 /**
  * AuthProvider component that provides authentication state and methods
@@ -146,6 +147,15 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     setSessionExpired(false)
   }
 
+  /**
+   * Refetch user data from /auth/whoami endpoint
+   * Useful after updating user profile
+   */
+  const refetchUser = async (): Promise<void> => {
+    const userData = await fetchUser()
+    setUser(userData)
+  }
+
   const contextValue: AuthContextType = {
     user,
     isAuthenticated,
@@ -153,7 +163,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     sessionExpired,
     dismissSessionExpired,
     login,
-    logout
+    logout,
+    refetchUser
   }
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

@@ -1,39 +1,116 @@
-import fetcher from '~/app/fetcher'
-import { extractSessionIdFromToken } from '~/app/guards'
-import { authStore } from '~/app/stores'
+import { fetcher } from '~/app/fetcher'
+import type { WhoamiResponse } from '~/shared/schemas/user.schema'
 
-/**
- * Logout function to clear auth state and call logout endpoint
- *
- * @returns Promise that resolves when logout is complete
- */
-export async function logout(): Promise<void> {
-  const authState = authStore.get()
+// =============================================================================
+// AUTHENTICATION
+// =============================================================================
 
-  if (authState?.rtoken && authState?.atoken) {
-    const sessionId = extractSessionIdFromToken(authState.atoken)
-    if (sessionId) {
-      try {
-        // Call logout endpoint to revoke refresh token and deactivate session
-        await fetcher('/auth/logout', {
-          method: 'POST',
-          body: {
-            refresh_token: authState.rtoken,
-            session_id: sessionId
-          }
-        })
-      } catch (error) {
-        console.error('Logout API call failed:', error)
-      }
-    }
-  }
-
-  // Clear auth store
-  authStore.set({
-    atoken: null,
-    atokenexp: null,
-    rtoken: null,
-    rtokenexp: null,
-    remember: false
+export async function signin(email: string, password: string) {
+  return await fetcher<any>('/auth/signin', {
+    method: 'POST',
+    body: { email, password }
   })
+}
+
+export async function logout() {
+  return await fetcher<any>('/auth/logout', {
+    method: 'POST'
+  })
+}
+
+export async function refresh(refreshToken: string, sessionId: string) {
+  return await fetcher<any>('/auth/refresh', {
+    method: 'POST',
+    body: { refresh_token: refreshToken, session_id: sessionId }
+  })
+}
+
+export async function validateToken(token: string) {
+  return await fetcher<any>('/auth/validate-token', {
+    method: 'GET',
+    query: { token }
+  })
+}
+
+export async function whoami() {
+  return await fetcher<WhoamiResponse>('/auth/whoami', {
+    method: 'GET'
+  })
+}
+
+// =============================================================================
+// PASSWORD RECOVERY
+// =============================================================================
+
+export async function passwordChange(currentPassword: string, newPassword: string) {
+  return await fetcher<any>('/auth/password/change', {
+    method: 'POST',
+    body: { current_password: currentPassword, new_password: newPassword }
+  })
+}
+
+export async function passwordForgot(email: string) {
+  return await fetcher<any>('/auth/password/forgot', {
+    method: 'POST',
+    body: { email }
+  })
+}
+
+export async function passwordReset(token: string, password: string) {
+  return await fetcher<any>('/auth/password/reset', {
+    method: 'POST',
+    body: { token, password }
+  })
+}
+
+// =============================================================================
+// SESSIONS MANAGEMENT
+// =============================================================================
+
+export async function getUserSessions() {
+  try {
+    const response = await fetcher<any>('/auth/sessions', {
+      method: 'GET'
+    })
+    return response.status === 'success' ? response.data.sessions : []
+  } catch (error) {
+    console.error('Failed to fetch sessions:', error)
+    return []
+  }
+}
+
+export async function revokeAllSessions() {
+  try {
+    const response = await fetcher<any>('/auth/sessions/all', {
+      method: 'DELETE'
+    })
+    return response.status === 'success'
+  } catch (error) {
+    console.error('Failed to revoke all sessions:', error)
+    return false
+  }
+}
+
+export async function revokeSession(sessionId: string) {
+  try {
+    const response = await fetcher<any>(`/auth/sessions?session_id=${sessionId}`, {
+      method: 'DELETE'
+    })
+    return response.status === 'success'
+  } catch (error) {
+    console.error('Failed to revoke session:', error)
+    return false
+  }
+}
+
+export async function revokeOtherSessions() {
+  try {
+    const response = await fetcher<any>('/auth/sessions/others', {
+      method: 'DELETE'
+    })
+    return response.status === 'success'
+  } catch (error) {
+    console.error('Failed to revoke other sessions:', error)
+    return false
+  }
 }

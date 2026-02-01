@@ -2,7 +2,8 @@
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 
 // Re-export types for convenience
-export type { WhoamiResponse, ClusterStatistics } from '~/shared/schemas/dashboard.schema'
+export type { ClusterStatistics } from '~/shared/schemas/dashboard.schema'
+export type { WhoamiResponse } from '~/shared/schemas/user.schema'
 export type { GetClusterHealthResponse as ClusterHealthResponse } from '~/shared/schemas/cluster.schema'
 export type { ListBucketsResponse as BucketResponse } from '~/shared/schemas/bucket.schema'
 

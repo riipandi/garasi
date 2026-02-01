@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { ThemeProvider } from 'tan-themer'
 import { NotFound } from '~/app/errors'
 import type { AuthStore, UIStore } from '~/app/stores'
 
@@ -10,7 +11,7 @@ export interface GlobalContext {
 }
 
 export const Route = createRootRouteWithContext<GlobalContext>()({
-  component: () => <Outlet />,
+  component: RootComponent,
   notFoundComponent: NotFound,
   loader({ context }) {
     // Always return current auth and ui state from context
@@ -18,3 +19,19 @@ export const Route = createRootRouteWithContext<GlobalContext>()({
     return { queryClient, auth, ui }
   }
 })
+
+function RootComponent() {
+  return (
+    <ThemeProvider
+      themes={['light', 'dark']}
+      attribute='data-theme'
+      storage='localStorage'
+      defaultTheme='system'
+      disableTransitionOnChange={true}
+      enableColorScheme={false}
+      enableSystem={true}
+    >
+      <Outlet />
+    </ThemeProvider>
+  )
+}

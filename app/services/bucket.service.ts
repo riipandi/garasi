@@ -14,7 +14,7 @@ import type { RemoveBucketAliasResponse } from '~/shared/schemas/bucket.schema'
 import type { UpdateBucketRequest, UpdateBucketParams } from '~/shared/schemas/bucket.schema'
 import type { UpdateBucketResponse } from '~/shared/schemas/bucket.schema'
 import type { ApiResponse } from '~/shared/schemas/common.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function listBuckets() {
   return await fetcher<ApiResponse<ListBucketsResponse[]>>('/bucket', {

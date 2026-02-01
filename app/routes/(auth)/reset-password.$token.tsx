@@ -9,7 +9,7 @@ import { InputPassword } from '~/app/components/input-password'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import fetcher from '~/app/fetcher'
+import { fetcher } from '~/app/fetcher'
 
 interface ResetPasswordLoaderData {
   isValidToken: boolean

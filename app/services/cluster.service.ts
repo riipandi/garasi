@@ -4,7 +4,7 @@ import type { GetClusterHealthResponse } from '~/shared/schemas/cluster.schema'
 import type { GetClusterStatisticsResponse } from '~/shared/schemas/cluster.schema'
 import type { GetClusterStatusResponse } from '~/shared/schemas/cluster.schema'
 import type { ApiResponse } from '~/shared/schemas/common.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function getClusterStatus() {
   return await fetcher<ApiResponse<GetClusterStatusResponse>>('/cluster/status', {

@@ -11,7 +11,7 @@ import type { ListWorkersResponse } from '~/shared/schemas/worker.schema'
 import type { SetWorkerVariableParams } from '~/shared/schemas/worker.schema'
 import type { SetWorkerVariableRequest } from '~/shared/schemas/worker.schema'
 import type { SetWorkerVariableResponse } from '~/shared/schemas/worker.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function listWorkers(params: ListWorkersParams, data: ListWorkersRequest) {
   return await fetcher<ApiResponse<ListWorkersResponse>>('/worker', {

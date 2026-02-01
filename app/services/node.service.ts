@@ -7,7 +7,7 @@ import type { GetNodeStatisticsResponse } from '~/shared/schemas/node.schema'
 import type { LaunchRepairOperationParams } from '~/shared/schemas/node.schema'
 import type { LaunchRepairOperationRequest } from '~/shared/schemas/node.schema'
 import type { LaunchRepairOperationResponse } from '~/shared/schemas/node.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function getNodeInfo(params: GetNodeInfoRequest) {
   return await fetcher<ApiResponse<GetNodeInfoResponse>>('/node/info', {

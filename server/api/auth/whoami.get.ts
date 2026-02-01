@@ -1,6 +1,6 @@
 import { HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-import type { WhoamiResponse } from '~/shared/schemas/dashboard.schema'
+import type { WhoamiResponse } from '~/shared/schemas/user.schema'
 
 export default defineProtectedHandler(async (event): Promise<WhoamiResponse> => {
   const { db, auth, logger } = event.context

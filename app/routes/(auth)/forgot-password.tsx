@@ -9,7 +9,7 @@ import { Input } from '~/app/components/input'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import fetcher from '~/app/fetcher'
+import { fetcher } from '~/app/fetcher'
 
 const forgotPasswordSchema = z.object({
   email: z.email({ error: 'Invalid email address' })

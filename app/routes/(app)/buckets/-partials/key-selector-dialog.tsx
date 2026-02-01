@@ -17,7 +17,7 @@ import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
 import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
-import fetcher from '~/app/fetcher'
+import { fetcher } from '~/app/fetcher'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 

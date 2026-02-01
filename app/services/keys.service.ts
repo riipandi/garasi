@@ -6,7 +6,7 @@ import type { ImportKeyRequest, ImportKeyResponse } from '~/shared/schemas/keys.
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
 import type { UpdateAccessKeyResponse, UpdateAccessKeyParams } from '~/shared/schemas/keys.schema'
 import type { UpdateAccessKeyRequest, DeleteAccessKeyParams } from '~/shared/schemas/keys.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function listAccessKeys() {
   return await fetcher<ApiResponse<ListAccessKeysResponse[]>>('/keys', {

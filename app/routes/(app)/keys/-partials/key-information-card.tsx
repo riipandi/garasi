@@ -65,9 +65,7 @@ export function KeyInformationCard({
         {accessKey.secretKeyId || accessKey.secretAccessKey ? (
           <div className='flex items-center gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 shadow-sm'>
             <code className='min-w-0 flex-1 truncate font-mono text-sm text-gray-900'>
-              {showSecretKey
-                ? accessKey.secretAccessKey || accessKey.secretKeyId
-                : '*'.repeat(54)}
+              {showSecretKey ? accessKey.secretAccessKey || accessKey.secretKeyId : '*'.repeat(54)}
             </code>
             <button
               type='button'

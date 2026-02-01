@@ -1,4 +1,4 @@
 export * from './provider'
-export * from './services'
+export * from './procedures'
 export * from './expired-alert'
 export { useAuth } from './context'

@@ -9,7 +9,7 @@ import type { UpdateAdminTokenParams } from '~/shared/schemas/admin-token.schema
 import type { UpdateAdminTokenRequest } from '~/shared/schemas/admin-token.schema'
 import type { UpdateAdminTokenResponse } from '~/shared/schemas/admin-token.schema'
 import type { ApiResponse } from '~/shared/schemas/common.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function listAdminTokens() {
   return await fetcher<ApiResponse<ListAdminTokensResponse[]>>('/admin/token', {

@@ -7,7 +7,7 @@ import type { ListBucketObjectsResponse } from '~/shared/schemas/objects.schema'
 import type { UploadFileParams } from '~/shared/schemas/objects.schema'
 import type { UploadFileRequest } from '~/shared/schemas/objects.schema'
 import type { UploadFileResponse } from '~/shared/schemas/objects.schema'
-import fetcher from '../fetcher'
+import { fetcher } from '../fetcher'
 
 export async function listBucketObjects(params: ListBucketObjectsParams) {
   return await fetcher<ApiResponse<ListBucketObjectsResponse>>('/objects', {
