@@ -72,7 +72,7 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogPopup className='w-sm'>
+      <DialogPopup>
         <DialogHeader>
           <IconBox variant='primary' size='sm'>
             <Lucide.Download className='size-4' />
