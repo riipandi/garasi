@@ -136,8 +136,15 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
    * Logout function that clears authentication state and calls logout API
    */
   const logout = async (): Promise<void> => {
-    await logoutApi() // Call logout API to revoke refresh token and deactivate session
-    setUser(null) // Clear user state
+    await logoutApi()
+    setUser(null)
+    authStore.set({
+      atoken: null,
+      atokenexp: null,
+      rtoken: null,
+      rtokenexp: null,
+      remember: false
+    })
   }
 
   /**

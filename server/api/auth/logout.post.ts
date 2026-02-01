@@ -1,36 +1,42 @@
-import { HTTPError, readBody } from 'nitro/h3'
+import { getCookie, HTTPError } from 'h3'
+import pkg from '~/package.json' with { type: 'json' }
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { clearCookie } from '~/server/platform/guards'
 import { verifyRefreshToken } from '~/server/platform/jwt'
+import { createResponse } from '~/server/platform/responder'
 import { deactivateSession, revokeRefreshToken } from '~/server/services/session.service'
 
 export default defineProtectedHandler(async (event) => {
-  const { db } = event.context
+  const { db, auth, logger } = event.context
 
-  // Parse request body
-  const body = await readBody<{ refresh_token: string; session_id: string }>(event)
+  const refreshToken = getCookie(event, `${pkg.name}_rtoken`)
 
-  // Validate required fields
-  if (!body?.refresh_token) {
+  if (!refreshToken) {
+    logger.warn('Refresh token not found in cookies')
     throw new HTTPError({ status: 400, statusText: 'Refresh token is required' })
   }
 
-  if (!body?.session_id) {
-    throw new HTTPError({ status: 400, statusText: 'Session ID is required' })
-  }
-
-  // Verify the refresh token signature and type
-  const payload = await verifyRefreshToken(body.refresh_token)
+  const payload = await verifyRefreshToken(refreshToken)
 
   if (!payload.sub) {
+    logger.warn('Invalid refresh token payload')
     throw new HTTPError({ status: 401, statusText: 'Invalid refresh token payload' })
   }
 
-  // Revoke the refresh token
-  await revokeRefreshToken(db, body.refresh_token)
+  await revokeRefreshToken(db, refreshToken)
 
-  // Deactivate the session
-  await deactivateSession(db, body.session_id)
+  await deactivateSession(db, auth.sessionId)
 
-  // Return success message
-  return { success: true, message: 'Logged out successfully', data: null }
+  logger
+    .withMetadata({ userId: auth.userId, sessionId: auth.sessionId })
+    .info('User logged out successfully')
+
+  clearCookie(event, 'atoken')
+  clearCookie(event, 'rtoken')
+  clearCookie(event, 'sessid')
+
+  return createResponse(event, 'Logged out successfully', {
+    statusCode: 200,
+    data: null
+  })
 })

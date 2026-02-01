@@ -10,12 +10,22 @@ export function storeCookie(event: H3Event, name: string, value: string, maxAge:
   const { hostname, protocol } = getRequestURL(event)
   const isProduction = protectedEnv.APP_MODE === 'production'
 
-  return setCookie(event, `${pkg.name}_${name}`, value, {
+  void setCookie(event, `${pkg.name}_${name}`, value, {
     httpOnly: isProduction && protocol !== 'https',
     secure: isProduction && protocol === 'https',
     domain: hostname,
     sameSite: 'lax',
     maxAge
+  })
+}
+
+export function clearCookie(event: H3Event, name: string): void {
+  const { hostname } = getRequestURL(event)
+
+  void setCookie(event, `${pkg.name}_${name}`, '', {
+    maxAge: 0,
+    domain: hostname,
+    sameSite: 'lax'
   })
 }
 
