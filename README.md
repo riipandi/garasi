@@ -13,59 +13,169 @@
     <a href="https://github.com/riipandi/garasi/graphs/contributors">
         <img src="https://img.shields.io/badge/Contributions-welcome-gray.svg?labelColor=green" alt="Contributions welcome">
     </a>
-    <!-- <a href="https://github.com/riipandi/garasi/actions/workflows/build.yaml">
-        <img src="https://github.com/riipandi/garasi/actions/workflows/build.yaml/badge.svg?event=workflow_dispatch" alt="CI Build">
-    </a> -->
 </p>
 
 ---
 
-A modern web-based GUI for [Garage S3](https://garagehq.deuxfleurs.fr/), a distributed object
-storage system. Built with React, TanStack Router/Query/Form/Table, Tailwind CSS, and Bun,
-Garasi provides a full-stack management interface featuring Nitro 3 server with SQLite/Kysely
-persistence and type-safe operations with Zod schema validation. Designed for simplicity and
-developer experience, it includes Docker-ready multi-stage builds with healthcheck monitoring,
-making deployment seamless across environments.
+A modern web-based management interface for [Garage S3](https://garagehq.deuxfleurs.fr/), a distributed
+object storage system. Garasi provides an intuitive GUI to manage your Garage cluster, buckets, access keys,
+and objects with full-stack type-safe operations.
 
 ## Features
 
-- **Modern Stack**: React, TanStack (Router, Query, Form, Table), Tailwind CSS, Bun.
-- **Full-Stack**: Nitro 3 server with SQLite database via Kysely.
-- **Docker Ready**: Multi-stage builds with healthcheck monitoring.
-- **Type-Safe**: TypeScript with Zod schema validation.
+### Bucket Management
+
+Create, delete, and configure S3 buckets with comprehensive settings:
+
+- **Bucket Operations:** Create, delete, and inspect buckets
+- **Alias Management:** Manage local and global bucket aliases for easy access
+- **Configuration:** Set website access, quotas, versioning, and other bucket parameters
+- **Object Browser:** Browse, upload, and delete objects within buckets
+- **Folder Management:** Create folders to organize objects
+- **Object Inspection:** View detailed object metadata and properties
+
+### Access Key Management
+
+Control S3 API access with comprehensive key management:
+
+- **Key Creation:** Generate new access keys with custom permissions
+- **Key Import:** Import existing access keys from external sources
+- **Permission Management:** Configure read/write permissions per bucket
+- **Key Information:** View detailed key metadata and usage information
+- **Key Revocation:** Delete or disable access keys when no longer needed
+
+### Cluster Operations
+
+Monitor and manage your Garage cluster:
+
+- **Cluster Status:** Real-time cluster health and status monitoring
+- **Node Management:** View detailed information about each cluster node
+- **Cluster Statistics:** Monitor storage usage, object counts, and cluster metrics
+- **Node Connectivity:** Manage connections between cluster nodes
+- **Cluster Layout:** Apply, preview, and revert cluster layout changes
+- **Repair Operations:** Trigger repair operations to maintain data integrity
+
+### Monitoring & Diagnostics
+
+Advanced cluster monitoring and maintenance tools:
+
+- **Health Monitoring:** Real-time cluster and node health checks
+- **Node Statistics:** Per-node storage, memory, and network statistics
+- **Metadata Snapshots:** Capture and analyze node metadata states
+- **Block Operations:** Resync blocks, purge orphaned data, check errors
+- **Worker Management:** View and configure worker variables
 
 ## Quick Start
 
+### Using Docker
+
+Pull and run the latest Docker image:
+
+```sh
+docker pull ghcr.io/riipandi/garasi:latest
+docker run -d --name garasi -p 3990:3990 --env-file .env.local ghcr.io/riipandi/garasi:latest
+```
+
 ### Using Docker Compose
 
-```sh
-docker compose up --detach --remove-orphans
+Create a `docker-compose.yml` file:
+
+```yaml
+services:
+  garasi:
+    image: ghcr.io/riipandi/garasi:latest
+    ports: ['3990:3990']
+    env_file: .env.local
+    restart: unless-stopped
 ```
 
-### Development
+Then start the service:
 
 ```sh
-cp .env.example .env.local
-bun install
-bun run dev
+docker compose up -d
 ```
+
+Access the application at `http://localhost:3990`
 
 ## Configuration
 
-Generate required secrets:
+Generate required secrets using the built-in script:
 
 ```sh
-openssl rand -hex 32      # For GARAGE_RPC_SECRET
-openssl rand -base64 32   # For GARAGE_ADMIN_TOKEN, GARAGE_METRICS_TOKEN, SECRET_KEY
+bun run genkey
 ```
 
-See [`.env.example`](./.env.example) for all available options.
+This will generate secure values for:
+- `GARAGE_RPC_SECRET` - Secret for Garage RPC communication
+- `GARAGE_ADMIN_TOKEN` - Admin API token for Garage management
+- `GARAGE_METRICS_TOKEN` - Token for accessing Garage metrics
+- `SECRET_KEY` - Encryption key for the application
+
+See [`.env.example`](./.env.example) for all available configuration options.
+
+## Development
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) runtime `>=1.3.6`
+- [Garage S3](https://garagehq.deuxfleurs.fr/) cluster running
+
+### Setup
+
+```sh
+bun install                  # Install required dependencies
+bun run genkey               # Generate application keys
+cp .env.example .env.local   # Create environment variable file
+```
+
+### Development Commands
+
+```sh
+bun run dev           # Start development server
+bun run build         # Build for production
+bun run typecheck     # Run TypeScript checks
+bun run lint          # Fix linting issues
+bun run format        # Format code with oxfmt
+bun run check         # Final check before commit
+bun run storybook     # Start Storybook for components
+```
+
+### Docker Development
+
+```sh
+bun run docker:build      # Build Docker image
+bun run compose:up        # Start with Docker Compose
+bun run compose:down      # Stop Docker Compose
+bun run compose:cleanup   # Cleanup volumes
+```
+
+## Tech Stack
+
+- **Frontend:** React 19, TanStack (Router, Query, Form, Table), Tailwind CSS v4
+- **Backend:** Nitro 3 server with Bun runtime
+- **Database:** SQLite with Kysely query builder
+- **Validation:** Zod schema validation
+- **Styling:** Tailwind CSS v4 with Base UI components
 
 ## Documentation
 
 - [Garage Quick Start](https://garagehq.deuxfleurs.fr/documentation/quick-start)
 - [Garage Admin API](https://garagehq.deuxfleurs.fr/documentation/reference-manual/admin-api)
 - [S3 Compatibility](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility)
+
+## API Endpoints
+| Endpoint         | Description                                    |
+|------------------|------------------------------------------------|
+| `/api/bucket/*`  | Bucket CRUD operations, aliases, configuration |
+| `/api/keys/*`    | Access key management and permissions          |
+| `/api/cluster/*` | Cluster status, health, and statistics         |
+| `/api/node/*`    | Node operations, repair, and metadata          |
+| `/api/layout/*`  | Cluster layout management                      |
+| `/api/block/*`   | Block operations (resync, purge)               |
+| `/api/admin/*`   | Admin token management                         |
+| `/api/worker/*`  | Worker variables and information               |
+| `/api/objects/*` | Object and folder operations                   |
+| `/api/metrics/*` | Cluster metrics endpoint                       |
 
 ## License
 

@@ -63,7 +63,10 @@ function renderNavGroup(group: NavGroup, index: number) {
 
 export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) {
   const overviewGroup: NavGroup = {
-    items: [{ to: '/', label: 'Overview', icon: Lucide.Warehouse, exact: true }]
+    items: [
+      { to: '/', label: 'Overview', icon: Lucide.Warehouse, exact: true },
+      { to: '/profile', label: 'Account', icon: Lucide.UserCircle }
+    ]
   }
 
   const primaryGroup: NavGroup = {
@@ -75,12 +78,7 @@ export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) 
     ]
   }
 
-  const secondaryGroup: NavGroup = {
-    title: 'Settings',
-    items: [{ to: '/profile', label: 'User Account', icon: Lucide.CircleUser, exact: true }]
-  }
-
-  const navGroups = [overviewGroup, primaryGroup, secondaryGroup]
+  const navGroups = [overviewGroup, primaryGroup]
 
   return (
     <Sidebar
