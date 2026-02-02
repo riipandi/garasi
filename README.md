@@ -95,7 +95,10 @@ Then start the service:
 docker compose up -d
 ```
 
-Access the application at `http://localhost:3990`
+Access the application at: [`http://localhost:3990`](http://localhost:3990)
+
+- Default user: `admin@example.com`
+- Default pass: `P@ssw0rd!`
 
 ## Configuration
 
