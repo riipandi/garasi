@@ -73,7 +73,7 @@ Pull and run the latest Docker image:
 
 ```sh
 docker pull ghcr.io/riipandi/garasi:latest
-docker run -d --name garasi -p 3990:3990 --env-file .env.local ghcr.io/riipandi/garasi:latest
+docker run -d --name garasi -p 3990:3990 --env-file .env ghcr.io/riipandi/garasi:latest
 ```
 
 ### Using Docker Compose
@@ -84,9 +84,9 @@ Create a `docker-compose.yml` file:
 services:
   garasi:
     image: ghcr.io/riipandi/garasi:latest
-    ports: ['3990:3990']
-    env_file: .env.local
     restart: unless-stopped
+    ports: ['3990:3990']
+    env_file: .env
 ```
 
 Then start the service:
