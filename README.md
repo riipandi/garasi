@@ -54,6 +54,7 @@ Monitor and manage your Garage cluster:
 - **Node Connectivity:** Manage connections between cluster nodes
 - **Cluster Layout:** Apply, preview, and revert cluster layout changes
 - **Repair Operations:** Trigger repair operations to maintain data integrity
+- **Automatic Setup:** Automatic cluster layout initialization for fresh Garage installations
 
 ### Monitoring & Diagnostics
 
@@ -116,12 +117,22 @@ This will generate secure values for:
 
 See [`.env.example`](./.env.example) for all available configuration options.
 
+**Auto-Setup:** On first run, Garasi automatically configures your Garage cluster layout if it's not already initialized (layout version < 1). This includes:
+
+- Creating required directories
+- Setting up cluster layout with default capacity and zone redundancy
+- Applying the initial cluster configuration
+
+Customize auto-setup behavior with these environment variables:
+- `GARAGE_DEFAULT_CAPACITY` - Default storage capacity per node (default: 10GB)
+- `GARAGE_DEFAULT_ZONE_REDUNDANCY` - Zone redundancy level (default: 1)
+
 ## Development
 
 ### Prerequisites
 
 - [Bun](https://bun.sh/) runtime `>=1.3.6`
-- [Garage S3](https://garagehq.deuxfleurs.fr/) cluster running
+- [Garage S3](https://garagehq.deuxfleurs.fr/) cluster (will be auto-configured if not initialized)
 
 ### Setup
 
