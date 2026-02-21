@@ -64,7 +64,7 @@ export async function generateToken(
   }
 
   const secret = new TextEncoder().encode(secretKey)
-  const tokenExpiry = protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY
+  const tokenExpiry = protectedEnv.PUBLIC_TOKEN_EXPIRY
   const issuer = protectedEnv.PUBLIC_BASE_URL
   const audience = parseUserAgentHash(userAgent, 'long')
   const now = Math.floor(Date.now() / 1000)

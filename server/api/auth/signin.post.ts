@@ -55,8 +55,8 @@ export default defineHandler(async (event) => {
       logger.withError(error).error('Error cleaning up expired sessions')
     )
 
-    storeCookie(event, 'token', token, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
-    storeCookie(event, 'sessid', sessionId, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
+    storeCookie(event, 'token', token, protectedEnv.PUBLIC_TOKEN_EXPIRY)
+    storeCookie(event, 'sessid', sessionId, protectedEnv.PUBLIC_TOKEN_EXPIRY)
 
     logger.withMetadata({ userId: user.id, sessionId }).info('User signed in successfully')
 

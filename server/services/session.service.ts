@@ -60,7 +60,7 @@ export async function createSession(
   const sessionId = generateSessionId()
   const deviceInfo = parseDeviceInfo(userAgent)
   const now = Math.floor(Date.now() / 1000)
-  const expiresAt = now + protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY
+  const expiresAt = now + protectedEnv.PUBLIC_TOKEN_EXPIRY
 
   const sessionRecord = await db
     .insertInto('sessions')
