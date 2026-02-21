@@ -1,4 +1,4 @@
-import { useRouter } from '@tanstack/react-router'
+import { useRouter, type AnyRouter } from '@tanstack/react-router'
 import { useCallback, useEffect, useState } from 'react'
 import { fetcher } from '~/app/fetcher'
 import { logout as logoutApi } from '~/app/services/auth.service'
@@ -7,13 +7,18 @@ import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'
 import { onSessionExpired } from './procedures'
 
+interface AuthProviderProps {
+  children: React.ReactNode
+  router?: AnyRouter
+}
+
 /**
  * AuthProvider component that provides authentication state and methods
  * to all child components using the existing authStore for persistence.
  * User information is fetched from /auth/whoami endpoint.
  */
-export function AuthProvider({ children }: React.PropsWithChildren) {
-  const router = useRouter()
+export function AuthProvider({ children, router: propsRouter }: AuthProviderProps) {
+  const router = propsRouter ?? useRouter()
 
   // Get current auth state from store
   const authState = authStore.get()

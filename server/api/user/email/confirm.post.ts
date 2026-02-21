@@ -1,6 +1,6 @@
 import { HTTPError, getQuery, defineEventHandler } from 'h3'
 import { sendMail } from '~/server/platform/mailer'
-import { createErrorResonse } from '~/server/platform/responder'
+import { createErrorResonse, createResponse } from '~/server/platform/responder'
 import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
 
 export default defineEventHandler(async (event) => {
@@ -146,16 +146,17 @@ export default defineEventHandler(async (event) => {
       `
     })
 
-    return {
-      success: true,
-      message:
-        'Email changed successfully. All sessions have been terminated for security. Please sign in again with your new email address.',
-      data: {
-        new_email: emailChangeToken.newEmail,
-        revoked_tokens: revokedCount,
-        deactivated_sessions: deactivatedCount
+    return createResponse(
+      event,
+      'Email changed successfully. All sessions have been terminated for security. Please sign in again with your new email address.',
+      {
+        data: {
+          new_email: emailChangeToken.newEmail,
+          revoked_tokens: revokedCount,
+          deactivated_sessions: deactivatedCount
+        }
       }
-    }
+    )
   } catch (error) {
     logger.withError(error).error('Error processing email change confirmation')
     return createErrorResonse(event, error)
