@@ -18,9 +18,8 @@ import { Button } from '~/app/components/button'
 import { Spinner } from '~/app/components/spinner'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { listBuckets, getBucketInfo } from '~/app/services/bucket.service'
-import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
-import { getKeyInformation, updateAccessKey, deleteAccessKey } from '~/app/services/keys.service'
+import bucketService from '~/app/services/bucket.service'
+import keysService from '~/app/services/keys.service'
 import type { ApiBucketKeyPerm } from '~/shared/schemas/bucket.schema'
 import type { GetKeyInformationResponse } from '~/shared/schemas/keys.schema'
 import type { UpdateAccessKeyRequest } from '~/shared/schemas/keys.schema'
@@ -55,12 +54,12 @@ export const Route = createFileRoute('/(app)/keys/$id')({
 const keyDetailsQuery = (keyId: string) =>
   queryOptions({
     queryKey: ['keyDetails', keyId],
-    queryFn: () => getKeyInformation(keyId, { showSecretKey: 'true' })
+    queryFn: () => keysService.getKeyInformation(keyId, { showSecretKey: 'true' })
   })
 
 const bucketsQuery = queryOptions({
   queryKey: ['buckets'],
-  queryFn: () => listBuckets()
+  queryFn: () => bucketService.listBuckets()
 })
 
 function RouteComponent() {
@@ -89,7 +88,9 @@ function RouteComponent() {
   const { data: bucketsWithPermissions, isLoading: isLoadingPermissions } = useQuery({
     queryKey: ['bucketsWithPermissions', id],
     queryFn: async () => {
-      const results = await Promise.all(buckets.map((bucket) => getBucketInfo({ id: bucket.id })))
+      const results = await Promise.all(
+        buckets.map((bucket) => bucketService.getBucketInfo({ id: bucket.id }))
+      )
       return results.map((r) => r.data)
     },
     enabled: buckets.length > 0
@@ -104,7 +105,7 @@ function RouteComponent() {
       bucketId: string
       permissions: ApiBucketKeyPerm
     }) => {
-      return allowBucketKey(bucketId, { accessKeyId: id, permissions })
+      return bucketService.allowBucketKey(bucketId, { accessKeyId: id, permissions })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
@@ -125,7 +126,7 @@ function RouteComponent() {
       bucketId: string
       permissions: ApiBucketKeyPerm
     }) => {
-      return denyBucketKey(bucketId, { accessKeyId: id, permissions })
+      return bucketService.denyBucketKey(bucketId, { accessKeyId: id, permissions })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
@@ -140,7 +141,7 @@ function RouteComponent() {
   // Update key mutation
   const updateKeyMutation = useMutation({
     mutationFn: async (values: UpdateAccessKeyRequest) => {
-      return updateAccessKey(id, values)
+      return keysService.updateAccessKey(id, values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keyDetails', id] })
@@ -156,7 +157,7 @@ function RouteComponent() {
   // Delete key mutation
   const deleteKeyMutation = useMutation({
     mutationFn: async () => {
-      return deleteAccessKey(id)
+      return keysService.deleteAccessKey(id)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })

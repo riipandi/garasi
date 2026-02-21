@@ -17,14 +17,14 @@ import { Button } from '~/app/components/button'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { createBucket, deleteBucket, listBuckets } from '~/app/services/bucket.service'
+import bucketService from '~/app/services/bucket.service'
 import type { CreateBucketRequest } from '~/shared/schemas/bucket.schema'
 import { BucketCreate } from './-partials/bucket-create'
 import { BucketTable } from './-partials/bucket-table'
 
 const bucketsQueryOpts = queryOptions({
   queryKey: ['buckets'],
-  queryFn: () => listBuckets()
+  queryFn: () => bucketService.listBuckets()
 })
 
 export const Route = createFileRoute('/(app)/buckets/')({
@@ -48,7 +48,7 @@ function RouteComponent() {
 
   const createBucketMutation = useMutation({
     mutationFn: async (values: CreateBucketRequest) => {
-      return createBucket(values)
+      return bucketService.createBucket(values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
@@ -62,7 +62,7 @@ function RouteComponent() {
 
   const deleteBucketMutation = useMutation({
     mutationFn: async (bucketId: string) => {
-      return deleteBucket(bucketId)
+      return bucketService.deleteBucket(bucketId)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buckets'] })

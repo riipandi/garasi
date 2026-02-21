@@ -23,8 +23,8 @@ import {
   TableRow
 } from '~/app/components/table'
 import { Text } from '~/app/components/typography'
-import { getClusterStatus } from '~/app/services/cluster.service'
-import { getNodeInfo } from '~/app/services/node.service'
+import clusterService from '~/app/services/cluster.service'
+import nodeService from '~/app/services/node.service'
 import type { NodeResp } from '~/shared/schemas/cluster.schema'
 import { ConnectNodesDialog } from './-partials/connect-nodes-dialog'
 
@@ -38,12 +38,12 @@ export const Route = createFileRoute('/(app)/cluster/nodes/')({
 
 const clusterStatusQuery = queryOptions({
   queryKey: ['cluster', 'status'],
-  queryFn: () => getClusterStatus()
+  queryFn: () => clusterService.getClusterStatus()
 })
 
 const nodeInfoQuery = queryOptions({
   queryKey: ['cluster', 'node', 'info'],
-  queryFn: () => getNodeInfo({ node: '*' })
+  queryFn: () => nodeService.getNodeInfo({ node: '*' })
 })
 
 const columnHelper = createColumnHelper<NodeResp>()

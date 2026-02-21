@@ -5,7 +5,7 @@ import { Badge } from '~/app/components/badge'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Text, TextLink } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { getClusterHealth, getClusterStatus } from '~/app/services/cluster.service'
+import clusterService from '~/app/services/cluster.service'
 
 export const Route = createFileRoute('/(app)/cluster/')({
   component: RouteComponent,
@@ -17,12 +17,12 @@ export const Route = createFileRoute('/(app)/cluster/')({
 
 const clusterHealthQuery = queryOptions({
   queryKey: ['cluster', 'health'],
-  queryFn: () => getClusterHealth()
+  queryFn: () => clusterService.getClusterHealth()
 })
 
 const clusterStatusQuery = queryOptions({
   queryKey: ['cluster', 'status'],
-  queryFn: () => getClusterStatus()
+  queryFn: () => clusterService.getClusterStatus()
 })
 
 function RouteComponent() {

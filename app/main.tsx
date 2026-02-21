@@ -1,3 +1,4 @@
+import './styles.css'
 import type { TanStackDevtoolsReactInit } from '@tanstack/react-devtools'
 import { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
@@ -5,7 +6,6 @@ import { createRouter } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './styles/globals.css'
 import { routeTree } from '~/app/routes.gen'
 import App from './app'
 

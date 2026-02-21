@@ -15,7 +15,7 @@ import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { getBucketInfo } from '~/app/services/bucket.service'
+import bucketService from '~/app/services/bucket.service'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 const ObjectBrowser = React.lazy(() =>
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/(app)/buckets/$id/')({
 function bucketQuery(bucketId: string) {
   return queryOptions({
     queryKey: ['bucket', bucketId],
-    queryFn: () => getBucketInfo({ id: bucketId })
+    queryFn: () => bucketService.getBucketInfo({ id: bucketId })
   })
 }
 

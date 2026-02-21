@@ -1,3 +1,4 @@
+import { fetcher } from '~/app/fetcher'
 import type { ApiResponse } from '~/shared/schemas/common.schema'
 import type { GetWorkerInfoParams } from '~/shared/schemas/worker.schema'
 import type { GetWorkerInfoRequest } from '~/shared/schemas/worker.schema'
@@ -11,41 +12,60 @@ import type { ListWorkersResponse } from '~/shared/schemas/worker.schema'
 import type { SetWorkerVariableParams } from '~/shared/schemas/worker.schema'
 import type { SetWorkerVariableRequest } from '~/shared/schemas/worker.schema'
 import type { SetWorkerVariableResponse } from '~/shared/schemas/worker.schema'
-import { fetcher } from '../fetcher'
 
-export async function listWorkers(params: ListWorkersParams, data: ListWorkersRequest) {
-  return await fetcher<ApiResponse<ListWorkersResponse>>('/worker', {
-    method: 'GET',
-    query: params,
-    body: data
-  })
+export interface WorkerService {
+  listWorkers: (
+    params: ListWorkersParams,
+    data: ListWorkersRequest
+  ) => Promise<ApiResponse<ListWorkersResponse>>
+  getWorkerInfo: (
+    params: GetWorkerInfoParams & GetWorkerInfoRequest
+  ) => Promise<ApiResponse<GetWorkerInfoResponse>>
+  getWorkerVariable: (
+    params: GetWorkerVariableParams & GetWorkerVariableRequest
+  ) => Promise<ApiResponse<GetWorkerVariableResponse>>
+  setWorkerVariable: (
+    params: SetWorkerVariableParams,
+    data: SetWorkerVariableRequest
+  ) => Promise<ApiResponse<SetWorkerVariableResponse>>
 }
 
-export async function getWorkerInfo(params: GetWorkerInfoParams & GetWorkerInfoRequest) {
-  return await fetcher<ApiResponse<GetWorkerInfoResponse>>('/worker/info', {
-    method: 'GET',
-    query: params
-  })
+function defineWorkerService(): WorkerService {
+  return {
+    async listWorkers(params: ListWorkersParams, data: ListWorkersRequest) {
+      return await fetcher<ApiResponse<ListWorkersResponse>>('/worker', {
+        method: 'GET',
+        query: params,
+        body: data
+      })
+    },
+
+    async getWorkerInfo(params: GetWorkerInfoParams & GetWorkerInfoRequest) {
+      return await fetcher<ApiResponse<GetWorkerInfoResponse>>('/worker/info', {
+        method: 'GET',
+        query: params
+      })
+    },
+
+    async getWorkerVariable(params: GetWorkerVariableParams & GetWorkerVariableRequest) {
+      const { variable, ...query } = params
+      return await fetcher<ApiResponse<GetWorkerVariableResponse>>('/worker/variable', {
+        method: 'GET',
+        query: query,
+        body: { variable }
+      })
+    },
+
+    async setWorkerVariable(params: SetWorkerVariableParams, data: SetWorkerVariableRequest) {
+      return await fetcher<ApiResponse<SetWorkerVariableResponse>>('/worker/variable', {
+        method: 'POST',
+        query: params,
+        body: data
+      })
+    }
+  }
 }
 
-export async function getWorkerVariable(
-  params: GetWorkerVariableParams & GetWorkerVariableRequest
-) {
-  const { variable, ...query } = params
-  return await fetcher<ApiResponse<GetWorkerVariableResponse>>('/worker/variable', {
-    method: 'GET',
-    query: query,
-    body: { variable }
-  })
-}
+const workerService = defineWorkerService()
 
-export async function setWorkerVariable(
-  params: SetWorkerVariableParams,
-  data: SetWorkerVariableRequest
-) {
-  return await fetcher<ApiResponse<SetWorkerVariableResponse>>('/worker/variable', {
-    method: 'POST',
-    query: params,
-    body: data
-  })
-}
+export default workerService

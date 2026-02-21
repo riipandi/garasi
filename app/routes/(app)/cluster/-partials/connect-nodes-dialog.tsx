@@ -15,7 +15,7 @@ import {
 import { Field, FieldLabel } from '~/app/components/field'
 import { Input } from '~/app/components/input'
 import { Text } from '~/app/components/typography'
-import { connectClusterNodes } from '~/app/services/cluster.service'
+import clusterService from '~/app/services/cluster.service'
 
 interface ConnectNodesDialogProps {
   isOpen: boolean
@@ -30,7 +30,7 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
 
   const connectMutation = useMutation({
     mutationFn: (nodeList: string[]) =>
-      connectClusterNodes({ nodes: nodeList.filter((n) => n.trim() !== '') }),
+      clusterService.connectClusterNodes({ nodes: nodeList.filter((n) => n.trim() !== '') }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })
       queryClient.invalidateQueries({ queryKey: ['cluster', 'status'] })

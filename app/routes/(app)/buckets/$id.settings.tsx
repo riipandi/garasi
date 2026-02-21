@@ -18,9 +18,7 @@ import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
-import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
-import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
+import bucketService from '~/app/services/bucket.service'
 import type { UpdateBucketRequest } from '~/shared/schemas/bucket.schema'
 import type { RemoveBucketLocalAliasRequest } from '~/shared/schemas/bucket.schema'
 import type { RemoveBucketGlobalAliasRequest } from '~/shared/schemas/bucket.schema'
@@ -87,7 +85,7 @@ export const Route = createFileRoute('/(app)/buckets/$id/settings')({
 function bucketQuery(bucketId: string) {
   return queryOptions({
     queryKey: ['bucket', bucketId],
-    queryFn: () => getBucketInfo({ id: bucketId })
+    queryFn: () => bucketService.getBucketInfo({ id: bucketId })
   })
 }
 
@@ -163,7 +161,7 @@ function RouteComponent() {
 
   const updateBucketMutation = useMutation({
     mutationFn: async (values: UpdateBucketRequest) => {
-      return updateBucket(id, values)
+      return bucketService.updateBucket(id, values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -177,7 +175,7 @@ function RouteComponent() {
 
   const deleteBucketMutation = useMutation({
     mutationFn: async () => {
-      return deleteBucket(id)
+      return bucketService.deleteBucket(id)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
@@ -192,7 +190,7 @@ function RouteComponent() {
   const addGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
       const data: AddGlobalBucketAliasRequest = { globalAlias, bucketId: id }
-      return addBucketAlias(id, data)
+      return bucketService.addBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -208,7 +206,7 @@ function RouteComponent() {
   const removeGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
       const data: Omit<RemoveBucketGlobalAliasRequest, 'bucketId'> = { globalAlias }
-      return removeBucketAlias(id, data)
+      return bucketService.removeBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -222,7 +220,7 @@ function RouteComponent() {
 
   const addLocalAliasMutation = useMutation({
     mutationFn: async (data: AddLocalBucketAliasRequest) => {
-      return addBucketAlias(id, data)
+      return bucketService.addBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -240,7 +238,7 @@ function RouteComponent() {
         localAlias: data.localAlias,
         accessKeyId: data.accessKeyId
       }
-      return removeBucketAlias(id, requestData)
+      return bucketService.removeBucketAlias(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -265,7 +263,7 @@ function RouteComponent() {
           write: data.permissions.write ?? false
         }
       }
-      return allowBucketKey(id, requestData)
+      return bucketService.allowBucketKey(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
@@ -289,7 +287,7 @@ function RouteComponent() {
           write: data.permissions.write ?? false
         }
       }
-      return denyBucketKey(id, requestData)
+      return bucketService.denyBucketKey(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })

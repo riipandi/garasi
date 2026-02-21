@@ -16,18 +16,16 @@ import {
 import { Button } from '~/app/components/button'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import {
-  listAccessKeys,
-  createAccessKey,
-  deleteAccessKey,
-  importKey
-} from '~/app/services/keys.service'
+import keysService from '~/app/services/keys.service'
 import type { ImportKeyRequest, CreateAccessKeyRequest } from '~/shared/schemas/keys.schema'
 import { KeyCreate } from './-partials/key-create'
 import { KeyImport } from './-partials/key-import'
 import { KeyTable } from './-partials/key-table'
 
-const keysQueryOpts = queryOptions({ queryKey: ['keys'], queryFn: () => listAccessKeys() })
+const keysQueryOpts = queryOptions({
+  queryKey: ['keys'],
+  queryFn: () => keysService.listAccessKeys()
+})
 
 export const Route = createFileRoute('/(app)/keys/')({
   component: RouteComponent,
@@ -54,7 +52,7 @@ function RouteComponent() {
   // Create key mutation
   const createKeyMutation = useMutation({
     mutationFn: async (values: CreateAccessKeyRequest) => {
-      return createAccessKey(values)
+      return keysService.createAccessKey(values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
@@ -69,7 +67,7 @@ function RouteComponent() {
   // Delete key mutation
   const deleteKeyMutation = useMutation({
     mutationFn: async (keyId: string) => {
-      return deleteAccessKey(keyId)
+      return keysService.deleteAccessKey(keyId)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
@@ -83,7 +81,7 @@ function RouteComponent() {
   // Import key mutation
   const importKeyMutation = useMutation({
     mutationFn: async (values: ImportKeyRequest) => {
-      return importKey(values)
+      return keysService.importKey(values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
