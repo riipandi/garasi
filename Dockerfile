@@ -1,13 +1,12 @@
 # syntax=docker/dockerfile:1.7
 
 # Arguments with default value (for build).
-ARG PLATFORM=linux/amd64
-ARG BUN_VERSION=1
+ARG BUN_VERSION=1.3
 
 # ------------------------------------------------------------------------------
 # Base image with Bun and system dependencies.
 # ------------------------------------------------------------------------------
-FROM --platform=${PLATFORM} dhi.io/bun:${BUN_VERSION}-debian13-dev AS base
+FROM dhi.io/bun:${BUN_VERSION}-debian13-dev AS base
 ENV CI=true DO_NOT_TRACK=1 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=true
 
 # Install system dependencies (optional tools for building and debugging)
@@ -62,7 +61,7 @@ RUN chmod -R 0775 /srv/public && chmod +x /srv/server/index.mjs
 # ------------------------------------------------------------------------------
 # Production image, copy build output files and run the application.
 # ------------------------------------------------------------------------------
-FROM --platform=${PLATFORM} dhi.io/bun:${BUN_VERSION} AS runner
+FROM dhi.io/bun:${BUN_VERSION} AS runner
 
 # Read application environment variables
 ARG APP_BASE_URL=http://localhost:3990
