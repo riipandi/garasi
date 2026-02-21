@@ -2,7 +2,6 @@ import { queryOptions, useMutation, useQuery, useSuspenseQuery } from '@tanstack
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/alert'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -15,7 +14,9 @@ import {
 } from '~/app/components/alert-dialog'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
+import { Card, CardBody } from '~/app/components/card'
 import { Spinner } from '~/app/components/spinner'
+import { toast } from '~/app/components/toast'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import bucketService from '~/app/services/bucket.service'
@@ -35,9 +36,6 @@ interface AccessKey extends GetKeyInformationResponse {
 // Lazy load components for code splitting
 const KeyInformationCard = React.lazy(() =>
   import('./-partials/key-information-card').then((m) => ({ default: m.KeyInformationCard }))
-)
-const PermissionsSection = React.lazy(() =>
-  import('./-partials/permissions').then((m) => ({ default: m.PermissionsSection }))
 )
 const BucketAccessSection = React.lazy(() =>
   import('./-partials/bucket-access').then((m) => ({ default: m.BucketAccessSection }))
@@ -69,8 +67,6 @@ function RouteComponent() {
   const [showSecretKey, setShowSecretKey] = React.useState(false)
   const [showEditDialog, setShowEditDialog] = React.useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
   const [selectedBuckets, setSelectedBuckets] = React.useState<Set<string>>(new Set())
   const [bucketPermissions, setBucketPermissions] = React.useState<
     Record<string, ApiBucketKeyPerm>
@@ -110,10 +106,14 @@ function RouteComponent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Bucket access granted successfully!')
+      toast.add({ title: 'Bucket access granted', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to grant bucket access')
+      toast.add({
+        title: 'Failed to grant bucket access',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        type: 'error'
+      })
     }
   })
 
@@ -131,10 +131,14 @@ function RouteComponent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Bucket access revoked successfully!')
+      toast.add({ title: 'Bucket access revoked', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to revoke bucket access')
+      toast.add({
+        title: 'Failed to revoke bucket access',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        type: 'error'
+      })
     }
   })
 
@@ -146,11 +150,15 @@ function RouteComponent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keyDetails', id] })
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key updated successfully!')
+      toast.add({ title: 'Access key updated', type: 'success' })
       setShowEditDialog(false)
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to update access key')
+      toast.add({
+        title: 'Failed to update access key',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        type: 'error'
+      })
     }
   })
 
@@ -161,12 +169,16 @@ function RouteComponent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key deleted successfully!')
+      toast.add({ title: 'Access key deleted', type: 'success' })
       setShowDeleteDialog(false)
       navigate({ to: '/keys' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to delete access key')
+      toast.add({
+        title: 'Failed to delete access key',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        type: 'error'
+      })
     }
   })
 
@@ -264,9 +276,7 @@ function RouteComponent() {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     })
   }
 
@@ -299,6 +309,7 @@ function RouteComponent() {
   const handleCopyAccessKey = () => {
     if (accessKey?.accessKeyId) {
       navigator.clipboard.writeText(accessKey.accessKeyId)
+      toast.add({ title: 'Access Key ID copied', type: 'success' })
     }
   }
 
@@ -306,24 +317,9 @@ function RouteComponent() {
     const secretKey = accessKey?.secretAccessKey || accessKey?.secretKeyId
     if (secretKey) {
       navigator.clipboard.writeText(secretKey)
+      toast.add({ title: 'Secret Key copied', type: 'success' })
     }
   }
-
-  React.useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [successMessage])
-
-  React.useEffect(() => {
-    if (errorMessage) {
-      const timer = setTimeout(() => setErrorMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [errorMessage])
 
   if (isLoadingKey || !accessKey) {
     return (
@@ -368,7 +364,7 @@ function RouteComponent() {
                 </Badge>
               )}
             </div>
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-4'>
               <Button variant='outline' onClick={handleEditKey}>
                 <Lucide.Edit2 className='size-4' />
                 Edit Key
@@ -385,61 +381,48 @@ function RouteComponent() {
         </div>
       </div>
 
-      {successMessage && <Alert variant='success'>{successMessage}</Alert>}
-      {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
-
-      <div className='space-y-6'>
-        <React.Suspense
-          fallback={
-            <div className='flex items-center justify-center py-8'>
+      <React.Suspense
+        fallback={
+          <Card>
+            <CardBody className='flex items-center justify-center py-8'>
               <Spinner />
-            </div>
-          }
-        >
-          <KeyInformationCard
-            accessKey={accessKey}
-            showSecretKey={showSecretKey}
-            onToggleSecretKey={() => setShowSecretKey(!showSecretKey)}
-            onCopyAccessKey={handleCopyAccessKey}
-            onCopySecretKey={handleCopySecretKey}
-            formatDate={formatDate}
-            formatExpiration={formatExpiration}
-            expired={expired}
-          />
-        </React.Suspense>
+            </CardBody>
+          </Card>
+        }
+      >
+        <KeyInformationCard
+          accessKey={accessKey}
+          showSecretKey={showSecretKey}
+          onToggleSecretKey={() => setShowSecretKey(!showSecretKey)}
+          onCopyAccessKey={handleCopyAccessKey}
+          onCopySecretKey={handleCopySecretKey}
+          formatDate={formatDate}
+          formatExpiration={formatExpiration}
+          expired={expired}
+        />
+      </React.Suspense>
 
-        {accessKey.permissions && (
-          <React.Suspense
-            fallback={
-              <div className='flex items-center justify-center py-8'>
-                <Spinner />
-              </div>
-            }
-          >
-            <PermissionsSection accessKey={accessKey} />
-          </React.Suspense>
-        )}
-
-        <React.Suspense
-          fallback={
-            <div className='flex items-center justify-center py-8'>
+      <React.Suspense
+        fallback={
+          <Card>
+            <CardBody className='flex items-center justify-center py-8'>
               <Spinner />
-            </div>
-          }
-        >
-          <BucketAccessSection
-            buckets={buckets}
-            selectedBuckets={selectedBuckets}
-            bucketPermissions={bucketPermissions}
-            isLoadingPermissions={isLoadingPermissions}
-            isLoadingBuckets={isLoadingBuckets}
-            isSaving={allowBucketKeyMutation.isPending || denyBucketKeyMutation.isPending}
-            onBucketToggle={handleBucketToggle}
-            onPermissionChange={handlePermissionChange}
-            onSavePermissions={handleSavePermissions}
-          />
-        </React.Suspense>
-      </div>
+            </CardBody>
+          </Card>
+        }
+      >
+        <BucketAccessSection
+          buckets={buckets}
+          selectedBuckets={selectedBuckets}
+          bucketPermissions={bucketPermissions}
+          isLoadingPermissions={isLoadingPermissions}
+          isLoadingBuckets={isLoadingBuckets}
+          isSaving={allowBucketKeyMutation.isPending || denyBucketKeyMutation.isPending}
+          onBucketToggle={handleBucketToggle}
+          onPermissionChange={handlePermissionChange}
+          onSavePermissions={handleSavePermissions}
+        />
+      </React.Suspense>
 
       {/* Edit Key Dialog */}
       <KeyEdit
