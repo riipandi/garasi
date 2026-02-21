@@ -1,51 +1,65 @@
-import { useRouter, type AnyRouter } from '@tanstack/react-router'
-import { useCallback, useEffect, useState } from 'react'
-import { fetcher } from '~/app/fetcher'
-import { logout as logoutApi } from '~/app/services/auth.service'
+import { useStore } from '@nanostores/react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from '~/app/components/toast'
+import { resetSessionExpiredFlag } from '~/app/fetcher'
+import authService from '~/app/services/auth.service'
 import { authStore } from '~/app/stores'
+import pkg from '~/package.json' with { type: 'json' }
 import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'
-import { onSessionExpired } from './procedures'
+import { signout } from './procedures'
 
-interface AuthProviderProps {
-  children: React.ReactNode
-  router?: AnyRouter
-}
+const STORAGE_KEY = `${pkg.name}_auth:`
 
-/**
- * AuthProvider component that provides authentication state and methods
- * to all child components using the existing authStore for persistence.
- * User information is fetched from /auth/whoami endpoint.
- */
-export function AuthProvider({ children, router: propsRouter }: AuthProviderProps) {
-  const router = propsRouter ?? useRouter()
-
-  // Get current auth state from store
-  const authState = authStore.get()
-
-  // Check if user is authenticated based on access token
+export function AuthProvider({ children }: React.PropsWithChildren) {
+  const authState = useStore(authStore)
   const isAuthenticated = !!authState?.atoken
 
-  // Store user data fetched from /auth/whoami endpoint
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [sessionExpired, setSessionExpired] = useState(false)
 
-  /**
-   * Fetch user information from /auth/whoami endpoint
-   */
+  const previousAuthState = useRef<typeof authState>(null)
+  const isLoggingOutRef = useRef(false)
+  const isManualLogoutRef = useRef(false)
+
+  const navigateTo = useCallback((to: string) => {
+    window.location.href = to
+  }, [])
+
+  const performLogout = useCallback(
+    async (showToast = false) => {
+      if (isLoggingOutRef.current) return
+      isLoggingOutRef.current = true
+
+      try {
+        await signout()
+      } catch (error) {
+        console.error('Logout API call failed:', error)
+      } finally {
+        setUser(null)
+        isLoggingOutRef.current = false
+
+        if (showToast && !isManualLogoutRef.current) {
+          toast.add({
+            title: 'Signed Out',
+            description:
+              'You have been signed out due to a session change, you need to login again.',
+            type: 'info',
+            timeout: 0,
+            actionProps: {
+              children: 'Login again',
+              onClick: () => navigateTo('/signin')
+            }
+          })
+        }
+      }
+    },
+    [navigateTo]
+  )
+
   const fetchUser = useCallback(async (): Promise<User | null> => {
     try {
-      const response = await fetcher<{
-        status: 'success' | 'error'
-        message: string
-        data: {
-          user_id: string
-          email: string
-          name: string
-        } | null
-        error: any
-      }>('/auth/whoami')
+      const response = await authService.whoami()
 
       if (response.status === 'success' && response.data) {
         return {
@@ -54,115 +68,217 @@ export function AuthProvider({ children, router: propsRouter }: AuthProviderProp
           name: response.data.name
         }
       }
+
+      authStore.set({
+        atoken: null,
+        atokenexp: null,
+        rtoken: null,
+        rtokenexp: null,
+        sessid: null,
+        remember: false
+      })
+
       return null
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch user info:', error)
+
+      const err = error as { statusCode?: number; name?: string; statusMessage?: string }
+
+      const isAuthError =
+        err.statusCode === 401 ||
+        err.statusCode === 403 ||
+        err.name === 'FetchError' ||
+        err.name === 'TypeError'
+
+      if (isAuthError) {
+        authStore.set({
+          atoken: null,
+          atokenexp: null,
+          rtoken: null,
+          rtokenexp: null,
+          sessid: null,
+          remember: false
+        })
+
+        if (!isManualLogoutRef.current) {
+          toast.add({
+            title: 'Session Invalid',
+            description: 'Your session is no longer valid. Please sign in again.',
+            type: 'warning',
+            timeout: 0,
+            actionProps: {
+              children: 'Login again',
+              onClick: () => navigateTo('/signin')
+            }
+          })
+        }
+      }
+
       return null
     }
-  }, [])
+  }, [navigateTo])
 
-  // Fetch user data when authenticated
+  const checkAuthUnexpectedChange = useCallback(
+    (prev: typeof authState, current: typeof authState) => {
+      if (!prev || !current) return false
+
+      const wasAuthenticated = !!prev.atoken
+      const isAuthenticatedNow = !!current.atoken
+
+      if (wasAuthenticated && !isAuthenticatedNow) {
+        return true
+      }
+
+      if (wasAuthenticated && isAuthenticatedNow) {
+        const tokenCleared = prev.atoken !== current.atoken && current.atoken === null
+        const sessionCleared = prev.sessid !== current.sessid && current.sessid === null
+
+        if (tokenCleared || sessionCleared) {
+          return true
+        }
+      }
+
+      return false
+    },
+    []
+  )
+
   useEffect(() => {
-    if (isAuthenticated) {
-      setIsLoading(true)
-      fetchUser().then((userData) => {
-        setUser(userData)
-        setIsLoading(false)
-      })
-    } else {
-      setUser(null)
+    let mounted = true
+
+    const loadUserData = async () => {
+      if (!mounted || !isAuthenticated) return
+
+      try {
+        setIsLoading(true)
+        const userData = await fetchUser()
+        if (mounted) {
+          setUser(userData)
+        }
+      } catch (error) {
+        console.error('Failed to fetch user info:', error)
+        if (mounted) {
+          setUser(null)
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadUserData()
+
+    return () => {
+      mounted = false
     }
   }, [isAuthenticated, fetchUser])
 
-  // Listen to session expired events and redirect to signin
   useEffect(() => {
-    const unsubscribe = onSessionExpired(() => {
-      setSessionExpired(true)
-      setUser(null)
-      // Redirect to signin after a short delay to show the session expired message
-      setTimeout(() => {
-        router.navigate({
-          to: '/signin',
-          search: { redirect: window.location.pathname + window.location.search }
-        })
-      }, 2000)
+    const unsubscribe = authStore.subscribe((newState) => {
+      const prev = previousAuthState.current
+      previousAuthState.current = newState
+
+      if (prev && checkAuthUnexpectedChange(prev, newState)) {
+        if (!isManualLogoutRef.current) {
+          performLogout(true)
+        }
+      }
     })
 
-    return unsubscribe
-  }, [router])
+    return () => {
+      unsubscribe()
+    }
+  }, [checkAuthUnexpectedChange, performLogout])
 
-  /**
-   * Login function with API authentication
-   * @param email - User email
-   * @param password - User password
-   * @returns Promise with success status and optional error message
-   */
+  useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (!event.key || !event.key.startsWith(STORAGE_KEY) || event.newValue === event.oldValue) {
+        return
+      }
+
+      const currentAuth = authStore.get()
+      const wasAuthenticated = !!currentAuth?.atoken
+
+      if (!wasAuthenticated) return
+
+      const storageKey = event.key.replace(STORAGE_KEY, '')
+
+      if (storageKey === 'atoken' || storageKey === 'rtoken' || storageKey === 'sessid') {
+        const newValue = event.newValue
+
+        if (newValue === '' || newValue === null) {
+          if (!isManualLogoutRef.current) {
+            performLogout(true)
+          }
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [performLogout])
+
   const login = async (
     email: string,
-    password: string
+    password: string,
+    remember: boolean = false
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await fetcher<{
-        status: 'success' | 'error'
-        message: string
-        data: {
-          user_id: string
-          email: string
-          name: string
-          session_id: string
-          access_token: string
-          refresh_token: string
-          access_token_expiry: number | null
-          refresh_token_expiry: number | null
-        } | null
-        error: any
-      }>('/auth/signin', {
-        method: 'POST',
-        body: { email, password }
-      })
+      const response = await authService.signin(email, password, remember)
 
       if (response.status !== 'success' || !response.data) {
+        toast.add({
+          title: 'Login Failed',
+          description: response.message || 'Invalid email or password',
+          type: 'error',
+          timeout: 7000
+        })
         return { success: false, error: response.message || 'Invalid email or password' }
       }
 
-      authStore.setKey('atoken', response.data.access_token)
-      authStore.setKey('atokenexp', response.data.access_token_expiry)
-      authStore.setKey('rtoken', response.data.refresh_token)
-      authStore.setKey('rtokenexp', response.data.refresh_token_expiry)
+      const sessionData = response.data
+
+      authStore.set({
+        atoken: sessionData.access_token,
+        atokenexp: sessionData.access_token_expiry,
+        rtoken: sessionData.refresh_token,
+        rtokenexp: sessionData.refresh_token_expiry,
+        sessid: sessionData.session_id,
+        remember
+      })
+
+      resetSessionExpiredFlag()
+
+      toast.add({
+        title: 'Welcome back!',
+        description: 'You have successfully signed in',
+        type: 'success',
+        timeout: 5000
+      })
 
       return { success: true }
     } catch (error: any) {
       const errorMessage = error?.data?.message || error?.message || 'Login failed'
+      toast.add({
+        title: 'Login Failed',
+        description: errorMessage,
+        type: 'error',
+        timeout: 7000
+      })
       return { success: false, error: errorMessage }
     }
   }
 
-  /**
-   * Logout function that clears authentication state and calls logout API
-   */
   const logout = async (): Promise<void> => {
-    await logoutApi()
-    setUser(null)
-    authStore.set({
-      atoken: null,
-      atokenexp: null,
-      rtoken: null,
-      rtokenexp: null,
-      remember: false
-    })
+    isManualLogoutRef.current = true
+    await performLogout(false)
+    isManualLogoutRef.current = false
   }
 
-  /**
-   * Dismiss session expired notification
-   */
-  const dismissSessionExpired = () => {
-    setSessionExpired(false)
-  }
-
-  /**
-   * Refetch user data from /auth/whoami endpoint
-   * Useful after updating user profile
-   */
   const refetchUser = async (): Promise<void> => {
     const userData = await fetchUser()
     setUser(userData)
@@ -172,8 +288,6 @@ export function AuthProvider({ children, router: propsRouter }: AuthProviderProp
     user,
     isAuthenticated,
     isLoading,
-    sessionExpired,
-    dismissSessionExpired,
     login,
     logout,
     refetchUser

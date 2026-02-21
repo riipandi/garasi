@@ -14,6 +14,7 @@ export interface AuthStore {
   atokenexp: number | null
   rtoken: string | null
   rtokenexp: number | null
+  sessid: string | null
   remember: boolean
 }
 
@@ -25,6 +26,7 @@ export const authStore = persistentMap<AuthStore>(
     atokenexp: null,
     rtoken: null,
     rtokenexp: null,
+    sessid: null,
     remember: false
   },
   {
