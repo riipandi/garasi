@@ -2,7 +2,7 @@ import { Migrator } from 'kysely'
 import { definePlugin } from 'nitro'
 import { dbClient } from '~/server/database/db.client'
 import { createMigrationProvider } from '~/server/database/db.migrator'
-import logger from '~/server/platform/logger'
+import { logger } from '~/server/platform/logger'
 
 export default definePlugin(async (_nitro) => {
   const log = logger.withPrefix('[MIGRATION]')

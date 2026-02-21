@@ -2,7 +2,7 @@ import { mkdir } from 'fs/promises'
 import { definePlugin } from 'nitro'
 import { ofetch } from 'ofetch'
 import { join } from 'path'
-import logger from '~/server/platform/logger'
+import { logger } from '~/server/platform/logger'
 import { protectedEnv } from '~/shared/envars'
 
 interface GarageClusterStatusResp {

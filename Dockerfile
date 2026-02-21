@@ -65,7 +65,9 @@ FROM dhi.io/bun:${BUN_VERSION} AS runner
 
 # Read application environment variables
 ARG APP_BASE_URL=http://localhost:3990
+ARG APP_LOG_EXPANDED=false
 ARG APP_LOG_LEVEL=info
+ARG APP_LOG_TRANSPORT=console
 ARG APP_MODE=production
 ARG GARAGE_ADMIN_API
 ARG GARAGE_ADMIN_TOKEN
@@ -89,10 +91,9 @@ COPY --chown=nonroot:nonroot --from=pruner /srv /srv
 COPY --from=base /usr/bin/tini /usr/bin/tini
 
 # Define the host and port to listen on.
-ARG HOST=0.0.0.0 PORT=3990 APP_LOG_TIMESTAMP=true
-ARG APP_LOG_TO_CONSOLE=true APP_LOG_TO_FILE=true APP_LOG_EXPANDED=false
-ENV PATH="/usr/bin:/usr/local/bin:$PATH" TINI_SUBREAPER=true
-ENV DO_NOT_TRACK=1 HOST=$HOST PORT=$PORT
+ARG HOST=0.0.0.0 PORT=3990
+ENV PATH="/usr/bin:/usr/local/bin:$PATH"
+ENV HOST=$HOST PORT=$PORT TINI_SUBREAPER=true
 
 WORKDIR /srv
 USER nonroot:nonroot
