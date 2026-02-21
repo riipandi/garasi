@@ -6,6 +6,7 @@ import type { Options as NuqsOptions } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { Suspense, useEffect, useState } from 'react'
 import { Toast } from '~/app/components/toast'
+import { ErrorBoundary } from '~/app/errors'
 import { AuthProvider } from '~/app/guards'
 import type { GlobalContext } from '~/app/routes/__root'
 import { authStore, uiStore } from '~/app/stores'
@@ -50,20 +51,22 @@ export default function App(props: AppProps) {
   }, [])
 
   return (
-    <NuqsAdapter defaultOptions={props.nuqsOptions}>
-      <QueryClientProvider client={props.queryClient}>
-        <AuthProvider>
-          <Suspense fallback={<div>Loading...</div>}>
-            <RouterProvider
-              router={props.routes}
-              context={routerContext}
-              basepath={props.basePath}
-            />
-          </Suspense>
-          <Toast />
-          <TanStackDevtools {...props.devTools} />
-        </AuthProvider>
-      </QueryClientProvider>
-    </NuqsAdapter>
+    <ErrorBoundary fallback={<div>Something went wrong</div>}>
+      <NuqsAdapter defaultOptions={props.nuqsOptions}>
+        <QueryClientProvider client={props.queryClient}>
+          <AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <RouterProvider
+                router={props.routes}
+                context={routerContext}
+                basepath={props.basePath}
+              />
+            </Suspense>
+            <Toast />
+            <TanStackDevtools {...props.devTools} />
+          </AuthProvider>
+        </QueryClientProvider>
+      </NuqsAdapter>
+    </ErrorBoundary>
   )
 }

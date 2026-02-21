@@ -1,6 +1,7 @@
 import { redirect, type ParsedLocation } from '@tanstack/react-router'
 import { decodeJwt } from 'jose'
 import { ofetch } from 'ofetch'
+import { clearAuthState } from '~/app/fetcher'
 import { authStore } from '~/app/stores'
 import type { JWTClaims } from '~/shared/schemas/auth.schema'
 
@@ -103,14 +104,7 @@ export async function signout(): Promise<void> {
     }
   }
 
-  authStore.set({
-    atoken: null,
-    atokenexp: null,
-    rtoken: null,
-    rtokenexp: null,
-    sessid: null,
-    remember: false
-  })
+  clearAuthState()
 }
 
 export function requireAuthentication(location: ParsedLocation) {

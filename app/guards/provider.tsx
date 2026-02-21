@@ -1,13 +1,13 @@
 import { useStore } from '@nanostores/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from '~/app/components/toast'
-import { resetSessionExpiredFlag } from '~/app/fetcher'
+import { resetAuthClearedFlag } from '~/app/fetcher'
+import { clearAuthState } from '~/app/fetcher'
 import authService from '~/app/services/auth.service'
 import { authStore } from '~/app/stores'
 import pkg from '~/package.json' with { type: 'json' }
 import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'
-import { signout } from './procedures'
 
 const STORAGE_KEY = `${pkg.name}_auth:`
 
@@ -31,27 +31,21 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       if (isLoggingOutRef.current) return
       isLoggingOutRef.current = true
 
-      try {
-        await signout()
-      } catch (error) {
-        console.error('Logout API call failed:', error)
-      } finally {
-        setUser(null)
-        isLoggingOutRef.current = false
+      clearAuthState()
+      setUser(null)
+      isLoggingOutRef.current = false
 
-        if (showToast && !isManualLogoutRef.current) {
-          toast.add({
-            title: 'Signed Out',
-            description:
-              'You have been signed out due to a session change, you need to login again.',
-            type: 'info',
-            timeout: 0,
-            actionProps: {
-              children: 'Login again',
-              onClick: () => navigateTo('/signin')
-            }
-          })
-        }
+      if (showToast && !isManualLogoutRef.current) {
+        toast.add({
+          title: 'Signed Out',
+          description: 'You have been signed out due to a session change, you need to login again.',
+          type: 'info',
+          timeout: 0,
+          actionProps: {
+            children: 'Login again',
+            onClick: () => navigateTo('/signin')
+          }
+        })
       }
     },
     [navigateTo]
@@ -251,7 +245,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
         remember
       })
 
-      resetSessionExpiredFlag()
+      resetAuthClearedFlag()
 
       toast.add({
         title: 'Welcome back!',

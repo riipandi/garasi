@@ -14,8 +14,12 @@ type RefreshResult = {
 let isRefreshing = false
 let refreshPromise: Promise<RefreshResult> | null = null
 let hasShownSessionExpiredToast = false
+let isCleared = false
 
-function clearAuthAndRedirect() {
+export function clearAuthState() {
+  if (isCleared) return
+  isCleared = true
+
   authStore.set({
     atoken: null,
     atokenexp: null,
@@ -24,14 +28,11 @@ function clearAuthAndRedirect() {
     sessid: null,
     remember: false
   })
+}
 
-  const currentPath = window.location.pathname
-  if (currentPath !== '/signin') {
-    setTimeout(() => {
-      hasShownSessionExpiredToast = false
-    }, 1000)
-    window.location.href = `/signin?redirect=${encodeURIComponent(currentPath)}`
-  }
+export function resetAuthClearedFlag() {
+  isCleared = false
+  hasShownSessionExpiredToast = false
 }
 
 function showSessionExpiredToast() {
@@ -57,9 +58,7 @@ function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fetch {
         if (isTokenExpired(authState.atokenexp)) {
           if (isRefreshTokenExpired(authState.rtokenexp)) {
             showSessionExpiredToast()
-            clearAuthAndRedirect()
-
-            ;(options as any)._cancelled = true
+            clearAuthState()
             return
           }
 
@@ -80,18 +79,14 @@ function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fetch {
               options.headers.set('Authorization', `Bearer ${updatedAuthState.atoken}`)
             } else {
               showSessionExpiredToast()
-              clearAuthAndRedirect()
-
-              ;(options as any)._cancelled = true
+              clearAuthState()
               return
             }
           } catch {
             isRefreshing = false
             refreshPromise = null
             showSessionExpiredToast()
-            clearAuthAndRedirect()
-
-            ;(options as any)._cancelled = true
+            clearAuthState()
             return
           }
         } else {
@@ -103,22 +98,12 @@ function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fetch {
     onResponseError({ response }) {
       if (response.status === 401) {
         showSessionExpiredToast()
-        clearAuthAndRedirect()
+        clearAuthState()
       }
     }
   })
 
   return (async (url, opts = {}) => {
-    if ((opts as any)._cancelled) {
-      return {
-        status: 'error',
-        message: 'Session expired. Please sign in again.',
-        data: null,
-        error: { statusCode: 401, reason: 'Session expired' },
-        metadata: { request_id: '' }
-      }
-    }
-
     try {
       return await baseFetcher(url, opts)
     } catch (error: any) {
@@ -127,7 +112,7 @@ function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fetch {
 
       if (statusCode === 401) {
         showSessionExpiredToast()
-        clearAuthAndRedirect()
+        clearAuthState()
       }
 
       return {
@@ -142,9 +127,5 @@ function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fetch {
 }
 
 const fetcher = createFetcher('/api')
-
-export function resetSessionExpiredFlag() {
-  hasShownSessionExpiredToast = false
-}
 
 export { createFetcher, fetcher }
