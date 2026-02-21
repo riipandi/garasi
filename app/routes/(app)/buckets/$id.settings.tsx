@@ -467,19 +467,19 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-5xl space-y-6'>
-      <div className='min-w-0 flex-1'>
-        <div className='flex items-center justify-between'>
-          <div>
-            <Link to='/buckets/$id' params={{ id }} search={{ key: undefined, prefix: undefined }}>
-              <Button variant='plain' size='sm'>
-                <Lucide.ArrowLeft className='mr-2 size-4' />
-                Back to Bucket
-              </Button>
-            </Link>
-            <div className='space-y-1'>
-              <Heading size='lg'>Bucket Settings</Heading>
-              <Text className='text-muted-foreground'>Manage settings for bucket {bucket.id}</Text>
-            </div>
+      <div className='flex items-start gap-4'>
+        <Link
+          to='/buckets/$id'
+          params={{ id }}
+          search={{ key: undefined, prefix: undefined }}
+          className='rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+        >
+          <Lucide.ArrowLeft className='size-5' />
+        </Link>
+        <div className='min-w-0 flex-1'>
+          <div className='space-y-1'>
+            <Heading size='lg'>Bucket Settings</Heading>
+            <Text className='text-muted-foreground'>Manage settings for bucket {bucket.id}</Text>
           </div>
         </div>
       </div>
