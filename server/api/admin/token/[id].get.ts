@@ -1,5 +1,6 @@
 import { HTTPError, getRouterParam, getQuery } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 
 interface GetAdminTokenInfoParams {
   search?: string // Partial token ID or name to search for
@@ -24,8 +25,8 @@ export default defineProtectedHandler(async (event) => {
 
   if (!data) {
     log.withMetadata({ id }).warn('Admin token not found')
-    return { success: false, message: 'Admin token not found', data: null }
+    return createResponse(event, 'Admin token not found', { data: null })
   }
 
-  return { status: 'success', message: 'Get Admin Token Info', data }
+  return createResponse(event, 'Get Admin Token Info', { data })
 })

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_yN3vaiLiu7
 createdAt: 2026-01-20T04:33:06.333955
-updatedAt: 2026-01-20T05:12:12.951358
+updatedAt: 2026-02-21T15:18:19.868646
 workspaceId: wk_YrPa97TLKc
 folderId: fl_WpJjgZXdWN
 authentication: {}
@@ -15,10 +15,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: gVNpVAEGwQ
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: gVNpVAEGwQ
 method: PUT
 name: Update Profile
 sortPriority: 2000.0

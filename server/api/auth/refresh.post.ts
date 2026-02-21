@@ -1,6 +1,7 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler, storeCookie } from '~/server/platform/guards'
 import { generateTokenPair, verifyRefreshToken } from '~/server/platform/jwt'
+import { createResponse } from '~/server/platform/responder'
 import { storeRefreshToken, updateSessionActivity } from '~/server/services/session.service'
 import { validateRefreshToken, revokeRefreshToken } from '~/server/services/session.service'
 import { protectedEnv } from '~/shared/envars'
@@ -64,9 +65,7 @@ export default defineProtectedHandler(async (event) => {
   storeCookie(event, 'sessid', body.session_id, protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY)
 
   // Return new tokens with session ID
-  return {
-    success: true,
-    message: 'Tokens refreshed successfully',
+  return createResponse(event, 'Tokens refreshed successfully', {
     data: {
       session_id: body.session_id,
       access_token: tokens.accessToken,
@@ -74,5 +73,5 @@ export default defineProtectedHandler(async (event) => {
       access_token_expiry: tokens.accessTokenExpiry,
       refresh_token_expiry: tokens.refreshTokenExpiry
     }
-  }
+  })
 })

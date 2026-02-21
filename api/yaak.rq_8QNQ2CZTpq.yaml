@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_8QNQ2CZTpq
 createdAt: 2026-01-19T20:19:03.289811
-updatedAt: 2026-01-21T08:18:07.932124
+updatedAt: 2026-02-21T15:17:35.216176
 workspaceId: wk_YrPa97TLKc
 folderId: fl_SVGNWxfTR6
 authentication: {}
@@ -18,10 +18,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: K7W7scguNJ
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: K7W7scguNJ
 method: PUT
 name: Update Admin Token
 sortPriority: 0.005

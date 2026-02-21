@@ -39,7 +39,7 @@ export function createErrorResonse<R = EventHandlerResponse>(
     .withError(error)
     .error(logMessage ?? message)
 
-  return { success: false, message, data: null, error } as R
+  return { status: 'error', message, data: null, error } as R
 }
 
 export function parseError(err: any | unknown) {

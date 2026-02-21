@@ -1,4 +1,5 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 
 interface GetAdminTokenInfoResp {
   id: string | null
@@ -18,8 +19,8 @@ export default defineProtectedHandler(async (event) => {
 
   if (!data) {
     log.warn('Current admin token not found')
-    return { success: false, message: 'Admin token not found', data: null }
+    return createResponse(event, 'Admin token not found', { data: null })
   }
 
-  return { status: 'success', message: 'Get Current Admin Token Info', data }
+  return createResponse(event, 'Get Current Admin Token Info', { data })
 })
