@@ -14,7 +14,7 @@ import type { ErrorLogEvent, KyselyConfig, QueryLogEvent } from 'kysely'
 import { CamelCasePlugin, Kysely, ParseJSONResultsPlugin } from 'kysely'
 import { BunSqliteDialect } from 'kysely-bun-sqlite'
 import pkg from '~/package.json' with { type: 'json' }
-import logger from '~/server/platform/logger'
+import { logger } from '~/server/platform/logger'
 import { protectedEnv } from '~/shared/envars'
 import { prettyMs } from '~/shared/utils/humanize'
 import type { AppDatabase } from './db.schema'

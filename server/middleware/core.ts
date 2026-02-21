@@ -2,7 +2,7 @@ import type { ILogLayer } from 'loglayer'
 import { defineHandler, getRequestURL } from 'nitro/h3'
 import { dbClient } from '~/server/database/db.client'
 import type { DBContext } from '~/server/database/db.schema'
-import logger from '~/server/platform/logger'
+import { logger } from '~/server/platform/logger'
 
 export default defineHandler((event) => {
   const reqUrl = getRequestURL(event)

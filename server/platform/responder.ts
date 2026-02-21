@@ -87,6 +87,6 @@ export function parseError(err: any | unknown) {
 }
 
 function formatStack(err: any | unknown) {
-  const includeStack = protectedEnv.APP_LOG_LEVEL === 'debug'
+  const includeStack = protectedEnv.APP_LOG_LEVEL === 'trace'
   return includeStack && { stack: err.stack ? err.stack.split('\n') : [] }
 }

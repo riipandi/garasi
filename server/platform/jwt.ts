@@ -1,7 +1,7 @@
 import { HTTPError } from 'h3'
 import { SignJWT, jwtVerify } from 'jose'
 import { UAParser, type IResult } from 'ua-parser-js'
-import logger from '~/server/platform/logger'
+import { logger } from '~/server/platform/logger'
 import { parseUserAgentHash } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
 import type { JWTClaims } from '~/shared/schemas/auth.schema'

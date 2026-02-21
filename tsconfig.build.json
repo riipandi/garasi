@@ -24,7 +24,7 @@
     "strict": true,
     "strictPropertyInitialization": true,
     "target": "esnext",
-    "tsBuildInfoFile": "./node_modules/tsconfig_node.tsbuildinfo",
+    "tsBuildInfoFile": "./node_modules/tsconfig_build.tsbuildinfo",
     "types": ["bun"],
     "useDefineForClassFields": true,
     "verbatimModuleSyntax": true
