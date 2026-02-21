@@ -52,7 +52,7 @@ export default function App(props: AppProps) {
   return (
     <NuqsAdapter defaultOptions={props.nuqsOptions}>
       <QueryClientProvider client={props.queryClient}>
-        <AuthProvider>
+        <AuthProvider router={props.routes}>
           <SessionExpiredAlert />
           <Suspense fallback={<div>Loading...</div>}>
             <RouterProvider
