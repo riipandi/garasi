@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody, HTTPError } from 'h3'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
-import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
+import { deactivateAllSessions } from '~/server/services/session.service'
 
 interface ResetPasswordBody {
   token: string
@@ -40,20 +40,20 @@ export default defineEventHandler(async (event) => {
     // Check if token exists
     if (!resetToken) {
       logger.warn('Invalid or expired reset token')
-      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is expired
     const now = Math.floor(Date.now() / 1000)
     if (resetToken.expiresAt < now) {
       logger.warn('Reset token has expired')
-      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is already used
     if (resetToken.used !== 0) {
       logger.warn('Reset token has already been used')
-      throw new HTTPError({ status: 400, statusText: 'Token has already been used' })
+      throw new HTTPError({ status: 401, statusText: 'Token has already been used' })
     }
 
     // Hash the new password
@@ -73,14 +73,11 @@ export default defineEventHandler(async (event) => {
       .where('id', '=', resetToken.id)
       .execute()
 
-    // Revoke all refresh tokens for security
-    const revokedCount = await revokeUserRefreshTokens(db, resetToken.userId)
-
     // Deactivate all sessions for security
     const deactivatedCount = await deactivateAllSessions(db, resetToken.userId)
 
     logger
-      .withMetadata({ userId: resetToken.userId, revokedCount, deactivatedCount })
+      .withMetadata({ userId: resetToken.userId, deactivatedCount })
       .info('Password reset successful')
 
     return createResponse(

@@ -1,7 +1,7 @@
 import { HTTPError, getQuery, defineEventHandler } from 'h3'
 import { sendMail } from '~/server/platform/mailer'
 import { createErrorResonse, createResponse } from '~/server/platform/responder'
-import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
+import { deactivateAllSessions } from '~/server/services/session.service'
 
 export default defineEventHandler(async (event) => {
   const { db, logger } = event.context
@@ -30,20 +30,20 @@ export default defineEventHandler(async (event) => {
     // Check if token exists
     if (!emailChangeToken) {
       logger.warn('Invalid or expired token')
-      throw new HTTPError({ status: 404, statusText: 'Invalid or expired token' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is already used
     if (emailChangeToken.used !== 0) {
       logger.warn('Token has already been used')
-      throw new HTTPError({ status: 400, statusText: 'This token has already been used' })
+      throw new HTTPError({ status: 401, statusText: 'This token has already been used' })
     }
 
     // Check if token is expired
     const currentTime = Math.floor(Date.now() / 1000)
     if (emailChangeToken.expiresAt < currentTime) {
       logger.warn('Token has expired')
-      throw new HTTPError({ status: 400, statusText: 'Token has expired' })
+      throw new HTTPError({ status: 401, statusText: 'Token has expired' })
     }
 
     // Get user details
@@ -110,15 +110,10 @@ export default defineEventHandler(async (event) => {
       .where('id', '=', emailChangeToken.id)
       .execute()
 
-    // Revoke all refresh tokens for security
-    const revokedCount = await revokeUserRefreshTokens(db, user.id)
-
     // Deactivate all sessions for security
     const deactivatedCount = await deactivateAllSessions(db, user.id)
 
-    logger
-      .withMetadata({ userId: user.id, revokedCount, deactivatedCount })
-      .info('Email changed successfully')
+    logger.withMetadata({ userId: user.id, deactivatedCount }).info('Email changed successfully')
 
     // Send notification email to old email address
     await sendMail({
@@ -152,7 +147,6 @@ export default defineEventHandler(async (event) => {
       {
         data: {
           new_email: emailChangeToken.newEmail,
-          revoked_tokens: revokedCount,
           deactivated_sessions: deactivatedCount
         }
       }

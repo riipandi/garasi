@@ -1,14 +1,12 @@
 import type { Kysely } from 'kysely'
 import type { EmailChangeTokenTable } from './schemas/email-change-token'
 import type { PasswordResetTokenTable } from './schemas/password-reset-token'
-import type { RefreshTokenTable } from './schemas/refresh-token'
 import type { SessionTable } from './schemas/session'
 import type { UserTable } from './schemas/user'
 
 export interface AppDatabase {
   email_change_tokens: EmailChangeTokenTable
   password_reset_tokens: PasswordResetTokenTable
-  refresh_tokens: RefreshTokenTable
   sessions: SessionTable
   users: UserTable
 }

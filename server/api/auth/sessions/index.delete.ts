@@ -1,7 +1,7 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
-import { deactivateSession, revokeSessionRefreshTokens } from '~/server/services/session.service'
+import { deactivateSession } from '~/server/services/session.service'
 
 export default defineProtectedHandler(async (event) => {
   const { db, logger } = event.context
@@ -21,8 +21,6 @@ export default defineProtectedHandler(async (event) => {
     logger.withMetadata({ sessionId: body.session_id }).warn('Session not found')
     throw new HTTPError({ status: 404, statusText: 'Session not found' })
   }
-
-  await revokeSessionRefreshTokens(db, body.session_id)
 
   logger.withMetadata({ sessionId: body.session_id }).info('Session revoked successfully')
 

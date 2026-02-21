@@ -13,7 +13,6 @@ import { Input } from '~/app/components/input'
 import { InputPassword } from '~/app/components/input-password'
 import { Label } from '~/app/components/label'
 import { Spinner } from '~/app/components/spinner'
-import { toast } from '~/app/components/toast'
 import { TextLink } from '~/app/components/typography'
 import { useAuth } from '~/app/guards'
 
@@ -49,27 +48,20 @@ function RouteComponent() {
         return
       }
 
-      const loginResult = await login(value.email, value.password)
+      const loginResult = await login(value.email, value.password, value.remember)
       if (!loginResult.success) {
         setSubmitError(loginResult.error || 'Invalid email or password. Please try again.')
         return formApi.resetField('password')
       }
 
-      toast.add({
-        title: 'Login success',
-        description: 'Welcome back!',
-        type: 'success'
-      })
-
-      formApi.resetField('password')
-      return navigate({ to: '/' })
+      navigate({ to: '/' })
     }
   })
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    form.handleSubmit()
+    await form.handleSubmit()
   }
 
   return (

@@ -1,7 +1,7 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
-import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
+import { deactivateAllSessions } from '~/server/services/session.service'
 
 interface ChangePasswordBody {
   current_password: string
@@ -71,14 +71,11 @@ export default defineProtectedHandler(async (event) => {
     .where('id', '=', auth.userId)
     .execute()
 
-  // Revoke all refresh tokens for security
-  const revokedCount = await revokeUserRefreshTokens(db, auth.userId)
-
   // Deactivate all sessions for security
   const deactivatedCount = await deactivateAllSessions(db, auth.userId)
 
   logger
-    .withMetadata({ userId: auth.userId, revokedCount, deactivatedCount })
+    .withMetadata({ userId: auth.userId, deactivatedCount })
     .info('Password changed successfully')
 
   return createResponse(
@@ -87,7 +84,6 @@ export default defineProtectedHandler(async (event) => {
     {
       statusCode: 200,
       data: {
-        revoked_tokens: revokedCount,
         deactivated_sessions: deactivatedCount
       }
     }

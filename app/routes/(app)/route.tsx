@@ -1,19 +1,17 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Button } from '~/app/components/button'
 import { NotFound } from '~/app/errors'
-import { useAuth } from '~/app/guards'
+import { requireAuthentication, useAuth } from '~/app/guards'
 import { clx } from '~/app/utils'
 import { Navbar } from './-navbar'
 
 export const Route = createFileRoute('/(app)')({
   component: RouteComponent,
   notFoundComponent: NotFound,
-  beforeLoad: ({ location, context }) => {
-    if (!context.auth.atoken) {
-      throw redirect({ to: '/signin', search: { redirect: location.href } })
-    }
+  beforeLoad: async ({ location }) => {
+    return requireAuthentication(location)
   }
 })
 

@@ -29,12 +29,7 @@ import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { useAuth } from '~/app/guards'
-import {
-  getUserSessions,
-  revokeAllSessions,
-  revokeOtherSessions,
-  revokeSession
-} from '~/app/services/auth.service'
+import authService from '~/app/services/auth.service'
 import { clx } from '~/app/utils'
 
 interface Session {
@@ -61,7 +56,9 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
   useEffect(() => {
     const fetchSessions = async () => {
       setIsLoading(true)
-      const fetchedSessions = await getUserSessions()
+      const response = await authService.getUserSessions()
+      const fetchedSessions =
+        response.status === 'success' && response.data ? response.data.sessions : []
       setSessions(fetchedSessions)
       setIsLoading(false)
     }
@@ -70,7 +67,8 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
   }, [])
 
   const handleRevokeSession = async (sessionId: string, isCurrent: boolean) => {
-    const success = await revokeSession(sessionId)
+    const response = await authService.revokeSession(sessionId)
+    const success = response.status === 'success'
     if (success) {
       if (isCurrent) {
         onNotification('success', 'Current session revoked. Please sign in again.')
@@ -86,7 +84,8 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
   }
 
   const handleRevokeOthers = async () => {
-    const success = await revokeOtherSessions()
+    const response = await authService.revokeOtherSessions()
+    const success = response.status === 'success'
     if (success) {
       setSessions(sessions.filter((s) => s.is_current))
       onNotification('success', 'Other sessions revoked successfully')
@@ -96,7 +95,8 @@ export function SessionsCard({ onNotification }: SessionsCardProps) {
   }
 
   const handleRevokeAll = async () => {
-    const success = await revokeAllSessions()
+    const response = await authService.revokeAllSessions()
+    const success = response.status === 'success'
     if (success) {
       setSessions([])
       onNotification('success', 'All sessions revoked successfully')

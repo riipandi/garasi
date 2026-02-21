@@ -1,3 +1,4 @@
+import { HTTPError } from 'h3'
 import { SignJWT, jwtVerify } from 'jose'
 import { UAParser, type IResult } from 'ua-parser-js'
 import logger from '~/server/platform/logger'
@@ -17,9 +18,10 @@ export async function hashUserAgent(userAgent: string): Promise<string> {
   const data = encoder.encode(userAgent)
   hasher.update(data)
   const hashBuffer = hasher.digest()
-  // Convert hash to hex string and limit to 32 characters
   const hashArray = Array.from(new Uint8Array(hashBuffer))
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  const hashHex = Array.from(hashArray)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
   return hashHex.slice(0, 32)
 }
 
@@ -32,28 +34,29 @@ export async function hashUserAgent(userAgent: string): Promise<string> {
 export async function generateAudienceFromUserAgent(
   userAgent: string | IResult | null
 ): Promise<string> {
-  // Convert userAgent to string (handle IResult and null cases)
   const uaStringInput = typeof userAgent === 'string' ? userAgent : userAgent?.ua || 'unknown'
 
-  // Parse user agent to get consistent format
   const parser = new UAParser(uaStringInput)
   const ua = parser.getResult()
 
-  // Create a consistent string from user agent components
   const uaString = `${ua.browser.name || 'unknown'}-${ua.os.name || 'unknown'}-${ua.device.type || 'desktop'}`
 
-  // Hash the user agent string
   return await hashUserAgent(uaString)
 }
 
 /**
- * Generate a JWT token using HMAC-SHA256 with standard claims
+ * Generate a JWT token with standard JWT claims
  *
- * @param payload - The token payload
- * @param expiresIn - Token expiry in seconds
- * @returns The signed JWT token
+ * @param userId - User ID
+ * @param sessionId - Session ID
+ * @param userAgent - User agent string from request headers
+ * @returns Object containing token and expiry time
  */
-export async function generateToken(payload: JWTClaims, expiresIn: number): Promise<string> {
+export async function generateToken(
+  userId: string,
+  sessionId: string,
+  userAgent: string | IResult | null
+): Promise<{ token: string; tokenExpiry: number }> {
   const secretKey = protectedEnv.SECRET_KEY
 
   if (!secretKey) {
@@ -61,74 +64,28 @@ export async function generateToken(payload: JWTClaims, expiresIn: number): Prom
   }
 
   const secret = new TextEncoder().encode(secretKey)
-  const now = Math.floor(Date.now() / 1000)
-
-  return await new SignJWT({
-    sub: payload.sub, // Subject (User ID) - standard claim
-    sid: payload.sid, // Session ID
-    aud: payload.aud, // Audience - Hashed user agent (standard JWT claim)
-    iss: payload.iss, // Issuer - standard claim
-    nbf: payload.nbf, // Not Before - Token is valid from this time (standard JWT claim)
-    typ: payload.typ // Type - Token type (standard JWT claim)
-  })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setNotBefore(payload.nbf ?? '')
-    .setExpirationTime(now + expiresIn)
-    .sign(secret)
-}
-
-/**
- * Generate both access and refresh tokens with standard JWT claims
- *
- * @param user - User data
- * @param userAgent - User agent string from request headers
- * @returns Object containing access and refresh tokens with expiry times
- */
-export async function generateTokenPair(
-  user: { userId: string; sessionId?: string },
-  userAgent: string | IResult | null
-): Promise<{
-  accessToken: string
-  refreshToken: string
-  accessTokenExpiry: number
-  refreshTokenExpiry: number
-}> {
-  const accessTokenExpiry = protectedEnv.PUBLIC_JWT_ACCESS_TOKEN_EXPIRY
-  const refreshTokenExpiry = protectedEnv.PUBLIC_JWT_REFRESH_TOKEN_EXPIRY
+  const tokenExpiry = protectedEnv.PUBLIC_TOKEN_EXPIRY
   const issuer = protectedEnv.PUBLIC_BASE_URL
   const audience = parseUserAgentHash(userAgent, 'long')
   const now = Math.floor(Date.now() / 1000)
 
-  const accessToken = await generateToken(
-    {
-      sub: user.userId, // Subject (User ID)
-      sid: user.sessionId, // Session ID
-      aud: audience, // Audience - Hashed user agent
-      iss: issuer, // Issuer
-      nbf: now, // Not Before - Token is valid from now
-      typ: 'access' // Type - Token type
-    },
-    accessTokenExpiry
-  )
-
-  const refreshToken = await generateToken(
-    {
-      sub: user.userId, // Subject (User ID)
-      sid: user.sessionId, // Session ID
-      aud: audience, // Audience - Hashed user agent
-      iss: issuer, // Issuer
-      nbf: now, // Not Before - Token is valid from now
-      typ: 'refresh' // Type - Token type
-    },
-    refreshTokenExpiry
-  )
+  const token = await new SignJWT({
+    sub: userId,
+    sid: sessionId,
+    aud: audience,
+    iss: issuer,
+    nbf: now,
+    typ: 'access'
+  })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setNotBefore(now)
+    .setExpirationTime(now + tokenExpiry)
+    .sign(secret)
 
   return {
-    accessToken,
-    refreshToken,
-    accessTokenExpiry: now + accessTokenExpiry,
-    refreshTokenExpiry: now + refreshTokenExpiry
+    token,
+    tokenExpiry: now + tokenExpiry
   }
 }
 
@@ -137,7 +94,7 @@ export async function generateTokenPair(
  *
  * @param token - The JWT token to verify
  * @returns The decoded payload if valid
- * @throws Error if token is invalid or expired
+ * @throws HTTPError if token is invalid or expired
  */
 export async function verifyToken(token: string): Promise<JWTClaims> {
   const secretKey = protectedEnv.SECRET_KEY
@@ -153,7 +110,7 @@ export async function verifyToken(token: string): Promise<JWTClaims> {
     return payload as unknown as JWTClaims
   } catch (error) {
     logger.withError(error).error('Invalid or expired token')
-    throw new Error('Invalid or expired token')
+    throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
   }
 }
 
@@ -162,30 +119,13 @@ export async function verifyToken(token: string): Promise<JWTClaims> {
  *
  * @param token - The access token to verify
  * @returns The decoded payload if valid
- * @throws Error if token is invalid, expired, or not an access token
+ * @throws HTTPError if token is invalid, expired, or not an access token
  */
 export async function verifyAccessToken(token: string): Promise<JWTClaims> {
   const payload = await verifyToken(token)
 
   if (payload.typ !== 'access') {
-    throw new Error('Invalid token type: expected access token')
-  }
-
-  return payload
-}
-
-/**
- * Verify a refresh token
- *
- * @param token - The refresh token to verify
- * @returns The decoded payload if valid
- * @throws Error if token is invalid, expired, or not a refresh token
- */
-export async function verifyRefreshToken(token: string): Promise<JWTClaims> {
-  const payload = await verifyToken(token)
-
-  if (payload.typ !== 'refresh') {
-    throw new Error('Invalid token type: expected refresh token')
+    throw new HTTPError({ status: 401, statusText: 'Invalid token type: expected access token' })
   }
 
   return payload
