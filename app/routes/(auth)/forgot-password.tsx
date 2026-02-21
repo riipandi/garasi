@@ -145,7 +145,9 @@ function RouteComponent() {
                           placeholder='you@example.com'
                           autoFocus
                         />
-                        <FieldError match='valueMissing'>Email is required</FieldError>
+                        <FieldError match={!field.state.meta.isValid}>
+                          {field.state.meta.errors.join(', ')}
+                        </FieldError>
                       </Field>
                     )}
                   </form.Field>

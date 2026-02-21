@@ -144,7 +144,9 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
                     placeholder='e.g., production-api-key'
                     disabled={isSubmitting}
                   />
-                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
                 </Field>
               )}
             </form.Field>
@@ -175,7 +177,9 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
                         onChange={(e) => field.handleChange(e.target.value)}
                         disabled={isSubmitting || neverExpires}
                       />
-                      <FieldError>{field.state.meta.errors[0]}</FieldError>
+                      <FieldError match={!field.state.meta.isValid}>
+                        {field.state.meta.errors.join(', ')}
+                      </FieldError>
                     </Field>
                   )}
                 </form.Field>

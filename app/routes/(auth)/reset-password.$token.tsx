@@ -196,7 +196,9 @@ function RouteComponent() {
                           strengthIndicator
                           autoFocus
                         />
-                        <FieldError match='valueMissing'>Password is required</FieldError>
+                        <FieldError match={!field.state.meta.isValid}>
+                          {field.state.meta.errors.join(', ')}
+                        </FieldError>
                       </Field>
                     )}
                   </form.Field>
@@ -231,7 +233,9 @@ function RouteComponent() {
                           onChange={(e) => field.handleChange(e.target.value)}
                           placeholder='•••••••••'
                         />
-                        <FieldError match='valueMissing'>Please confirm your password</FieldError>
+                        <FieldError match={!field.state.meta.isValid}>
+                          {field.state.meta.errors.join(', ')}
+                        </FieldError>
                       </Field>
                     )}
                   </form.Field>
