@@ -90,7 +90,7 @@ export function ProfileInfoCard({ onNotification }: ProfileInfoCardProps) {
           <CardDescription>Update your account information below</CardDescription>
         </CardHeader>
         <CardBody className='space-y-6 lg:space-y-0'>
-          <Fieldset className='grid grid-cols-1 lg:grid-cols-2 lg:gap-6'>
+          <Fieldset>
             <form.Field
               name='name'
               validators={{
@@ -121,16 +121,6 @@ export function ProfileInfoCard({ onNotification }: ProfileInfoCardProps) {
                 </Field>
               )}
             </form.Field>
-            <Field>
-              <FieldLabel>Email</FieldLabel>
-              <Input
-                className='bg-accent/70'
-                placeholder='john@example.com'
-                value={user?.email || ''}
-                disabled
-                readOnly
-              />
-            </Field>
           </Fieldset>
         </CardBody>
         <CardFooter className='justify-end space-x-2'>

@@ -16,13 +16,7 @@ import {
 } from '~/app/components/select'
 import { Spinner } from '~/app/components/spinner'
 import { Text } from '~/app/components/typography'
-import { getClusterLayout } from '~/app/services/layout.service'
-import { getLayoutHistory } from '~/app/services/layout.service'
-import { previewLayoutChanges } from '~/app/services/layout.service'
-import { applyClusterLayout } from '~/app/services/layout.service'
-import { updateClusterLayout } from '~/app/services/layout.service'
-import { revertClusterLayout } from '~/app/services/layout.service'
-import { skipDeadNodes } from '~/app/services/layout.service'
+import layoutService from '~/app/services/layout.service'
 
 interface LayoutManagementProps {
   layoutVersion?: number
@@ -43,12 +37,12 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
 
   const { data: layoutData, isLoading: isLoadingLayout } = useQuery({
     queryKey: ['cluster', 'layout'],
-    queryFn: () => getClusterLayout()
+    queryFn: () => layoutService.getClusterLayout()
   })
 
   const { data: historyData } = useQuery({
     queryKey: ['cluster', 'layout', 'history'],
-    queryFn: () => getLayoutHistory(),
+    queryFn: () => layoutService.getLayoutHistory(),
     enabled: showHistory
   })
 
@@ -56,14 +50,14 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
   const history = historyData?.data
 
   const previewMutation = useMutation({
-    mutationFn: () => previewLayoutChanges(),
+    mutationFn: () => layoutService.previewLayoutChanges(),
     onSuccess: () => {
       setShowPreview(true)
     }
   })
 
   const applyMutation = useMutation({
-    mutationFn: (version: number) => applyClusterLayout({ version }),
+    mutationFn: (version: number) => layoutService.applyClusterLayout({ version }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })
@@ -72,7 +66,8 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
   })
 
   const updateMutation = useMutation({
-    mutationFn: (data: { roles: any[]; parameters: any }) => updateClusterLayout(data),
+    mutationFn: (data: { roles: any[]; parameters: any }) =>
+      layoutService.updateClusterLayout(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })
@@ -85,7 +80,7 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
   })
 
   const revertMutation = useMutation({
-    mutationFn: () => revertClusterLayout(),
+    mutationFn: () => layoutService.revertClusterLayout(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
       queryClient.invalidateQueries({ queryKey: ['cluster', 'health'] })
@@ -94,7 +89,8 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
   })
 
   const skipDeadMutation = useMutation({
-    mutationFn: (data: { version: number; allowMissingData: boolean }) => skipDeadNodes(data),
+    mutationFn: (data: { version: number; allowMissingData: boolean }) =>
+      layoutService.skipDeadNodes(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster', 'layout'] })
     }

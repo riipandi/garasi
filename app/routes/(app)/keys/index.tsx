@@ -14,20 +14,19 @@ import {
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
+import { toast } from '~/app/components/toast'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import {
-  listAccessKeys,
-  createAccessKey,
-  deleteAccessKey,
-  importKey
-} from '~/app/services/keys.service'
+import keysService from '~/app/services/keys.service'
 import type { ImportKeyRequest, CreateAccessKeyRequest } from '~/shared/schemas/keys.schema'
 import { KeyCreate } from './-partials/key-create'
 import { KeyImport } from './-partials/key-import'
 import { KeyTable } from './-partials/key-table'
 
-const keysQueryOpts = queryOptions({ queryKey: ['keys'], queryFn: () => listAccessKeys() })
+const keysQueryOpts = queryOptions({
+  queryKey: ['keys'],
+  queryFn: () => keysService.listAccessKeys()
+})
 
 export const Route = createFileRoute('/(app)/keys/')({
   component: RouteComponent,
@@ -43,8 +42,6 @@ function RouteComponent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = React.useState(false)
   const [keyToDelete, setKeyToDelete] = React.useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
   // Fetch access keys
@@ -54,44 +51,55 @@ function RouteComponent() {
   // Create key mutation
   const createKeyMutation = useMutation({
     mutationFn: async (values: CreateAccessKeyRequest) => {
-      return createAccessKey(values)
+      return keysService.createAccessKey(values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key created successfully!')
+      toast.add({ title: 'Access key created successfully', type: 'success' })
       setShowCreateDialog(false)
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to create access key')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to create access key'
+      toast.add({ title: 'Creation failed', description: errorMsg, type: 'error' })
     }
   })
 
   // Delete key mutation
   const deleteKeyMutation = useMutation({
     mutationFn: async (keyId: string) => {
-      return deleteAccessKey(keyId)
+      return keysService.deleteAccessKey(keyId)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key deleted successfully!')
+      toast.add({ title: 'Access key deleted successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to delete access key')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to delete access key'
+      toast.add({ title: 'Deletion failed', description: errorMsg, type: 'error' })
     }
   })
 
   // Import key mutation
   const importKeyMutation = useMutation({
     mutationFn: async (values: ImportKeyRequest) => {
-      return importKey(values)
+      const response = (await keysService.importKey(values)) as {
+        status: string
+        message?: string
+        error?: { reason?: string }
+      }
+      if (response.status === 'error') {
+        throw new Error(response.message || response.error?.reason || 'Failed to import access key')
+      }
+      return response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key imported successfully!')
+      toast.add({ title: 'Access key imported successfully', type: 'success' })
       setShowKeyImport(false)
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to import access key')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to import access key'
+      toast.add({ title: 'Import failed', description: errorMsg, type: 'error' })
     }
   })
 
@@ -142,22 +150,6 @@ function RouteComponent() {
     setShowCreateDialog(false)
   }
 
-  React.useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [successMessage])
-
-  React.useEffect(() => {
-    if (errorMessage) {
-      const timer = setTimeout(() => setErrorMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [errorMessage])
-
   return (
     <div className='mx-auto w-full max-w-7xl space-y-6'>
       <div className='min-w-0 flex-1 space-y-1.5'>
@@ -191,17 +183,13 @@ function RouteComponent() {
         </Button>
       </div>
 
-      {successMessage && <Alert variant='success'>{successMessage}</Alert>}
-      {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
-
       <KeyTable keys={keys} onDelete={handleDeleteKey} isLoading={isRefreshing} />
 
       <Alert variant='info'>
         <Lucide.Info className='size-4' />
         <AlertDescription>
-          Access keys are used to authenticate with the Garage S3 API. Each key consists of an
-          Access Key ID and a Secret Key ID. Keep your secret keys secure and never share them
-          publicly.
+          Access keys are used to authenticate with the Garage S3 API. Keep your secret keys secure
+          and never share them publicly.
         </AlertDescription>
       </Alert>
 
@@ -229,8 +217,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this access key? This action cannot be undone and will
-              permanently remove the key from your account.
+              Are you sure you want to delete this access key? <br />
+              This action cannot be undone and will permanently remove the key from your account.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -258,8 +246,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete all {keys.length} access keys? This action cannot be
-              undone and will permanently remove all keys from your account.
+              Are you sure you want to delete all {keys.length} access keys? <br />
+              This action cannot be undone and will permanently remove all keys from your account.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>

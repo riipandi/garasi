@@ -111,7 +111,9 @@ function RouteComponent() {
                       placeholder='somebody@example.com'
                       autoFocus
                     />
-                    <FieldError match='valueMissing'>Email is required</FieldError>
+                    <FieldError match={!field.state.meta.isValid}>
+                      {field.state.meta.errors.join(', ')}
+                    </FieldError>
                   </Field>
                 )}
               </form.Field>
@@ -140,7 +142,9 @@ function RouteComponent() {
                       onChange={(e) => field.handleChange(e.target.value)}
                       placeholder='***********'
                     />
-                    <FieldError match='valueMissing'>Password is required</FieldError>
+                    <FieldError match={!field.state.meta.isValid}>
+                      {field.state.meta.errors.join(', ')}
+                    </FieldError>
                   </Field>
                 )}
               </form.Field>

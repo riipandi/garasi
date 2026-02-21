@@ -8,14 +8,12 @@ import {
   Dialog,
   DialogBody,
   DialogClose,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogPopup,
   DialogTitle
 } from '~/app/components/dialog'
 import { Field, FieldLabel, FieldError } from '~/app/components/field'
-import { Fieldset, FieldsetLegend } from '~/app/components/fieldset'
 import { Form } from '~/app/components/form'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
@@ -26,7 +24,6 @@ import type {
   UpdateAccessKeyRequest
 } from '~/shared/schemas/keys.schema'
 
-// Extend the schema type with additional properties needed by the UI
 interface AccessKey extends GetKeyInformationResponse {
   deleted?: boolean
   neverExpires?: boolean
@@ -53,13 +50,34 @@ const updateKeySchema = z.object({
   allowCreateBucket: z.boolean().default(false)
 })
 
+function formatDateForInput(dateString: string | null | undefined): string {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toISOString().slice(0, 10)
+}
+
+function formatExpirationForSubmit(dateValue: string): string | null {
+  if (!dateValue) return null
+  return new Date(`${dateValue}T23:59:00`).toISOString()
+}
+
 export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: KeyEditProps) {
   const form = useForm({
     defaultValues: {
       name: accessKey.name || '',
-      neverExpires: accessKey.neverExpires || false,
-      expiration: accessKey.expiration || '',
+      neverExpires: accessKey.neverExpires ?? false,
+      expiration: formatDateForInput(accessKey.expiration),
       allowCreateBucket: accessKey.permissions?.createBucket ?? false
+    },
+    validators: {
+      onChange: ({ value }) => {
+        if (!value.neverExpires) {
+          if (!value.expiration || value.expiration.trim() === '') {
+            return 'Expiration Date is required'
+          }
+        }
+        return undefined
+      }
     },
     onSubmit: async ({ value }) => {
       const result = updateKeySchema.safeParse(value)
@@ -74,7 +92,7 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
       const submitValue: UpdateAccessKeyRequest = {
         name: value.name,
         neverExpires: value.neverExpires,
-        expiration: value.neverExpires ? null : value.expiration || null,
+        expiration: value.neverExpires ? null : formatExpirationForSubmit(value.expiration),
         allow: value.allowCreateBucket ? { createBucket: true } : null,
         deny: value.allowCreateBucket ? null : { createBucket: true }
       }
@@ -87,8 +105,8 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
     if (isOpen) {
       form.reset({
         name: accessKey.name || '',
-        neverExpires: accessKey.neverExpires || false,
-        expiration: accessKey.expiration || '',
+        neverExpires: accessKey.neverExpires ?? false,
+        expiration: formatDateForInput(accessKey.expiration),
         allowCreateBucket: accessKey.permissions?.createBucket ?? false
       })
     }
@@ -102,21 +120,18 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <Form onSubmit={handleSubmit}>
-        <DialogPopup>
-          <DialogHeader>
-            <IconBox variant='primary' size='sm'>
-              <Lucide.KeyRound className='size-4' />
-            </IconBox>
-            <DialogTitle>Edit Access Key</DialogTitle>
-
-            <DialogClose className='ml-auto'>
-              <Lucide.X className='size-4' strokeWidth={2.0} />
-            </DialogClose>
-          </DialogHeader>
-          <DialogBody>
-            <DialogDescription>Update the access key details</DialogDescription>
-
+      <DialogPopup>
+        <DialogHeader>
+          <IconBox variant='primary' size='sm'>
+            <Lucide.KeyRound className='size-4' />
+          </IconBox>
+          <DialogTitle>Edit Access Key</DialogTitle>
+          <DialogClose className='ml-auto'>
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
+          </DialogClose>
+        </DialogHeader>
+        <DialogBody className='border-border mt-3 border-t pt-0'>
+          <Form onSubmit={handleSubmit}>
             <form.Field
               name='name'
               validators={{
@@ -144,7 +159,9 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
                     placeholder='e.g., production-api-key'
                     disabled={isSubmitting}
                   />
-                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
                 </Field>
               )}
             </form.Field>
@@ -165,17 +182,19 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
                   }}
                 >
                   {(field) => (
-                    <Field>
+                    <Field className={neverExpires ? 'pointer-events-none opacity-50' : ''}>
                       <FieldLabel htmlFor='expiration'>Expiration Date</FieldLabel>
                       <Input
                         id='expiration'
-                        type='datetime-local'
+                        type='date'
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         disabled={isSubmitting || neverExpires}
                       />
-                      <FieldError>{field.state.meta.errors[0]}</FieldError>
+                      <FieldError match={!field.state.meta.isValid}>
+                        {field.state.meta.errors.join(', ')}
+                      </FieldError>
                     </Field>
                   )}
                 </form.Field>
@@ -185,55 +204,57 @@ export function KeyEdit({ isOpen, accessKey, onClose, onSubmit, isSubmitting }: 
             <form.Field name='neverExpires'>
               {(field) => (
                 <Field>
-                  <Label>
-                    <Checkbox name={field.name} />
+                  <Label className='flex cursor-pointer items-center gap-2'>
+                    <Checkbox
+                      checked={field.state.value}
+                      onCheckedChange={(checked) => field.handleChange(checked === true)}
+                    />
                     <span>Never expires</span>
                   </Label>
                 </Field>
               )}
             </form.Field>
 
-            <Fieldset>
-              <FieldsetLegend>Permissions</FieldsetLegend>
-              <form.Field name='allowCreateBucket'>
-                {(field) => (
-                  <Field>
-                    <Label>
-                      <Checkbox name={field.name} />
-                      <span>Allow creating buckets</span>
-                    </Label>
-                  </Field>
-                )}
-              </form.Field>
-            </Fieldset>
-          </DialogBody>
-          <DialogFooter>
-            <DialogClose>Cancel</DialogClose>
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmittingForm]) => (
-                <DialogClose
-                  render={
-                    <Button
-                      type='submit'
-                      size='sm'
-                      disabled={!canSubmit || isSubmittingForm || isSubmitting}
-                    >
-                      {isSubmitting || isSubmittingForm ? (
-                        <span className='flex items-center gap-2'>
-                          <Spinner className='size-4' strokeWidth={2.0} />
-                          Updating...
-                        </span>
-                      ) : (
-                        'Update Key'
-                      )}
-                    </Button>
-                  }
-                />
+            <form.Field name='allowCreateBucket'>
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor='allowCreateBucket'>Permissions</FieldLabel>
+                  <Label className='flex cursor-pointer items-center gap-2'>
+                    <Checkbox
+                      checked={field.state.value}
+                      onCheckedChange={(checked) => field.handleChange(checked === true)}
+                    />
+                    <span>Allow creating buckets</span>
+                  </Label>
+                </Field>
               )}
-            </form.Subscribe>
-          </DialogFooter>
-        </DialogPopup>
-      </Form>
+            </form.Field>
+          </Form>
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose block>Cancel</DialogClose>
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmittingForm]) => (
+              <Button
+                type='button'
+                size='sm'
+                disabled={!canSubmit || isSubmittingForm || isSubmitting}
+                onClick={() => form.handleSubmit()}
+                block
+              >
+                {isSubmitting || isSubmittingForm ? (
+                  <span className='flex items-center gap-2'>
+                    <Spinner className='size-4' strokeWidth={2.0} />
+                    Updating...
+                  </span>
+                ) : (
+                  'Update Key'
+                )}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
+      </DialogPopup>
     </Dialog>
   )
 }

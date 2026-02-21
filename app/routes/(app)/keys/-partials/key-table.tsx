@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow
 } from '~/app/components/table'
+import { anchoredToast } from '~/app/components/toast'
 import { Text } from '~/app/components/typography'
 import { clx } from '~/app/utils'
 import type { ListAccessKeysResponse } from '~/shared/schemas/keys.schema'
@@ -42,6 +43,14 @@ const columnHelper = createColumnHelper<AccessKeyListItem>()
 
 export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
   const [filtering, setFiltering] = React.useState('')
+  const [copiedKeyId, setCopiedKeyId] = React.useState<string | null>(null)
+  const buttonRefs = React.useRef<Map<string, HTMLButtonElement>>(new Map())
+  const getButtonRef = React.useCallback(
+    (keyId: string) => (el: HTMLButtonElement | null) => {
+      if (el) buttonRefs.current.set(keyId, el)
+    },
+    []
+  )
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'N/A'
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -61,26 +70,99 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
     }),
     columnHelper.accessor('id', {
       header: 'Access Key ID',
-      cell: (info) => (
-        <div className='flex items-center gap-2'>
-          <Text className='font-mono text-sm'>{info.getValue()}</Text>
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation()
-              navigator.clipboard.writeText(info.getValue())
-            }}
-            className='text-dimmed hover:text-foreground transition-colors'
-            title='Copy Access Key ID'
-          >
-            <Lucide.Copy className='size-3.5' />
-          </button>
-        </div>
-      )
+      cell: (info) => {
+        const keyId = info.getValue()
+        return (
+          <div className='flex items-center gap-2'>
+            <Text className='text-muted-foreground font-mono text-sm'>{keyId}</Text>
+            <Button
+              ref={getButtonRef(keyId)}
+              type='button'
+              variant='plain'
+              size='xs-icon'
+              onClick={(e) => {
+                e.stopPropagation()
+                navigator.clipboard.writeText(keyId)
+                setCopiedKeyId(keyId)
+
+                anchoredToast.add({
+                  description: 'Copied',
+                  positionerProps: {
+                    anchor: buttonRefs.current.get(keyId) || null,
+                    sideOffset: 8
+                  },
+                  data: { size: 'sm' },
+                  onClose: () => {
+                    setCopiedKeyId(null)
+                  },
+                  timeout: 1500
+                })
+              }}
+              disabled={copiedKeyId === keyId}
+              title='Copy Access Key ID'
+              className={clx(
+                'text-dimmed hover:text-primary transition-colors',
+                copiedKeyId === keyId && 'text-success'
+              )}
+            >
+              {copiedKeyId === keyId ? (
+                <Lucide.Check className='size-3.5' />
+              ) : (
+                <Lucide.Copy className='size-3.5' />
+              )}
+            </Button>
+          </div>
+        )
+      }
     }),
     columnHelper.accessor('created', {
       header: 'Created',
-      cell: (info) => formatDate(info.getValue() || null)
+      cell: (info) => {
+        const date = info.getValue()
+        return (
+          <div className='flex items-center gap-1.5'>
+            <Lucide.Calendar className='text-dimmed size-3.5' />
+            <Text className='text-muted-foreground text-sm'>{formatDate(date || null)}</Text>
+          </div>
+        )
+      }
+    }),
+    columnHelper.accessor('expiration', {
+      header: 'Expiration',
+      cell: (info) => {
+        const expiration = info.getValue()
+        const expired = info.row.original.expired
+
+        if (!expiration) {
+          return (
+            <div className='flex items-center gap-1.5'>
+              <Lucide.Infinity className='text-muted size-3.5' />
+              <Badge variant='secondary' pill className='h-5.5 px-2' size='sm'>
+                Never
+              </Badge>
+            </div>
+          )
+        }
+
+        return (
+          <div className='flex items-center gap-2'>
+            <Lucide.Clock className={clx('size-3.5', expired ? 'text-danger' : 'text-dimmed')} />
+            <Text
+              className={clx(
+                'text-sm',
+                expired ? 'text-danger font-medium' : 'text-muted-foreground'
+              )}
+            >
+              {formatDate(expiration)}
+            </Text>
+            {expired && (
+              <Badge variant='danger' pill className='h-5.5 px-2' size='sm'>
+                Expired
+              </Badge>
+            )}
+          </div>
+        )
+      }
     }),
     columnHelper.display({
       id: 'status',
@@ -89,27 +171,35 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
         const key = info.row.original
         if (key.deleted) {
           return (
-            <Badge variant='secondary' pill className='h-5 px-2' size='sm'>
-              <Lucide.Trash2 className='h-3 w-3' />
+            <Badge variant='secondary' pill className='h-5.5 px-2' size='sm'>
+              <Lucide.Ban className='size-3' />
               Deleted
             </Badge>
           )
         }
+        if (key.expired) {
+          return (
+            <Badge variant='danger' pill className='h-5.5 px-2' size='sm'>
+              <Lucide.XCircle className='size-3' />
+              Expired
+            </Badge>
+          )
+        }
         return (
-          <Badge variant='success' pill className='h-5 px-2' size='sm'>
-            <Lucide.CheckCircle2 className='h-3 w-3' />
+          <Badge variant='success' pill className='h-5.5 px-2' size='sm'>
+            <Lucide.CheckCircle2 className='size-3' />
             Active
           </Badge>
         )
       }
     }),
     columnHelper.display({
-      id: 'delete',
+      id: 'actions',
       header: '',
       cell: (info) => {
         const key = info.row.original
         return (
-          <div className='mx-2 flex justify-center'>
+          <div className='flex justify-end gap-1'>
             <Button
               type='button'
               variant='plain'
@@ -119,8 +209,9 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
                 onDelete(key.id)
               }}
               title='Delete Access Key'
+              className='text-dimmed hover:text-danger hover:bg-danger/5'
             >
-              <Lucide.Trash2 className='text-danger size-4' />
+              <Lucide.Trash2 className='size-4' />
             </Button>
           </div>
         )
@@ -149,24 +240,40 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
             <TableHead>Name</TableHead>
             <TableHead>Access Key ID</TableHead>
             <TableHead>Created</TableHead>
+            <TableHead>Expiration</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className='w-16 text-right'></TableHead>
+            <TableHead className='w-20 text-right'>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {Array.from({ length: 5 }).map((_, i) => (
-            <TableRow key={`skeleton-name-${i}`}>
+            <TableRow key={`skeleton-${i}`}>
               <TableCell>
-                <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
+                <div className='flex items-center gap-2'>
+                  <div className='size-4 animate-pulse rounded bg-gray-100' />
+                  <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
+                </div>
               </TableCell>
               <TableCell>
-                <div className='h-4 w-40 animate-pulse rounded bg-gray-100' />
+                <div className='flex items-center gap-2'>
+                  <div className='h-3.5 w-40 animate-pulse rounded bg-gray-100' />
+                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
+                </div>
               </TableCell>
               <TableCell>
-                <div className='h-4 w-24 animate-pulse rounded bg-gray-100' />
+                <div className='flex items-center gap-1.5'>
+                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
+                  <div className='h-3.5 w-24 animate-pulse rounded bg-gray-100' />
+                </div>
               </TableCell>
               <TableCell>
-                <div className='h-6 w-20 animate-pulse rounded-full bg-gray-100' />
+                <div className='flex items-center gap-1.5'>
+                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
+                  <div className='h-3.5 w-24 animate-pulse rounded bg-gray-100' />
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className='h-5.5 w-20 animate-pulse rounded-full bg-gray-100' />
               </TableCell>
               <TableCell className='text-right'>
                 <div className='ml-auto h-8 w-8 animate-pulse rounded bg-gray-100' />
@@ -188,7 +295,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
           type='text'
           value={filtering}
           onChange={(e) => setFiltering(e.target.value)}
-          placeholder='Search access keys by name...'
+          placeholder='Search keys by name...'
           disabled={isLoading}
         />
         {filtering && !isLoading && (
@@ -215,7 +322,9 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
           </IconBox>
           <div className='space-y-1'>
             <Text className='font-semibold'>No keys found</Text>
-            <Text className='text-muted-foreground'>Try adjusting your search or filters.</Text>
+            <Text className='text-muted-foreground text-sm'>
+              Try adjusting your search or filters.
+            </Text>
           </div>
         </div>
       ) : keys.length === 0 ? (
@@ -224,8 +333,8 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
             <Lucide.KeyRound className='size-16' />
           </IconBox>
           <div className='space-y-1'>
-            <Text className='font-semibold'>No access keys found</Text>
-            <Text className='text-muted-foreground'>
+            <Text className='font-semibold'>No access keys</Text>
+            <Text className='text-muted-foreground text-sm'>
               Get started by creating a new access key or importing an existing one.
             </Text>
           </div>
@@ -239,7 +348,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={clx('rounded-t', header.id === 'delete' ? 'w-16 text-right' : '')}
+                      className={clx('rounded-t', header.id === 'actions' ? 'w-20 text-right' : '')}
                     >
                       {header.isPlaceholder
                         ? null
@@ -262,7 +371,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={cell.column.id === 'delete' ? 'text-right' : ''}
+                      className={cell.column.id === 'actions' ? 'text-right' : ''}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>

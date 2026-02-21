@@ -17,7 +17,7 @@ import {
   TableRow
 } from '~/app/components/table'
 import { Text, TextLink } from '~/app/components/typography'
-import { createFolder, listBucketObjects, uploadFile } from '~/app/services/objects.service'
+import objectsService from '~/app/services/objects.service'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 import { CreateFolderDialog } from './create-folder-dialog'
 import { DropdownItem } from './dropdown-item'
@@ -54,13 +54,13 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
       if (!hasAccessKeys) {
         return { data: { commonPrefixes: [], contents: [] } }
       }
-      return listBucketObjects({ bucket: bucketParam, prefix: prefix || undefined })
+      return objectsService.listBucketObjects({ bucket: bucketParam, prefix: prefix || undefined })
     }
   })
 
   const createFolderMutation = useMutation({
     mutationFn: async (folderName: string) => {
-      return createFolder(
+      return objectsService.createFolder(
         { bucket: bucketParam, prefix: prefix || undefined },
         { name: folderName }
       )
@@ -75,7 +75,7 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
 
   const uploadFileMutation = useMutation({
     mutationFn: async (file: File) => {
-      return uploadFile({ bucket: bucketParam }, { file })
+      return objectsService.uploadFile({ bucket: bucketParam }, { file })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })

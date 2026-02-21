@@ -15,7 +15,7 @@ import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { getBucketInfo } from '~/app/services/bucket.service'
+import bucketService from '~/app/services/bucket.service'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 const ObjectBrowser = React.lazy(() =>
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/(app)/buckets/$id/')({
 function bucketQuery(bucketId: string) {
   return queryOptions({
     queryKey: ['bucket', bucketId],
-    queryFn: () => getBucketInfo({ id: bucketId })
+    queryFn: () => bucketService.getBucketInfo({ id: bucketId })
   })
 }
 
@@ -73,7 +73,7 @@ function RouteComponent() {
 
   if (!bucket) {
     return (
-      <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
+      <div className='mx-auto w-full max-w-7xl space-y-6'>
         <div className='border-danger/20 bg-danger/5 flex flex-col items-center gap-4 rounded-lg border px-8 py-6 text-center'>
           <IconBox variant='danger' size='lg' circle>
             <Lucide.AlertTriangle className='size-12' />
@@ -106,7 +106,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-screen-2xl space-y-6'>
+    <div className='mx-auto w-full max-w-7xl space-y-6'>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

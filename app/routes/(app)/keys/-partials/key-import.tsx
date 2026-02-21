@@ -112,7 +112,9 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                     placeholder='e.g., Imported Key from Production'
                     disabled={isSubmitting}
                   />
-                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
                 </Field>
               )}
             </form.Field>
@@ -143,7 +145,9 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                     className='font-mono'
                     disabled={isSubmitting}
                   />
-                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
                 </Field>
               )}
             </form.Field>
@@ -173,7 +177,9 @@ export function KeyImport({ isOpen, onClose, onSubmit, isSubmitting }: KeyImport
                     className='font-mono'
                     disabled={isSubmitting}
                   />
-                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
                 </Field>
               )}
             </form.Field>

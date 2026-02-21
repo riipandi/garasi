@@ -68,6 +68,26 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
       expiration: '',
       allowCreateBucket: false
     },
+    validators: {
+      onChange: ({ value }) => {
+        // Validate expiration based on preset
+        if (value.expirationPreset === 'never') {
+          // Never preset is always valid regardless of expiration value
+          return undefined
+        }
+        if (value.expirationPreset === 'custom') {
+          if (!value.expiration || value.expiration.trim() === '') {
+            return { expiration: 'Expiration Date is required' }
+          }
+        } else {
+          // For 7d, 30d, 90d presets
+          if (!value.expiration || value.expiration.trim() === '') {
+            return { expiration: 'Expiration Date is required' }
+          }
+        }
+        return undefined
+      }
+    },
     onSubmit: async ({ value }) => {
       const result = createKeySchema.safeParse(value)
       if (!result.success) {
@@ -79,17 +99,18 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
       }
 
       const neverExpires = value.expirationPreset === 'never'
-      const submitValue = {
+
+      const submitValue: CreateAccessKeyRequest = {
         name: value.name,
         neverExpires,
         expiration: neverExpires ? null : value.expiration || null,
-        allow: value.allowCreateBucket ? { createBucket: true } : null,
-        deny: value.allowCreateBucket ? null : { createBucket: true }
+        allow: value.allowCreateBucket ? { createBucket: true } : undefined,
+        deny: value.allowCreateBucket ? undefined : { createBucket: true }
       }
 
       try {
         await onSubmit(submitValue)
-        onClose()
+        form.reset()
       } catch (error) {
         // Error is handled by parent component
         console.error(error)
@@ -108,6 +129,8 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
         form.setFieldValue('expiration', expirationDate)
       }
     } else if (preset === 'never') {
+      form.setFieldValue('expiration', '')
+    } else if (preset === 'custom') {
       form.setFieldValue('expiration', '')
     }
   }
@@ -166,7 +189,9 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
                     placeholder='e.g., production-api-key'
                     disabled={isSubmitting}
                   />
-                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
                 </Field>
               )}
             </form.Field>
@@ -219,36 +244,22 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
                       ))}
                     </div>
                   </div>
-                  <FieldError>{field.state.meta.errors[0]}</FieldError>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
                 </Field>
               )}
             </form.Field>
 
             <form.Subscribe selector={(state) => state.values.expirationPreset}>
               {(expirationPreset) => (
-                <form.Field
-                  name='expiration'
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (expirationPreset === 'custom') {
-                        if (!value || value.trim() === '') {
-                          return 'Expiration Date is required'
-                        }
-                      } else if (expirationPreset !== 'never') {
-                        if (!value || value.trim() === '') {
-                          return 'Expiration Date is required'
-                        }
-                      }
-                      return undefined
-                    }
-                  }}
-                >
+                <form.Field name='expiration'>
                   {(field) => (
                     <Field className={expirationPreset !== 'custom' ? 'hidden' : ''}>
                       <FieldLabel htmlFor='expiration'>Custom Expiration Date</FieldLabel>
                       <Input
                         id='expiration'
-                        type='datetime-local'
+                        type='date'
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => {
@@ -257,7 +268,9 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
                         }}
                         disabled={isSubmitting || expirationPreset === 'never'}
                       />
-                      <FieldError>{field.state.meta.errors[0]}</FieldError>
+                      <FieldError match={!field.state.meta.isValid}>
+                        {field.state.meta.errors.join(', ')}
+                      </FieldError>
                     </Field>
                   )}
                 </form.Field>

@@ -4,7 +4,7 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Card } from '~/app/components/card'
 import { Text, TextLink } from '~/app/components/typography'
-import { getNodeInfo, launchRepairOperation } from '~/app/services/node.service'
+import nodeService from '~/app/services/node.service'
 import type { RepairType } from '~/shared/schemas/node.schema'
 
 const NodeInformationCard = React.lazy(() =>
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/(app)/cluster/nodes/$id')({
 const nodeInfoQuery = (nodeId: string) =>
   queryOptions({
     queryKey: ['cluster', 'node', 'info', nodeId],
-    queryFn: () => getNodeInfo({ node: nodeId })
+    queryFn: () => nodeService.getNodeInfo({ node: nodeId })
   })
 
 function RouteComponent() {
@@ -66,7 +66,7 @@ function RouteComponent() {
 
   const repairMutation = useMutation({
     mutationFn: ({ node, repairType }: { node: string; repairType: RepairType }) =>
-      launchRepairOperation({ node }, { repairType }),
+      nodeService.launchRepairOperation({ node }, { repairType }),
     onMutate: (variables) => {
       setRunningOperation(variables.repairType)
     },

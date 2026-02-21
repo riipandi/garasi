@@ -5,7 +5,7 @@ import { Card, CardBody } from '~/app/components/card'
 import { Progress } from '~/app/components/progress'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { getClusterStatus, getClusterStatistics } from '~/app/services/cluster.service'
+import clusterService from '~/app/services/cluster.service'
 import { LayoutManagement } from './-partials/layout-management'
 
 interface ClusterStatisticsResponse {
@@ -42,12 +42,12 @@ export const Route = createFileRoute('/(app)/cluster/layout')({
 
 const clusterStatusQuery = queryOptions({
   queryKey: ['cluster', 'status'],
-  queryFn: () => getClusterStatus()
+  queryFn: () => clusterService.getClusterStatus()
 })
 
 const clusterStatisticsQuery = queryOptions({
   queryKey: ['cluster', 'statistics'],
-  queryFn: () => getClusterStatistics()
+  queryFn: () => clusterService.getClusterStatistics()
 })
 
 function RouteComponent() {

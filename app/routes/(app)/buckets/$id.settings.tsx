@@ -2,7 +2,6 @@ import { queryOptions, useSuspenseQuery, useMutation } from '@tanstack/react-que
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import { Alert } from '~/app/components/alert'
 import {
   AlertDialog,
   AlertDialogBody,
@@ -15,12 +14,11 @@ import {
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
 import { Spinner } from '~/app/components/spinner'
-import { Stack } from '~/app/components/stack'
+import { toast } from '~/app/components/toast'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
-import { addBucketAlias, removeBucketAlias } from '~/app/services/bucket.service'
-import { updateBucket, deleteBucket, getBucketInfo } from '~/app/services/bucket.service'
-import { allowBucketKey, denyBucketKey } from '~/app/services/bucket.service'
+import bucketService from '~/app/services/bucket.service'
+import keysService from '~/app/services/keys.service'
 import type { UpdateBucketRequest } from '~/shared/schemas/bucket.schema'
 import type { RemoveBucketLocalAliasRequest } from '~/shared/schemas/bucket.schema'
 import type { RemoveBucketGlobalAliasRequest } from '~/shared/schemas/bucket.schema'
@@ -81,13 +79,21 @@ export const Route = createFileRoute('/(app)/buckets/$id/settings')({
   component: RouteComponent,
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(bucketQuery(params.id))
+    context.queryClient.ensureQueryData(keysQuery())
   }
 })
 
 function bucketQuery(bucketId: string) {
   return queryOptions({
     queryKey: ['bucket', bucketId],
-    queryFn: () => getBucketInfo({ id: bucketId })
+    queryFn: () => bucketService.getBucketInfo({ id: bucketId })
+  })
+}
+
+function keysQuery() {
+  return queryOptions({
+    queryKey: ['keys'],
+    queryFn: () => keysService.listAccessKeys()
   })
 }
 
@@ -105,8 +111,6 @@ function RouteComponent() {
   const [isAddingLocalAlias, setIsAddingLocalAlias] = React.useState(false)
   const [globalAliasToDelete, setGlobalAliasToDelete] = React.useState<string | null>(null)
   const [keyToDelete, setKeyToDelete] = React.useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
   const [showDeleteLocalAliasConfirm, setShowDeleteLocalAliasConfirm] = React.useState(false)
   const [localAliasToDelete, setLocalAliasToDelete] = React.useState<{
     accessKeyId: string
@@ -123,6 +127,9 @@ function RouteComponent() {
 
   const { data: bucketData } = useSuspenseQuery(bucketQuery(id))
   const bucket = bucketData?.data
+
+  const { data: keysData } = useSuspenseQuery(keysQuery())
+  const keys = keysData?.data ?? []
 
   React.useEffect(() => {
     if (bucket) {
@@ -163,74 +170,79 @@ function RouteComponent() {
 
   const updateBucketMutation = useMutation({
     mutationFn: async (values: UpdateBucketRequest) => {
-      return updateBucket(id, values)
+      return bucketService.updateBucket(id, values)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Bucket updated successfully!')
+      toast.add({ title: 'Bucket updated successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to update bucket')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to update bucket'
+      toast.add({ title: 'Update failed', description: errorMsg, type: 'error' })
     }
   })
 
   const deleteBucketMutation = useMutation({
     mutationFn: async () => {
-      return deleteBucket(id)
+      return bucketService.deleteBucket(id)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Bucket deleted successfully!')
+      toast.add({ title: 'Bucket deleted successfully', type: 'success' })
       navigate({ to: '/buckets' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to delete bucket')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to delete bucket'
+      toast.add({ title: 'Deletion failed', description: errorMsg, type: 'error' })
     }
   })
 
   const addGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
       const data: AddGlobalBucketAliasRequest = { globalAlias, bucketId: id }
-      return addBucketAlias(id, data)
+      return bucketService.addBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Global alias added successfully!')
+      toast.add({ title: 'Global alias added successfully', type: 'success' })
       setShowAddGlobalAliasDialog(false)
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to add global alias')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to add global alias'
+      toast.add({ title: 'Add failed', description: errorMsg, type: 'error' })
     }
   })
 
   const removeGlobalAliasMutation = useMutation({
     mutationFn: async (globalAlias: string) => {
       const data: Omit<RemoveBucketGlobalAliasRequest, 'bucketId'> = { globalAlias }
-      return removeBucketAlias(id, data)
+      return bucketService.removeBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Global alias removed successfully!')
+      toast.add({ title: 'Global alias removed successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to remove global alias')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to remove global alias'
+      toast.add({ title: 'Remove failed', description: errorMsg, type: 'error' })
     }
   })
 
   const addLocalAliasMutation = useMutation({
     mutationFn: async (data: AddLocalBucketAliasRequest) => {
-      return addBucketAlias(id, data)
+      return bucketService.addBucketAlias(id, data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Local alias added successfully!')
+      toast.add({ title: 'Local alias added successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to add local alias')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to add local alias'
+      toast.add({ title: 'Add failed', description: errorMsg, type: 'error' })
     }
   })
 
@@ -240,15 +252,16 @@ function RouteComponent() {
         localAlias: data.localAlias,
         accessKeyId: data.accessKeyId
       }
-      return removeBucketAlias(id, requestData)
+      return bucketService.removeBucketAlias(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
       queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      setSuccessMessage('Local alias removed successfully!')
+      toast.add({ title: 'Local alias removed successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to remove local alias')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to remove local alias'
+      toast.add({ title: 'Remove failed', description: errorMsg, type: 'error' })
     }
   })
 
@@ -265,14 +278,15 @@ function RouteComponent() {
           write: data.permissions.write ?? false
         }
       }
-      return allowBucketKey(id, requestData)
+      return bucketService.allowBucketKey(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
-      setSuccessMessage('Key permissions updated successfully!')
+      toast.add({ title: 'Key permissions updated successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to update key permissions')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to update key permissions'
+      toast.add({ title: 'Update failed', description: errorMsg, type: 'error' })
     }
   })
 
@@ -289,23 +303,26 @@ function RouteComponent() {
           write: data.permissions.write ?? false
         }
       }
-      return denyBucketKey(id, requestData)
+      return bucketService.denyBucketKey(id, requestData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bucket', id] })
-      setSuccessMessage('Key permissions updated successfully!')
+      toast.add({ title: 'Key permissions updated successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to update key permissions')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to update key permissions'
+      toast.add({ title: 'Update failed', description: errorMsg, type: 'error' })
     }
   })
 
   const handleDeleteBucket = () => {
     if (!bucket) return
     if (bucket.objects > 0) {
-      setErrorMessage(
-        `Cannot delete bucket. This bucket contains ${bucket.objects} object${bucket.objects !== 1 ? 's' : ''}. You must delete all objects before deleting the bucket.`
-      )
+      toast.add({
+        title: 'Cannot delete bucket',
+        description: `This bucket contains ${bucket.objects} object${bucket.objects !== 1 ? 's' : ''}. You must delete all objects before deleting the bucket.`,
+        type: 'error'
+      })
       return
     }
     setShowDeleteConfirm(true)
@@ -323,7 +340,11 @@ function RouteComponent() {
       const bytes = sizeUnitToBytes(maxSize, maxSizeUnit)
       const MIN_SIZE_BYTES = 100 * BYTES_PER_MB
       if (bytes !== null && bytes < MIN_SIZE_BYTES) {
-        setErrorMessage('Max size must be at least 100MB')
+        toast.add({
+          title: 'Validation error',
+          description: 'Max size must be at least 100MB',
+          type: 'error'
+        })
         return
       }
     }
@@ -445,92 +466,71 @@ function RouteComponent() {
     }
   }
 
-  React.useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [successMessage])
-
-  React.useEffect(() => {
-    if (errorMessage) {
-      const timer = setTimeout(() => setErrorMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [errorMessage])
-
   if (!bucket) {
     return (
       <div className='flex min-h-screen items-center justify-center'>
         <div className='flex flex-col items-center'>
           <Spinner className='text-primary size-12' />
-          <Text className='text-muted-foreground mt-4 text-sm'>Loading bucket settings...</Text>
+          <Text className='text-muted-foreground mt-4'>Loading bucket settings...</Text>
         </div>
       </div>
     )
   }
 
   return (
-    <div className='mx-auto w-full max-w-5xl space-y-6'>
-      <div className='min-w-0 flex-1'>
-        <div className='flex items-center justify-between'>
-          <div>
-            <Link to='/buckets/$id' params={{ id }} search={{ key: undefined, prefix: undefined }}>
-              <Button variant='plain' size='sm'>
-                <Lucide.ArrowLeft className='mr-2 size-4' />
-                Back to Bucket
-              </Button>
-            </Link>
-            <Stack>
-              <Heading size='lg'>Bucket Settings</Heading>
-              <Text className='text-muted-foreground'>Manage settings for bucket {bucket.id}</Text>
-            </Stack>
+    <div className='mx-auto w-full max-w-4xl space-y-8'>
+      <div className='flex items-start gap-4'>
+        <Link
+          to='/buckets/$id'
+          params={{ id }}
+          search={{ key: undefined, prefix: undefined }}
+          className='rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+        >
+          <Lucide.ArrowLeft className='size-5' />
+        </Link>
+        <div className='min-w-0 flex-1'>
+          <div className='space-y-1'>
+            <Heading size='lg'>Bucket Settings</Heading>
+            <Text className='text-muted-foreground'>Manage settings for bucket {bucket.id}</Text>
           </div>
         </div>
       </div>
 
-      <div className='min-w-0 flex-1'>
-        <Stack>
-          {successMessage && <Alert variant='success'>{successMessage}</Alert>}
-          {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
+      <div className='min-w-0 flex-1 space-y-8'>
+        <BucketConfigurationForm
+          websiteAccessEnabled={websiteAccessEnabled}
+          setWebsiteAccessEnabled={setWebsiteAccessEnabled}
+          indexDocument={indexDocument}
+          setIndexDocument={setIndexDocument}
+          errorDocument={errorDocument}
+          setErrorDocument={setErrorDocument}
+          maxObjects={maxObjects}
+          setMaxObjects={setMaxObjects}
+          maxSize={maxSize}
+          setMaxSize={setMaxSize}
+          maxSizeUnit={maxSizeUnit}
+          setMaxSizeUnit={setMaxSizeUnit}
+          isPending={updateBucketMutation.isPending}
+          onSubmit={handleEditBucket}
+          sizeWarning={sizeWarning}
+        />
 
-          <BucketConfigurationForm
-            websiteAccessEnabled={websiteAccessEnabled}
-            setWebsiteAccessEnabled={setWebsiteAccessEnabled}
-            indexDocument={indexDocument}
-            setIndexDocument={setIndexDocument}
-            errorDocument={errorDocument}
-            setErrorDocument={setErrorDocument}
-            maxObjects={maxObjects}
-            setMaxObjects={setMaxObjects}
-            maxSize={maxSize}
-            setMaxSize={setMaxSize}
-            maxSizeUnit={maxSizeUnit}
-            setMaxSizeUnit={setMaxSizeUnit}
-            isPending={updateBucketMutation.isPending}
-            onSubmit={handleEditBucket}
-            sizeWarning={sizeWarning}
-          />
+        <AliasesSection
+          bucket={bucket}
+          onShowAddGlobalAliasDialog={() => setShowAddGlobalAliasDialog(true)}
+          onShowAddLocalAliasDialog={() => setShowAddLocalAliasDialog(true)}
+          onRemoveGlobalAlias={handleRemoveGlobalAlias}
+          onRemoveLocalAlias={handleRemoveLocalAlias}
+        />
 
-          <AliasesSection
-            bucket={bucket}
-            onShowAddGlobalAliasDialog={() => setShowAddGlobalAliasDialog(true)}
-            onShowAddLocalAliasDialog={() => setShowAddLocalAliasDialog(true)}
-            onRemoveGlobalAlias={handleRemoveGlobalAlias}
-            onRemoveLocalAlias={handleRemoveLocalAlias}
-          />
+        <AccessKeysSection
+          bucket={bucket}
+          onShowKeySelectorDialog={() => setShowKeySelectorDialog(true)}
+          onViewKey={handleViewKey}
+          onDeleteKey={handleDeleteKey}
+        />
 
-          <AccessKeysSection
-            bucket={bucket}
-            onShowKeySelectorDialog={() => setShowKeySelectorDialog(true)}
-            onViewKey={handleViewKey}
-            onDeleteKey={handleDeleteKey}
-          />
-
-          <DeleteBucketSection onDeleteBucket={handleDeleteBucket} objectCount={bucket.objects} />
-        </Stack>
+        <DeleteBucketSection onDeleteBucket={handleDeleteBucket} objectCount={bucket.objects} />
       </div>
 
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
@@ -540,8 +540,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this bucket? This action cannot be undone and will
-              permanently remove bucket and all its contents.
+              Are you sure you want to delete this bucket? <br />
+              This action cannot be undone and will permanently remove bucket and all its contents.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -579,8 +579,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete global alias "{globalAliasToDelete}"? This action
-              cannot be undone.
+              Are you sure you want to delete global alias "{globalAliasToDelete}"? <br />
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -608,7 +608,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete key "{keyToDelete}"? This action cannot be undone.
+              Are you sure you want to delete key "{keyToDelete}"? <br />
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -670,6 +671,7 @@ function RouteComponent() {
         onClose={() => setShowAddLocalAliasDialog(false)}
         onSubmit={handleAddLocalAliasFromDialog}
         isSubmitting={isAddingLocalAlias}
+        keys={keys}
       />
     </div>
   )
