@@ -14,6 +14,7 @@ import {
   AlertDialogTitle
 } from '~/app/components/alert-dialog'
 import { Button } from '~/app/components/button'
+import { toast } from '~/app/components/toast'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import keysService from '~/app/services/keys.service'
@@ -41,8 +42,6 @@ function RouteComponent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = React.useState(false)
   const [keyToDelete, setKeyToDelete] = React.useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
   // Fetch access keys
@@ -56,11 +55,12 @@ function RouteComponent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key created successfully!')
+      toast.add({ title: 'Access key created successfully', type: 'success' })
       setShowCreateDialog(false)
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to create access key')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to create access key'
+      toast.add({ title: 'Creation failed', description: errorMsg, type: 'error' })
     }
   })
 
@@ -71,25 +71,31 @@ function RouteComponent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key deleted successfully!')
+      toast.add({ title: 'Access key deleted successfully', type: 'success' })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to delete access key')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to delete access key'
+      toast.add({ title: 'Deletion failed', description: errorMsg, type: 'error' })
     }
   })
 
   // Import key mutation
   const importKeyMutation = useMutation({
     mutationFn: async (values: ImportKeyRequest) => {
-      return keysService.importKey(values)
+      const response = await keysService.importKey(values) as { status: string; message?: string; error?: { reason?: string } }
+      if (response.status === 'error') {
+        throw new Error(response.message || response.error?.reason || 'Failed to import access key')
+      }
+      return response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys'] })
-      setSuccessMessage('Access key imported successfully!')
+      toast.add({ title: 'Access key imported successfully', type: 'success' })
       setShowKeyImport(false)
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to import access key')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to import access key'
+      toast.add({ title: 'Import failed', description: errorMsg, type: 'error' })
     }
   })
 
@@ -140,22 +146,6 @@ function RouteComponent() {
     setShowCreateDialog(false)
   }
 
-  React.useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [successMessage])
-
-  React.useEffect(() => {
-    if (errorMessage) {
-      const timer = setTimeout(() => setErrorMessage(null), 5000)
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [errorMessage])
-
   return (
     <div className='mx-auto w-full max-w-7xl space-y-6'>
       <div className='min-w-0 flex-1 space-y-1.5'>
@@ -188,9 +178,6 @@ function RouteComponent() {
           {isRefreshing ? 'Refreshing...' : 'Refresh'}
         </Button>
       </div>
-
-      {successMessage && <Alert variant='success'>{successMessage}</Alert>}
-      {errorMessage && <Alert variant='danger'>{errorMessage}</Alert>}
 
       <KeyTable keys={keys} onDelete={handleDeleteKey} isLoading={isRefreshing} />
 

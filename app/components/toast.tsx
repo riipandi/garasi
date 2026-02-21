@@ -33,7 +33,7 @@ function StackedToasts() {
 
   return (
     <BaseToast.Portal>
-      <BaseToast.Viewport className='fixed top-2 right-0 left-0 mx-2 flex md:top-4 md:mx-auto'>
+      <BaseToast.Viewport className='fixed top-2 right-0 left-0 z-999 mx-2 flex md:top-4 md:mx-auto'>
         {toasts.map((toast) => (
           <BaseToast.Root
             key={toast.id}
