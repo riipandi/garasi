@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_DWjEqsmiTt
 createdAt: 2026-01-20T00:49:22.810920
-updatedAt: 2026-01-20T03:50:09.034957
+updatedAt: 2026-02-21T17:24:01.423112
 workspaceId: wk_YrPa97TLKc
 folderId: fl_ougj9dmJYS
 authentication:
@@ -11,16 +11,15 @@ authenticationType: bearer
 body:
   text: |-
     {
-      "refresh_token": "${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLnJlZnJlc2hfdG9rZW4') ]}",
       "session_id": "${[ response.body.path(behavior='smart', ttl='0', result='first', join=b64'LCA', request='rq_afiL2Uw3rb', path=b64'JC5kYXRhLnNlc3Npb25faWQ') ]}"
     }
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: IBWGB7acJG
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: IBWGB7acJG
 method: POST
 name: Signout User
 sortPriority: 3000.0

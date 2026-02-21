@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody, HTTPError } from 'h3'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
-import { revokeUserRefreshTokens, deactivateAllSessions } from '~/server/services/session.service'
+import { deactivateAllSessions } from '~/server/services/session.service'
 
 interface ResetPasswordBody {
   token: string
@@ -73,14 +73,11 @@ export default defineEventHandler(async (event) => {
       .where('id', '=', resetToken.id)
       .execute()
 
-    // Revoke all refresh tokens for security
-    const revokedCount = await revokeUserRefreshTokens(db, resetToken.userId)
-
     // Deactivate all sessions for security
     const deactivatedCount = await deactivateAllSessions(db, resetToken.userId)
 
     logger
-      .withMetadata({ userId: resetToken.userId, revokedCount, deactivatedCount })
+      .withMetadata({ userId: resetToken.userId, deactivatedCount })
       .info('Password reset successful')
 
     return createResponse(

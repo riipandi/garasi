@@ -1,18 +1,8 @@
 import { ofetch, type $Fetch, type FetchOptions } from 'ofetch'
 import { toast } from '~/app/components/toast'
-import { isTokenExpired, isRefreshTokenExpired, refreshAccessToken } from '~/app/guards'
+import { isTokenExpired } from '~/app/guards'
 import { authStore } from '~/app/stores'
 
-type RefreshResult = {
-  access_token: string
-  refresh_token: string
-  access_token_expiry: number
-  refresh_token_expiry: number
-  sessid: string
-} | null
-
-let isRefreshing = false
-let refreshPromise: Promise<RefreshResult> | null = null
 let hasShownSessionExpiredToast = false
 let isCleared = false
 
@@ -21,10 +11,8 @@ export function clearAuthState() {
   isCleared = true
 
   authStore.set({
-    atoken: null,
-    atokenexp: null,
-    rtoken: null,
-    rtokenexp: null,
+    token: null,
+    tokenexp: null,
     sessid: null,
     remember: false
   })
@@ -54,45 +42,16 @@ function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fetch {
     async onRequest({ options }) {
       const authState = authStore.get()
 
-      if (authState?.atoken && authState?.rtoken) {
-        if (isTokenExpired(authState.atokenexp)) {
-          if (isRefreshTokenExpired(authState.rtokenexp)) {
-            showSessionExpiredToast()
-            clearAuthState()
-            return
-          }
-
-          try {
-            if (isRefreshing && refreshPromise) {
-              await refreshPromise
-            } else {
-              isRefreshing = true
-              refreshPromise = refreshAccessToken()
-              await refreshPromise
-              isRefreshing = false
-              refreshPromise = null
-            }
-
-            const updatedAuthState = authStore.get()
-            if (updatedAuthState?.atoken) {
-              options.headers = new Headers(options.headers)
-              options.headers.set('Authorization', `Bearer ${updatedAuthState.atoken}`)
-            } else {
-              showSessionExpiredToast()
-              clearAuthState()
-              return
-            }
-          } catch {
-            isRefreshing = false
-            refreshPromise = null
-            showSessionExpiredToast()
-            clearAuthState()
-            return
-          }
-        } else {
-          options.headers = new Headers(options.headers)
-          options.headers.set('Authorization', `Bearer ${authState.atoken}`)
+      if (authState?.token) {
+        if (isTokenExpired(authState.tokenexp, 0)) {
+          showSessionExpiredToast()
+          clearAuthState()
+          return
         }
+
+        const headers = new Headers(options.headers)
+        headers.set('Authorization', `Bearer ${authState.token}`)
+        options.headers = headers
       }
     },
     onResponseError({ response }) {

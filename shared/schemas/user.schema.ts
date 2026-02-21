@@ -18,7 +18,5 @@ export interface SigninResponse extends ApiResponse<{
   name: string
   session_id: string
   access_token: string
-  refresh_token: string
   access_token_expiry: number
-  refresh_token_expiry: number
 }> {}

@@ -209,9 +209,7 @@ export default defineHandler(async (event) => {
         name: user.name,
         session_id: sessionId,
         access_token: tokens.accessToken,
-        refresh_token: tokens.refreshToken,
         access_token_expiry: tokens.accessTokenExpiry,
-        refresh_token_expiry: tokens.refreshTokenExpiry
       }
     })
   } catch (error) {
@@ -469,9 +467,7 @@ export interface SignInResponse {
   name: string
   session_id: string
   access_token: string
-  refresh_token: string
   access_token_expiry: number
-  refresh_token_expiry: number
 }
 
 export interface ValidateTokenParams {
@@ -491,7 +487,7 @@ export interface ValidateTokenParams {
 - Use these for imports to avoid relative path hell
 
 ### Additional Notes
-- The project uses JWT for authentication with access/refresh tokens
+- The project uses JWT for authentication with tokens
 - Sessions are tracked with IP and user agent
 - All environment variables are validated in `shared/envars/`
 - Logger uses structured logging with loglayer

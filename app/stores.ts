@@ -8,24 +8,32 @@
 import { persistentMap } from '@nanostores/persistent'
 import pkg from '~/package.json' with { type: 'json' }
 
+const AUTH_STORAGE_KEY = `${pkg.name}_auth:`
+
+if (typeof window !== 'undefined') {
+  const oldKeys = ['atoken', 'atokenexp', 'rtoken', 'rtokenexp']
+  oldKeys.forEach((key) => {
+    const fullKey = AUTH_STORAGE_KEY + key
+    if (localStorage.getItem(fullKey)) {
+      localStorage.removeItem(fullKey)
+    }
+  })
+}
+
 // Auth store type definition
 export interface AuthStore {
-  atoken: string | null
-  atokenexp: number | null
-  rtoken: string | null
-  rtokenexp: number | null
+  token: string | null
+  tokenexp: number | null
   sessid: string | null
   remember: boolean
 }
 
 // Persistent authentication state store
 export const authStore = persistentMap<AuthStore>(
-  `${pkg.name}_auth:`,
+  AUTH_STORAGE_KEY,
   {
-    atoken: null,
-    atokenexp: null,
-    rtoken: null,
-    rtokenexp: null,
+    token: null,
+    tokenexp: null,
     sessid: null,
     remember: false
   },

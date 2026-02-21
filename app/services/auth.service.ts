@@ -2,14 +2,6 @@ import { fetcher } from '~/app/fetcher'
 import type { ApiResponse } from '~/shared/schemas/common.schema'
 import type { SigninResponse, WhoamiResponse } from '~/shared/schemas/user.schema'
 
-interface RefreshData {
-  session_id: string
-  access_token: string
-  refresh_token: string
-  access_token_expiry: number
-  refresh_token_expiry: number
-}
-
 interface SessionData {
   id: string
   ip_address: string
@@ -26,8 +18,7 @@ interface SessionsData {
 
 export interface AuthService {
   signin: (email: string, password: string, remember?: boolean) => Promise<SigninResponse>
-  logout: (refreshToken: string, sessionId: string) => Promise<ApiResponse<null>>
-  refresh: (refreshToken: string, sessionId: string) => Promise<ApiResponse<RefreshData>>
+  logout: (sessionId: string) => Promise<ApiResponse<null>>
   validateToken: (token: string) => Promise<ApiResponse<{ is_token_valid: boolean }>>
   whoami: () => Promise<WhoamiResponse>
   passwordChange: (currentPassword: string, newPassword: string) => Promise<ApiResponse<null>>
@@ -48,17 +39,10 @@ function defineAuthService(): AuthService {
       })
     },
 
-    async logout(refreshToken: string, sessionId: string) {
+    async logout(sessionId: string) {
       return await fetcher<ApiResponse<null>>('/auth/logout', {
         method: 'POST',
-        body: { refresh_token: refreshToken, session_id: sessionId }
-      })
-    },
-
-    async refresh(refreshToken: string, sessionId: string) {
-      return await fetcher<ApiResponse<RefreshData>>('/auth/refresh', {
-        method: 'POST',
-        body: { refresh_token: refreshToken, session_id: sessionId }
+        body: { session_id: sessionId }
       })
     },
 

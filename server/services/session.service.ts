@@ -2,7 +2,6 @@ import type { Selectable } from 'kysely'
 import { typeid } from 'typeid-js'
 import { UAParser, type IResult } from 'ua-parser-js'
 import type { DBContext } from '~/server/database/db.schema'
-import type { RefreshTokenTable } from '~/server/database/schemas/refresh-token'
 import type { SessionTable } from '~/server/database/schemas/session'
 import { isIResult } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
@@ -20,11 +19,9 @@ export function parseDeviceInfo(userAgent: string | IResult | null): string {
 
   let ua: IResult
 
-  // If already parsed as IResult, use it directly
   if (isIResult(userAgent)) {
     ua = userAgent
   } else {
-    // Otherwise parse the user agent string
     const parser = new UAParser(userAgent)
     ua = parser.getResult()
   }
@@ -43,31 +40,6 @@ export function parseDeviceInfo(userAgent: string | IResult | null): string {
  */
 export function generateSessionId(): string {
   return typeid('sess').toString()
-}
-
-/**
- * Generate a unique refresh token ID using typeid-js
- *
- * @returns Unique refresh token ID
- */
-export function generateRefreshTokenId(): string {
-  return typeid('rtoken').toString()
-}
-
-/**
- * Hash a refresh token for storage in the database
- *
- * @param token - The refresh token to hash
- * @returns Hashed token
- */
-export function hashRefreshToken(token: string): string {
-  const hasher = new Bun.CryptoHasher('blake2b256')
-  const encoder = new TextEncoder()
-  const data = encoder.encode(token)
-  hasher.update(data)
-  const hashBuffer = hasher.digest()
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 /**
@@ -254,146 +226,4 @@ export async function cleanupExpiredSessions(db: DBContext): Promise<number> {
   const result = await db.deleteFrom('sessions').where('expiresAt', '<=', now).executeTakeFirst()
 
   return Number(result.numDeletedRows)
-}
-
-/**
- * Clean up expired and revoked refresh tokens
- *
- * @param db - Database context
- * @returns Number of deleted rows
- */
-export async function cleanupExpiredRefreshTokens(db: DBContext): Promise<number> {
-  const now = Math.floor(Date.now() / 1000)
-
-  const result = await db
-    .deleteFrom('refresh_tokens')
-    .where('expiresAt', '<=', now)
-    .where('isRevoked', '=', 1)
-    .executeTakeFirst()
-
-  return Number(result.numDeletedRows)
-}
-
-/**
- * Store a refresh token in the database
- *
- * @param db - Database context
- * @param userId - User ID
- * @param sessionId - Session ID
- * @param refreshToken - The refresh token to store (will be hashed)
- * @param expiresAt - Expiration timestamp
- * @returns Created refresh token record
- */
-export async function storeRefreshToken(
-  db: DBContext,
-  userId: string,
-  sessionId: string,
-  refreshToken: string,
-  expiresAt: number
-): Promise<Selectable<RefreshTokenTable> | undefined> {
-  const tokenHash = hashRefreshToken(refreshToken)
-  const refreshTokenId = generateRefreshTokenId()
-
-  const refreshTokenRecord = await db
-    .insertInto('refresh_tokens')
-    .values({
-      id: refreshTokenId,
-      userId: userId,
-      sessionId: sessionId,
-      tokenHash: tokenHash,
-      expiresAt: expiresAt,
-      isRevoked: 0
-    })
-    .returningAll()
-    .executeTakeFirst()
-
-  return refreshTokenRecord
-}
-
-/**
- * Validate a refresh token
- *
- * @param db - Database context
- * @param refreshToken - The refresh token to validate
- * @returns Valid refresh token record or undefined
- */
-export async function validateRefreshToken(
-  db: DBContext,
-  refreshToken: string
-): Promise<Selectable<RefreshTokenTable> | undefined> {
-  const tokenHash = hashRefreshToken(refreshToken)
-  const now = Math.floor(Date.now() / 1000)
-
-  const tokenRecord = await db
-    .selectFrom('refresh_tokens')
-    .selectAll()
-    .where('tokenHash', '=', tokenHash)
-    .where('isRevoked', '=', 0)
-    .where('expiresAt', '>', now)
-    .executeTakeFirst()
-
-  return tokenRecord
-}
-
-/**
- * Revoke a refresh token
- *
- * @param db - Database context
- * @param refreshToken - The refresh token to revoke
- * @returns Number of affected rows
- */
-export async function revokeRefreshToken(db: DBContext, refreshToken: string): Promise<number> {
-  const tokenHash = hashRefreshToken(refreshToken)
-  const now = Math.floor(Date.now() / 1000)
-
-  const result = await db
-    .updateTable('refresh_tokens')
-    .set({ isRevoked: 1, revokedAt: now })
-    .where('tokenHash', '=', tokenHash)
-    .executeTakeFirst()
-
-  return Number(result.numUpdatedRows)
-}
-
-/**
- * Revoke all refresh tokens for a session
- *
- * @param db - Database context
- * @param sessionId - Session ID
- * @returns Number of affected rows
- */
-export async function revokeSessionRefreshTokens(
-  db: DBContext,
-  sessionId: string
-): Promise<number> {
-  const now = Math.floor(Date.now() / 1000)
-
-  const result = await db
-    .updateTable('refresh_tokens')
-    .set({ isRevoked: 1, revokedAt: now })
-    .where('sessionId', '=', sessionId)
-    .where('isRevoked', '=', 0)
-    .executeTakeFirst()
-
-  return Number(result.numUpdatedRows)
-}
-
-/**
- * Revoke all refresh tokens for a user
- *
- * @param db - Database context
- * @param userId - User ID
- * @returns Number of affected rows
- */
-export async function revokeUserRefreshTokens(db: DBContext, userId: string): Promise<number> {
-  const now = Math.floor(Date.now() / 1000)
-
-  const result = await db
-    .updateTable('refresh_tokens')
-    .set({ isRevoked: 1, revokedAt: now })
-    .where('userId', '=', userId)
-    .where('isRevoked', '=', 0)
-    .executeTakeFirst()
-
-  return Number(result.numUpdatedRows)
 }

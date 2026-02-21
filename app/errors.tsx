@@ -66,7 +66,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       <>
         <title>Application Error</title>
         <div className='bg-background relative flex min-h-screen flex-col items-center justify-center'>
-          <div className='from-muted/20 absolute inset-0 bg-gradient-to-b via-transparent to-transparent' />
+          <div className='from-muted/20 absolute inset-0 bg-linear-to-b via-transparent to-transparent' />
           <div className='pointer-events-none fixed inset-0 z-10 flex items-center justify-center select-none'>
             <h2 className='text-danger/10 text-[12rem] font-black mix-blend-overlay sm:text-[16rem] md:text-[20rem]'>
               ERROR
@@ -119,7 +119,7 @@ export function NotFound() {
     <>
       <title>404 Not Found</title>
       <div className='bg-background relative flex min-h-screen flex-col items-center justify-center'>
-        <div className='from-muted/20 absolute inset-0 bg-gradient-to-b via-transparent to-transparent' />
+        <div className='from-muted/20 absolute inset-0 bg-linear-to-b via-transparent to-transparent' />
         <div className='pointer-events-none fixed inset-0 z-10 flex items-center justify-center select-none'>
           <h2 className='text-danger/10 text-[12rem] font-black mix-blend-overlay sm:text-[16rem] md:text-[20rem]'>
             404
@@ -201,7 +201,7 @@ export function ErrorGeneral({ error, reset }: ErrorComponentProps) {
     <>
       <title>500 Error</title>
       <div className='bg-background relative flex min-h-screen flex-col items-center justify-center'>
-        <div className='from-muted/20 absolute inset-0 bg-gradient-to-b via-transparent to-transparent' />
+        <div className='from-muted/20 absolute inset-0 bg-linear-to-b via-transparent to-transparent' />
         <div className='pointer-events-none fixed inset-0 z-10 flex items-center justify-center select-none'>
           <h2 className='text-danger/10 text-[12rem] font-black mix-blend-overlay sm:text-[16rem] md:text-[20rem]'>
             500

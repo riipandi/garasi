@@ -13,7 +13,7 @@ const STORAGE_KEY = `${pkg.name}_auth:`
 
 export function AuthProvider({ children }: React.PropsWithChildren) {
   const authState = useStore(authStore)
-  const isAuthenticated = !!authState?.atoken
+  const isAuthenticated = !!authState?.token
 
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -64,10 +64,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       }
 
       authStore.set({
-        atoken: null,
-        atokenexp: null,
-        rtoken: null,
-        rtokenexp: null,
+        token: null,
+        tokenexp: null,
         sessid: null,
         remember: false
       })
@@ -86,10 +84,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
       if (isAuthError) {
         authStore.set({
-          atoken: null,
-          atokenexp: null,
-          rtoken: null,
-          rtokenexp: null,
+          token: null,
+          tokenexp: null,
           sessid: null,
           remember: false
         })
@@ -116,15 +112,15 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     (prev: typeof authState, current: typeof authState) => {
       if (!prev || !current) return false
 
-      const wasAuthenticated = !!prev.atoken
-      const isAuthenticatedNow = !!current.atoken
+      const wasAuthenticated = !!prev.token
+      const isAuthenticatedNow = !!current.token
 
       if (wasAuthenticated && !isAuthenticatedNow) {
         return true
       }
 
       if (wasAuthenticated && isAuthenticatedNow) {
-        const tokenCleared = prev.atoken !== current.atoken && current.atoken === null
+        const tokenCleared = prev.token !== current.token && current.token === null
         const sessionCleared = prev.sessid !== current.sessid && current.sessid === null
 
         if (tokenCleared || sessionCleared) {
@@ -192,13 +188,13 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       }
 
       const currentAuth = authStore.get()
-      const wasAuthenticated = !!currentAuth?.atoken
+      const wasAuthenticated = !!currentAuth?.token
 
       if (!wasAuthenticated) return
 
       const storageKey = event.key.replace(STORAGE_KEY, '')
 
-      if (storageKey === 'atoken' || storageKey === 'rtoken' || storageKey === 'sessid') {
+      if (storageKey === 'token' || storageKey === 'sessid') {
         const newValue = event.newValue
 
         if (newValue === '' || newValue === null) {
@@ -237,10 +233,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       const sessionData = response.data
 
       authStore.set({
-        atoken: sessionData.access_token,
-        atokenexp: sessionData.access_token_expiry,
-        rtoken: sessionData.refresh_token,
-        rtokenexp: sessionData.refresh_token_expiry,
+        token: sessionData.access_token,
+        tokenexp: sessionData.access_token_expiry,
         sessid: sessionData.session_id,
         remember
       })
