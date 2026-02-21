@@ -30,20 +30,20 @@ export default defineEventHandler(async (event) => {
     // Check if token exists
     if (!emailChangeToken) {
       logger.warn('Invalid or expired token')
-      throw new HTTPError({ status: 404, statusText: 'Invalid or expired token' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
     }
 
     // Check if token is already used
     if (emailChangeToken.used !== 0) {
       logger.warn('Token has already been used')
-      throw new HTTPError({ status: 400, statusText: 'This token has already been used' })
+      throw new HTTPError({ status: 401, statusText: 'This token has already been used' })
     }
 
     // Check if token is expired
     const currentTime = Math.floor(Date.now() / 1000)
     if (emailChangeToken.expiresAt < currentTime) {
       logger.warn('Token has expired')
-      throw new HTTPError({ status: 400, statusText: 'Token has expired' })
+      throw new HTTPError({ status: 401, statusText: 'Token has expired' })
     }
 
     // Get user details

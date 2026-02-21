@@ -18,16 +18,16 @@ export default defineEventHandler(async (event) => {
       .executeTakeFirst()
 
     if (!resetToken) {
-      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
     }
 
     const now = Math.floor(Date.now() / 1000)
     if (resetToken.expiresAt < now) {
-      throw new HTTPError({ status: 400, statusText: 'Invalid or expired token' })
+      throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
     }
 
     if (resetToken.used !== 0) {
-      throw new HTTPError({ status: 400, statusText: 'Token has already been used' })
+      throw new HTTPError({ status: 401, statusText: 'Token has already been used' })
     }
 
     return createResponse(event, 'Token valid', {

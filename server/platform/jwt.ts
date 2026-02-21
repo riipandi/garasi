@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose'
+import { HTTPError } from 'h3'
 import { UAParser, type IResult } from 'ua-parser-js'
 import logger from '~/server/platform/logger'
 import { parseUserAgentHash } from '~/server/utils/parser'
@@ -153,7 +154,7 @@ export async function verifyToken(token: string): Promise<JWTClaims> {
     return payload as unknown as JWTClaims
   } catch (error) {
     logger.withError(error).error('Invalid or expired token')
-    throw new Error('Invalid or expired token')
+    throw new HTTPError({ status: 401, statusText: 'Invalid or expired token' })
   }
 }
 
@@ -168,7 +169,7 @@ export async function verifyAccessToken(token: string): Promise<JWTClaims> {
   const payload = await verifyToken(token)
 
   if (payload.typ !== 'access') {
-    throw new Error('Invalid token type: expected access token')
+    throw new HTTPError({ status: 401, statusText: 'Invalid token type: expected access token' })
   }
 
   return payload
@@ -185,7 +186,7 @@ export async function verifyRefreshToken(token: string): Promise<JWTClaims> {
   const payload = await verifyToken(token)
 
   if (payload.typ !== 'refresh') {
-    throw new Error('Invalid token type: expected refresh token')
+    throw new HTTPError({ status: 401, statusText: 'Invalid token type: expected refresh token' })
   }
 
   return payload
