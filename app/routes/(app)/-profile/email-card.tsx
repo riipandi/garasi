@@ -93,7 +93,7 @@ export function ChangeEmailCard({ onNotification }: ChangeEmailCardProps) {
           </CardDescription>
         </CardHeader>
         <CardBody className='space-y-6 lg:space-y-0'>
-          <Fieldset className='grid grid-cols-1 lg:grid-cols-2 lg:gap-6'>
+          <Fieldset>
             <Field>
               <FieldLabel>Current Email Address</FieldLabel>
               <Input
@@ -134,8 +134,6 @@ export function ChangeEmailCard({ onNotification }: ChangeEmailCardProps) {
                 </Field>
               )}
             </form.Field>
-          </Fieldset>
-          <Fieldset>
             <form.Field
               name='password'
               validators={{
