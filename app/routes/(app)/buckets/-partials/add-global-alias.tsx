@@ -6,16 +6,17 @@ import { Button } from '~/app/components/button'
 import {
   Dialog,
   DialogBody,
-  DialogPopup,
-  DialogTitle,
+  DialogClose,
   DialogFooter,
-  DialogHeader
+  DialogHeader,
+  DialogPopup,
+  DialogTitle
 } from '~/app/components/dialog'
+import { Field, FieldError, FieldLabel } from '~/app/components/field'
+import { Form } from '~/app/components/form'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
-import { Label } from '~/app/components/label'
-import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/typography'
+import { Spinner } from '~/app/components/spinner'
 
 interface AddGlobalAliasProps {
   isOpen: boolean
@@ -34,9 +35,19 @@ const addGlobalAliasSchema = z.object({
 })
 
 export function AddGlobalAlias({ isOpen, onClose, onSubmit, isSubmitting }: AddGlobalAliasProps) {
-  const Form = useForm({
+  const form = useForm({
     defaultValues: {
       globalAlias: ''
+    },
+    validators: {
+      onChange: ({ value }) => {
+        const result = addGlobalAliasSchema.shape.globalAlias.safeParse(value.globalAlias)
+        if (!result.success) {
+          const firstError = result.error.issues[0]
+          return firstError ? { globalAlias: firstError.message } : undefined
+        }
+        return undefined
+      }
     },
     onSubmit: async ({ value }) => {
       await onSubmit(value.globalAlias)
@@ -44,65 +55,35 @@ export function AddGlobalAlias({ isOpen, onClose, onSubmit, isSubmitting }: AddG
   })
 
   React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [onClose])
-
-  React.useEffect(() => {
     if (isOpen) {
-      Form.reset()
+      form.reset()
     }
-  }, [isOpen, Form])
+  }, [isOpen, form])
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    form.handleSubmit()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPopup>
         <DialogHeader>
-          <Stack direction='row' className='items-start'>
-            <IconBox variant='info' size='md' circle>
-              <Lucide.Globe className='size-5' />
-            </IconBox>
-            <div>
-              <DialogTitle>Add Global Alias</DialogTitle>
-              <Text className='text-muted-foreground text-sm'>
-                Add a global alias to this bucket
-              </Text>
-            </div>
-          </Stack>
+          <IconBox variant='primary' size='sm'>
+            <Lucide.Globe className='size-4' />
+          </IconBox>
+          <DialogTitle>Add Global Alias</DialogTitle>
+          <DialogClose className='ml-auto'>
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
+          </DialogClose>
         </DialogHeader>
-
-        <DialogBody>
-          <form
-            className={`space-y-4 ${isSubmitting ? 'animate-pulse' : ''}`}
-            onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              Form.handleSubmit()
-            }}
-          >
-            <Form.Field
-              name='globalAlias'
-              validators={{
-                onChange: ({ value }) => {
-                  const result = addGlobalAliasSchema.shape.globalAlias.safeParse(value)
-                  if (!result.success) {
-                    const firstError = result.error.issues[0]
-                    return firstError ? firstError.message : undefined
-                  }
-                  return undefined
-                }
-              }}
-            >
+        <DialogBody className='border-border mt-3 border-t pt-0'>
+          <Form onSubmit={handleSubmit}>
+            <form.Field name='globalAlias'>
               {(field) => (
-                <Stack>
-                  <Label htmlFor='globalAlias'>
-                    Global Alias <Text className='text-danger'>*</Text>
-                  </Label>
+                <Field className='mt-4'>
+                  <FieldLabel htmlFor='globalAlias'>Global Alias</FieldLabel>
                   <Input
                     id='globalAlias'
                     name={field.name}
@@ -113,43 +94,48 @@ export function AddGlobalAlias({ isOpen, onClose, onSubmit, isSubmitting }: AddG
                     placeholder='my-bucket-alias'
                     disabled={isSubmitting}
                   />
-                  {field.state.meta.errors[0] && (
-                    <Text className='text-danger'>{String(field.state.meta.errors[0])}</Text>
-                  )}
-                </Stack>
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
+                </Field>
               )}
-            </Form.Field>
+            </form.Field>
 
             <div className='border-info/20 bg-info/5 rounded-lg border p-3'>
               <div className='flex items-start gap-2'>
                 <IconBox variant='info' size='sm' className='mt-0.5'>
                   <Lucide.Info className='size-4' />
                 </IconBox>
-                <Text className='text-info-foreground text-xs'>
+                <p className='text-foreground text-sm'>
                   Global aliases are accessible by all keys. Use lowercase letters, numbers, and
                   dashes only.
-                </Text>
+                </p>
               </div>
             </div>
-
-            <Stack>
-              <Button type='button' variant='outline' onClick={onClose}>
-                Cancel
-              </Button>
+          </Form>
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose block>Cancel</DialogClose>
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmittingForm]) => (
               <Button
                 type='button'
-                variant='primary'
-                disabled={!Form.state.canSubmit || Form.state.isSubmitting || isSubmitting}
-                progress={isSubmitting || Form.state.isSubmitting}
-                onClick={() => Form.handleSubmit()}
+                disabled={!canSubmit || isSubmittingForm || isSubmitting}
+                onClick={() => form.handleSubmit()}
+                block
               >
-                {isSubmitting || Form.state.isSubmitting ? 'Adding...' : 'Add Alias'}
+                {isSubmitting || isSubmittingForm ? (
+                  <span className='flex items-center gap-2'>
+                    <Spinner className='size-4' strokeWidth={2.0} />
+                    Adding...
+                  </span>
+                ) : (
+                  'Add Alias'
+                )}
               </Button>
-            </Stack>
-          </form>
-        </DialogBody>
-
-        <DialogFooter />
+            )}
+          </form.Subscribe>
+        </DialogFooter>
       </DialogPopup>
     </Dialog>
   )

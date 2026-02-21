@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_v4bLNjEYVx
 createdAt: 2026-01-19T20:20:50.780394
-updatedAt: 2026-01-28T17:47:00.157481
+updatedAt: 2026-02-21T22:30:25.490767
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -16,10 +16,10 @@ body:
 bodyType: application/json
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: application/json
-    id: HIFGfea2ZZ
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: HIFGfea2ZZ
 method: POST
 name: Create Bucket
 sortPriority: 5000.0

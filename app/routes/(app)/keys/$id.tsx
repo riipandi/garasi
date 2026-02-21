@@ -441,8 +441,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete the access key "{accessKey.name}"? This action cannot
-              be undone.
+              Are you sure you want to delete the access key "{accessKey.name}"? <br />
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>

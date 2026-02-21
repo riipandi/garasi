@@ -217,8 +217,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this access key? This action cannot be undone and will
-              permanently remove the key from your account.
+              Are you sure you want to delete this access key? <br />
+              This action cannot be undone and will permanently remove the key from your account.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -246,8 +246,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete all {keys.length} access keys? This action cannot be
-              undone and will permanently remove all keys from your account.
+              Are you sure you want to delete all {keys.length} access keys? <br />
+              This action cannot be undone and will permanently remove all keys from your account.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>

@@ -80,7 +80,7 @@ export function AliasesSection({
         <CardTitle>Aliases</CardTitle>
         <CardDescription>Configure global and local aliases for this bucket</CardDescription>
         {hasAliases && (
-          <CardHeaderAction>
+          <CardHeaderAction className='gap-3'>
             <Button size='sm' variant='outline' onClick={onShowAddGlobalAliasDialog}>
               <Lucide.Globe className='size-4' />
               Add Global
@@ -122,7 +122,7 @@ export function AliasesSection({
                 </ItemMedia>
                 <ItemContent>
                   <ItemTitle>{item.alias}</ItemTitle>
-                  <ItemDescription>
+                  <ItemDescription className='text-sm font-medium'>
                     {item.type === 'local' && item.keyName
                       ? `Key: ${item.keyName}`
                       : 'Global alias'}

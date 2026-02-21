@@ -77,7 +77,9 @@ export function AccessKeysSection({
                 </ItemMedia>
                 <ItemContent>
                   <ItemTitle>{key.name}</ItemTitle>
-                  <ItemDescription>{key.accessKeyId}</ItemDescription>
+                  <ItemDescription className='font-mono text-sm font-medium'>
+                    {key.accessKeyId}
+                  </ItemDescription>
                 </ItemContent>
                 <ItemAction>
                   <div className='flex gap-1'>

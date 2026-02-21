@@ -51,7 +51,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       header: 'Bucket ID',
       cell: (info) => (
         <div className='flex items-center gap-2'>
-          <Text className='font-mono'>{info.getValue()}</Text>
+          <Text className='font-mono text-sm'>{info.getValue()}</Text>
           <button
             type='button'
             onClick={(e) => {

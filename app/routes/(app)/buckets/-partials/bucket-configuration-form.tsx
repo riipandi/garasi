@@ -15,6 +15,7 @@ import {
 } from '~/app/components/select'
 import { Switch } from '~/app/components/switch'
 import { Text } from '~/app/components/typography'
+import { clx } from '~/app/utils'
 
 type SizeUnit = 'MB' | 'GB' | 'TB'
 
@@ -72,7 +73,7 @@ export function BucketConfigurationForm({
             </div>
 
             <div
-              className={`grid gap-4 sm:grid-cols-2 ${websiteAccessEnabled ? '' : 'opacity-50'}`}
+              className={clx(`grid gap-4 sm:grid-cols-2`, websiteAccessEnabled ? '' : 'opacity-50')}
             >
               <div className='space-y-2'>
                 <Label htmlFor='indexDocument'>Index Document</Label>
@@ -84,7 +85,7 @@ export function BucketConfigurationForm({
                   placeholder='index.html'
                   disabled={!websiteAccessEnabled}
                 />
-                <Text className='text-muted-foreground text-xs'>
+                <Text className='text-muted-foreground text-sm'>
                   The document to serve when a directory is requested
                 </Text>
               </div>
@@ -99,7 +100,7 @@ export function BucketConfigurationForm({
                   placeholder='error.html'
                   disabled={!websiteAccessEnabled}
                 />
-                <Text className='text-muted-foreground text-xs'>
+                <Text className='text-muted-foreground text-sm'>
                   The document to serve when an error occurs
                 </Text>
               </div>
@@ -117,14 +118,14 @@ export function BucketConfigurationForm({
               onChange={(e) => setMaxObjects(e.target.value)}
               placeholder='Unlimited'
             />
-            <Text className='text-muted-foreground text-xs'>
+            <Text className='text-muted-foreground text-sm'>
               Maximum number of objects allowed in this bucket
             </Text>
           </div>
 
           <div className='space-y-2'>
             <Label htmlFor='maxSize'>Max Size</Label>
-            <div className='flex gap-2'>
+            <div className='flex gap-4'>
               <Input
                 id='maxSize'
                 type='text'
@@ -149,14 +150,14 @@ export function BucketConfigurationForm({
                 </SelectPopup>
               </Select>
             </div>
-            <Text className='text-muted-foreground text-xs'>
+            <Text className='text-muted-foreground text-sm'>
               Maximum total size of all objects (minimum 100MB)
             </Text>
             {sizeWarning && (
               <Alert variant='warning' className='mt-2'>
                 <div className='flex items-start gap-2'>
                   <Lucide.AlertTriangle className='mt-0.5 size-4 shrink-0' />
-                  <Text className='text-xs'>{sizeWarning}</Text>
+                  <Text className='text-sm'>{sizeWarning}</Text>
                 </div>
               </Alert>
             )}

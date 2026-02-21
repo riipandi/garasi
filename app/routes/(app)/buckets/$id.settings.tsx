@@ -18,6 +18,7 @@ import { toast } from '~/app/components/toast'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import bucketService from '~/app/services/bucket.service'
+import keysService from '~/app/services/keys.service'
 import type { UpdateBucketRequest } from '~/shared/schemas/bucket.schema'
 import type { RemoveBucketLocalAliasRequest } from '~/shared/schemas/bucket.schema'
 import type { RemoveBucketGlobalAliasRequest } from '~/shared/schemas/bucket.schema'
@@ -78,6 +79,7 @@ export const Route = createFileRoute('/(app)/buckets/$id/settings')({
   component: RouteComponent,
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(bucketQuery(params.id))
+    context.queryClient.ensureQueryData(keysQuery())
   }
 })
 
@@ -85,6 +87,13 @@ function bucketQuery(bucketId: string) {
   return queryOptions({
     queryKey: ['bucket', bucketId],
     queryFn: () => bucketService.getBucketInfo({ id: bucketId })
+  })
+}
+
+function keysQuery() {
+  return queryOptions({
+    queryKey: ['keys'],
+    queryFn: () => keysService.listAccessKeys()
   })
 }
 
@@ -118,6 +127,9 @@ function RouteComponent() {
 
   const { data: bucketData } = useSuspenseQuery(bucketQuery(id))
   const bucket = bucketData?.data
+
+  const { data: keysData } = useSuspenseQuery(keysQuery())
+  const keys = keysData?.data ?? []
 
   React.useEffect(() => {
     if (bucket) {
@@ -466,7 +478,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-5xl space-y-6'>
+    <div className='mx-auto w-full max-w-4xl space-y-8'>
       <div className='flex items-start gap-4'>
         <Link
           to='/buckets/$id'
@@ -484,7 +496,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className='min-w-0 flex-1 space-y-6'>
+      <div className='min-w-0 flex-1 space-y-8'>
         <BucketConfigurationForm
           websiteAccessEnabled={websiteAccessEnabled}
           setWebsiteAccessEnabled={setWebsiteAccessEnabled}
@@ -528,8 +540,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this bucket? This action cannot be undone and will
-              permanently remove bucket and all its contents.
+              Are you sure you want to delete this bucket? <br />
+              This action cannot be undone and will permanently remove bucket and all its contents.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -567,8 +579,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete global alias "{globalAliasToDelete}"? This action
-              cannot be undone.
+              Are you sure you want to delete global alias "{globalAliasToDelete}"? <br />
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -596,7 +608,8 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete key "{keyToDelete}"? This action cannot be undone.
+              Are you sure you want to delete key "{keyToDelete}"? <br />
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>
@@ -658,6 +671,7 @@ function RouteComponent() {
         onClose={() => setShowAddLocalAliasDialog(false)}
         onSubmit={handleAddLocalAliasFromDialog}
         isSubmitting={isAddingLocalAlias}
+        keys={keys}
       />
     </div>
   )

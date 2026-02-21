@@ -150,8 +150,9 @@ function RouteComponent() {
           </AlertDialogHeader>
           <AlertDialogBody>
             <AlertDialogDescription>
-              Are you sure you want to delete this bucket? This action cannot be undone and will
-              permanently remove the bucket and all its contents.
+              Are you sure you want to delete this bucket? <br />
+              This action cannot be undone and will permanently remove the bucket and all its
+              contents.
             </AlertDialogDescription>
           </AlertDialogBody>
           <AlertDialogFooter>

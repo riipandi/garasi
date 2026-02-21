@@ -13,9 +13,7 @@ import {
   DialogTitle
 } from '~/app/components/dialog'
 import { IconBox } from '~/app/components/icon-box'
-import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
 import { Spinner } from '~/app/components/spinner'
-import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { fetcher } from '~/app/fetcher'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
@@ -34,7 +32,6 @@ interface KeySelectorDialogProps {
 export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySelectorDialogProps) {
   const [selectedKey, setSelectedKey] = React.useState<string | null>(null)
   const [permissions, setPermissions] = React.useState({ owner: true, read: true, write: true })
-  const [searchQuery, setSearchQuery] = React.useState('')
 
   const { data: keysData, isLoading: isKeysLoading } = useQuery({
     queryKey: ['keys'],
@@ -46,16 +43,10 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
   const assignedKeyIds = Array.isArray(bucket.keys) ? bucket.keys.map((k) => k.accessKeyId) : []
   const availableKeys = allKeys.filter((key) => !assignedKeyIds.includes(key.id))
 
-  const filteredKeys = availableKeys.filter((key) => {
-    const query = searchQuery.toLowerCase()
-    return key.name.toLowerCase().includes(query) || key.id.toLowerCase().includes(query)
-  })
-
   const handleClose = () => {
     onClose()
     setSelectedKey(null)
     setPermissions({ owner: true, read: true, write: true })
-    setSearchQuery('')
   }
 
   const handleSelectKey = (keyId: string) => {
@@ -70,26 +61,19 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
   }
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogPopup className='max-w-md'>
         <DialogHeader>
-          <Stack direction='row' className='items-start'>
-            <IconBox variant='info' size='md' circle>
-              <Lucide.Lock className='size-5' />
-            </IconBox>
-            <div>
-              <DialogTitle>Allow Access Key</DialogTitle>
-              <Text className='text-muted-foreground text-xs'>Grant access to this bucket</Text>
-            </div>
-          </Stack>
-          <DialogClose>
-            <Button type='button' variant='plain' size='sm-icon'>
-              <Lucide.X className='size-5' />
-            </Button>
+          <IconBox variant='primary' size='sm'>
+            <Lucide.Key className='size-4' />
+          </IconBox>
+          <DialogTitle>Allow Access Key</DialogTitle>
+          <DialogClose className='ml-auto'>
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
           </DialogClose>
         </DialogHeader>
 
-        <DialogBody>
+        <DialogBody className='border-border mt-3 border-t pt-4'>
           {isKeysLoading ? (
             <div className='flex flex-col items-center justify-center py-12'>
               <Spinner className='text-primary size-8' />
@@ -115,98 +99,26 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                 <Text className='text-muted-foreground mb-2 block text-xs font-semibold tracking-wider uppercase'>
                   Select Key
                 </Text>
-                <InputGroup>
-                  <InputGroupAddon align='start'>
-                    <Lucide.Search className='text-muted-foreground size-4' />
-                  </InputGroupAddon>
-                  <input
-                    type='text'
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder='Search by name or ID...'
-                    className='flex-1 bg-transparent py-2 pr-4 pl-2 text-sm outline-none'
-                  />
-                  {searchQuery && (
-                    <InputGroupAddon align='end'>
-                      <Button
-                        type='button'
-                        variant='plain'
-                        size='xs-icon'
-                        onClick={() => setSearchQuery('')}
-                      >
-                        <Lucide.X className='size-3' />
-                      </Button>
-                    </InputGroupAddon>
-                  )}
-                </InputGroup>
-
-                <div className='border-border max-h-56 overflow-y-auto rounded-lg border'>
-                  {filteredKeys.length === 0 ? (
-                    <div className='flex flex-col items-center justify-center px-4 py-8'>
-                      <IconBox variant='tertiary-subtle' size='md' circle>
-                        <Lucide.Search className='size-8' />
-                      </IconBox>
-                      <Text className='text-muted-foreground mt-2 text-sm'>
-                        {searchQuery ? 'No keys found matching your search' : 'No keys available'}
-                      </Text>
-                    </div>
-                  ) : (
-                    <Stack>
-                      {filteredKeys.map((key) => (
-                        <button
-                          key={key.id}
-                          type='button'
-                          onClick={() => handleSelectKey(key.id)}
-                          className={`flex w-full items-center gap-2 px-3 py-2 text-left transition-all ${
-                            selectedKey === key.id ? 'bg-primary/10' : 'hover:bg-muted/50'
-                          }`}
-                        >
-                          <IconBox
-                            variant={selectedKey === key.id ? 'primary' : 'secondary-subtle'}
-                            size='sm'
-                            circle
-                          >
-                            {selectedKey === key.id ? (
-                              <Lucide.Check className='size-3.5' />
-                            ) : (
-                              <Lucide.Key className='size-3' />
-                            )}
-                          </IconBox>
-                          <div className='min-w-0 flex-1'>
-                            <Text className='block truncate text-sm font-medium'>{key.name}</Text>
-                            <Text className='text-muted-foreground block truncate font-mono text-xs'>
-                              {key.id}
-                            </Text>
-                          </div>
-                        </button>
-                      ))}
-                    </Stack>
-                  )}
-                </div>
-
-                <div className='text-muted-foreground mt-2 flex items-center justify-between text-xs'>
-                  <Text>
-                    Showing {filteredKeys.length} of {availableKeys.length} key
-                    {availableKeys.length !== 1 ? 's' : ''}
-                  </Text>
-                  {searchQuery && (
-                    <Button
-                      type='button'
-                      variant='plain'
-                      size='xs'
-                      onClick={() => setSearchQuery('')}
-                    >
-                      Clear search
-                    </Button>
-                  )}
-                </div>
+                <select
+                  id='selectedKey'
+                  value={selectedKey ?? ''}
+                  onChange={(e) => handleSelectKey(e.target.value)}
+                  className='bg-input placeholder:text-dimmed shadow-input border-input-border focus:ring-primary h-9 w-full rounded border px-3 py-1 pr-6 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none'
+                >
+                  <option value=''>Select a key...</option>
+                  {availableKeys.map((key) => (
+                    <option key={key.id} value={key.id}>
+                      {key.name} ({key.id})
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className='border-border bg-muted/5 rounded-lg border p-4'>
                 <Text className='text-muted-foreground mb-3 block text-xs font-semibold tracking-wider uppercase'>
                   Permissions
                 </Text>
-                <Stack direction='row'>
+                <div className='grid grid-cols-3 gap-2'>
                   <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
                     <Checkbox
                       id='owner'
@@ -215,7 +127,7 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                         setPermissions({ ...permissions, owner: checked as boolean })
                       }
                     />
-                    <Text className='text-sm font-medium'>Owner</Text>
+                    <span className='text-sm font-medium'>Owner</span>
                   </div>
                   <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
                     <Checkbox
@@ -225,7 +137,7 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                         setPermissions({ ...permissions, read: checked as boolean })
                       }
                     />
-                    <Text className='text-sm font-medium'>Read</Text>
+                    <span className='text-sm font-medium'>Read</span>
                   </div>
                   <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
                     <Checkbox
@@ -235,26 +147,23 @@ export function KeySelectorDialog({ isOpen, onClose, bucket, onAllowKey }: KeySe
                         setPermissions({ ...permissions, write: checked as boolean })
                       }
                     />
-                    <Text className='text-sm font-medium'>Write</Text>
+                    <span className='text-sm font-medium'>Write</span>
                   </div>
-                </Stack>
+                </div>
               </div>
             </>
           )}
         </DialogBody>
 
-        {availableKeys.length > 0 && !isKeysLoading && filteredKeys.length > 0 && (
+        {availableKeys.length > 0 && !isKeysLoading && (
           <DialogFooter>
-            <DialogClose>
-              <Button type='button' variant='outline'>
-                Cancel
-              </Button>
-            </DialogClose>
+            <DialogClose block>Cancel</DialogClose>
             <Button
               type='button'
               variant='primary'
               disabled={!selectedKey}
               onClick={handleAllowSelectedKey}
+              block
             >
               <Lucide.Plus className='size-4' />
               Allow Key
