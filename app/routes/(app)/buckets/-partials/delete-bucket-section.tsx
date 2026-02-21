@@ -1,8 +1,7 @@
 import * as Lucide from 'lucide-react'
 import { Button } from '~/app/components/button'
-import { IconBox } from '~/app/components/icon-box'
+import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Text } from '~/app/components/typography'
-import { Heading } from '~/app/components/typography'
 
 interface DeleteBucketSectionProps {
   onDeleteBucket: () => void
@@ -13,30 +12,29 @@ export function DeleteBucketSection({ onDeleteBucket, objectCount }: DeleteBucke
   const hasObjects = objectCount > 0
 
   return (
-    <div className='border-danger/20 bg-danger/5 flex items-center justify-between rounded-lg border p-4 shadow-sm'>
-      <div className='flex items-start gap-3'>
-        <IconBox variant='danger' size='md' circle>
-          <Lucide.AlertTriangle className='size-5' />
-        </IconBox>
-        <div>
-          <Heading level={3} className='text-danger'>
-            Delete Bucket
-          </Heading>
-          <Text className='text-danger text-sm'>
-            This action cannot be undone and will delete all objects
+    <Card className='border-danger/20'>
+      <CardHeader className='bg-danger/5'>
+        <Lucide.AlertTriangle className='text-danger size-5' />
+        <CardTitle className='text-danger'>Delete Bucket</CardTitle>
+      </CardHeader>
+      <CardBody className='bg-danger/5 flex items-center justify-between gap-4'>
+        <div className='space-y-1'>
+          <Text className='text-muted-foreground'>
+            This action cannot be undone and will permanently delete this bucket and all its
+            contents.
           </Text>
           {hasObjects && (
-            <Text className='text-danger/80 mt-1 text-xs'>
+            <Text className='text-danger'>
               This bucket contains {objectCount} object{objectCount !== 1 ? 's' : ''}. You must
-              delete all objects before deleting bucket.
+              delete all objects before deleting the bucket.
             </Text>
           )}
         </div>
-      </div>
-      <Button type='button' variant='danger' onClick={onDeleteBucket} disabled={hasObjects}>
-        <Lucide.Trash2 className='size-4' />
-        Delete Bucket
-      </Button>
-    </div>
+        <Button type='button' variant='danger' onClick={onDeleteBucket} disabled={hasObjects}>
+          <Lucide.Trash2 className='size-4' />
+          Delete Bucket
+        </Button>
+      </CardBody>
+    </Card>
   )
 }

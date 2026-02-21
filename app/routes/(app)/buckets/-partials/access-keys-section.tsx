@@ -1,9 +1,26 @@
 import * as Lucide from 'lucide-react'
+import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
-import { IconBox } from '~/app/components/icon-box'
+import {
+  Card,
+  CardBody,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardHeaderAction,
+  CardTitle
+} from '~/app/components/card'
+import {
+  Item,
+  ItemAction,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from '~/app/components/item'
+import { Separator } from '~/app/components/separator'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
-import { Heading } from '~/app/components/typography'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 interface AccessKeysSectionProps {
@@ -23,103 +40,94 @@ export function AccessKeysSection({
   const hasKeys = keys.length > 0
 
   return (
-    <div className='border-border bg-background overflow-hidden rounded-lg border shadow-sm'>
-      <div className='border-border border-b px-6 py-4'>
-        <Heading level={3} size='md'>
-          Access Keys
-        </Heading>
-        <Text className='text-muted-foreground text-sm'>
-          Manage access keys that can access this bucket
-        </Text>
-      </div>
-      <div className='p-6'>
-        {hasKeys ? (
-          <Stack>
+    <Card>
+      <CardHeader>
+        <CardTitle>Access Keys</CardTitle>
+        <CardDescription>Manage access keys that can access this bucket</CardDescription>
+        {hasKeys && (
+          <CardHeaderAction>
+            <Button size='sm' variant='outline' onClick={onShowKeySelectorDialog}>
+              <Lucide.Plus className='size-4' />
+              Assign Key
+            </Button>
+          </CardHeaderAction>
+        )}
+      </CardHeader>
+      <CardBody className='p-12'>
+        {!hasKeys ? (
+          <div className='flex flex-col items-center justify-center py-8 text-center'>
+            <Lucide.Lock className='text-dimmed mb-4 size-12' />
+            <Text className='text-dimmed mb-4'>No access keys have access to this bucket.</Text>
+            <Text className='text-muted-foreground mb-6'>
+              Keys that have access to this bucket will appear here.
+            </Text>
+            <Button type='button' onClick={onShowKeySelectorDialog}>
+              <Lucide.Plus className='size-4' />
+              Assign Key
+            </Button>
+          </div>
+        ) : (
+          <Stack spacing='md'>
             {keys.map((key) => (
-              <div
-                key={key.accessKeyId}
-                className='border-border bg-background flex items-center justify-between rounded-md border px-4 py-3 shadow-sm'
-              >
-                <div className='flex items-center gap-3'>
-                  <IconBox variant='tertiary-subtle' size='sm'>
-                    <Lucide.Lock className='size-4' />
-                  </IconBox>
-                  <div>
-                    <Text className='text-sm font-medium'>{key.name}</Text>
-                    <Text className='text-muted-foreground ml-2 text-sm'>({key.accessKeyId})</Text>
+              <Item key={key.accessKeyId}>
+                <ItemMedia>
+                  <div className='bg-dimmed/5 flex size-10 items-center justify-center rounded-full'>
+                    <Lucide.Key className='text-dimmed size-5' />
                   </div>
-                </div>
-                <div className='flex items-center gap-3'>
-                  <Stack direction='row'>
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>{key.name}</ItemTitle>
+                  <ItemDescription>{key.accessKeyId}</ItemDescription>
+                </ItemContent>
+                <ItemAction>
+                  <div className='flex gap-1'>
                     {key.permissions.owner && (
-                      <Text className='inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800'>
+                      <Badge variant='primary' size='sm' pill>
                         Owner
-                      </Text>
+                      </Badge>
                     )}
                     {key.permissions.read && (
-                      <Text className='inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800'>
+                      <Badge variant='info' size='sm' pill>
                         Read
-                      </Text>
+                      </Badge>
                     )}
                     {key.permissions.write && (
-                      <Text className='inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800'>
+                      <Badge variant='success' size='sm' pill>
                         Write
-                      </Text>
+                      </Badge>
                     )}
-                  </Stack>
-                  <div className='border-border ml-4 flex items-center gap-2 border-l pl-4'>
-                    <Button
-                      type='button'
-                      variant='plain'
-                      size='sm'
-                      onClick={() => onViewKey(key.accessKeyId)}
-                    >
-                      <Lucide.Eye className='size-4' />
-                      View Key
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='danger'
-                      size='sm'
-                      onClick={() => onDeleteKey(key.accessKeyId)}
-                    >
-                      <Lucide.Trash2 className='size-4' />
-                      Delete
-                    </Button>
                   </div>
-                </div>
-              </div>
+                  <Separator orientation='vertical' className='mx-4' />
+                  <Button
+                    type='button'
+                    variant='plain'
+                    size='sm'
+                    onClick={() => onViewKey(key.accessKeyId)}
+                  >
+                    <Lucide.Eye className='size-4' />
+                  </Button>
+                  <Button
+                    type='button'
+                    variant='plain'
+                    size='sm'
+                    onClick={() => onDeleteKey(key.accessKeyId)}
+                  >
+                    <Lucide.Trash2 className='size-4' />
+                  </Button>
+                </ItemAction>
+              </Item>
             ))}
           </Stack>
-        ) : (
-          <div className='border-border bg-muted/5 flex items-center gap-4 rounded-lg border-2 border-dashed px-4 py-4'>
-            <IconBox variant='tertiary-subtle' size='md' circle>
-              <Lucide.Lock className='size-6' />
-            </IconBox>
-            <div className='flex-1'>
-              <Text className='text-sm font-medium'>
-                No access keys have access to this bucket.
-              </Text>
-              <Text className='text-muted-foreground text-sm'>
-                Keys that have access to this bucket will appear here.
-              </Text>
-            </div>
-            <Button type='button' variant='primary' onClick={onShowKeySelectorDialog}>
-              <Lucide.Plus className='size-4' />
-              Assign Key
-            </Button>
-          </div>
         )}
-
-        {hasKeys && (
-          <div className='border-border mt-4 flex justify-end border-t pt-4'>
-            <Button type='button' variant='outline' onClick={onShowKeySelectorDialog}>
-              <Lucide.Plus className='size-4' />
-              Assign Key
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
+      </CardBody>
+      {!hasKeys && (
+        <CardFooter className='justify-end'>
+          <Button type='button' onClick={onShowKeySelectorDialog}>
+            <Lucide.Plus className='size-4' />
+            Assign Key
+          </Button>
+        </CardFooter>
+      )}
+    </Card>
   )
 }

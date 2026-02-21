@@ -2,10 +2,24 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Badge } from '~/app/components/badge'
 import { Button } from '~/app/components/button'
-import { IconBox } from '~/app/components/icon-box'
+import {
+  Card,
+  CardBody,
+  CardDescription,
+  CardHeader,
+  CardHeaderAction,
+  CardTitle
+} from '~/app/components/card'
+import {
+  Item,
+  ItemAction,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from '~/app/components/item'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
-import { Heading } from '~/app/components/typography'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 interface AliasesSectionProps {
@@ -61,83 +75,33 @@ export function AliasesSection({
   const isLastGlobalAlias = (bucket.globalAliases?.length ?? 0) === 1
 
   return (
-    <div className='border-border bg-background overflow-hidden rounded-lg border shadow-sm'>
-      <div className='border-border border-b px-6 py-4'>
-        <Heading level={3} size='md'>
-          Aliases
-        </Heading>
-        <Text className='text-muted-foreground text-sm'>
-          Configure global and local aliases for this bucket
-        </Text>
-      </div>
-      <div className='p-6'>
-        {hasAliases ? (
-          <Stack>
-            {aliases.map((item) => (
-              <div
-                key={item.id}
-                className='border-border bg-background flex items-center justify-between rounded-md border px-4 py-3 shadow-sm'
-              >
-                <div className='flex items-center gap-3'>
-                  <div className='flex flex-col'>
-                    <Text className='text-sm font-medium'>{item.alias}</Text>
-                    {item.type === 'local' && item.keyName && (
-                      <Text className='text-muted-foreground text-xs'>Key: {item.keyName}</Text>
-                    )}
-                  </div>
-                </div>
-                <div className='flex items-center gap-3'>
-                  <Stack direction='row'>
-                    {item.type === 'global' ? (
-                      <Badge variant='primary' size='sm' pill>
-                        Global
-                      </Badge>
-                    ) : (
-                      <Badge variant='tertiary' size='sm' pill>
-                        Local
-                      </Badge>
-                    )}
-                  </Stack>
-                  <div className='border-border ml-4 flex items-center gap-2 border-l pl-4'>
-                    <Button
-                      type='button'
-                      variant='danger'
-                      size='sm'
-                      onClick={() => {
-                        if (item.type === 'global') {
-                          onRemoveGlobalAlias(item.alias)
-                        } else {
-                          onRemoveLocalAlias(item.accessKeyId!, item.alias)
-                        }
-                      }}
-                      disabled={item.type === 'global' && isLastGlobalAlias}
-                      title={
-                        item.type === 'global' && isLastGlobalAlias
-                          ? 'Cannot remove last global alias'
-                          : 'Remove alias'
-                      }
-                    >
-                      <Lucide.Trash2 className='size-4' />
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Stack>
-        ) : (
-          <div className='border-border bg-muted/5 flex flex-col items-center gap-6 rounded-lg border-2 border-dashed p-8'>
-            <IconBox variant='tertiary-subtle' size='lg' circle>
-              <Lucide.Link2 className='size-12' />
-            </IconBox>
-            <div className='text-center'>
-              <Text className='text-base font-medium'>No aliases configured</Text>
-              <Text className='text-muted-foreground text-sm'>
-                Add global or local aliases to make this bucket more accessible
-              </Text>
-            </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Aliases</CardTitle>
+        <CardDescription>Configure global and local aliases for this bucket</CardDescription>
+        {hasAliases && (
+          <CardHeaderAction>
+            <Button size='sm' variant='outline' onClick={onShowAddGlobalAliasDialog}>
+              <Lucide.Globe className='size-4' />
+              Add Global
+            </Button>
+            <Button size='sm' variant='outline' onClick={onShowAddLocalAliasDialog}>
+              <Lucide.Key className='size-4' />
+              Add Local
+            </Button>
+          </CardHeaderAction>
+        )}
+      </CardHeader>
+      <CardBody className='p-12'>
+        {!hasAliases ? (
+          <div className='flex flex-col items-center justify-center py-8 text-center'>
+            <Lucide.Link2 className='text-dimmed mb-4 size-12' />
+            <Text className='text-dimmed mb-4'>No aliases configured</Text>
+            <Text className='text-muted-foreground mb-6'>
+              Add global or local aliases to make this bucket more accessible
+            </Text>
             <Stack direction='row'>
-              <Button type='button' variant='primary' onClick={onShowAddGlobalAliasDialog}>
+              <Button type='button' onClick={onShowAddGlobalAliasDialog}>
                 <Lucide.Globe className='size-4' />
                 Add Global Alias
               </Button>
@@ -147,21 +111,53 @@ export function AliasesSection({
               </Button>
             </Stack>
           </div>
+        ) : (
+          <Stack spacing='md'>
+            {aliases.map((item) => (
+              <Item key={item.id}>
+                <ItemMedia>
+                  <div className='bg-dimmed/5 flex size-10 items-center justify-center rounded-full'>
+                    <Lucide.Link className='text-dimmed size-5' />
+                  </div>
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>{item.alias}</ItemTitle>
+                  <ItemDescription>
+                    {item.type === 'local' && item.keyName
+                      ? `Key: ${item.keyName}`
+                      : 'Global alias'}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemAction>
+                  <Badge variant={item.type === 'global' ? 'primary' : 'tertiary'} size='sm' pill>
+                    {item.type === 'global' ? 'Global' : 'Local'}
+                  </Badge>
+                  <Button
+                    type='button'
+                    variant='plain'
+                    size='sm'
+                    onClick={() => {
+                      if (item.type === 'global') {
+                        onRemoveGlobalAlias(item.alias)
+                      } else {
+                        onRemoveLocalAlias(item.accessKeyId!, item.alias)
+                      }
+                    }}
+                    disabled={item.type === 'global' && isLastGlobalAlias}
+                    title={
+                      item.type === 'global' && isLastGlobalAlias
+                        ? 'Cannot remove last global alias'
+                        : 'Remove alias'
+                    }
+                  >
+                    <Lucide.Trash2 className='size-4' />
+                  </Button>
+                </ItemAction>
+              </Item>
+            ))}
+          </Stack>
         )}
-
-        {hasAliases && (
-          <div className='border-border mt-4 flex flex-wrap justify-end gap-3 border-t pt-4'>
-            <Button type='button' variant='outline' onClick={onShowAddGlobalAliasDialog}>
-              <Lucide.Globe className='size-4' />
-              <span className='hidden sm:inline'>Add Global Alias</span>
-            </Button>
-            <Button type='button' variant='outline' onClick={onShowAddLocalAliasDialog}>
-              <Lucide.Key className='size-4' />
-              <span className='hidden sm:inline'>Add Local Alias</span>
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   )
 }

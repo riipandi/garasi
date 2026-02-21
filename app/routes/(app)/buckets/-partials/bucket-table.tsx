@@ -1,6 +1,12 @@
-import { createColumnHelper, flexRender, useReactTable } from '@tanstack/react-table'
-import { getCoreRowModel, getFilteredRowModel } from '@tanstack/react-table'
-import { getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel
+} from '@tanstack/react-table'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Badge } from '~/app/components/badge'
@@ -8,7 +14,6 @@ import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
-import { Stack } from '~/app/components/stack'
 import {
   Table,
   TableBody,
@@ -19,6 +24,7 @@ import {
   TableRow
 } from '~/app/components/table'
 import { Text } from '~/app/components/typography'
+import { clx } from '~/app/utils'
 import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
 
 interface BucketTableProps {
@@ -45,7 +51,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       header: 'Bucket ID',
       cell: (info) => (
         <div className='flex items-center gap-2'>
-          <Text className='font-mono text-sm'>{info.getValue()}</Text>
+          <Text className='font-mono'>{info.getValue()}</Text>
           <button
             type='button'
             onClick={(e) => {
@@ -72,13 +78,13 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       cell: (info) => {
         const aliases = info.getValue<string[]>()
         return aliases.length > 0 ? (
-          <Stack direction='row'>
+          <div className='flex flex-wrap gap-1'>
             {aliases.map((alias) => (
               <Badge key={alias} variant='success' size='sm' pill>
                 {alias}
               </Badge>
             ))}
-          </Stack>
+          </div>
         ) : (
           <Text className='text-dimmed'>None</Text>
         )
@@ -89,10 +95,10 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       cell: (info) => {
         const aliases = info.getValue<{ accessKeyId: string; alias: string }[]>()
         return aliases.length > 0 ? (
-          <Stack direction='row'>
-            {aliases.map((alias, index) => (
+          <div className='flex flex-wrap gap-1'>
+            {aliases.map((alias) => (
               <Badge
-                key={`${alias.accessKeyId}-${alias.alias}-${index}`}
+                key={`${alias.accessKeyId}-${alias.alias}`}
                 variant='primary'
                 size='sm'
                 pill
@@ -101,28 +107,29 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
                 {alias.alias}
               </Badge>
             ))}
-          </Stack>
+          </div>
         ) : (
           <Text className='text-dimmed'>None</Text>
         )
       }
     }),
     columnHelper.display({
-      id: 'delete',
+      id: 'actions',
       header: '',
       cell: (info) => {
         const bucket = info.row.original
         return (
-          <div className='mx-2 flex justify-center'>
+          <div className='flex justify-end gap-1'>
             <Button
               type='button'
-              variant='danger'
+              variant='plain'
               size='sm-icon'
               onClick={(e) => {
                 e.stopPropagation()
                 onDelete(bucket.id)
               }}
               title='Delete Bucket'
+              className='text-dimmed hover:text-danger hover:bg-danger/5'
             >
               <Lucide.Trash2 className='size-4' />
             </Button>
@@ -154,26 +161,26 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
             <TableHead>Created</TableHead>
             <TableHead>Global Aliases</TableHead>
             <TableHead>Local Aliases</TableHead>
-            <TableHead className='w-16 text-right'></TableHead>
+            <TableHead className='w-20 text-right'>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {Array.from({ length: 5 }).map((_, i) => (
             <TableRow key={`skeleton-row-bucket-${i}`}>
               <TableCell>
-                <div className='bg-muted h-4 w-64 animate-pulse rounded' />
+                <div className='h-4 w-64 animate-pulse rounded bg-gray-100' />
               </TableCell>
               <TableCell>
-                <div className='bg-muted h-4 w-32 animate-pulse rounded' />
+                <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
               </TableCell>
               <TableCell>
-                <div className='bg-muted h-4 w-40 animate-pulse rounded' />
+                <div className='h-4 w-40 animate-pulse rounded bg-gray-100' />
               </TableCell>
               <TableCell>
-                <div className='bg-muted h-4 w-40 animate-pulse rounded' />
+                <div className='h-4 w-40 animate-pulse rounded bg-gray-100' />
               </TableCell>
               <TableCell className='text-right'>
-                <div className='bg-muted ml-auto h-8 w-8 animate-pulse rounded' />
+                <div className='ml-auto h-8 w-8 animate-pulse rounded bg-gray-100' />
               </TableCell>
             </TableRow>
           ))}
@@ -183,7 +190,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
   )
 
   return (
-    <Stack>
+    <div className='space-y-4'>
       <InputGroup>
         <InputGroupAddon align='start'>
           <Lucide.Search className='text-dimmed size-4' />
@@ -192,7 +199,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           type='text'
           value={filtering}
           onChange={(e) => setFiltering(e.target.value)}
-          placeholder='Search buckets by ID or alias...'
+          placeholder='Search buckets by ID...'
           disabled={isLoading}
         />
         {filtering && !isLoading && (
@@ -213,37 +220,37 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       {isLoading ? (
         <TableSkeleton />
       ) : table.getRowModel().rows.length === 0 && buckets.length > 0 ? (
-        <div className='border-border bg-muted/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-dimmed/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.Search className='size-16' />
           </IconBox>
-          <Stack>
+          <div className='space-y-1'>
             <Text className='font-semibold'>No buckets found</Text>
             <Text className='text-muted-foreground'>Try adjusting your search or filters.</Text>
-          </Stack>
+          </div>
         </div>
       ) : buckets.length === 0 ? (
-        <div className='border-border bg-muted/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-dimmed/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.Database className='size-16' />
           </IconBox>
-          <Stack>
-            <Text className='font-semibold'>No buckets found</Text>
+          <div className='space-y-1'>
+            <Text className='font-semibold'>No buckets</Text>
             <Text className='text-muted-foreground'>
               Get started by creating your first bucket to store your data.
             </Text>
-          </Stack>
+          </div>
         </div>
       ) : (
-        <TableContainer>
-          <Table>
-            <TableHeader>
+        <TableContainer className='border-border rounded-lg border border-t-transparent'>
+          <Table className='rounded-lg'>
+            <TableHeader className='rounded-t'>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className='rounded-t'>
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={header.id === 'delete' ? 'w-16 text-right' : ''}
+                      className={clx('rounded-t', header.id === 'actions' ? 'w-20 text-right' : '')}
                     >
                       {header.isPlaceholder
                         ? null
@@ -266,7 +273,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={cell.column.id === 'delete' ? 'text-right' : ''}
+                      className={cell.column.id === 'actions' ? 'text-right' : ''}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -277,6 +284,6 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           </Table>
         </TableContainer>
       )}
-    </Stack>
+    </div>
   )
 }
