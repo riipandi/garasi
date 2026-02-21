@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow
 } from '~/app/components/table'
+import { anchoredToast } from '~/app/components/toast'
 import { Text } from '~/app/components/typography'
 import { clx } from '~/app/utils'
 import type { ListBucketsResponse } from '~/shared/schemas/bucket.schema'
@@ -37,6 +38,14 @@ const columnHelper = createColumnHelper<ListBucketsResponse>()
 
 export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTableProps) {
   const [filtering, setFiltering] = React.useState('')
+  const [copiedBucketId, setCopiedBucketId] = React.useState<string | null>(null)
+  const buttonRefs = React.useRef<Map<string, HTMLButtonElement>>(new Map())
+  const getButtonRef = React.useCallback(
+    (bucketId: string) => (el: HTMLButtonElement | null) => {
+      if (el) buttonRefs.current.set(bucketId, el)
+    },
+    []
+  )
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -49,29 +58,65 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
   const columns = [
     columnHelper.accessor('id', {
       header: 'Bucket ID',
-      cell: (info) => (
-        <div className='flex items-center gap-2'>
-          <Text className='font-mono text-sm'>{info.getValue()}</Text>
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation()
-              navigator.clipboard.writeText(info.getValue())
-            }}
-            className='text-dimmed hover:text-foreground transition-colors'
-            title='Copy Bucket ID'
-          >
-            <Lucide.Copy className='size-3.5' />
-          </button>
-        </div>
-      ),
+      cell: (info) => {
+        const bucketId = info.getValue()
+        return (
+          <div className='flex items-center gap-2'>
+            <Text className='text-muted-foreground font-mono text-sm'>{bucketId}</Text>
+            <Button
+              ref={getButtonRef(bucketId)}
+              type='button'
+              variant='plain'
+              size='xs-icon'
+              onClick={(e) => {
+                e.stopPropagation()
+                navigator.clipboard.writeText(bucketId)
+                setCopiedBucketId(bucketId)
+
+                anchoredToast.add({
+                  description: 'Copied',
+                  positionerProps: {
+                    anchor: buttonRefs.current.get(bucketId) || null,
+                    sideOffset: 8
+                  },
+                  data: { size: 'sm' },
+                  onClose: () => {
+                    setCopiedBucketId(null)
+                  },
+                  timeout: 1500
+                })
+              }}
+              disabled={copiedBucketId === bucketId}
+              title='Copy Bucket ID'
+              className={clx(
+                'text-dimmed hover:text-primary transition-colors',
+                copiedBucketId === bucketId && 'text-success'
+              )}
+            >
+              {copiedBucketId === bucketId ? (
+                <Lucide.Check className='size-3.5' />
+              ) : (
+                <Lucide.Copy className='size-3.5' />
+              )}
+            </Button>
+          </div>
+        )
+      },
       filterFn: (row, value) => {
         return row.original.id.toLowerCase().includes(value.toLowerCase())
       }
     }),
     columnHelper.accessor('created', {
       header: 'Created',
-      cell: (info) => formatDate(info.getValue())
+      cell: (info) => {
+        const date = info.getValue()
+        return (
+          <div className='flex items-center gap-1.5'>
+            <Lucide.Calendar className='text-dimmed size-3.5' />
+            <Text className='text-muted-foreground text-sm'>{formatDate(date)}</Text>
+          </div>
+        )
+      }
     }),
     columnHelper.accessor('globalAliases', {
       header: 'Global Aliases',
@@ -168,16 +213,27 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           {Array.from({ length: 5 }).map((_, i) => (
             <TableRow key={`skeleton-row-bucket-${i}`}>
               <TableCell>
-                <div className='h-4 w-64 animate-pulse rounded bg-gray-100' />
+                <div className='flex items-center gap-2'>
+                  <div className='h-3.5 w-48 animate-pulse rounded bg-gray-100' />
+                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
+                </div>
               </TableCell>
               <TableCell>
-                <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
+                <div className='flex items-center gap-1.5'>
+                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
+                  <div className='h-3.5 w-24 animate-pulse rounded bg-gray-100' />
+                </div>
               </TableCell>
               <TableCell>
-                <div className='h-4 w-40 animate-pulse rounded bg-gray-100' />
+                <div className='flex gap-1'>
+                  <div className='h-5.5 w-16 animate-pulse rounded-full bg-gray-100' />
+                  <div className='h-5.5 w-20 animate-pulse rounded-full bg-gray-100' />
+                </div>
               </TableCell>
               <TableCell>
-                <div className='h-4 w-40 animate-pulse rounded bg-gray-100' />
+                <div className='flex gap-1'>
+                  <div className='h-5.5 w-14 animate-pulse rounded-full bg-gray-100' />
+                </div>
               </TableCell>
               <TableCell className='text-right'>
                 <div className='ml-auto h-8 w-8 animate-pulse rounded bg-gray-100' />
@@ -226,7 +282,9 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           </IconBox>
           <div className='space-y-1'>
             <Text className='font-semibold'>No buckets found</Text>
-            <Text className='text-muted-foreground'>Try adjusting your search or filters.</Text>
+            <Text className='text-muted-foreground text-sm'>
+              Try adjusting your search or filters.
+            </Text>
           </div>
         </div>
       ) : buckets.length === 0 ? (
@@ -236,7 +294,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           </IconBox>
           <div className='space-y-1'>
             <Text className='font-semibold'>No buckets</Text>
-            <Text className='text-muted-foreground'>
+            <Text className='text-muted-foreground text-sm'>
               Get started by creating your first bucket to store your data.
             </Text>
           </div>

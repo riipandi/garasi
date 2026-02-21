@@ -138,8 +138,7 @@ function RouteComponent() {
         <Lucide.Info className='size-4' />
         <AlertDescription>
           Buckets are containers for objects stored in Garage. Each bucket can have global aliases
-          (accessible by all keys) or local aliases (accessible only by specific keys). Click on a
-          bucket ID to view details and manage its settings.
+          (accessible by all keys) or local aliases (accessible only by specific keys).
         </AlertDescription>
       </Alert>
 

@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Button } from '~/app/components/button'
+import { Checkbox } from '~/app/components/checkbox'
 import { IconBox } from '~/app/components/icon-box'
 import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
 import { Spinner } from '~/app/components/spinner'
@@ -18,10 +19,10 @@ import {
 } from '~/app/components/table'
 import { Text, TextLink } from '~/app/components/typography'
 import objectsService from '~/app/services/objects.service'
+import { clx } from '~/app/utils'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 import { CreateFolderDialog } from './create-folder-dialog'
-import { DropdownItem } from './dropdown-item'
-import { DropdownMenu } from './dropdown-menu'
+import { DropdownItem, DropdownMenu, MenuSeparator } from './dropdown-menu'
 import { UploadFileDialog } from './upload-file-dialog'
 
 interface FileItem {
@@ -91,6 +92,7 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
   const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null)
   const [isCreatingFolder, setIsCreatingFolder] = React.useState(false)
   const [isUploadingFile, setIsUploadingFile] = React.useState(false)
+  const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set())
 
   const fileItems: FileItem[] = React.useMemo(() => {
     const commonPrefixes = objectsQuery.data?.data?.commonPrefixes || []
@@ -156,8 +158,18 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
     })
   }
 
-  const handleShare = (item: FileItem) => {
-    console.log('Share', item)
+  const handleCopyUrl = (item: FileItem) => {
+    console.log('Copy URL', item)
+    setActiveDropdown(null)
+  }
+
+  const handleCopyPresignedUrl = (item: FileItem) => {
+    console.log('Copy Pre-signed URL', item)
+    setActiveDropdown(null)
+  }
+
+  const handleRename = (item: FileItem) => {
+    console.log('Rename', item)
     setActiveDropdown(null)
   }
 
@@ -169,6 +181,27 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
   const handleDelete = (item: FileItem) => {
     console.log('Delete', item)
     setActiveDropdown(null)
+  }
+
+  const handleToggleSelect = (itemId: string) => {
+    setSelectedItems((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId)
+      } else {
+        newSet.add(itemId)
+      }
+      return newSet
+    })
+  }
+
+  const handleSelectAll = () => {
+    const allItemIds = [...folders.map((f) => f.id), ...files.map((f) => f.id)]
+    if (selectedItems.size === allItemIds.length && allItemIds.length > 0) {
+      setSelectedItems(new Set())
+    } else {
+      setSelectedItems(new Set(allItemIds))
+    }
   }
 
   const handleCreateFolder = async (folderName: string) => {
@@ -216,7 +249,7 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
             placeholder='Search files and folders...'
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            className='bg-transparent py-2 pr-4 pl-2 text-sm outline-none'
+            className='h-9 bg-transparent py-2 pr-4 pl-2 outline-none'
           />
           {filterText && (
             <InputGroupAddon align='end'>
@@ -254,7 +287,7 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         </Stack>
       </div>
 
-      <div className='border-border bg-background flex items-center gap-2 rounded-md px-2 py-1.5'>
+      <div className='border-border flex items-center gap-2 rounded-md border px-2 py-1.5'>
         <Link
           to='/buckets/$id'
           params={{ id: bucketId }}
@@ -288,46 +321,107 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
         )}
       </div>
 
-      <TableContainer>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className='w-1/2'>Name</TableHead>
-              <TableHead className='w-1/4'>Size</TableHead>
-              <TableHead className='w-1/4'>Last Modified</TableHead>
-              <TableHead className='w-12'></TableHead>
+      <TableContainer className='border-border rounded-lg border border-t-transparent'>
+        <Table className='rounded-lg'>
+          <TableHeader className='rounded-t'>
+            <TableRow className='rounded-t'>
+              <TableHead className='w-8 rounded-t'>
+                <Checkbox
+                  checked={
+                    filteredFiles.length > 0 &&
+                    selectedItems.size ===
+                      [...folders.map((f) => f.id), ...files.map((f) => f.id)].length
+                  }
+                  onClick={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead className='w-96 rounded-t pl-0'>Name</TableHead>
+              <TableHead className='w-32 rounded-t'>Type</TableHead>
+              <TableHead className='w-32 rounded-t'>Size</TableHead>
+              <TableHead className='w-40 rounded-t'>Last Modified</TableHead>
+              <TableHead className='w-12 rounded-t'></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {folders.map((folder) => (
-              <TableRow key={folder.id}>
+              <TableRow
+                key={folder.id}
+                data-checked={selectedItems.has(folder.id)}
+                className='group cursor-pointer'
+                onClick={(e) => {
+                  e.preventDefault()
+                  window.location.href = `/buckets/${bucketId}?prefix=${encodeURIComponent(folder.id)}`
+                }}
+              >
+                <TableCell className='text-center' onClick={(e) => e.stopPropagation()}>
+                  <div className='relative flex size-4 items-center justify-center'>
+                    <div
+                      className={clx(
+                        'absolute inset-0 flex items-center justify-center transition-opacity duration-150',
+                        selectedItems.has(folder.id) || selectedItems.size > 0
+                          ? 'opacity-0'
+                          : 'opacity-100 group-hover:opacity-0'
+                      )}
+                    >
+                      <IconBox variant='info' size='sm' className='p-0'>
+                        <Lucide.Folder className='size-4' />
+                      </IconBox>
+                    </div>
+                    <div
+                      className={clx(
+                        'absolute inset-0 transition-opacity duration-150',
+                        selectedItems.has(folder.id) || selectedItems.size > 0
+                          ? 'opacity-100'
+                          : 'opacity-0 group-hover:opacity-100'
+                      )}
+                    >
+                      <Checkbox
+                        checked={selectedItems.has(folder.id)}
+                        onClick={() => handleToggleSelect(folder.id)}
+                      />
+                    </div>
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Link
                     to='/buckets/$id'
                     params={{ id: bucketId }}
                     search={{ prefix: folder.id, key: undefined }}
-                    className='flex items-center gap-3'
+                    onClick={(e) => e.stopPropagation()}
+                    className='block max-w-96 truncate'
                   >
-                    <IconBox variant='info' size='sm'>
-                      <Lucide.Folder className='size-5' />
-                    </IconBox>
                     <Text className='text-sm font-medium'>{folder.name}</Text>
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <Text className='text-muted-foreground'>-</Text>
+                  <div className='flex items-center gap-1.5'>
+                    <Lucide.Folder className='text-dimmed size-3.5' />
+                    <Text className='text-muted-foreground text-sm'>Folder</Text>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Text className='text-muted-foreground'>{formatDate(folder.modified)}</Text>
+                  <Text className='text-muted-foreground text-sm'>-</Text>
                 </TableCell>
                 <TableCell>
+                  <div className='flex items-center gap-1.5'>
+                    <Lucide.Calendar className='text-dimmed size-3.5' />
+                    <Text className='text-muted-foreground text-sm'>
+                      {formatDate(folder.modified)}
+                    </Text>
+                  </div>
+                </TableCell>
+                <TableCell className='text-right'>
                   <DropdownMenu
                     isOpen={activeDropdown === folder.id}
                     onClose={() => setActiveDropdown(null)}
                   >
-                    <DropdownItem icon={Lucide.Share} onClick={() => handleShare(folder)}>
-                      Share
+                    <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(folder)}>
+                      Copy URL
                     </DropdownItem>
+                    <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(folder)}>
+                      Rename
+                    </DropdownItem>
+                    <MenuSeparator />
                     <DropdownItem icon={Lucide.Trash2} onClick={() => handleDelete(folder)} danger>
                       Delete
                     </DropdownItem>
@@ -336,32 +430,79 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
               </TableRow>
             ))}
             {files.map((file) => (
-              <TableRow key={file.id}>
+              <TableRow key={file.id} data-checked={selectedItems.has(file.id)} className='group'>
                 <TableCell>
-                  <div className='flex items-center gap-3'>
-                    <IconBox variant='tertiary-subtle' size='sm'>
-                      <Lucide.File className='size-5' />
-                    </IconBox>
-                    <Text className='text-sm font-medium'>{file.name}</Text>
+                  <div className='relative flex size-4 items-center justify-center'>
+                    <div
+                      className={clx(
+                        'absolute inset-0 flex items-center justify-center transition-opacity duration-150',
+                        selectedItems.has(file.id) || selectedItems.size > 0
+                          ? 'opacity-0'
+                          : 'opacity-100 group-hover:opacity-0'
+                      )}
+                    >
+                      <IconBox variant='primary-subtle' size='sm' className='p-0'>
+                        <Lucide.File className='size-4' />
+                      </IconBox>
+                    </div>
+                    <div
+                      className={clx(
+                        'absolute inset-0 transition-opacity duration-150',
+                        selectedItems.has(file.id) || selectedItems.size > 0
+                          ? 'opacity-100'
+                          : 'opacity-0 group-hover:opacity-100'
+                      )}
+                    >
+                      <Checkbox
+                        checked={selectedItems.has(file.id)}
+                        onClick={() => handleToggleSelect(file.id)}
+                      />
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className='pl-0'>
+                  <Text className='max-w-96 truncate text-sm font-medium'>{file.name}</Text>
+                </TableCell>
+                <TableCell>
+                  <div className='flex items-center gap-1.5'>
+                    <Lucide.File className='text-dimmed size-3.5' />
+                    <Text className='text-muted-foreground text-sm'>File</Text>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Text className='text-muted-foreground'>{formatFileSize(file.size)}</Text>
+                  <div className='flex items-center gap-1.5'>
+                    <Lucide.HardDrive className='text-dimmed size-3.5' />
+                    <Text className='text-muted-foreground text-sm'>
+                      {formatFileSize(file.size)}
+                    </Text>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Text className='text-muted-foreground'>{formatDate(file.modified)}</Text>
+                  <div className='flex items-center gap-1.5'>
+                    <Lucide.Calendar className='text-dimmed size-3.5' />
+                    <Text className='text-muted-foreground text-sm'>
+                      {formatDate(file.modified)}
+                    </Text>
+                  </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className='text-right'>
                   <DropdownMenu
                     isOpen={activeDropdown === file.id}
                     onClose={() => setActiveDropdown(null)}
                   >
+                    <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(file)}>
+                      Copy URL
+                    </DropdownItem>
+                    <DropdownItem icon={Lucide.Clock} onClick={() => handleCopyPresignedUrl(file)}>
+                      Copy Pre-signed URL
+                    </DropdownItem>
+                    <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(file)}>
+                      Rename
+                    </DropdownItem>
                     <DropdownItem icon={Lucide.Download} onClick={() => handleDownload(file)}>
                       Download
                     </DropdownItem>
-                    <DropdownItem icon={Lucide.Share} onClick={() => handleShare(file)}>
-                      Share
-                    </DropdownItem>
+                    <MenuSeparator />
                     <DropdownItem icon={Lucide.Trash2} onClick={() => handleDelete(file)} danger>
                       Delete
                     </DropdownItem>

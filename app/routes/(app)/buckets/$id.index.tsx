@@ -2,13 +2,6 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbButton,
-  BreadcrumbSeparator
-} from '~/app/components/breadcrumb'
 import { Button } from '~/app/components/button'
 import { IconBox } from '~/app/components/icon-box'
 import { Spinner } from '~/app/components/spinner'
@@ -107,47 +100,43 @@ function RouteComponent() {
 
   return (
     <div className='mx-auto w-full max-w-7xl space-y-6'>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbButton render={<Link to='/buckets' />}>
-              <Lucide.Home className='size-4' />
-              Buckets
-            </BreadcrumbButton>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbButton active>{displayName}</BreadcrumbButton>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-        <div className='space-y-1'>
-          <Heading size='lg'>{displayName}</Heading>
+      <div className='flex items-start gap-4'>
+        <Link
+          to='/buckets'
+          className='rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+        >
+          <Lucide.ArrowLeft className='size-5' />
+        </Link>
+        <div className='min-w-0 flex-1'>
+          <div className='flex items-center justify-between gap-3'>
+            <div className='flex items-center gap-3'>
+              <Heading level={1} size='lg'>
+                {displayName}
+              </Heading>
+            </div>
+            <div className='flex items-center gap-4'>
+              <Button
+                variant='outline'
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                progress={isRefreshing}
+              >
+                <Lucide.RefreshCw className='size-4' />
+                Refresh
+              </Button>
+              <Link to='/buckets/$id/settings' params={{ id }}>
+                <Button variant='outline'>
+                  <Lucide.Settings2 className='size-4' />
+                  Settings
+                </Button>
+              </Link>
+            </div>
+          </div>
           {displayName !== bucket.id && (
-            <Text className='text-sm'>
-              ID:{' '}
-              <Text className='bg-muted rounded px-1.5 py-0.5 font-mono text-xs'>{bucket.id}</Text>
+            <Text className='text-normal mt-1 text-sm text-gray-500'>
+              ID: <code className='font-mono'>{bucket.id}</code>
             </Text>
           )}
-        </div>
-        <div className='flex gap-2'>
-          <Button
-            variant='outline'
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            progress={isRefreshing}
-          >
-            <Lucide.RefreshCw className='size-4' />
-            Refresh
-          </Button>
-          <Link to='/buckets/$id/settings' params={{ id }}>
-            <Button variant='outline'>
-              <Lucide.Settings2 className='size-4' />
-              Settings
-            </Button>
-          </Link>
         </div>
       </div>
 
