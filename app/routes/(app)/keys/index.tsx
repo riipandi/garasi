@@ -82,7 +82,11 @@ function RouteComponent() {
   // Import key mutation
   const importKeyMutation = useMutation({
     mutationFn: async (values: ImportKeyRequest) => {
-      const response = await keysService.importKey(values) as { status: string; message?: string; error?: { reason?: string } }
+      const response = (await keysService.importKey(values)) as {
+        status: string
+        message?: string
+        error?: { reason?: string }
+      }
       if (response.status === 'error') {
         throw new Error(response.message || response.error?.reason || 'Failed to import access key')
       }
@@ -184,9 +188,8 @@ function RouteComponent() {
       <Alert variant='info'>
         <Lucide.Info className='size-4' />
         <AlertDescription>
-          Access keys are used to authenticate with the Garage S3 API. Each key consists of an
-          Access Key ID and a Secret Key ID. Keep your secret keys secure and never share them
-          publicly.
+          Access keys are used to authenticate with the Garage S3 API. Keep your secret keys secure
+          and never share them publicly.
         </AlertDescription>
       </Alert>
 
