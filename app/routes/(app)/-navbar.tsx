@@ -90,7 +90,12 @@ export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) 
           <img src='/logo.png' alt='Garasi' className='h-8 w-auto' />
           <span className='sr-only'>Garage Console</span>
         </SidebarLogo>
-        <Button variant='plain' size='sm-icon' className='hidden lg:flex' onClick={sidebarFn}>
+        <Button
+          variant='plain'
+          size='sm-icon'
+          className={!sidebarOpen ? 'lg:hidden' : ''}
+          onClick={sidebarFn}
+        >
           {sidebarOpen ? <Lucide.SidebarCloseIcon /> : <Lucide.SidebarOpenIcon />}
         </Button>
       </SidebarHeader>

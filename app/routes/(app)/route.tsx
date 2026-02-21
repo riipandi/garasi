@@ -57,7 +57,7 @@ function RouteComponent() {
       />
       <div
         className={clx(
-          'fixed top-0 z-50 h-dvh w-full max-w-64 transition-all *:h-full md:w-64',
+          'fixed top-0 z-50 h-dvh w-full transition-all *:h-full lg:w-64 lg:max-w-64',
           sidebarOpen ? 'left-0' : '-left-full'
         )}
       >
@@ -68,7 +68,7 @@ function RouteComponent() {
           sidebarFn={handleSidebarOpen}
         />
       </div>
-      <main className={clx('transition-all', sidebarOpen ? 'xl:ml-64' : 'xl:ml-0')}>
+      <main className={clx('transition-all', sidebarOpen ? 'lg:ml-64' : 'lg:ml-0')}>
         <nav className='flex h-16 items-center gap-2.5 bg-transparent px-2 lg:h-12'>
           <React.Activity mode={sidebarOpen ? 'hidden' : 'visible'}>
             <Button variant='plain' size='sm-icon' onClick={handleSidebarOpen}>
