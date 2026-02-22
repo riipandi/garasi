@@ -62,7 +62,7 @@ export function NodeTable({ nodes, onDelete, isLoading = false }: NodeTableProps
         const nodeId = info.getValue()
         return (
           <div className='flex items-center gap-2' title={nodeId}>
-            <Text className='max-w-36 truncate font-mono text-sm'>{nodeId}</Text>
+            <Text className='max-w-44 truncate font-mono text-sm'>{nodeId}</Text>
             <Button
               ref={getButtonRef(nodeId)}
               type='button'
@@ -125,9 +125,9 @@ export function NodeTable({ nodes, onDelete, isLoading = false }: NodeTableProps
         return (
           <Badge variant={node.isUp ? 'success' : 'danger'} pill size='sm'>
             {node.isUp ? (
-              <Lucide.CheckCircle2 className='size-3' />
+              <Lucide.CheckCircle2 className='mr-1 size-3' />
             ) : (
-              <Lucide.XCircle className='size-3' />
+              <Lucide.XCircle className='mr-1 size-3' />
             )}
             {node.isUp ? 'Online' : 'Offline'}
           </Badge>

@@ -31,6 +31,7 @@ usage() {
   printf "${BOLD}Usage:${NC} %s ${CYAN}<command>${NC} [args]\n\n" "$0"
   printf "${BOLD}Commands:${NC}\n"
   printf "  ${GREEN}init${NC}                  Setup cluster, buckets, and master key\n"
+  printf "  ${GREEN}nodes${NC}                 List available Garage nodes (node_id@addr:port)\n"
   printf "  ${GREEN}status${NC}                Show cluster, buckets, and keys status\n"
   printf "  ${GREEN}create-bucket${NC} <name>  Create a new bucket and assign master key\n"
   printf "  ${GREEN}bucket-web${NC} <name>     Enable or disable website access for a bucket\n"
@@ -42,9 +43,9 @@ usage() {
 # Garage API helper
 garage_api() {
   if [ -n "$2" ]; then
-    docker-compose exec --env RUST_LOG=garage=warn -T garage /garage json-api "$1" "$2"
+    docker-compose exec --env RUST_LOG=garage=warn -T garage-1 /garage json-api "$1" "$2"
   else
-    docker-compose exec --env RUST_LOG=garage=warn -T garage /garage json-api "$1"
+    docker-compose exec --env RUST_LOG=garage=warn -T garage-1 /garage json-api "$1"
   fi
 }
 
@@ -171,8 +172,8 @@ case "$CMD" in
     if [ -z "$layout_version" ] || [ "$layout_version" = "null" ] || [ "$layout_version" -le 0 ]; then
       printf "${CYAN}Applying initial layout...${NC}\n"
       first_node_id=$(echo "$status_json" | jq -r '.nodes[0].id')
-      docker-compose exec --env RUST_LOG=garage=warn -T garage /garage layout assign -z dc1 -c 1G "$first_node_id" >/dev/null 2>&1
-      docker-compose exec --env RUST_LOG=garage=warn -T garage /garage layout apply --version 1 >/dev/null 2>&1
+      docker-compose exec --env RUST_LOG=garage=warn -T garage-1 /garage layout assign -z dc1 -c 1G "$first_node_id" >/dev/null 2>&1
+      docker-compose exec --env RUST_LOG=garage=warn -T garage-1 /garage layout apply --version 1 >/dev/null 2>&1
       printf "${GREEN}[OK]${NC} Layout applied\n"
       printf "\n${DIM}Waiting for cluster to stabilize...${NC}\n"
       sleep 3
@@ -585,6 +586,32 @@ case "$CMD" in
     printf "STORAGE_S3_ENDPOINT_URL=http://localhost:3900\n"
     printf "STORAGE_S3_PUBLIC_URL=http://localhost:3902\n"
     printf "STORAGE_S3_REGION=auto\n"
+    printf "\n"
+    ;;
+
+  nodes)
+    # List available Garage nodes (node_id@addr:port)
+    garage1_status=$(docker-compose exec --env RUST_LOG=garage=warn -T garage-1 /garage json-api GetClusterStatus)
+    garage2_status=$(docker-compose exec --env RUST_LOG=garage=warn -T garage-2 /garage json-api GetClusterStatus)
+    garage3_status=$(docker-compose exec --env RUST_LOG=garage=warn -T garage-3 /garage json-api GetClusterStatus)
+
+    garage1_node_id=$(echo "$garage1_status" | jq -r '.nodes[0].id // empty')
+    garage1_addr=$(echo "$garage1_status" | jq -r '.nodes[0].addr // empty')
+    garage1_hostname=$(echo "$garage1_status" | jq -r '.nodes[0].hostname // empty')
+
+    garage2_node_id=$(echo "$garage2_status" | jq -r '.nodes[0].id // empty')
+    garage2_addr=$(echo "$garage2_status" | jq -r '.nodes[0].addr // empty')
+    garage2_hostname=$(echo "$garage2_status" | jq -r '.nodes[0].hostname // empty')
+
+    garage3_node_id=$(echo "$garage3_status" | jq -r '.nodes[0].id // empty')
+    garage3_addr=$(echo "$garage3_status" | jq -r '.nodes[0].addr // empty')
+    garage3_hostname=$(echo "$garage3_status" | jq -r '.nodes[0].hostname // empty')
+
+    printf "\n"
+    printf "${BOLD}${CYAN}List available nodes:${NC}\n"
+    printf "${NC}- $garage1_hostname: ${DIM}${garage1_node_id}@${garage1_addr}${NC}\n"
+    printf "${NC}- $garage2_hostname: ${DIM}${garage2_node_id}@${garage2_addr}${NC}\n"
+    printf "${NC}- $garage3_hostname: ${DIM}${garage3_node_id}@${garage3_addr}${NC}\n"
     printf "\n"
     ;;
 
