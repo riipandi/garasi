@@ -5,7 +5,6 @@ import {
   Card,
   CardBody,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardHeaderAction,
   CardTitle
@@ -122,14 +121,6 @@ export function AccessKeysSection({
           </Stack>
         )}
       </CardBody>
-      {!hasKeys && (
-        <CardFooter className='justify-end'>
-          <Button type='button' onClick={onShowKeySelectorDialog}>
-            <Lucide.Plus className='size-4' />
-            Assign Key
-          </Button>
-        </CardFooter>
-      )}
     </Card>
   )
 }
