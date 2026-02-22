@@ -39,9 +39,17 @@ interface ObjectBrowserProps {
   prefix?: string | null
   key?: string | null
   bucketId: string
+  isRefreshing?: boolean
 }
 
-export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: ObjectBrowserProps) {
+export function ObjectBrowser({
+  queryClient,
+  bucket,
+  prefix,
+  key,
+  bucketId,
+  isRefreshing
+}: ObjectBrowserProps) {
   const bucketParam =
     bucket.globalAliases && bucket.globalAliases.length > 0 && bucket.globalAliases[0]
       ? bucket.globalAliases[0]
@@ -381,173 +389,218 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
             </TableRow>
           </TableHeader>
           <TableBody>
-            {folders.map((folder) => (
-              <TableRow
-                key={folder.id}
-                data-checked={selectedItems.has(folder.id)}
-                className='group cursor-pointer'
-                onClick={(e) => {
-                  e.preventDefault()
-                  window.location.href = `/buckets/${bucketId}?prefix=${encodeURIComponent(folder.id)}`
-                }}
-              >
-                <TableCell className='text-center' onClick={(e) => e.stopPropagation()}>
-                  <div className='relative flex size-4 items-center justify-center'>
-                    <div
-                      className={clx(
-                        'absolute inset-0 flex items-center justify-center transition-opacity duration-150',
-                        selectedItems.has(folder.id) || selectedItems.size > 0
-                          ? 'opacity-0'
-                          : 'opacity-100 group-hover:opacity-0'
-                      )}
-                    >
-                      <IconBox variant='info' size='sm' className='p-0'>
-                        <Lucide.Folder className='size-4' />
-                      </IconBox>
-                    </div>
-                    <div
-                      className={clx(
-                        'absolute inset-0 transition-opacity duration-150',
-                        selectedItems.has(folder.id) || selectedItems.size > 0
-                          ? 'opacity-100'
-                          : 'opacity-0 group-hover:opacity-100'
-                      )}
-                    >
-                      <Checkbox
-                        checked={selectedItems.has(folder.id)}
-                        onClick={() => handleToggleSelect(folder.id)}
-                      />
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Link
-                    to='/buckets/$id'
-                    params={{ id: bucketId }}
-                    search={{ prefix: folder.id, key: undefined }}
-                    onClick={(e) => e.stopPropagation()}
-                    className='block max-w-96 truncate'
+            {isRefreshing ? (
+              <>
+                {Array.from({ length: 8 }).map((_, idx) => (
+                  <TableRow key={`skeleton-${idx}`}>
+                    <TableCell>
+                      <div className='size-4 animate-pulse rounded bg-gray-100' />
+                    </TableCell>
+                    <TableCell>
+                      <div className='flex items-center gap-2'>
+                        <div className='size-4 animate-pulse rounded bg-gray-100' />
+                        <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className='h-4 w-16 animate-pulse rounded bg-gray-100' />
+                    </TableCell>
+                    <TableCell>
+                      <div className='h-4 w-20 animate-pulse rounded bg-gray-100' />
+                    </TableCell>
+                    <TableCell>
+                      <div className='h-4 w-28 animate-pulse rounded bg-gray-100' />
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                ))}
+              </>
+            ) : (
+              <>
+                {folders.map((folder) => (
+                  <TableRow
+                    key={folder.id}
+                    data-checked={selectedItems.has(folder.id)}
+                    className='group cursor-pointer'
+                    onClick={(e) => {
+                      e.preventDefault()
+                      window.location.href = `/buckets/${bucketId}?prefix=${encodeURIComponent(folder.id)}`
+                    }}
                   >
-                    <Text className='text-sm font-medium'>{folder.name}</Text>
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-1.5'>
-                    <Lucide.Folder className='text-dimmed size-3.5' />
-                    <Text className='text-muted-foreground text-sm'>Folder</Text>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Text className='text-muted-foreground text-sm'>-</Text>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-1.5'>
-                    <Lucide.Calendar className='text-dimmed size-3.5' />
-                    <Text className='text-muted-foreground text-sm'>
-                      {formatDate(folder.modified)}
-                    </Text>
-                  </div>
-                </TableCell>
-                <TableCell className='text-right'>
-                  <DropdownMenu
-                    isOpen={activeDropdown === folder.id}
-                    onClose={() => setActiveDropdown(null)}
+                    <TableCell className='text-center' onClick={(e) => e.stopPropagation()}>
+                      <div className='relative flex size-4 items-center justify-center'>
+                        <div
+                          className={clx(
+                            'absolute inset-0 flex items-center justify-center transition-opacity duration-150',
+                            selectedItems.has(folder.id) || selectedItems.size > 0
+                              ? 'opacity-0'
+                              : 'opacity-100 group-hover:opacity-0'
+                          )}
+                        >
+                          <IconBox variant='info' size='sm' className='p-0'>
+                            <Lucide.Folder className='size-4' />
+                          </IconBox>
+                        </div>
+                        <div
+                          className={clx(
+                            'absolute inset-0 transition-opacity duration-150',
+                            selectedItems.has(folder.id) || selectedItems.size > 0
+                              ? 'opacity-100'
+                              : 'opacity-0 group-hover:opacity-100'
+                          )}
+                        >
+                          <Checkbox
+                            checked={selectedItems.has(folder.id)}
+                            onClick={() => handleToggleSelect(folder.id)}
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Link
+                        to='/buckets/$id'
+                        params={{ id: bucketId }}
+                        search={{ prefix: folder.id, key: undefined }}
+                        onClick={(e) => e.stopPropagation()}
+                        className='block max-w-96 truncate'
+                      >
+                        <Text className='text-sm font-medium'>{folder.name}</Text>
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <div className='flex items-center gap-1.5'>
+                        <Lucide.Folder className='text-dimmed size-3.5' />
+                        <Text className='text-muted-foreground text-sm'>Folder</Text>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Text className='text-muted-foreground text-sm'>-</Text>
+                    </TableCell>
+                    <TableCell>
+                      <div className='flex items-center gap-1.5'>
+                        <Lucide.Calendar className='text-dimmed size-3.5' />
+                        <Text className='text-muted-foreground text-sm'>
+                          {formatDate(folder.modified)}
+                        </Text>
+                      </div>
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <DropdownMenu
+                        isOpen={activeDropdown === folder.id}
+                        onClose={() => setActiveDropdown(null)}
+                      >
+                        <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(folder)}>
+                          Copy URL
+                        </DropdownItem>
+                        <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(folder)}>
+                          Rename
+                        </DropdownItem>
+                        <MenuSeparator />
+                        <DropdownItem
+                          icon={Lucide.Trash2}
+                          onClick={() => handleDelete(folder)}
+                          danger
+                        >
+                          Delete
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {files.map((file) => (
+                  <TableRow
+                    key={file.id}
+                    data-checked={selectedItems.has(file.id)}
+                    className='group'
                   >
-                    <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(folder)}>
-                      Copy URL
-                    </DropdownItem>
-                    <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(folder)}>
-                      Rename
-                    </DropdownItem>
-                    <MenuSeparator />
-                    <DropdownItem icon={Lucide.Trash2} onClick={() => handleDelete(folder)} danger>
-                      Delete
-                    </DropdownItem>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-            {files.map((file) => (
-              <TableRow key={file.id} data-checked={selectedItems.has(file.id)} className='group'>
-                <TableCell>
-                  <div className='relative flex size-4 items-center justify-center'>
-                    <div
-                      className={clx(
-                        'absolute inset-0 flex items-center justify-center transition-opacity duration-150',
-                        selectedItems.has(file.id) || selectedItems.size > 0
-                          ? 'opacity-0'
-                          : 'opacity-100 group-hover:opacity-0'
-                      )}
-                    >
-                      <IconBox variant='primary-subtle' size='sm' className='p-0'>
-                        <Lucide.File className='size-4' />
-                      </IconBox>
-                    </div>
-                    <div
-                      className={clx(
-                        'absolute inset-0 transition-opacity duration-150',
-                        selectedItems.has(file.id) || selectedItems.size > 0
-                          ? 'opacity-100'
-                          : 'opacity-0 group-hover:opacity-100'
-                      )}
-                    >
-                      <Checkbox
-                        checked={selectedItems.has(file.id)}
-                        onClick={() => handleToggleSelect(file.id)}
-                      />
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className='pl-0'>
-                  <Text className='max-w-96 truncate text-sm font-medium'>{file.name}</Text>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-1.5'>
-                    <Lucide.File className='text-dimmed size-3.5' />
-                    <Text className='text-muted-foreground text-sm'>File</Text>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-1.5'>
-                    <Lucide.HardDrive className='text-dimmed size-3.5' />
-                    <Text className='text-muted-foreground text-sm'>
-                      {formatFileSize(file.size)}
-                    </Text>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-1.5'>
-                    <Lucide.Calendar className='text-dimmed size-3.5' />
-                    <Text className='text-muted-foreground text-sm'>
-                      {formatDate(file.modified)}
-                    </Text>
-                  </div>
-                </TableCell>
-                <TableCell className='text-right'>
-                  <DropdownMenu
-                    isOpen={activeDropdown === file.id}
-                    onClose={() => setActiveDropdown(null)}
-                  >
-                    <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(file)}>
-                      Copy URL
-                    </DropdownItem>
-                    <DropdownItem icon={Lucide.Clock} onClick={() => handleCopyPresignedUrl(file)}>
-                      Copy Pre-signed URL
-                    </DropdownItem>
-                    <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(file)}>
-                      Rename
-                    </DropdownItem>
-                    <DropdownItem icon={Lucide.Download} onClick={() => handleDownload(file)}>
-                      Download
-                    </DropdownItem>
-                    <MenuSeparator />
-                    <DropdownItem icon={Lucide.Trash2} onClick={() => handleDelete(file)} danger>
-                      Delete
-                    </DropdownItem>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                    <TableCell>
+                      <div className='relative flex size-4 items-center justify-center'>
+                        <div
+                          className={clx(
+                            'absolute inset-0 flex items-center justify-center transition-opacity duration-150',
+                            selectedItems.has(file.id) || selectedItems.size > 0
+                              ? 'opacity-0'
+                              : 'opacity-100 group-hover:opacity-0'
+                          )}
+                        >
+                          <IconBox variant='primary-subtle' size='sm' className='p-0'>
+                            <Lucide.File className='size-4' />
+                          </IconBox>
+                        </div>
+                        <div
+                          className={clx(
+                            'absolute inset-0 transition-opacity duration-150',
+                            selectedItems.has(file.id) || selectedItems.size > 0
+                              ? 'opacity-100'
+                              : 'opacity-0 group-hover:opacity-100'
+                          )}
+                        >
+                          <Checkbox
+                            checked={selectedItems.has(file.id)}
+                            onClick={() => handleToggleSelect(file.id)}
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className='pl-0'>
+                      <Text className='max-w-96 truncate text-sm font-medium'>{file.name}</Text>
+                    </TableCell>
+                    <TableCell>
+                      <div className='flex items-center gap-1.5'>
+                        <Lucide.File className='text-dimmed size-3.5' />
+                        <Text className='text-muted-foreground text-sm'>File</Text>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className='flex items-center gap-1.5'>
+                        <Lucide.HardDrive className='text-dimmed size-3.5' />
+                        <Text className='text-muted-foreground text-sm'>
+                          {formatFileSize(file.size)}
+                        </Text>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className='flex items-center gap-1.5'>
+                        <Lucide.Calendar className='text-dimmed size-3.5' />
+                        <Text className='text-muted-foreground text-sm'>
+                          {formatDate(file.modified)}
+                        </Text>
+                      </div>
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <DropdownMenu
+                        isOpen={activeDropdown === file.id}
+                        onClose={() => setActiveDropdown(null)}
+                      >
+                        <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(file)}>
+                          Copy URL
+                        </DropdownItem>
+                        <DropdownItem
+                          icon={Lucide.Clock}
+                          onClick={() => handleCopyPresignedUrl(file)}
+                        >
+                          Copy Pre-signed URL
+                        </DropdownItem>
+                        <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(file)}>
+                          Rename
+                        </DropdownItem>
+                        <DropdownItem icon={Lucide.Download} onClick={() => handleDownload(file)}>
+                          Download
+                        </DropdownItem>
+                        <MenuSeparator />
+                        <DropdownItem
+                          icon={Lucide.Trash2}
+                          onClick={() => handleDelete(file)}
+                          danger
+                        >
+                          Delete
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
