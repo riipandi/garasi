@@ -606,32 +606,32 @@ export function ObjectBrowser({
       </TableContainer>
 
       {filteredFiles.length === 0 && (
-        <div className='flex flex-col items-center justify-center py-12 text-center'>
+        <div className='border-border bg-dimmed/10 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           {!hasAccessKeys ? (
             <>
-              <IconBox variant='tertiary-subtle' size='lg' circle>
-                <Lucide.Lock className='size-12' />
+              <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+                <Lucide.Lock className='size-16' />
               </IconBox>
-              <Stack>
-                <Text className='text-base font-medium'>No access keys assigned</Text>
+              <div className='space-y-1'>
+                <Text className='font-semibold'>No access keys assigned</Text>
                 <Text className='text-muted-foreground text-sm'>
                   Assign access keys to this bucket to view and manage objects
                 </Text>
-              </Stack>
+              </div>
             </>
           ) : (
             <>
-              <IconBox variant='tertiary-subtle' size='lg' circle>
-                <Lucide.FolderOpen className='size-12' />
+              <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+                <Lucide.FolderOpen className='size-16' />
               </IconBox>
-              <Stack>
-                <Text className='text-base font-medium'>No files or folders found</Text>
+              <div className='space-y-1'>
+                <Text className='font-semibold'>No files or folders found</Text>
                 <Text className='text-muted-foreground text-sm'>
                   {filterText
                     ? 'Try adjusting your search'
                     : 'Upload files or create folders to get started'}
                 </Text>
-              </Stack>
+              </div>
             </>
           )}
         </div>

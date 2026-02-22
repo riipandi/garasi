@@ -1,22 +1,35 @@
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { Button } from '~/app/components/button'
 import { NotFound } from '~/app/errors'
 import { requireAuthentication, useAuth } from '~/app/guards'
+import bucketService from '~/app/services/bucket.service'
 import { clx } from '~/app/utils'
 import { Navbar } from './-navbar'
+
+const bucketsQueryOpts = queryOptions({
+  queryKey: ['buckets'],
+  queryFn: () => bucketService.listBuckets()
+})
 
 export const Route = createFileRoute('/(app)')({
   component: RouteComponent,
   notFoundComponent: NotFound,
   beforeLoad: async ({ location }) => {
     return requireAuthentication(location)
+  },
+  loader: async ({ context }) => {
+    context.queryClient.ensureQueryData(bucketsQueryOpts)
   }
 })
 
 function RouteComponent() {
   const { user, logout } = useAuth()
+
+  const { data: bucketsResponse, isLoading: bucketsLoading } = useQuery(bucketsQueryOpts)
+  const buckets = bucketsResponse?.data ?? []
 
   const [sidebarOpen, setSidebarOpen] = React.useState(true)
 
@@ -66,6 +79,8 @@ function RouteComponent() {
           logoutFn={handleLogout}
           sidebarOpen={sidebarOpen}
           sidebarFn={handleSidebarOpen}
+          buckets={buckets}
+          isLoading={bucketsLoading}
         />
       </div>
       <main className={clx('transition-all', sidebarOpen ? 'lg:ml-64' : 'lg:ml-0')}>
