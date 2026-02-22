@@ -26,8 +26,7 @@ function RouteComponent() {
 
   const tabs: { id: TabType; label: string; icon: any; path: string }[] = [
     { id: 'overview', label: 'Overview', icon: Lucide.LayoutDashboard, path: '/cluster' },
-    { id: 'layout', label: 'Layout', icon: Lucide.LayoutGrid, path: '/cluster/layout' },
-    { id: 'nodes', label: 'Nodes', icon: Lucide.Server, path: '/cluster/nodes' }
+    { id: 'layout', label: 'Layout', icon: Lucide.LayoutGrid, path: '/cluster/layout' }
   ]
 
   const handleTabChange = (tabId: TabType) => {

@@ -55,30 +55,34 @@ function renderNavItem(item: NavItem) {
 function renderNavGroup(group: NavGroup, index: number) {
   return (
     <SidebarGroup key={`${index}-${group.title}`}>
-      {group.title ? <SidebarGroupTitle>{group.title}</SidebarGroupTitle> : null}
+      {group.title ? (
+        <SidebarGroupTitle className='text-sm'>{group.title}</SidebarGroupTitle>
+      ) : null}
       <SidebarList>{group.items.map((item) => renderNavItem(item))}</SidebarList>
     </SidebarGroup>
   )
 }
 
 export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) {
-  const overviewGroup: NavGroup = {
+  const mainMenu: NavGroup = {
     items: [
       { to: '/', label: 'Overview', icon: Lucide.Warehouse, exact: true },
-      { to: '/profile', label: 'Account', icon: Lucide.UserCircle }
+      { to: '/keys', label: 'Access Keys', icon: Lucide.KeyRound, exact: true },
+      { to: '/buckets', label: 'Buckets', icon: Lucide.Box, exact: false },
+      { to: '/profile', label: 'Account', icon: Lucide.UserCircle, exact: false }
     ]
   }
 
-  const primaryGroup: NavGroup = {
-    title: 'Manage',
+  const bucketList: NavGroup = {
+    title: 'Quick Access',
     items: [
-      { to: '/cluster', label: 'Cluster', icon: Lucide.ServerCog },
-      { to: '/buckets', label: 'Buckets', icon: Lucide.Box, exact: true },
-      { to: '/keys', label: 'Access Keys', icon: Lucide.KeyRound }
+      // { to: '/cluster', label: 'Cluster', icon: Lucide.ServerCog },
+      // { to: '/buckets', label: 'Buckets', icon: Lucide.Box, exact: true },
+      // { to: '/keys', label: 'Access Keys', icon: Lucide.KeyRound }
     ]
   }
 
-  const navGroups = [overviewGroup, primaryGroup]
+  const navGroups = [mainMenu, bucketList]
 
   return (
     <Sidebar

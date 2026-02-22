@@ -56,6 +56,7 @@ vitest.workspace.*
 !.env.example
 compose.env*
 !compose.env.example
+compose.dev.yaml
 .*.vars
 
 # Disable this line in your real app

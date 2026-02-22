@@ -26,7 +26,7 @@ interface NodeInfo {
   garageFeatures: string[] | null
 }
 
-export const Route = createFileRoute('/(app)/cluster/nodes/$id')({
+export const Route = createFileRoute('/(app)/nodes/$id')({
   component: RouteComponent,
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(nodeInfoQuery(params.id))

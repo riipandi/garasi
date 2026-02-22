@@ -28,7 +28,7 @@ import nodeService from '~/app/services/node.service'
 import type { NodeResp } from '~/shared/schemas/cluster.schema'
 import { ConnectNodesDialog } from './-partials/connect-nodes-dialog'
 
-export const Route = createFileRoute('/(app)/cluster/nodes/')({
+export const Route = createFileRoute('/(app)/nodes/')({
   component: RouteComponent,
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(clusterStatusQuery)

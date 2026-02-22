@@ -25,7 +25,7 @@ export function StatCard({ title, value, icon: Icon, color, subtitle }: StatCard
         <div className='flex items-start justify-between gap-4'>
           <div className='flex-1 space-y-1'>
             <p className='text-dimmed text-sm font-medium'>{title}</p>
-            <p className='text-foreground text-2xl font-semibold'>{value}</p>
+            <p className='text-foreground text-2xl font-semibold capitalize'>{value}</p>
             <p className='text-dimmed text-sm'>{subtitle}</p>
           </div>
           <IconBox variant={iconBoxSubtleVariant[color]} circle size='lg'>

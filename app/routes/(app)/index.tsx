@@ -112,7 +112,7 @@ function RouteComponent() {
     <div className='mx-auto w-full max-w-7xl space-y-6'>
       <div className='min-w-0 flex-1 space-y-1.5'>
         <Heading level={1} size='lg'>
-          Dashboard
+          Cluster Overview
         </Heading>
         <Text className='text-muted'>
           Welcome back, {whoamiData?.data?.name || 'User'}! Here's an overview of your S3 storage

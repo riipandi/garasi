@@ -179,7 +179,7 @@ function RouteComponent() {
                 Layout Version: {status?.layoutVersion || 0}
               </Text>
             </div>
-            <TextLink render={<Link to='/cluster/nodes' />}>
+            <TextLink render={<Link to='/nodes' />}>
               View All
               <Lucide.ArrowRight className='size-4' />
             </TextLink>
@@ -210,7 +210,7 @@ function RouteComponent() {
                       <td className='px-4 py-3'>
                         <div className='flex items-center gap-2'>
                           <TextLink
-                            render={<Link to='/cluster/nodes/$id' params={{ id: node.id }} />}
+                            render={<Link to='/nodes/$id' params={{ id: node.id }} />}
                             className='font-medium'
                           >
                             {node.hostname || node.id}
