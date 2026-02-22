@@ -1,47 +1,51 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
 
+# Getting the node_id:
+# docker-compose exec garage-1 /garage node id
+# docker-compose exec garage-2 /garage node id
+# docker-compose exec garage-3 /garage node id
+
 name: garasi
+
+x-common: &common
+  networks: ['garasi_network']
+  # extra_hosts: ['host.docker.internal:host-gateway']
+  restart: unless-stopped
 
 services:
   garage-1:
+    <<: *common
     image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
-    restart: unless-stopped
     hostname: garage-node1
     volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data1:/var/lib/garage:rw']
     ports: ['3900:3900', '3901:3901', '3902:3902', '3903:3903', '3904:3904']
-    env_file: '.env.local'
+    env_file: '.env.garage1'
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.
-    # extra_hosts: ['host.docker.internal:host-gateway']
-    networks: ['garasi_network']
 
   garage-2:
+    <<: *common
     image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
-    restart: unless-stopped
     hostname: garage-node2
     volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data2:/var/lib/garage:rw']
     ports: ['4900:3900', '4901:3901', '4902:3902', '4903:3903', '4904:3904']
-    env_file: '.env.local'
+    env_file: '.env.garage2'
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.
-    # extra_hosts: ['host.docker.internal:host-gateway']
-    networks: ['garasi_network']
 
   garage-3:
+    <<: *common
     image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
-    restart: unless-stopped
-    hostname: garage-node2
+    hostname: garage-node3
     volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data3:/var/lib/garage:rw']
     ports: ['5900:3900', '5901:3901', '5902:3902', '5903:3903', '5904:3904']
-    env_file: '.env.local'
+    env_file: '.env.garage3'
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.
-    # extra_hosts: ['host.docker.internal:host-gateway']
-    networks: ['garasi_network']
 
   mailpit:
+    <<: *common
     image: axllent/mailpit:${MAILPIT_VERSION:-latest}
-    restart: unless-stopped
     hostname: mailpit
     volumes: ['mailpit_data:/data:rw']
     ports: ['1025:1025', '8025:8025']
@@ -54,8 +58,6 @@ services:
       MP_SMTP_BIND_ADDR: 0.0.0.0:1025
       MP_SMTP_AUTH_ALLOW_INSECURE: true
       MP_SMTP_AUTH: 'maileruser1:mailerpass1 maileruser2:mailerpass2'
-    # extra_hosts: ['host.docker.internal:host-gateway']
-    networks: ['garasi_network']
 
 volumes:
   garage_data1:

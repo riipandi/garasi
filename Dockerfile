@@ -69,6 +69,7 @@ ARG APP_LOG_EXPANDED=false
 ARG APP_LOG_LEVEL=info
 ARG APP_LOG_TRANSPORT=console
 ARG APP_MODE=production
+ARG APP_SECRET_KEY
 ARG GARAGE_ADMIN_API
 ARG GARAGE_ADMIN_TOKEN
 ARG GARAGE_METRICS_TOKEN
@@ -83,7 +84,6 @@ ARG MAILER_SMTP_PASSWORD
 ARG MAILER_SMTP_SECURE
 ARG PUBLIC_TOKEN_EXPIRY
 ARG S3_MAX_UPLOAD_SIZE
-ARG SECRET_KEY
 
 # Copy the build output files and some necessary system utilities from previous stage.
 # To enhance security, consider avoiding the copying of sysutils.

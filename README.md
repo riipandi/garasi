@@ -113,7 +113,7 @@ This will generate secure values for:
 - `GARAGE_RPC_SECRET` - Secret for Garage RPC communication
 - `GARAGE_ADMIN_TOKEN` - Admin API token for Garage management
 - `GARAGE_METRICS_TOKEN` - Token for accessing Garage metrics
-- `SECRET_KEY` - Encryption key for the application
+- `APP_SECRET_KEY` - Encryption key for the application
 
 See [`.env.example`](./.env.example) for all available configuration options.
 

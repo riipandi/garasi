@@ -17,7 +17,7 @@ set -eu # Exit on error, treat unset variables as an error.
 #   - GARAGE_ADMIN_TOKEN    : Base64 encoded 32-byte random string
 #   - GARAGE_METRICS_TOKEN  : Base64 encoded 32-byte random string
 #   - GARAGE_RPC_SECRET     : Hex encoded 32-byte random string
-#   - SECRET_KEY            : Base64 encoded 48-byte random string
+#   - APP_SECRET_KEY        : Base64 encoded 48-byte random string
 #
 # Requirements:
 #   - OpenSSL must be installed and available in PATH
@@ -144,12 +144,12 @@ if [ "$APPLY_CHANGES" = true ]; then
     update_env_file "GARAGE_ADMIN_TOKEN" "$garage_admin_token"
     update_env_file "GARAGE_METRICS_TOKEN" "$garage_metrics_token"
     update_env_file "GARAGE_RPC_SECRET" "$garage_rpc_secret"
-    update_env_file "SECRET_KEY" "$secret_key"
+    update_env_file "APP_SECRET_KEY" "$secret_key"
     printf "\n"
     printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage_admin_token"
     printf "GARAGE_METRICS_TOKEN=%s\n" "$garage_metrics_token"
     printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
-    printf "SECRET_KEY=%s\n" "$secret_key"
+    printf "APP_SECRET_KEY=%s\n" "$secret_key"
     printf "\n${GREEN}Environment secrets updated successfully${NC}\n"
     printf "\n"
 else
@@ -159,6 +159,6 @@ else
     printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage_admin_token"
     printf "GARAGE_METRICS_TOKEN=%s\n" "$garage_metrics_token"
     printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
-    printf "SECRET_KEY=%s\n" "$secret_key"
+    printf "APP_SECRET_KEY=%s\n" "$secret_key"
     printf "\n"
 fi

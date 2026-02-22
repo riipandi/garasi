@@ -27,6 +27,7 @@ export const protectedEnv = {
   ...publicEnv,
   APP_LOG_EXPANDED: setEnv(Bun.env.APP_LOG_EXPANDED, false),
   APP_LOG_TRANSPORT: setEnv<AppLogTransport>(Bun.env.APP_LOG_TRANSPORT, 'console'),
+  APP_SECRET_KEY: setEnv(Bun.env.APP_SECRET_KEY),
   GARAGE_ADMIN_API: setEnv(Bun.env.GARAGE_ADMIN_API, 'http://localhost:3903'),
   GARAGE_ADMIN_TOKEN: setEnv(Bun.env.GARAGE_ADMIN_TOKEN),
   GARAGE_METRICS_TOKEN: setEnv(Bun.env.GARAGE_METRICS_TOKEN),
@@ -34,7 +35,6 @@ export const protectedEnv = {
   GARAGE_RPC_SECRET: setEnv(Bun.env.GARAGE_RPC_SECRET),
   GARAGE_DEFAULT_ZONE_REDUNDANCY: setEnv(Bun.env.GARAGE_DEFAULT_ZONE_REDUNDANCY, 1),
   GARAGE_DEFAULT_CAPACITY: setEnv(Bun.env.GARAGE_DEFAULT_CAPACITY, 10_000_000_000), // 10GB
-  SECRET_KEY: setEnv(Bun.env.SECRET_KEY),
   MAILER_FROM_EMAIL: setEnv(Bun.env.MAILER_FROM_EMAIL),
   MAILER_FROM_NAME: setEnv(Bun.env.MAILER_FROM_NAME),
   MAILER_SMTP_HOST: setEnv(Bun.env.MAILER_SMTP_HOST),

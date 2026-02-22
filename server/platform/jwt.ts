@@ -57,10 +57,10 @@ export async function generateToken(
   sessionId: string,
   userAgent: string | IResult | null
 ): Promise<{ token: string; tokenExpiry: number }> {
-  const secretKey = protectedEnv.SECRET_KEY
+  const secretKey = protectedEnv.APP_SECRET_KEY
 
   if (!secretKey) {
-    throw new Error('SECRET_KEY environment variable is not set')
+    throw new Error('APP_SECRET_KEY environment variable is not set')
   }
 
   const secret = new TextEncoder().encode(secretKey)
@@ -97,10 +97,10 @@ export async function generateToken(
  * @throws HTTPError if token is invalid or expired
  */
 export async function verifyToken(token: string): Promise<JWTClaims> {
-  const secretKey = protectedEnv.SECRET_KEY
+  const secretKey = protectedEnv.APP_SECRET_KEY
 
   if (!secretKey) {
-    throw new Error('SECRET_KEY environment variable is not set')
+    throw new Error('APP_SECRET_KEY environment variable is not set')
   }
 
   const secret = new TextEncoder().encode(secretKey)
