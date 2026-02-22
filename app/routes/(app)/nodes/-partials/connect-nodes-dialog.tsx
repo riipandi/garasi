@@ -13,7 +13,9 @@ import {
   DialogTitle
 } from '~/app/components/dialog'
 import { Field, FieldLabel } from '~/app/components/field'
+import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
+import { Separator } from '~/app/components/separator'
 import { Text } from '~/app/components/typography'
 import clusterService from '~/app/services/cluster.service'
 
@@ -113,86 +115,104 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
     }
   }
 
-  if (!isOpen) return null
+  React.useEffect(() => {
+    if (isOpen) {
+      setNodes([''])
+      setErrors({})
+    }
+  }, [isOpen])
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogPopup>
+      <DialogPopup className='w-lg'>
         <DialogHeader>
-          <div className='flex items-center gap-3'>
-            <div className='bg-primary/15 flex h-10 w-10 shrink-0 items-center justify-center rounded-full'>
-              <Lucide.Plus className='text-primary size-5' />
-            </div>
-            <div>
-              <DialogTitle>Connect Cluster Nodes</DialogTitle>
-              <Text className='text-muted text-sm'>Add new nodes to your Garage cluster</Text>
-            </div>
-          </div>
+          <IconBox variant='primary' size='sm'>
+            <Lucide.Network className='size-4' />
+          </IconBox>
+          <DialogTitle>Connect Cluster Nodes</DialogTitle>
+          <DialogClose className='ml-auto'>
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
+          </DialogClose>
         </DialogHeader>
-        <DialogBody>
+        <DialogBody className='border-border mt-3 border-t pt-4'>
           <div className='border-primary/30 bg-primary/10 mb-4 rounded-lg border p-3'>
             <div className='flex items-start gap-2'>
-              <Lucide.Info className='text-primary mt-0.5 size-4 shrink-0' />
-              <Text className='text-sm'>
+              <Lucide.Info className='text-primary mt-1.5 size-4 shrink-0' />
+              <Text className='text-sm leading-relaxed'>
                 Enter node addresses in the format:{' '}
-                <Badge variant='primary'>node_id@net_address</Badge>
+                <Badge variant='primary' size='sm'>
+                  node_id@net_address
+                </Badge>
                 <br />
-                Example: <Badge variant='primary'>node1@192.168.1.10:3901</Badge>
+                Example:{' '}
+                <Badge variant='primary' size='sm'>
+                  node1@192.168.1.10:3901
+                </Badge>
               </Text>
             </div>
           </div>
 
-          <div className='space-y-3'>
+          <div className='mt-4 space-y-3'>
             {nodes.map((node, index) => (
               <div key={nodeIds[index] || `node-input-${index}`} className='flex items-start gap-2'>
                 <div className='flex-1'>
                   <Field>
-                    <FieldLabel htmlFor={`node-${index}`}>Node Address</FieldLabel>
-                    <Input
-                      id={`node-${index}`}
-                      value={node}
-                      onChange={(e) => handleNodeChange(index, e.target.value)}
-                      placeholder='node_id@net_address'
-                      className={errors[node] ? 'border-danger ring-danger' : ''}
-                      disabled={connectMutation.isPending}
-                    />
+                    <FieldLabel htmlFor={`node-${index}`} hidden>
+                      Node Address
+                    </FieldLabel>
+                    <div className='inline-flex gap-3'>
+                      <Input
+                        id={`node-${index}`}
+                        value={node}
+                        onChange={(e) => handleNodeChange(index, e.target.value)}
+                        placeholder='node_id@net_address'
+                        className={errors[node] ? 'border-danger ring-danger' : ''}
+                        disabled={connectMutation.isPending}
+                      />
+                      {nodes.length > 1 && (
+                        <Button
+                          variant='outline'
+                          onClick={() => handleRemoveNode(index)}
+                          disabled={connectMutation.isPending}
+                        >
+                          <Lucide.X className='size-4' />
+                        </Button>
+                      )}
+                    </div>
                   </Field>
                   {errors[node] && <Text className='text-danger mt-1 text-xs'>{errors[node]}</Text>}
                 </div>
-                {nodes.length > 1 && (
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => handleRemoveNode(index)}
-                    disabled={connectMutation.isPending}
-                  >
-                    <Lucide.X className='size-4' />
-                  </Button>
-                )}
               </div>
             ))}
           </div>
-
+          <Separator className='my-6' />
           <Button
             variant='outline'
             block
             onClick={handleAddNode}
             disabled={connectMutation.isPending}
-            className='mt-3 border-dashed'
           >
             <Lucide.Plus className='size-4' />
             Add Another Node
           </Button>
         </DialogBody>
         <DialogFooter>
-          <DialogClose render={<Button variant='outline'>Cancel</Button>} />
+          <DialogClose block>Cancel</DialogClose>
           <Button
+            type='button'
             variant='primary'
             onClick={handleConnect}
             disabled={connectMutation.isPending || nodes.every((n) => !n.trim())}
-            progress={connectMutation.isPending}
+            block
           >
-            {connectMutation.isPending ? 'Connecting...' : 'Connect Nodes'}
+            {connectMutation.isPending ? (
+              <span className='flex items-center gap-2'>
+                <Lucide.Loader2 className='size-4 animate-spin' />
+                Connecting...
+              </span>
+            ) : (
+              'Connect Nodes'
+            )}
           </Button>
         </DialogFooter>
 
