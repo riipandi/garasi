@@ -3,7 +3,6 @@ import * as Lucide from 'lucide-react'
 import * as React from 'react'
 import { z } from 'zod'
 import { Button } from '~/app/components/button'
-import { Checkbox } from '~/app/components/checkbox'
 import {
   Dialog,
   DialogBody,
@@ -17,7 +16,6 @@ import { Field, FieldError, FieldLabel } from '~/app/components/field'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Spinner } from '~/app/components/spinner'
-import { Text } from '~/app/components/typography'
 import type { CreateBucketRequest } from '~/shared/schemas/bucket.schema'
 
 interface BucketCreateProps {
@@ -37,8 +35,6 @@ const createBucketSchema = z.object({
 })
 
 export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: BucketCreateProps) {
-  const [permissions, setPermissions] = React.useState({ owner: false, read: false, write: false })
-
   const form = useForm({
     defaultValues: {
       globalAlias: ''
@@ -69,7 +65,6 @@ export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: Bucket
   React.useEffect(() => {
     if (isOpen) {
       form.reset()
-      setPermissions({ owner: true, read: true, write: true })
     }
   }, [isOpen, form])
 
@@ -77,7 +72,7 @@ export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: Bucket
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogPopup>
+      <DialogPopup className='w-sm'>
         <DialogHeader>
           <IconBox variant='primary' size='sm'>
             <Lucide.Box className='size-4' />
@@ -88,7 +83,7 @@ export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: Bucket
           </DialogClose>
         </DialogHeader>
 
-        <DialogBody className='border-border mt-3 border-t pt-4'>
+        <DialogBody className='border-border mt-3 border-t pt-3'>
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -116,44 +111,6 @@ export function BucketCreate({ isOpen, onClose, onSubmit, isSubmitting }: Bucket
                 </Field>
               )}
             </form.Field>
-
-            <div className='border-border bg-muted/5 mt-4 rounded-lg border p-4'>
-              <Text className='text-muted-foreground mb-3 block text-xs font-semibold tracking-wider uppercase'>
-                Default Permissions
-              </Text>
-              <div className='grid grid-cols-3 gap-2'>
-                <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
-                  <Checkbox
-                    id='owner'
-                    checked={permissions.owner}
-                    onCheckedChange={(checked) =>
-                      setPermissions({ ...permissions, owner: checked as boolean })
-                    }
-                  />
-                  <span className='text-sm font-medium'>Owner</span>
-                </div>
-                <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
-                  <Checkbox
-                    id='read'
-                    checked={permissions.read}
-                    onCheckedChange={(checked) =>
-                      setPermissions({ ...permissions, read: checked as boolean })
-                    }
-                  />
-                  <span className='text-sm font-medium'>Read</span>
-                </div>
-                <div className='border-border bg-background hover:border-primary/50 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2.5 transition-all'>
-                  <Checkbox
-                    id='write'
-                    checked={permissions.write}
-                    onCheckedChange={(checked) =>
-                      setPermissions({ ...permissions, write: checked as boolean })
-                    }
-                  />
-                  <span className='text-sm font-medium'>Write</span>
-                </div>
-              </div>
-            </div>
           </form>
         </DialogBody>
 
