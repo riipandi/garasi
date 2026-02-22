@@ -427,7 +427,7 @@ export function ObjectBrowser({
                               : 'opacity-100 group-hover:opacity-0'
                           )}
                         >
-                          <IconBox variant='info' size='sm' className='p-0'>
+                          <IconBox variant='primary-subtle' size='sm' className='p-0'>
                             <Lucide.Folder className='size-4' />
                           </IconBox>
                         </div>
@@ -591,7 +591,7 @@ export function ObjectBrowser({
         <div className='border-border bg-dimmed/10 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           {!hasAccessKeys ? (
             <>
-              <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+              <IconBox variant='primary-subtle' size='lg' circle className='mb-4'>
                 <Lucide.Lock className='size-16' />
               </IconBox>
               <div className='space-y-1'>
@@ -603,7 +603,7 @@ export function ObjectBrowser({
             </>
           ) : (
             <>
-              <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
+              <IconBox variant='primary-subtle' size='lg' circle className='mb-4'>
                 <Lucide.FolderOpen className='size-16' />
               </IconBox>
               <div className='space-y-1'>

@@ -28,7 +28,7 @@
     "compose:down": "docker compose -f compose.yaml down --remove-orphans",
     "cleanup": "pnpm dlx del-cli .{nitro,output,tanstack} bun.lock node_modules storybook-static",
     "update-deps": "npm-check-updates --configFileName .ncurc.json",
-    "genkey": "dotenv -e .env.local -- sh ./scripts/prepare.sh",
+    "setup-dev": "dotenv -e .env.local -- sh ./scripts/setup-dev.sh",
     "garage:cmd": "dotenv -e .env.local -- sh ./scripts/garage.sh",
     "garage": "docker-compose exec garage /garage",
     "storybook:deps": "playwright install chromium --with-deps",

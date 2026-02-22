@@ -43,6 +43,21 @@ services:
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.
 
+  caddy:
+    <<: *common
+    image: caddy:${CADDY_VERSION:-2.8}
+    hostname: caddy
+    ports: ['80:80', '443:443', '8443:8443']
+    volumes: ['./storage/certs:/etc/caddy/certs:ro']
+    configs:
+      - source: caddy_config
+        target: /etc/caddy/Caddyfile
+    environment:
+      CADDY_HTTP_PORT: 80
+      CADDY_HTTPS_PORT: 8443
+    depends_on:
+      garage-1: { condition: service_started }
+
   mailpit:
     <<: *common
     image: axllent/mailpit:${MAILPIT_VERSION:-latest}
@@ -73,3 +88,14 @@ networks:
   garasi_network:
     name: garasi_network
     driver: bridge
+
+configs:
+  caddy_config:
+    content: |
+      {
+        admin off
+      }
+      :443 {
+        tls /etc/caddy/certs/localhost_crt.pem /etc/caddy/certs/localhost_key.pem
+        reverse_proxy garage-node1:39001
+      }

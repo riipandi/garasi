@@ -10,8 +10,8 @@ set -eu # Exit on error, treat unset variables as an error.
 #   the console or directly update the .env.local and .env.garage* files.
 #
 # Usage:
-#   ./scripts/prepare.sh          - Generate and display secrets only
-#   ./scripts/prepare.sh --apply  - Generate and apply to .env.* files
+#   ./scripts/setup-dev.sh          - Generate and display secrets only
+#   ./scripts/setup-dev.sh --apply  - Generate and apply to .env.* files
 #
 # Generated Secrets:
 #   - GARAGE_ADMIN_TOKEN    : Base64 encoded 32-byte random string
@@ -24,6 +24,10 @@ set -eu # Exit on error, treat unset variables as an error.
 #   - .env.local file must exist when using --apply flag
 #
 #------------------------------------------------------------------------------
+
+# Generate local SSL certificate with mkcert
+# mkdir -p storage/certs
+# mkcert -cert-file storage/certs/localhost_crt.pem -key-file storage/certs/localhost_key.pem localhost "*.local" 127.0.0.1 ::1
 
 # Colors
 RED='\033[0;31m'
@@ -82,8 +86,8 @@ for arg in "$@"; do
         --help|-h)
             printf "${BOLD}${CYAN}Garasi Secrets Generator${NC}\n\n"
             printf "Usage:\n"
-            printf "  ./scripts/prepare.sh          - Generate and display secrets\n"
-            printf "  ./scripts/prepare.sh --apply  - Generate and apply to .env.local and .env.garage*\n\n"
+            printf "  ./scripts/setup-dev.sh          - Generate and display secrets\n"
+            printf "  ./scripts/setup-dev.sh --apply  - Generate and apply to .env.local and .env.garage*\n\n"
             printf "Options:\n"
             printf "  --apply     Update .env.local and .env.garage* files with new secrets\n"
             printf "  --help, -h  Show this help message\n"

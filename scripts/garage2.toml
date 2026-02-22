@@ -31,12 +31,12 @@ rpc_bind_outgoing = false
 
 [s3_api]
 api_bind_addr = "0.0.0.0:39002"
-root_domain = ".s3.localhost"
+root_domain = ".local"
 s3_region = "auto"
 
 [s3_web]
 bind_addr = "0.0.0.0:39022"
-root_domain = ".localhost"
+root_domain = ".local"
 index = "index.html"
 add_host_to_metrics = true
 

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_sB7LfExMVs
 createdAt: 2026-01-19T20:20:51.568269
-updatedAt: 2026-01-24T05:05:54.107166
+updatedAt: 2026-02-22T21:48:51.464621
 workspaceId: wk_YrPa97TLKc
 folderId: fl_7Ew2sdp7wt
 authentication: {}
@@ -17,7 +17,7 @@ name: Inspect Object
 sortPriority: 4000.0
 url: ${[ baseURL ]}/api/bucket/:id/inspect-object?key=dummy
 urlParameters:
-  - enabled: true
-    name: :id
-    value: ${[ response.body.path(request='rq_CbPTEnV8Er', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhWzBdLmlk') ]}
-    id: fS99QC55V0
+- enabled: true
+  name: :id
+  value: ${[ response.body.path(request='rq_CbPTEnV8Er', behavior='always', ttl='0', result='first', join=b64'LCA', path=b64'JC5kYXRhWzBdLmlk') ]}
+  id: fS99QC55V0
