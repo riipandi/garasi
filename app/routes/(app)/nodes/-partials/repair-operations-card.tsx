@@ -171,12 +171,12 @@ export function RepairOperationsCard({
                     </div>
                   </div>
                   {status === 'running' ? (
-                    <Badge variant='warning'>
+                    <Badge size='sm' variant='warning'>
                       <Lucide.Loader2 className='size-3.5 animate-spin' />
                       Running...
                     </Badge>
                   ) : status === 'success' ? (
-                    <Badge variant='success'>
+                    <Badge size='sm' variant='success'>
                       <Lucide.CheckCircle2 className='size-3.5' />
                       Success
                     </Badge>

@@ -25,25 +25,25 @@ metadata_fsync = false
 replication_factor = 1
 use_local_tz = false
 
-rpc_bind_addr = "0.0.0.0:3901"
-rpc_public_addr = "127.0.0.1:3901"
+rpc_bind_addr = "0.0.0.0:39013"
+rpc_public_addr = "garage-node3:39013"
 rpc_bind_outgoing = false
 
 [s3_api]
-api_bind_addr = "0.0.0.0:3900"
+api_bind_addr = "0.0.0.0:39003"
 root_domain = ".s3.localhost"
 s3_region = "auto"
 
 [s3_web]
-bind_addr = "0.0.0.0:3902"
+bind_addr = "0.0.0.0:39023"
 root_domain = ".localhost"
 index = "index.html"
 add_host_to_metrics = true
 
 [k2v_api]
-api_bind_addr = "0.0.0.0:3904"
+api_bind_addr = "0.0.0.0:39043"
 
 [admin]
-api_bind_addr = "0.0.0.0:3903"
+api_bind_addr = "0.0.0.0:39033"
 metrics_require_token = false
 # trace_sink = "http://otel-lgtm:4317"

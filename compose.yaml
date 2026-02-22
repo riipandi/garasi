@@ -17,8 +17,8 @@ services:
     <<: *common
     image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
     hostname: garage-node1
-    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data1:/var/lib/garage:rw']
-    ports: ['3900:3900', '3901:3901', '3902:3902', '3903:3903', '3904:3904']
+    volumes: ['./scripts/garage1.toml:/etc/garage.toml:ro', 'garage_data1:/var/lib/garage:rw']
+    ports: ['39001:39001', '39011:39011', '39021:39021', '39031:39031', '39041:39041']
     env_file: '.env.garage1'
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.
@@ -27,8 +27,8 @@ services:
     <<: *common
     image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
     hostname: garage-node2
-    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data2:/var/lib/garage:rw']
-    ports: ['4900:3900', '4901:3901', '4902:3902', '4903:3903', '4904:3904']
+    volumes: ['./scripts/garage2.toml:/etc/garage.toml:ro', 'garage_data2:/var/lib/garage:rw']
+    ports: ['39002:39002', '39012:39012', '39022:39022', '39032:39032', '39042:39042']
     env_file: '.env.garage2'
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.
@@ -37,8 +37,8 @@ services:
     <<: *common
     image: dxflrs/garage:${GARAGE_VERSION:-v2.1.0}
     hostname: garage-node3
-    volumes: ['./scripts/garage.toml:/etc/garage.toml:ro', 'garage_data3:/var/lib/garage:rw']
-    ports: ['5900:3900', '5901:3901', '5902:3902', '5903:3903', '5904:3904']
+    volumes: ['./scripts/garage3.toml:/etc/garage.toml:ro', 'garage_data3:/var/lib/garage:rw']
+    ports: ['39003:39003', '39013:39013', '39023:39023', '39033:39033', '39043:39043']
     env_file: '.env.garage3'
     environment:
       RUST_LOG: garage=info # error, warn, info (default), debug, trace.

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_Wn2QQdBbKr
 createdAt: 2026-01-19T20:16:56.726601
-updatedAt: 2026-02-22T16:35:51.401398
+updatedAt: 2026-02-22T17:21:41.951659
 workspaceId: wk_YrPa97TLKc
 folderId: fl_8Fc9gwrsGC
 authentication: {}
@@ -11,9 +11,9 @@ body:
   text: |-
     {
       "nodes": [
-        "node_id1@garage-node1:3901",
-        "node_id2@garage-node2:3901",
-        "node_id3@garage-node3:3901"
+        "0dfe7dd0c41c52e2e88ef44d1007b319302db651289896553b4133572479255e@garage-node1:39011",
+        "a9c403c12ff11c493ab6cf82349c9b3449bb825769579b5164e07cfcc452807d@garage-node2:39012",
+        "89bc7228da1ce05459927c152e497f84c76e506eb204922c0d48e6459d829d04@garage-node3:39013"
       ]
     }
 bodyType: application/json

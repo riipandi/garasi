@@ -7,11 +7,11 @@ set -eu # Exit on error, treat unset variables as an error.
 # Description:
 #   This script generates cryptographically secure random secrets for the
 #   Garasi application using OpenSSL. It can either output the secrets to
-#   the console or directly update the .env.local file.
+#   the console or directly update the .env.local and .env.garage* files.
 #
 # Usage:
 #   ./scripts/prepare.sh          - Generate and display secrets only
-#   ./scripts/prepare.sh --apply  - Generate and apply to .env.local file
+#   ./scripts/prepare.sh --apply  - Generate and apply to .env.* files
 #
 # Generated Secrets:
 #   - GARAGE_ADMIN_TOKEN    : Base64 encoded 32-byte random string
@@ -83,9 +83,9 @@ for arg in "$@"; do
             printf "${BOLD}${CYAN}Garasi Secrets Generator${NC}\n\n"
             printf "Usage:\n"
             printf "  ./scripts/prepare.sh          - Generate and display secrets\n"
-            printf "  ./scripts/prepare.sh --apply  - Generate and apply to .env.local\n\n"
+            printf "  ./scripts/prepare.sh --apply  - Generate and apply to .env.local and .env.garage*\n\n"
             printf "Options:\n"
-            printf "  --apply     Update .env.local file with new secrets\n"
+            printf "  --apply     Update .env.local and .env.garage* files with new secrets\n"
             printf "  --help, -h  Show this help message\n"
             exit 0
             ;;
@@ -100,65 +100,134 @@ done
 #------------------------------------------------------------------------------
 
 # Generate cryptographically secure random secrets using OpenSSL
-garage_admin_token=$(openssl rand -base64 32)   # 32 bytes → 44 chars base64
-garage_metrics_token=$(openssl rand -base64 32) # 32 bytes → 44 chars base64
-garage_rpc_secret=$(openssl rand -hex 32)       # 32 bytes → 64 chars hex
-secret_key=$(openssl rand -base64 48)           # 48 bytes → 64 chars base64
+# Garage1 secrets
+garage1_admin_token=$(openssl rand -base64 32)
+garage1_metrics_token=$(openssl rand -base64 32)
+
+# Garage2 secrets
+garage2_admin_token=$(openssl rand -base64 32)
+garage2_metrics_token=$(openssl rand -base64 32)
+
+# Garage3 secrets
+garage3_admin_token=$(openssl rand -base64 32)
+garage3_metrics_token=$(openssl rand -base64 32)
+
+# RPC secret (shared across all nodes)
+garage_rpc_secret=$(openssl rand -hex 32)
+
+# App secret key
+secret_key=$(openssl rand -base64 48)
 
 #------------------------------------------------------------------------------
 # Helper Functions
 #------------------------------------------------------------------------------
 
-# Update a specific key-value pair in .env.local file
+# Update a specific key-value pair in .env file
 # Args:
 #   $1 - Environment variable key (e.g., "GARAGE_ADMIN_TOKEN")
 #   $2 - New value to set
+#   $3 - File path to update
 # Returns:
 #   0 on success, non-zero on failure
 update_env_file() {
     key="$1"
     value="$2"
+    env_file="$3"
     tmp="$(mktemp)"
     # If key exists, replace the whole line; otherwise append at end.
-    if grep -qE "^${key}=" "$ENV_FILE"; then
+    if grep -qE "^${key}=" "$env_file"; then
         # Use awk to safely replace without interpreting value
         awk -v k="$key" -v v="$value" '
             BEGIN{FS=OFS="="}
             $1==k{$0=k"="v; seen=1}
             {print}
             END{if(!seen) print k"="v}
-        ' "$ENV_FILE" > "$tmp"
+        ' "$env_file" > "$tmp"
     else
         # append
-        cp "$ENV_FILE" "$tmp"
+        cp "$env_file" "$tmp"
         printf "%s=%s\n" "$key" "$value" >> "$tmp"
     fi
-    mv "$tmp" "$ENV_FILE"
+    mv "$tmp" "$env_file"
+}
+
+# Create or update garage env file
+# Args:
+#   $1 - File path to create/update
+#   $2 - admin_token
+#   $3 - metrics_token
+#   $4 - rpc_secret
+create_garage_file() {
+    env_file="$1"
+    admin_token="$2"
+    metrics_token="$3"
+    rpc_secret="$4"
+    if [ ! -f "$env_file" ]; then
+        printf "Creating %s...\n" "$env_file"
+        cat > "$env_file" << EOF
+GARAGE_ADMIN_TOKEN=$admin_token
+GARAGE_METRICS_TOKEN=$metrics_token
+GARAGE_RPC_SECRET=$rpc_secret
+EOF
+    else
+        update_env_file "GARAGE_ADMIN_TOKEN" "$admin_token" "$env_file"
+        update_env_file "GARAGE_METRICS_TOKEN" "$metrics_token" "$env_file"
+        update_env_file "GARAGE_RPC_SECRET" "$rpc_secret" "$env_file"
+    fi
 }
 
 # Apply changes or output environment variables
 if [ "$APPLY_CHANGES" = true ]; then
     # File existence already validated in prerequisites check
+    # Updating .env.local file, using .env.garage1 for GARAGE_* values
+    update_env_file "GARAGE_ADMIN_TOKEN" "$garage1_admin_token" "$ENV_FILE"
+    update_env_file "GARAGE_METRICS_TOKEN" "$garage1_metrics_token" "$ENV_FILE"
+    update_env_file "GARAGE_RPC_SECRET" "$garage_rpc_secret" "$ENV_FILE"
+    update_env_file "APP_SECRET_KEY" "$secret_key" "$ENV_FILE"
+
+    # Updating .env.garage* files
+    create_garage_file "$ROOT_DIR/.env.garage1" "$garage1_admin_token" "$garage1_metrics_token" "$garage_rpc_secret"
+    create_garage_file "$ROOT_DIR/.env.garage2" "$garage2_admin_token" "$garage2_metrics_token" "$garage_rpc_secret"
+    create_garage_file "$ROOT_DIR/.env.garage3" "$garage3_admin_token" "$garage3_metrics_token" "$garage_rpc_secret"
+
     printf "\n"
-    printf "${BOLD}${CYAN}Updating .env.local file...${NC}\n"
-    update_env_file "GARAGE_ADMIN_TOKEN" "$garage_admin_token"
-    update_env_file "GARAGE_METRICS_TOKEN" "$garage_metrics_token"
-    update_env_file "GARAGE_RPC_SECRET" "$garage_rpc_secret"
-    update_env_file "APP_SECRET_KEY" "$secret_key"
-    printf "\n"
-    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage_admin_token"
-    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage_metrics_token"
+    printf "${BOLD}${CYAN}Generated Secrets for Garage1:${NC}\n"
+    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage1_admin_token"
+    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage1_metrics_token"
     printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
+    printf "\n"
+    printf "${BOLD}${CYAN}Generated Secrets for Garage2:${NC}\n"
+    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage2_admin_token"
+    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage2_metrics_token"
+    printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
+    printf "\n"
+    printf "${BOLD}${CYAN}Generated Secrets for Garage3:${NC}\n"
+    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage3_admin_token"
+    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage3_metrics_token"
+    printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
+    printf "\n"
+    printf "${BOLD}${CYAN}Application Secrets:${NC}\n"
     printf "APP_SECRET_KEY=%s\n" "$secret_key"
-    printf "\n${GREEN}Environment secrets updated successfully${NC}\n"
     printf "\n"
 else
     # Output environment variables
     printf "\n"
-    printf "${BOLD}${CYAN}Application Secrets:${NC}\n"
-    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage_admin_token"
-    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage_metrics_token"
+    printf "${BOLD}${CYAN}Generated Secrets for Garage1:${NC}\n"
+    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage1_admin_token"
+    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage1_metrics_token"
     printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
+    printf "\n"
+    printf "${BOLD}${CYAN}Generated Secrets for Garage2:${NC}\n"
+    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage2_admin_token"
+    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage2_metrics_token"
+    printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
+    printf "\n"
+    printf "${BOLD}${CYAN}Generated Secrets for Garage3:${NC}\n"
+    printf "GARAGE_ADMIN_TOKEN=%s\n" "$garage3_admin_token"
+    printf "GARAGE_METRICS_TOKEN=%s\n" "$garage3_metrics_token"
+    printf "GARAGE_RPC_SECRET=%s\n" "$garage_rpc_secret"
+    printf "\n"
+    printf "${BOLD}${CYAN}Application Secrets:${NC}\n"
     printf "APP_SECRET_KEY=%s\n" "$secret_key"
     printf "\n"
 fi
