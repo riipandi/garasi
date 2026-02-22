@@ -11,6 +11,9 @@ import {
   DialogTitle
 } from '~/app/components/dialog'
 import { IconBox } from '~/app/components/icon-box'
+import { Item, ItemContent, ItemMeta, ItemTitle } from '~/app/components/item'
+import { ScrollArea } from '~/app/components/scroll-area'
+import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { clx } from '~/app/utils'
 
@@ -82,9 +85,13 @@ export function UploadFileDialog({
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
+  const handleClearAll = () => {
+    setSelectedFiles([])
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogPopup>
+      <DialogPopup className='w-xl'>
         <DialogHeader>
           <IconBox variant='success' size='sm'>
             <Lucide.UploadCloud className='size-4' />
@@ -95,7 +102,7 @@ export function UploadFileDialog({
           </DialogClose>
         </DialogHeader>
 
-        <DialogBody className='border-border mt-3 border-t pt-0'>
+        <DialogBody className='border-border mt-3 border-t pt-1'>
           <form
             className={clx('space-y-4', isSubmitting ? 'animate-pulse' : '')}
             onSubmit={handleSubmit}
@@ -105,66 +112,81 @@ export function UploadFileDialog({
             onDrop={handleDrop}
           >
             <div className='space-y-4'>
-              <div
-                className={clx(
-                  'bg-muted/5 relative mt-4 rounded-lg border-2 border-dashed px-6 py-8 text-center transition-all',
-                  dragActive ? 'border-primary bg-primary/10' : 'border-border'
-                )}
-              >
-                <Lucide.UploadCloud
-                  className={clx(
-                    'mx-auto size-12 transition-all',
-                    dragActive ? 'text-primary' : 'text-muted-foreground'
-                  )}
-                />
-                <Text className='mt-2 text-sm font-medium'>Click to upload or drag and drop</Text>
-                <Text className='text-muted-foreground mt-1 text-xs'>
-                  Any file type is supported
-                </Text>
-                <input
-                  type='file'
-                  multiple
-                  onChange={handleFileSelect}
-                  className='absolute inset-0 size-full cursor-pointer opacity-0'
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              {selectedFiles.length > 0 && (
-                <div className='border-border bg-muted/5 mt-4 rounded-lg border p-3'>
-                  <div className='mb-3 flex items-center justify-between'>
-                    <Text className='text-sm font-medium'>
+              {selectedFiles.length > 0 ? (
+                <div className='border-border bg-muted/5 mt-4 rounded-lg border'>
+                  <div className='border-border flex items-center justify-between border-b py-2 pr-3 pl-4'>
+                    <Text className='text-xs font-medium'>
                       {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
                     </Text>
+                    <Button variant='plain' size='xs' className='text-xs' onClick={handleClearAll}>
+                      Clear All
+                    </Button>
                   </div>
-                  <div className='space-y-2'>
-                    {selectedFiles.map((file, index) => {
-                      const fileKey = `${file.name}-${file.size}-${index}`
-                      return (
-                        <div
-                          key={fileKey}
-                          className='flex items-center justify-between gap-3 text-sm'
-                        >
-                          <div className='min-w-0 flex-1'>
-                            <Text className='block truncate'>{file.name}</Text>
-                            <Text className='text-muted-foreground text-xs'>
-                              {formatFileSize(file.size)}
-                            </Text>
-                          </div>
-                          <Button
-                            type='button'
+                  <ScrollArea
+                    scrollbar='vertical'
+                    className={clx(selectedFiles.length > 3 && 'h-80 pr-2')}
+                  >
+                    <Stack className='p-3' spacing='sm'>
+                      {selectedFiles.map((file, index) => {
+                        const fileKey = `${file.name}-${file.size}-${index}`
+                        return (
+                          <Item
+                            key={fileKey}
                             variant='plain'
-                            size='xs-icon'
-                            onClick={() => handleRemoveFile(index)}
-                            disabled={isSubmitting}
-                            className='text-dimmed hover:text-danger shrink-0'
+                            className='border-border bg-background items-start justify-between rounded-lg border'
+                            size='sm'
                           >
-                            <Lucide.X className='size-4' />
-                          </Button>
-                        </div>
-                      )
-                    })}
-                  </div>
+                            <div className='flex w-full items-start gap-1'>
+                              <div className='flex size-8 items-center justify-center rounded'>
+                                <Lucide.FileText className='text-primary size-5' />
+                              </div>
+                              <ItemContent className='w-full px-1'>
+                                <ItemTitle className='text-xs'>{file.name}</ItemTitle>
+                                <ItemMeta className='mt-1 text-xs'>
+                                  {formatFileSize(file.size)}
+                                </ItemMeta>
+                              </ItemContent>
+                            </div>
+                            <Button
+                              type='button'
+                              variant='plain'
+                              size='xs-icon'
+                              onClick={() => handleRemoveFile(index)}
+                              disabled={isSubmitting}
+                              className='text-dimmed hover:text-danger'
+                            >
+                              <Lucide.X className='size-3.5' />
+                            </Button>
+                          </Item>
+                        )
+                      })}
+                    </Stack>
+                  </ScrollArea>
+                </div>
+              ) : (
+                <div
+                  className={clx(
+                    'bg-muted/5 relative mt-4 rounded-lg border-2 border-dashed px-6 py-8 text-center transition-all',
+                    dragActive ? 'border-primary bg-primary/10' : 'border-border'
+                  )}
+                >
+                  <Lucide.UploadCloud
+                    className={clx(
+                      'mx-auto size-12 transition-all',
+                      dragActive ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  />
+                  <Text className='mt-2 text-sm font-medium'>Click to upload or drag and drop</Text>
+                  <Text className='text-muted-foreground mt-1 text-xs'>
+                    Any file type is supported
+                  </Text>
+                  <input
+                    type='file'
+                    multiple
+                    onChange={handleFileSelect}
+                    className='absolute inset-0 size-full cursor-pointer opacity-0'
+                    disabled={isSubmitting}
+                  />
                 </div>
               )}
             </div>
