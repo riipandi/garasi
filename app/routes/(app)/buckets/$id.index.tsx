@@ -104,7 +104,7 @@ function RouteComponent() {
         <div className='flex items-start gap-4'>
           <Link
             to='/buckets'
-            className='rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+            className='hover:bg-dimmed/10 rounded-md p-2 text-gray-500 transition-colors hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
           >
             <Lucide.ArrowLeft className='size-5' />
           </Link>
@@ -146,10 +146,10 @@ function RouteComponent() {
             <>
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={`skeleton-${i}`} className='flex items-center gap-3'>
-                  <div className='size-10 animate-pulse rounded-full bg-gray-100' />
+                  <div className='bg-dimmed/10 size-10 animate-pulse rounded-full' />
                   <div className='min-w-0 flex-1 space-y-2'>
-                    <div className='h-3 w-20 animate-pulse rounded bg-gray-100' />
-                    <div className='h-4 w-24 animate-pulse rounded bg-gray-100' />
+                    <div className='bg-dimmed/10 h-3 w-20 animate-pulse rounded' />
+                    <div className='bg-dimmed/10 h-4 w-24 animate-pulse rounded' />
                   </div>
                 </div>
               ))}
@@ -228,18 +228,18 @@ function PageFallback() {
       <div className='flex items-start gap-4'>
         <div className='size-9'></div>
         <div className='min-w-0 flex-1 space-y-4'>
-          <div className='flex h-8 w-64 animate-pulse rounded bg-gray-100' />
-          <div className='flex h-4 w-48 animate-pulse rounded bg-gray-100' />
+          <div className='bg-dimmed/10 flex h-8 w-64 animate-pulse rounded' />
+          <div className='bg-dimmed/10 flex h-4 w-48 animate-pulse rounded' />
         </div>
       </div>
 
       <div className='border-border bg-background grid grid-cols-2 gap-4 rounded-xl border p-4 sm:grid-cols-4'>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={`page-skeleton-${i}`} className='flex items-center gap-3'>
-            <div className='size-10 animate-pulse rounded-full bg-gray-100' />
+            <div className='bg-dimmed/10 size-10 animate-pulse rounded-full' />
             <div className='min-w-0 flex-1 space-y-2'>
-              <div className='h-3 w-20 animate-pulse rounded bg-gray-100' />
-              <div className='h-4 w-24 animate-pulse rounded bg-gray-100' />
+              <div className='bg-dimmed/10 h-3 w-20 animate-pulse rounded' />
+              <div className='bg-dimmed/10 h-4 w-24 animate-pulse rounded' />
             </div>
           </div>
         ))}
@@ -247,8 +247,8 @@ function PageFallback() {
 
       <div className='border-border bg-muted/5 rounded-lg border-2 border-dashed px-6 py-12 text-center'>
         <div className='flex flex-col items-center gap-4'>
-          <div className='size-12 animate-pulse rounded-full bg-gray-100' />
-          <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
+          <div className='bg-dimmed/10 size-12 animate-pulse rounded-full' />
+          <div className='bg-dimmed/10 h-4 w-32 animate-pulse rounded' />
         </div>
       </div>
     </div>

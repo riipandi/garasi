@@ -1,9 +1,6 @@
-import * as Lucide from 'lucide-react'
 import { Badge } from '~/app/components/badge'
-import { Button } from '~/app/components/button'
-import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
+import { Card, CardBody } from '~/app/components/card'
 import { Text } from '~/app/components/typography'
-import { Heading } from '~/app/components/typography'
 
 export interface NodeInfo {
   nodeId: string
@@ -20,29 +17,7 @@ interface NodeInformationCardProps {
 export function NodeInformationCard({ nodeInfo }: NodeInformationCardProps) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
-          <Heading size='md'>Node Information</Heading>
-        </CardTitle>
-      </CardHeader>
       <CardBody className='space-y-4'>
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          <div className='col-span-1 sm:col-span-2 lg:col-span-4'>
-            <div className='flex items-start justify-between gap-4 rounded-lg bg-gray-50 p-4'>
-              <div className='min-w-0 flex-1'>
-                <Text className='text-muted'>Node ID</Text>
-                <Text className='font-mono text-sm font-medium break-all'>{nodeInfo.nodeId}</Text>
-              </div>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => navigator.clipboard.writeText(nodeInfo.nodeId)}
-              >
-                <Lucide.Copy className='size-4' />
-              </Button>
-            </div>
-          </div>
-        </div>
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
           <div className='rounded-lg bg-gray-50 p-4'>
             <Text className='text-muted'>Layout Version</Text>

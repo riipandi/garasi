@@ -214,29 +214,29 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
             <TableRow key={`skeleton-row-bucket-${i}`}>
               <TableCell>
                 <div className='flex items-center gap-2'>
-                  <div className='h-3.5 w-48 animate-pulse rounded bg-gray-100' />
-                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
+                  <div className='bg-dimmed/10 h-3.5 w-48 animate-pulse rounded' />
+                  <div className='bg-dimmed/10 size-3.5 animate-pulse rounded' />
                 </div>
               </TableCell>
               <TableCell>
                 <div className='flex items-center gap-1.5'>
-                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
-                  <div className='h-3.5 w-24 animate-pulse rounded bg-gray-100' />
+                  <div className='bg-dimmed/10 size-3.5 animate-pulse rounded' />
+                  <div className='bg-dimmed/10 h-3.5 w-24 animate-pulse rounded' />
                 </div>
               </TableCell>
               <TableCell>
                 <div className='flex gap-1'>
-                  <div className='h-5.5 w-16 animate-pulse rounded-full bg-gray-100' />
-                  <div className='h-5.5 w-20 animate-pulse rounded-full bg-gray-100' />
+                  <div className='bg-dimmed/10 h-5.5 w-16 animate-pulse rounded-full' />
+                  <div className='bg-dimmed/10 h-5.5 w-20 animate-pulse rounded-full' />
                 </div>
               </TableCell>
               <TableCell>
                 <div className='flex gap-1'>
-                  <div className='h-5.5 w-14 animate-pulse rounded-full bg-gray-100' />
+                  <div className='bg-dimmed/10 h-5.5 w-14 animate-pulse rounded-full' />
                 </div>
               </TableCell>
               <TableCell className='text-right'>
-                <div className='ml-auto h-8 w-8 animate-pulse rounded bg-gray-100' />
+                <div className='bg-dimmed/10 ml-auto h-8 w-8 animate-pulse rounded' />
               </TableCell>
             </TableRow>
           ))}
@@ -276,7 +276,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
       {isLoading ? (
         <TableSkeleton />
       ) : table.getRowModel().rows.length === 0 && buckets.length > 0 ? (
-        <div className='border-border bg-dimmed/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-dimmed/10 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.Search className='size-16' />
           </IconBox>
@@ -288,7 +288,7 @@ export function BucketTable({ buckets, onDelete, isLoading = false }: BucketTabl
           </div>
         </div>
       ) : buckets.length === 0 ? (
-        <div className='border-border bg-dimmed/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-dimmed/10 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.Database className='size-16' />
           </IconBox>

@@ -84,7 +84,7 @@ function RouteComponent() {
         <Avatar className='size-14 shrink-0'>
           <AvatarFallbackInitial
             name={displayUser?.name}
-            className='bg-gray-100 text-xl font-semibold text-gray-700'
+            className='bg-dimmed/5 text-xl font-semibold text-gray-700'
           />
         </Avatar>
         <div className='flex-1 space-y-1'>

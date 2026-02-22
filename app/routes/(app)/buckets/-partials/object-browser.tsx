@@ -394,22 +394,22 @@ export function ObjectBrowser({
                 {Array.from({ length: 8 }).map((_, idx) => (
                   <TableRow key={`skeleton-${idx}`}>
                     <TableCell>
-                      <div className='size-4 animate-pulse rounded bg-gray-100' />
+                      <div className='bg-dimmed/10 size-4 animate-pulse rounded' />
                     </TableCell>
                     <TableCell>
                       <div className='flex items-center gap-2'>
-                        <div className='size-4 animate-pulse rounded bg-gray-100' />
-                        <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
+                        <div className='bg-dimmed/10 size-4 animate-pulse rounded' />
+                        <div className='bg-dimmed/10 h-4 w-32 animate-pulse rounded' />
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className='h-4 w-16 animate-pulse rounded bg-gray-100' />
+                      <div className='bg-dimmed/10 h-4 w-16 animate-pulse rounded' />
                     </TableCell>
                     <TableCell>
-                      <div className='h-4 w-20 animate-pulse rounded bg-gray-100' />
+                      <div className='bg-dimmed/10 h-4 w-20 animate-pulse rounded' />
                     </TableCell>
                     <TableCell>
-                      <div className='h-4 w-28 animate-pulse rounded bg-gray-100' />
+                      <div className='bg-dimmed/10 h-4 w-28 animate-pulse rounded' />
                     </TableCell>
                     <TableCell></TableCell>
                   </TableRow>

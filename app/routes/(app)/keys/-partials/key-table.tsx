@@ -250,33 +250,33 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
             <TableRow key={`skeleton-${i}`}>
               <TableCell>
                 <div className='flex items-center gap-2'>
-                  <div className='size-4 animate-pulse rounded bg-gray-100' />
-                  <div className='h-4 w-32 animate-pulse rounded bg-gray-100' />
+                  <div className='bg-dimmed/10 size-4 animate-pulse rounded' />
+                  <div className='bg-dimmed/10 h-4 w-32 animate-pulse rounded' />
                 </div>
               </TableCell>
               <TableCell>
                 <div className='flex items-center gap-2'>
-                  <div className='h-3.5 w-40 animate-pulse rounded bg-gray-100' />
-                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
+                  <div className='bg-dimmed/10 h-3.5 w-40 animate-pulse rounded' />
+                  <div className='bg-dimmed/10 size-3.5 animate-pulse rounded' />
                 </div>
               </TableCell>
               <TableCell>
                 <div className='flex items-center gap-1.5'>
-                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
-                  <div className='h-3.5 w-24 animate-pulse rounded bg-gray-100' />
+                  <div className='bg-dimmed/10 size-3.5 animate-pulse rounded' />
+                  <div className='bg-dimmed/10 h-3.5 w-24 animate-pulse rounded' />
                 </div>
               </TableCell>
               <TableCell>
                 <div className='flex items-center gap-1.5'>
-                  <div className='size-3.5 animate-pulse rounded bg-gray-100' />
-                  <div className='h-3.5 w-24 animate-pulse rounded bg-gray-100' />
+                  <div className='bg-dimmed/10 size-3.5 animate-pulse rounded' />
+                  <div className='bg-dimmed/10 h-3.5 w-24 animate-pulse rounded' />
                 </div>
               </TableCell>
               <TableCell>
-                <div className='h-5.5 w-20 animate-pulse rounded-full bg-gray-100' />
+                <div className='bg-dimmed/10 h-5.5 w-20 animate-pulse rounded-full' />
               </TableCell>
               <TableCell className='text-right'>
-                <div className='ml-auto h-8 w-8 animate-pulse rounded bg-gray-100' />
+                <div className='bg-dimmed/10 ml-auto h-8 w-8 animate-pulse rounded' />
               </TableCell>
             </TableRow>
           ))}
@@ -316,7 +316,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
       {isLoading ? (
         <TableSkeleton />
       ) : table.getRowModel().rows.length === 0 && keys.length > 0 ? (
-        <div className='border-border bg-dimmed/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-dimmed/10 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.Search className='size-16' />
           </IconBox>
@@ -328,7 +328,7 @@ export function KeyTable({ keys, onDelete, isLoading = false }: KeyTableProps) {
           </div>
         </div>
       ) : keys.length === 0 ? (
-        <div className='border-border bg-dimmed/5 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
+        <div className='border-border bg-dimmed/10 flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-16 text-center'>
           <IconBox variant='tertiary-subtle' size='lg' circle className='mb-4'>
             <Lucide.KeyRound className='size-16' />
           </IconBox>

@@ -95,7 +95,7 @@ export function KeyInformationCard({
                 </button>
               </div>
             ) : (
-              <div className='text-muted flex items-center gap-2 rounded-md border border-gray-200 bg-gray-100 px-3 py-2 shadow-sm'>
+              <div className='text-muted bg-dimmed/10 flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 shadow-sm'>
                 <span>N/A</span>
               </div>
             )}

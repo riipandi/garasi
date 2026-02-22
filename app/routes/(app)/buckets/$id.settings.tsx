@@ -484,7 +484,7 @@ function RouteComponent() {
           to='/buckets/$id'
           params={{ id }}
           search={{ key: undefined, prefix: undefined }}
-          className='rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
+          className='hover:bg-dimmed/10 rounded-md p-2 text-gray-500 transition-colors hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
         >
           <Lucide.ArrowLeft className='size-5' />
         </Link>
