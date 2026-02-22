@@ -592,26 +592,22 @@ case "$CMD" in
   nodes)
     # List available Garage nodes (node_id@addr:port)
     garage1_status=$(docker-compose exec --env RUST_LOG=garage=warn -T garage-1 /garage json-api GetClusterStatus)
+    garage1_node=$(echo "$garage1_status" | jq -r '.nodes[] | select(.hostname == "garage-node1") | "\(.id)@\(.addr)"')
+    garage1_hostname="garage-node1"
+
     garage2_status=$(docker-compose exec --env RUST_LOG=garage=warn -T garage-2 /garage json-api GetClusterStatus)
+    garage2_node=$(echo "$garage2_status" | jq -r '.nodes[] | select(.hostname == "garage-node2") | "\(.id)@\(.addr)"')
+    garage2_hostname="garage-node2"
+
     garage3_status=$(docker-compose exec --env RUST_LOG=garage=warn -T garage-3 /garage json-api GetClusterStatus)
-
-    garage1_node_id=$(echo "$garage1_status" | jq -r '.nodes[0].id // empty')
-    garage1_addr=$(echo "$garage1_status" | jq -r '.nodes[0].addr // empty')
-    garage1_hostname=$(echo "$garage1_status" | jq -r '.nodes[0].hostname // empty')
-
-    garage2_node_id=$(echo "$garage2_status" | jq -r '.nodes[0].id // empty')
-    garage2_addr=$(echo "$garage2_status" | jq -r '.nodes[0].addr // empty')
-    garage2_hostname=$(echo "$garage2_status" | jq -r '.nodes[0].hostname // empty')
-
-    garage3_node_id=$(echo "$garage3_status" | jq -r '.nodes[0].id // empty')
-    garage3_addr=$(echo "$garage3_status" | jq -r '.nodes[0].addr // empty')
-    garage3_hostname=$(echo "$garage3_status" | jq -r '.nodes[0].hostname // empty')
+    garage3_node=$(echo "$garage3_status" | jq -r '.nodes[] | select(.hostname == "garage-node3") | "\(.id)@\(.addr)"')
+    garage3_hostname="garage-node3"
 
     printf "\n"
     printf "${BOLD}${CYAN}List available nodes:${NC}\n"
-    printf "${NC}- $garage1_hostname: ${DIM}${garage1_node_id}@${garage1_addr}${NC}\n"
-    printf "${NC}- $garage2_hostname: ${DIM}${garage2_node_id}@${garage2_addr}${NC}\n"
-    printf "${NC}- $garage3_hostname: ${DIM}${garage3_node_id}@${garage3_addr}${NC}\n"
+    printf "${NC}- $garage1_hostname: ${DIM}$garage1_node${NC}\n"
+    printf "${NC}- $garage2_hostname: ${DIM}$garage2_node${NC}\n"
+    printf "${NC}- $garage3_hostname: ${DIM}$garage3_node${NC}\n"
     printf "\n"
     ;;
 
