@@ -12,6 +12,7 @@ set -eu # Exit on error, treat unset variables as an error.
 # Usage:
 #   ./scripts/setup-dev.sh          - Generate and display secrets only
 #   ./scripts/setup-dev.sh --apply  - Generate and apply to .env.* files
+#   ./scripts/setup-dev.sh --certs  - Generate local SSL certificates with mkcert
 #
 # Generated Secrets:
 #   - GARAGE_ADMIN_TOKEN    : Base64 encoded 32-byte random string
@@ -21,13 +22,10 @@ set -eu # Exit on error, treat unset variables as an error.
 #
 # Requirements:
 #   - OpenSSL must be installed and available in PATH
+#   - mkcert must be installed for --certs option
 #   - .env.local file must exist when using --apply flag
 #
 #------------------------------------------------------------------------------
-
-# Generate local SSL certificate with mkcert
-# mkdir -p storage/certs
-# mkcert -cert-file storage/certs/localhost_crt.pem -key-file storage/certs/localhost_key.pem localhost "*.local" 127.0.0.1 ::1
 
 # Colors
 RED='\033[0;31m'
@@ -42,6 +40,7 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENV_FILE="$ROOT_DIR/.env.local"
+CERTS_DIR="$ROOT_DIR/storage/certs"
 
 #------------------------------------------------------------------------------
 # Prerequisites Check
@@ -57,18 +56,70 @@ if ! command -v openssl > /dev/null 2>&1; then
     exit 1
 fi
 
-# Quick check if --apply flag is provided for early validation
-for arg in "$@"; do
-    if [ "$arg" = "--apply" ]; then
-        if [ ! -f "$ENV_FILE" ]; then
-            printf "\n${RED}ERROR: .env.local file not found, the --apply flag requires .env.local to exist${NC}\n"
-            printf "${DIM}Create the file first, or run without --apply to generate secrets only${NC}\n"
-            printf "\n"
-            exit 0
-        fi
-        break
+# Verify mkcert is installed when --certs flag is provided
+check_mkcert() {
+    if ! command -v mkcert > /dev/null 2>&1; then
+        printf "${RED}Error: mkcert is not installed or not available in PATH${NC}\n"
+        printf "${YELLOW}Please install mkcert to use --certs option${NC}\n"
+        printf "${DIM}  macOS: brew install mkcert${NC}\n"
+        printf "${DIM}  Linux: Follow instructions at https://github.com/FiloSottile/mkcert${NC}\n"
+        printf "${DIM}  Windows: choco install mkcert${NC}\n"
+        exit 1
     fi
-done
+}
+
+# Install mkcert CA if not already installed
+install_mkcert_ca() {
+    printf "${YELLOW}Installing mkcert CA...${NC}\n"
+    mkcert -install
+    printf "${GREEN}mkcert CA installed successfully${NC}\n"
+}
+
+# Generate SSL certificates with mkcert
+generate_certificates() {
+    check_mkcert
+
+    # Create certs directory if it doesn't exist
+    mkdir -p "$CERTS_DIR"
+
+    # Check if certificates already exist
+    if [ -f "$CERTS_DIR/localhost_crt.pem" ] && [ -f "$CERTS_DIR/localhost_key.pem" ]; then
+        printf "\n"
+        printf "${GREEN}SSL certificates already exist!${NC}\n\n"
+        printf "${CYAN}- Certificate: $CERTS_DIR/localhost_crt.pem${NC}\n"
+        printf "${CYAN}- Private Key: $CERTS_DIR/localhost_key.pem${NC}\n"
+        printf "\n"
+        printf "${GREEN}Do you want to overwrite them? [y/N]: ${NC}"
+        read -r response
+        if [ "$response" != "y" ] && [ "$response" != "Y" ]; then
+            printf "${DIM}Certificate generation cancelled${NC}\n"
+            return 0
+        fi
+        printf "${DIM}Overwriting existing certificates...${NC}\n"
+    fi
+
+    # Check if CA is installed, if not, install it
+    if [ ! -d "$HOME/.local/share/mkcert" ] && [ ! -d "$(mkcert -CAROOT 2>/dev/null)" ]; then
+        install_mkcert_ca
+    fi
+
+    # Generate certificates for localhost and local domains
+    printf "${GREEN}Generating SSL certificates...${NC}\n"
+    mkcert -cert-file "$CERTS_DIR/localhost_crt.pem" \
+        -key-file "$CERTS_DIR/localhost_key.pem" \
+        localhost "*.local" 127.0.0.1 ::1
+
+    # Set proper permissions
+    chmod 600 "$CERTS_DIR/localhost_key.pem"
+    chmod 644 "$CERTS_DIR/localhost_crt.pem"
+
+    printf "${GREEN}SSL certificates generated successfully!${NC}\n"
+    printf "${CYAN}Certificate: $CERTS_DIR/localhost_crt.pem${NC}\n"
+    printf "${CYAN}Private Key: $CERTS_DIR/localhost_key.pem${NC}\n"
+    printf "\n"
+    printf "${GREEN}Note: Install the local CA in the system trust store:${NC} ${DIM}mkcert -install${NC}\n"
+    printf "\n"
+}
 
 #------------------------------------------------------------------------------
 # Argument Parsing
@@ -76,20 +127,28 @@ done
 
 # Parse command-line arguments
 # --apply: When provided, updates .env.local file instead of just printing
+# --certs: When provided, generates SSL certificates with mkcert
 APPLY_CHANGES=false
+GENERATE_CERTS=false
 for arg in "$@"; do
     case $arg in
         --apply)
             APPLY_CHANGES=true
             shift
             ;;
+        --certs)
+            GENERATE_CERTS=true
+            shift
+            ;;
         --help|-h)
             printf "${BOLD}${CYAN}Garasi Secrets Generator${NC}\n\n"
             printf "Usage:\n"
             printf "  ./scripts/setup-dev.sh          - Generate and display secrets\n"
-            printf "  ./scripts/setup-dev.sh --apply  - Generate and apply to .env.local and .env.garage*\n\n"
+            printf "  ./scripts/setup-dev.sh --apply  - Generate and apply to .env.local and .env.garage*\n"
+            printf "  ./scripts/setup-dev.sh --certs  - Generate local SSL certificates with mkcert\n\n"
             printf "Options:\n"
             printf "  --apply     Update .env.local and .env.garage* files with new secrets\n"
+            printf "  --certs     Generate SSL certificates for local development\n"
             printf "  --help, -h  Show this help message\n"
             exit 0
             ;;
@@ -98,6 +157,20 @@ for arg in "$@"; do
             ;;
     esac
 done
+
+# Validate .env.local exists when --apply is used
+if [ "$APPLY_CHANGES" = true ] && [ ! -f "$ENV_FILE" ]; then
+    printf "\n${RED}ERROR: .env.local file not found, the --apply flag requires .env.local to exist${NC}\n"
+    printf "${DIM}Create the file first, or run without --apply to generate secrets only${NC}\n"
+    printf "\n"
+    exit 1
+fi
+
+# Handle --certs flag separately (generates certificates and exits)
+if [ "$GENERATE_CERTS" = true ]; then
+    generate_certificates
+    exit 0
+fi
 
 #------------------------------------------------------------------------------
 # Secret Generation
