@@ -67,7 +67,6 @@ function RouteComponent() {
   const [showSecretKey, setShowSecretKey] = React.useState(false)
   const [showEditDialog, setShowEditDialog] = React.useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
-  const [selectedBuckets, setSelectedBuckets] = React.useState<Set<string>>(new Set())
   const [bucketPermissions, setBucketPermissions] = React.useState<
     Record<string, ApiBucketKeyPerm>
   >({})
@@ -90,56 +89,6 @@ function RouteComponent() {
       return results.map((r) => r.data)
     },
     enabled: buckets.length > 0
-  })
-
-  // Allow bucket key mutation
-  const allowBucketKeyMutation = useMutation({
-    mutationFn: async ({
-      bucketId,
-      permissions
-    }: {
-      bucketId: string
-      permissions: ApiBucketKeyPerm
-    }) => {
-      return bucketService.allowBucketKey(bucketId, { accessKeyId: id, permissions })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
-      queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      toast.add({ title: 'Bucket access granted', type: 'success' })
-    },
-    onError: (error) => {
-      toast.add({
-        title: 'Failed to grant bucket access',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        type: 'error'
-      })
-    }
-  })
-
-  // Deny bucket key mutation
-  const denyBucketKeyMutation = useMutation({
-    mutationFn: async ({
-      bucketId,
-      permissions
-    }: {
-      bucketId: string
-      permissions: ApiBucketKeyPerm
-    }) => {
-      return bucketService.denyBucketKey(bucketId, { accessKeyId: id, permissions })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bucketsWithPermissions', id] })
-      queryClient.invalidateQueries({ queryKey: ['buckets'] })
-      toast.add({ title: 'Bucket access revoked', type: 'success' })
-    },
-    onError: (error) => {
-      toast.add({
-        title: 'Failed to revoke bucket access',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        type: 'error'
-      })
-    }
   })
 
   // Update key mutation
@@ -199,57 +148,8 @@ function RouteComponent() {
       })
 
       setBucketPermissions(permissions)
-      setSelectedBuckets(selected)
     }
   }, [bucketsWithPermissions, id])
-
-  const handleBucketToggle = (bucketId: string) => {
-    setSelectedBuckets((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(bucketId)) {
-        newSet.delete(bucketId)
-      } else {
-        newSet.add(bucketId)
-      }
-      return newSet
-    })
-  }
-
-  const handlePermissionChange = (
-    bucketId: string,
-    permission: keyof ApiBucketKeyPerm,
-    value: boolean
-  ) => {
-    setBucketPermissions((prev) => {
-      const current = prev[bucketId] || { read: true, write: false, owner: false }
-      return {
-        ...prev,
-        [bucketId]: {
-          ...current,
-          [permission]: value
-        }
-      }
-    })
-  }
-
-  const handleSavePermissions = async () => {
-    // Process each bucket
-    for (const bucketId of selectedBuckets) {
-      const permissions = bucketPermissions[bucketId] || { read: true, write: false, owner: false }
-      await allowBucketKeyMutation.mutateAsync({ bucketId, permissions })
-    }
-
-    // Revoke access for unselected buckets
-    for (const bucket of buckets) {
-      const permissions = bucketPermissions[bucket.id]
-      if (!selectedBuckets.has(bucket.id) && permissions) {
-        await denyBucketKeyMutation.mutateAsync({
-          bucketId: bucket.id,
-          permissions
-        })
-      }
-    }
-  }
 
   const handleEditKey = () => {
     setShowEditDialog(true)
@@ -413,14 +313,9 @@ function RouteComponent() {
       >
         <BucketAccessSection
           buckets={buckets}
-          selectedBuckets={selectedBuckets}
           bucketPermissions={bucketPermissions}
           isLoadingPermissions={isLoadingPermissions}
           isLoadingBuckets={isLoadingBuckets}
-          isSaving={allowBucketKeyMutation.isPending || denyBucketKeyMutation.isPending}
-          onBucketToggle={handleBucketToggle}
-          onPermissionChange={handlePermissionChange}
-          onSavePermissions={handleSavePermissions}
         />
       </React.Suspense>
 

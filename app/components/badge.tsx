@@ -10,7 +10,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { clx } from '~/app/utils'
 
-export const badgeStyles = cva('inline-flex items-center gap-1 border border-transparent', {
+export const badgeStyles = cva('inline-flex items-center gap-0.5 border border-transparent', {
   variants: {
     variant: {
       primary: 'bg-primary/15 text-primary',
