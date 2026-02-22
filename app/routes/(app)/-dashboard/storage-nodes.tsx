@@ -69,7 +69,7 @@ export function StorageNodes({ statistics }: StorageNodesProps) {
                 </ItemMedia>
                 <ItemContent className='w-full min-w-0 px-2'>
                   <ItemTitle>{node.hostname}</ItemTitle>
-                  <ItemDescription className='font-mono text-xs max-w-32 truncate'>
+                  <ItemDescription className='max-w-32 truncate font-mono text-xs'>
                     {node.id}
                   </ItemDescription>
                   <div className='text-dimmed mt-1 flex items-center gap-3 text-xs'>

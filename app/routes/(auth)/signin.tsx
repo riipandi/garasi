@@ -5,21 +5,18 @@ import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
 import { Button } from '~/app/components/button'
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '~/app/components/card'
-import { Checkbox } from '~/app/components/checkbox'
 import { Field, FieldLabel, FieldError } from '~/app/components/field'
 import { Fieldset } from '~/app/components/fieldset'
 import { Form } from '~/app/components/form'
 import { Input } from '~/app/components/input'
 import { InputPassword } from '~/app/components/input-password'
-import { Label } from '~/app/components/label'
 import { Spinner } from '~/app/components/spinner'
 import { TextLink } from '~/app/components/typography'
 import { useAuth } from '~/app/guards'
 
 const signinSchema = z.object({
   email: z.email({ error: 'Please enter a valid email address' }),
-  password: z.string().min(1, { error: 'Password is required' }),
-  remember: z.boolean()
+  password: z.string().min(1, { error: 'Password is required' })
 })
 
 export const Route = createFileRoute('/(auth)/signin')({
@@ -34,7 +31,7 @@ function RouteComponent() {
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const form = useForm({
-    defaultValues: { email: '', password: '', remember: false },
+    defaultValues: { email: '', password: '' },
     validators: { onChange: signinSchema },
     onSubmit: async ({ value, formApi }) => {
       setSubmitError(null)
@@ -48,7 +45,7 @@ function RouteComponent() {
         return
       }
 
-      const loginResult = await login(value.email, value.password, value.remember)
+      const loginResult = await login(value.email, value.password)
       if (!loginResult.success) {
         setSubmitError(loginResult.error || 'Invalid email or password. Please try again.')
         return formApi.resetField('password')
@@ -149,17 +146,6 @@ function RouteComponent() {
                 )}
               </form.Field>
             </Fieldset>
-
-            <form.Field name='remember'>
-              {(field) => (
-                <Field className='-mt-1.5'>
-                  <Label>
-                    <Checkbox name={field.name} />
-                    <span>Remember me</span>
-                  </Label>
-                </Field>
-              )}
-            </form.Field>
 
             <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (

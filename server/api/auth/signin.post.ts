@@ -1,11 +1,9 @@
 import { readBody, defineHandler, getRequestIP, HTTPError } from 'nitro/h3'
-import { storeCookie } from '~/server/platform/guards'
 import { generateToken } from '~/server/platform/jwt'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
 import { createSession } from '~/server/services/session.service'
 import { cleanupExpiredSessions } from '~/server/services/session.service'
 import { parseUserAgent } from '~/server/utils/parser'
-import { protectedEnv } from '~/shared/envars'
 
 export default defineHandler(async (event) => {
   const { db, logger } = event.context
@@ -54,9 +52,6 @@ export default defineHandler(async (event) => {
     cleanupExpiredSessions(db).catch((error) =>
       logger.withError(error).error('Error cleaning up expired sessions')
     )
-
-    storeCookie(event, 'token', token, protectedEnv.PUBLIC_TOKEN_EXPIRY)
-    storeCookie(event, 'sessid', sessionId, protectedEnv.PUBLIC_TOKEN_EXPIRY)
 
     logger.withMetadata({ userId: user.id, sessionId }).info('User signed in successfully')
 

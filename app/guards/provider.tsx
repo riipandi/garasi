@@ -4,12 +4,9 @@ import { toast } from '~/app/components/toast'
 import { resetAuthClearedFlag } from '~/app/fetcher'
 import { clearAuthState } from '~/app/fetcher'
 import authService from '~/app/services/auth.service'
-import { authStore } from '~/app/stores'
-import pkg from '~/package.json' with { type: 'json' }
+import { authStore, STORAGE_KEY } from '~/app/stores'
 import type { User } from '~/shared/schemas/user.schema'
 import { AuthContext, type AuthContextType } from './context'
-
-const STORAGE_KEY = `${pkg.name}_auth:`
 
 export function AuthProvider({ children }: React.PropsWithChildren) {
   const authState = useStore(authStore)
@@ -65,9 +62,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
       authStore.set({
         token: null,
-        tokenexp: null,
-        sessid: null,
-        remember: false
+        expiry: null,
+        session: null
       })
 
       return null
@@ -85,9 +81,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       if (isAuthError) {
         authStore.set({
           token: null,
-          tokenexp: null,
-          sessid: null,
-          remember: false
+          expiry: null,
+          session: null
         })
 
         if (!isManualLogoutRef.current) {
@@ -121,7 +116,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
       if (wasAuthenticated && isAuthenticatedNow) {
         const tokenCleared = prev.token !== current.token && current.token === null
-        const sessionCleared = prev.sessid !== current.sessid && current.sessid === null
+        const sessionCleared = prev.session !== current.session && current.session === null
 
         if (tokenCleared || sessionCleared) {
           return true
@@ -194,7 +189,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
       const storageKey = event.key.replace(STORAGE_KEY, '')
 
-      if (storageKey === 'token' || storageKey === 'sessid') {
+      if (storageKey === 'token' || storageKey === 'session') {
         const newValue = event.newValue
 
         if (newValue === '' || newValue === null) {
@@ -214,11 +209,10 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
   const login = async (
     email: string,
-    password: string,
-    remember: boolean = false
+    password: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await authService.signin(email, password, remember)
+      const response = await authService.signin(email, password)
 
       if (response.status !== 'success' || !response.data) {
         toast.add({
@@ -234,9 +228,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
 
       authStore.set({
         token: sessionData.access_token,
-        tokenexp: sessionData.access_token_expiry,
-        sessid: sessionData.session_id,
-        remember
+        expiry: sessionData.access_token_expiry,
+        session: sessionData.session_id
       })
 
       resetAuthClearedFlag()

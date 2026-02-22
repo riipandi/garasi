@@ -17,7 +17,7 @@ interface SessionsData {
 }
 
 export interface AuthService {
-  signin: (email: string, password: string, remember?: boolean) => Promise<SigninResponse>
+  signin: (email: string, password: string) => Promise<SigninResponse>
   logout: (sessionId: string) => Promise<ApiResponse<null>>
   validateToken: (token: string) => Promise<ApiResponse<{ is_token_valid: boolean }>>
   whoami: () => Promise<WhoamiResponse>
@@ -32,10 +32,10 @@ export interface AuthService {
 
 function defineAuthService(): AuthService {
   return {
-    async signin(email: string, password: string, remember = false) {
+    async signin(email: string, password: string) {
       return await fetcher<SigninResponse>('/auth/signin', {
         method: 'POST',
-        body: { email, password, remember }
+        body: { email, password }
       })
     },
 

@@ -12,9 +12,8 @@ export function clearAuthState() {
 
   authStore.set({
     token: null,
-    tokenexp: null,
-    sessid: null,
-    remember: false
+    expiry: null,
+    session: null
   })
 }
 
@@ -43,7 +42,7 @@ function createFetcher(baseUrl: string, options: FetchOptions = {}): $Fetch {
       const authState = authStore.get()
 
       if (authState?.token) {
-        if (isTokenExpired(authState.tokenexp, 0)) {
+        if (isTokenExpired(authState.expiry, 0)) {
           showSessionExpiredToast()
           clearAuthState()
           return

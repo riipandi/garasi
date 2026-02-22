@@ -382,8 +382,7 @@ import { Button } from '~/app/components/button'
 
 const signinSchema = z.object({
   email: z.email({ error: 'Please enter a valid email address' }),
-  password: z.string().min(1, { error: 'Password is required' }),
-  remember: z.boolean()
+  password: z.string().min(1, { error: 'Password is required' })
 })
 
 export const Route = createFileRoute('/(auth)/signin')({
@@ -394,7 +393,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate()
 
   const form = useForm({
-    defaultValues: { email: '', password: '', remember: false },
+    defaultValues: { email: '', password: '' },
     validators: { onChange: signinSchema },
     onSubmit: async ({ value }) => {
       // Submit logic
