@@ -19,6 +19,7 @@ import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
 import { Label } from '~/app/components/label'
 import { Spinner } from '~/app/components/spinner'
+import { clx } from '~/app/utils'
 import type { CreateAccessKeyRequest } from '~/shared/schemas/keys.schema'
 
 interface KeyCreateProps {
@@ -35,12 +36,12 @@ const createKeySchema = z.object({
     .max(100, 'Name must be less than 100 characters')
     .regex(/^[a-z0-9-]+$/, 'Name must contain only lowercase letters, numbers, and dashes')
     .refine((val) => !val.includes(' '), 'Name cannot contain spaces'),
-  expirationPreset: z.enum(['1d', '7d', '30d', '90d', 'never', 'custom']).default('7d'),
+  expirationPreset: z.enum(['7d', '30d', '90d', 'never', 'custom']).default('7d'),
   expiration: z.string().nullable().optional(),
   allowCreateBucket: z.boolean().default(false)
 })
 
-type ExpirationPreset = '1d' | '7d' | '30d' | '90d' | 'never' | 'custom'
+type ExpirationPreset = '7d' | '30d' | '90d' | 'never' | 'custom'
 
 const EXPIRATION_PRESETS: {
   value: ExpirationPreset
@@ -212,11 +213,12 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
                             handlePresetChange(preset.value)
                           }}
                           disabled={isSubmitting}
-                          className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={clx(
+                            'flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all disabled:cursor-not-allowed disabled:opacity-50',
                             field.state.value === preset.value
                               ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                               : 'border-input-border bg-input hover:border-primary/50'
-                          } `}
+                          )}
                         >
                           <span className='text-xs font-medium'>{preset.label}</span>
                         </button>
@@ -233,11 +235,12 @@ export function KeyCreate({ isOpen, onClose, onSubmit, isSubmitting }: KeyCreate
                             handlePresetChange(preset.value)
                           }}
                           disabled={isSubmitting}
-                          className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={clx(
+                            'flex cursor-pointer items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-center transition-all disabled:cursor-not-allowed disabled:opacity-50',
                             field.state.value === preset.value
                               ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                               : 'border-input-border bg-input hover:border-primary/50'
-                          } `}
+                          )}
                         >
                           <span className='text-xs font-medium'>{preset.label}</span>
                         </button>

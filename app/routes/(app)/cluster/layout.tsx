@@ -6,6 +6,7 @@ import { Progress } from '~/app/components/progress'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import clusterService from '~/app/services/cluster.service'
+import { clx } from '~/app/utils'
 import { LayoutManagement } from './-partials/layout-management'
 
 interface ClusterStatisticsResponse {
@@ -146,7 +147,10 @@ function RouteComponent() {
               <div>
                 <Text className='text-muted'>Data Storage</Text>
                 <Text
-                  className={`mt-1 text-lg font-semibold ${getStorageStatusColor(dataPercentage)}`}
+                  className={clx(
+                    'mt-1 text-lg font-semibold',
+                    getStorageStatusColor(dataPercentage)
+                  )}
                 >
                   {dataPercentage.toFixed(1)}%
                 </Text>
@@ -154,7 +158,9 @@ function RouteComponent() {
               <Lucide.Database className='text-muted size-6' />
             </div>
             <Progress value={dataPercentage} className='h-1.5 w-full'>
-              <div className={`transition-all duration-500 ${getStorageColor(dataPercentage)}`} />
+              <div
+                className={clx('transition-all duration-500', getStorageColor(dataPercentage))}
+              />
             </Progress>
           </CardBody>
         </Card>
@@ -165,7 +171,10 @@ function RouteComponent() {
               <div>
                 <Text className='text-muted'>Metadata Storage</Text>
                 <Text
-                  className={`mt-1 text-lg font-semibold ${getStorageStatusColor(metaPercentage)}`}
+                  className={clx(
+                    'mt-1 text-lg font-semibold',
+                    getStorageStatusColor(metaPercentage)
+                  )}
                 >
                   {metaPercentage.toFixed(1)}%
                 </Text>
@@ -174,7 +183,10 @@ function RouteComponent() {
             </div>
             <Progress value={metaPercentage} className='h-1.5 w-full'>
               <div
-                className={`h-full transition-all duration-500 ${getStorageColor(metaPercentage)}`}
+                className={clx(
+                  'h-full transition-all duration-500',
+                  getStorageColor(metaPercentage)
+                )}
               />
             </Progress>
           </CardBody>
@@ -198,7 +210,9 @@ function RouteComponent() {
                   <Text className='text-sm font-medium'>Data Storage</Text>
                 </div>
                 <div className='text-right'>
-                  <Text className={`text-sm font-medium ${getStorageStatusColor(dataPercentage)}`}>
+                  <Text
+                    className={clx('text-sm font-medium', getStorageStatusColor(dataPercentage))}
+                  >
                     {getStorageStatus(dataPercentage)}
                   </Text>
                   <Text className='text-muted ml-2 text-sm'>
@@ -208,7 +222,10 @@ function RouteComponent() {
               </div>
               <Progress value={dataPercentage} className='h-2.5 w-full'>
                 <div
-                  className={`h-full transition-all duration-500 ${getStorageColor(dataPercentage)}`}
+                  className={clx(
+                    'h-full transition-all duration-500',
+                    getStorageColor(dataPercentage)
+                  )}
                 />
               </Progress>
               <Text className='text-muted mt-1 text-xs'>
@@ -223,7 +240,9 @@ function RouteComponent() {
                   <Text className='text-sm font-medium'>Metadata Storage</Text>
                 </div>
                 <div className='text-right'>
-                  <Text className={`text-sm font-medium ${getStorageStatusColor(metaPercentage)}`}>
+                  <Text
+                    className={clx('text-sm font-medium', getStorageStatusColor(metaPercentage))}
+                  >
                     {getStorageStatus(metaPercentage)}
                   </Text>
                   <Text className='text-muted ml-2 text-sm'>
@@ -233,7 +252,10 @@ function RouteComponent() {
               </div>
               <Progress value={metaPercentage} className='h-2.5 w-full'>
                 <div
-                  className={`h-full transition-all duration-500 ${getStorageColor(metaPercentage)}`}
+                  className={clx(
+                    'h-full transition-all duration-500',
+                    getStorageColor(metaPercentage)
+                  )}
                 />
               </Progress>
               <Text className='text-muted mt-1 text-xs'>
@@ -278,14 +300,20 @@ function RouteComponent() {
                           <Text className='text-muted'>Data</Text>
                         </div>
                         <Text
-                          className={`font-medium ${getStorageStatusColor(node.dataAvailable.percentage)}`}
+                          className={clx(
+                            'font-medium',
+                            getStorageStatusColor(node.dataAvailable.percentage)
+                          )}
                         >
                           {node.dataAvailable.percentage.toFixed(1)}%
                         </Text>
                       </div>
                       <div className='h-2 w-full overflow-hidden rounded-full bg-gray-200'>
                         <div
-                          className={`h-full transition-all duration-500 ${getStorageColor(node.dataAvailable.percentage)}`}
+                          className={clx(
+                            'h-full transition-all duration-500',
+                            getStorageColor(node.dataAvailable.percentage)
+                          )}
                           style={{ width: `${Math.min(node.dataAvailable.percentage, 100)}%` }}
                         />
                       </div>
@@ -301,14 +329,20 @@ function RouteComponent() {
                           <Text className='text-muted'>Metadata</Text>
                         </div>
                         <Text
-                          className={`font-medium ${getStorageStatusColor(node.metaAvailable.percentage)}`}
+                          className={clx(
+                            'font-medium',
+                            getStorageStatusColor(node.metaAvailable.percentage)
+                          )}
                         >
                           {node.metaAvailable.percentage.toFixed(1)}%
                         </Text>
                       </div>
                       <div className='h-2 w-full overflow-hidden rounded-full bg-gray-200'>
                         <div
-                          className={`h-full transition-all duration-500 ${getStorageColor(node.metaAvailable.percentage)}`}
+                          className={clx(
+                            'h-full transition-all duration-500',
+                            getStorageColor(node.metaAvailable.percentage)
+                          )}
                           style={{ width: `${Math.min(node.metaAvailable.percentage, 100)}%` }}
                         />
                       </div>

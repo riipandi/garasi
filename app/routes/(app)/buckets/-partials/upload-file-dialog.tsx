@@ -4,14 +4,15 @@ import { Button } from '~/app/components/button'
 import {
   Dialog,
   DialogBody,
-  DialogPopup,
-  DialogTitle,
+  DialogClose,
   DialogFooter,
-  DialogHeader
+  DialogHeader,
+  DialogPopup,
+  DialogTitle
 } from '~/app/components/dialog'
 import { IconBox } from '~/app/components/icon-box'
-import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
+import { clx } from '~/app/utils'
 
 interface UploadFileDialogProps {
   isOpen: boolean
@@ -28,19 +29,6 @@ export function UploadFileDialog({
 }: UploadFileDialogProps) {
   const [dragActive, setDragActive] = React.useState(false)
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
-
-  React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    document.addEventListener('keydown', handleEscape)
-    return () => {
-      document.removeEventListener('keydown', handleEscape)
-    }
-  }, [isOpen, onClose])
 
   React.useEffect(() => {
     if (isOpen) {
@@ -90,85 +78,112 @@ export function UploadFileDialog({
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
   }
 
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPopup>
         <DialogHeader>
-          <Stack direction='row' className='items-start'>
-            <IconBox variant='success' size='md' circle>
-              <Lucide.UploadCloud className='size-5' />
-            </IconBox>
-            <div>
-              <DialogTitle>Upload Files</DialogTitle>
-              <Text className='text-muted-foreground text-sm'>Select files to upload</Text>
-            </div>
-          </Stack>
+          <IconBox variant='success' size='sm'>
+            <Lucide.UploadCloud className='size-4' />
+          </IconBox>
+          <DialogTitle>Upload Files</DialogTitle>
+          <DialogClose className='ml-auto'>
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
+          </DialogClose>
         </DialogHeader>
 
-        <DialogBody>
+        <DialogBody className='border-border mt-3 border-t pt-0'>
           <form
-            className={`space-y-4 ${isSubmitting ? 'animate-pulse' : ''}`}
+            className={clx('space-y-4', isSubmitting ? 'animate-pulse' : '')}
             onSubmit={handleSubmit}
             onDragEnter={handleDrag}
             onDragLeave={handleDragLeave}
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <div
-              className={`bg-muted/5 mt-4 rounded-lg border-2 border-dashed px-6 py-8 text-center transition-all ${
-                dragActive ? 'border-primary bg-primary/10' : 'border-border'
-              }`}
-            >
-              <Lucide.UploadCloud
-                className={`mx-auto size-12 transition-all ${dragActive ? 'text-primary' : 'text-muted-foreground'}`}
-              />
-              <Text className='mt-2 text-sm font-medium'>Click to upload or drag and drop</Text>
-              <Text className='text-muted-foreground mt-1 text-xs'>Any file type is supported</Text>
-              <input
-                type='file'
-                multiple
-                onChange={handleFileSelect}
-                className='absolute inset-0 size-full cursor-pointer opacity-0'
-                disabled={isSubmitting}
-              />
-            </div>
-            {selectedFiles.length > 0 && (
-              <div className='border-border bg-muted/5 mt-4 rounded-lg border p-3'>
-                <Text className='mb-2 text-sm font-medium'>
-                  {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
-                </Text>
-                <Stack>
-                  {selectedFiles.map((file, index) => (
-                    <div
-                      key={`file-${index}`}
-                      className='flex items-center justify-between text-sm'
-                    >
-                      <Text className='truncate'>{file.name}</Text>
-                      <Text className='text-muted-foreground text-xs'>
-                        {formatFileSize(file.size)}
-                      </Text>
-                    </div>
-                  ))}
-                </Stack>
-              </div>
-            )}
-            <Stack>
-              <Button type='button' variant='outline' onClick={onClose} disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button
-                type='submit'
-                variant='primary'
-                disabled={selectedFiles.length === 0 || isSubmitting}
-                progress={isSubmitting}
+            <div className='space-y-4'>
+              <div
+                className={clx(
+                  'bg-muted/5 relative mt-4 rounded-lg border-2 border-dashed px-6 py-8 text-center transition-all',
+                  dragActive ? 'border-primary bg-primary/10' : 'border-border'
+                )}
               >
-                {isSubmitting ? 'Uploading...' : 'Upload'}
-              </Button>
-            </Stack>
+                <Lucide.UploadCloud
+                  className={clx(
+                    'mx-auto size-12 transition-all',
+                    dragActive ? 'text-primary' : 'text-muted-foreground'
+                  )}
+                />
+                <Text className='mt-2 text-sm font-medium'>Click to upload or drag and drop</Text>
+                <Text className='text-muted-foreground mt-1 text-xs'>
+                  Any file type is supported
+                </Text>
+                <input
+                  type='file'
+                  multiple
+                  onChange={handleFileSelect}
+                  className='absolute inset-0 size-full cursor-pointer opacity-0'
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              {selectedFiles.length > 0 && (
+                <div className='border-border bg-muted/5 mt-4 rounded-lg border p-3'>
+                  <div className='mb-3 flex items-center justify-between'>
+                    <Text className='text-sm font-medium'>
+                      {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
+                    </Text>
+                  </div>
+                  <div className='space-y-2'>
+                    {selectedFiles.map((file, index) => {
+                      const fileKey = `${file.name}-${file.size}-${index}`
+                      return (
+                        <div
+                          key={fileKey}
+                          className='flex items-center justify-between gap-3 text-sm'
+                        >
+                          <div className='min-w-0 flex-1'>
+                            <Text className='block truncate'>{file.name}</Text>
+                            <Text className='text-muted-foreground text-xs'>
+                              {formatFileSize(file.size)}
+                            </Text>
+                          </div>
+                          <Button
+                            type='button'
+                            variant='plain'
+                            size='xs-icon'
+                            onClick={() => handleRemoveFile(index)}
+                            disabled={isSubmitting}
+                            className='text-dimmed hover:text-danger shrink-0'
+                          >
+                            <Lucide.X className='size-4' />
+                          </Button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </form>
         </DialogBody>
 
-        <DialogFooter />
+        <DialogFooter>
+          <DialogClose block>Cancel</DialogClose>
+          <Button
+            type='submit'
+            size='sm'
+            onClick={handleSubmit}
+            disabled={selectedFiles.length === 0 || isSubmitting}
+            progress={isSubmitting}
+            block
+          >
+            {isSubmitting ? 'Uploading...' : 'Upload'}
+          </Button>
+        </DialogFooter>
       </DialogPopup>
     </Dialog>
   )

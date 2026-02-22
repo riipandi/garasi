@@ -6,6 +6,7 @@ import { Checkbox } from '~/app/components/checkbox'
 import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
+import { clx } from '~/app/utils'
 import type { ApiBucketKeyPerm } from '~/shared/schemas/bucket.schema'
 
 interface BucketAccessSectionProps {
@@ -80,9 +81,10 @@ export function BucketAccessSection({
               return (
                 <div key={bucket.id}>
                   <div
-                    className={`bg-background rounded-lg border p-4 transition-all ${
+                    className={clx(
+                      'bg-background rounded-lg border p-4 transition-all',
                       isSelected ? 'border-blue-300 bg-blue-50' : 'border-input'
-                    }`}
+                    )}
                   >
                     <div className='flex items-start gap-3'>
                       <Checkbox

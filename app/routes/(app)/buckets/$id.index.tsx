@@ -9,6 +9,7 @@ import { Stack } from '~/app/components/stack'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import bucketService from '~/app/services/bucket.service'
+import { clx } from '~/app/utils'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 
 const ObjectBrowser = React.lazy(() =>
@@ -181,7 +182,10 @@ function RouteComponent() {
           <div className='min-w-0'>
             <Text className='text-muted-foreground text-xs font-medium'>Website</Text>
             <Text
-              className={`text-sm font-semibold ${bucket.websiteAccess ? 'text-success' : 'text-muted-foreground'}`}
+              className={clx(
+                'text-sm font-semibold',
+                bucket.websiteAccess ? 'text-success' : 'text-muted-foreground'
+              )}
             >
               {bucket.websiteAccess ? 'Enabled' : 'Disabled'}
             </Text>

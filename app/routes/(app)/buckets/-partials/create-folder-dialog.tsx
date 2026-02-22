@@ -1,18 +1,21 @@
+import { useForm } from '@tanstack/react-form'
 import * as Lucide from 'lucide-react'
 import * as React from 'react'
+import { z } from 'zod'
 import { Button } from '~/app/components/button'
 import {
   Dialog,
   DialogBody,
-  DialogPopup,
-  DialogTitle,
+  DialogClose,
   DialogFooter,
-  DialogHeader
+  DialogHeader,
+  DialogPopup,
+  DialogTitle
 } from '~/app/components/dialog'
+import { Field, FieldLabel, FieldError } from '~/app/components/field'
+import { Form } from '~/app/components/form'
 import { IconBox } from '~/app/components/icon-box'
 import { Input } from '~/app/components/input'
-import { Stack } from '~/app/components/stack'
-import { Text } from '~/app/components/typography'
 
 interface CreateFolderDialogProps {
   isOpen: boolean
@@ -21,89 +24,129 @@ interface CreateFolderDialogProps {
   isSubmitting?: boolean
 }
 
+const createFolderSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Folder name is required')
+    .max(255, 'Folder name must be less than 255 characters')
+    .regex(/^[^/\\?%*:|"<>]+$/, 'Folder name contains invalid characters')
+    .refine((val) => !val.startsWith('.'), 'Folder name cannot start with a dot')
+    .refine((val) => !val.endsWith('.'), 'Folder name cannot end with a dot')
+})
+
 export function CreateFolderDialog({
   isOpen,
   onClose,
   onCreate,
   isSubmitting
 }: CreateFolderDialogProps) {
-  const [folderName, setFolderName] = React.useState('')
-
-  React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
+  const form = useForm({
+    defaultValues: {
+      name: ''
+    },
+    validators: {
+      onChange: ({ value }) => {
+        const result = createFolderSchema.safeParse(value)
+        if (!result.success) {
+          const firstError = result.error.issues[0]
+          return firstError ? firstError.message : undefined
+        }
+        return undefined
       }
-    }
+    },
+    onSubmit: async ({ value }) => {
+      const result = createFolderSchema.safeParse(value)
+      if (!result.success) {
+        const firstError = result.error.issues[0]
+        if (firstError) {
+          throw new Error(firstError.message)
+        }
+        return
+      }
 
-    document.addEventListener('keydown', handleEscape)
-    return () => {
-      document.removeEventListener('keydown', handleEscape)
+      onCreate(value.name.trim())
+      form.reset()
     }
-  }, [isOpen, onClose])
+  })
 
   React.useEffect(() => {
     if (isOpen) {
-      setFolderName('')
+      form.reset()
     }
-  }, [isOpen])
+  }, [isOpen, form])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (folderName.trim()) {
-      onCreate(folderName.trim())
-      setFolderName('')
-    }
+    e.stopPropagation()
+    form.handleSubmit()
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogPopup>
         <DialogHeader>
-          <Stack direction='row' className='items-start'>
-            <IconBox variant='info' size='md' circle>
-              <Lucide.FolderPlus className='size-5' />
-            </IconBox>
-            <div>
-              <DialogTitle>Create Folder</DialogTitle>
-              <Text className='text-muted-foreground text-sm'>Enter a name for new folder</Text>
-            </div>
-          </Stack>
+          <IconBox variant='info' size='sm'>
+            <Lucide.FolderPlus className='size-4' />
+          </IconBox>
+          <DialogTitle>Create Folder</DialogTitle>
+          <DialogClose className='ml-auto'>
+            <Lucide.XIcon className='size-4' strokeWidth={2.0} />
+          </DialogClose>
         </DialogHeader>
 
-        <DialogBody>
-          <form
-            className={`space-y-4 ${isSubmitting ? 'animate-pulse' : ''}`}
-            onSubmit={handleSubmit}
-          >
-            <Stack>
-              <Input
-                type='text'
-                value={folderName}
-                onChange={(e) => setFolderName(e.target.value)}
-                placeholder='Folder name'
-                disabled={isSubmitting}
-                autoFocus
-              />
-            </Stack>
-
-            <Stack>
-              <Button type='button' variant='outline' onClick={onClose} disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button
-                type='submit'
-                variant='primary'
-                disabled={!folderName.trim() || isSubmitting}
-                progress={isSubmitting}
-              >
-                {isSubmitting ? 'Creating...' : 'Create'}
-              </Button>
-            </Stack>
-          </form>
+        <DialogBody className='border-border mt-3 border-t pt-0'>
+          <Form onSubmit={handleSubmit}>
+            <form.Field
+              name='name'
+              validators={{
+                onChange: ({ value }) => {
+                  const result = createFolderSchema.shape.name.safeParse(value)
+                  if (!result.success) {
+                    const firstError = result.error.issues[0]
+                    return firstError ? firstError.message : undefined
+                  }
+                  return undefined
+                }
+              }}
+            >
+              {(field) => (
+                <Field className='mt-4'>
+                  <FieldLabel htmlFor='name'>Folder Name</FieldLabel>
+                  <Input
+                    id='name'
+                    type='text'
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder='e.g., documents, images, 2024'
+                    disabled={isSubmitting}
+                    autoFocus
+                  />
+                  <FieldError match={!field.state.meta.isValid}>
+                    {field.state.meta.errors.join(', ')}
+                  </FieldError>
+                </Field>
+              )}
+            </form.Field>
+          </Form>
         </DialogBody>
 
-        <DialogFooter />
+        <DialogFooter>
+          <DialogClose block>Cancel</DialogClose>
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmittingForm]) => (
+              <Button
+                type='button'
+                size='sm'
+                disabled={!canSubmit || isSubmittingForm || isSubmitting}
+                onClick={() => form.handleSubmit()}
+                block
+              >
+                {isSubmitting || isSubmittingForm ? 'Creating...' : 'Create'}
+              </Button>
+            )}
+          </form.Subscribe>
+        </DialogFooter>
       </DialogPopup>
     </Dialog>
   )

@@ -2,6 +2,7 @@ import * as Lucide from 'lucide-react'
 import { Badge } from '~/app/components/badge'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Field, FieldLabel } from '~/app/components/field'
+import { clx } from '~/app/utils'
 import type { GetKeyInformationResponse } from '~/shared/schemas/keys.schema'
 
 interface AccessKey extends GetKeyInformationResponse {
@@ -111,10 +112,10 @@ export function KeyInformationCard({
           </div>
 
           <div className='flex items-center gap-3'>
-            <Lucide.Clock className={`size-4 ${expired ? 'text-red-600' : 'text-muted'}`} />
+            <Lucide.Clock className={clx('size-4', expired ? 'text-red-600' : 'text-muted')} />
             <div>
               <p className='text-muted text-xs'>Expires</p>
-              <p className={`font-medium ${expired ? 'text-red-600' : ''}`}>
+              <p className={clx('font-medium', expired ? 'text-red-600' : '')}>
                 {formatExpiration(accessKey.expiration || null, accessKey.neverExpires || false)}
               </p>
             </div>

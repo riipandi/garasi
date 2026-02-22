@@ -4,6 +4,7 @@ import { Button } from '~/app/components/button'
 import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
+import { clx } from '~/app/utils'
 import type { RepairType } from '~/shared/schemas/node.schema'
 
 interface RepairOperationsCardProps {
@@ -123,32 +124,35 @@ export function RepairOperationsCard({
               return (
                 <div
                   key={op.name}
-                  className={`flex items-center justify-between rounded-lg border p-4 ${
+                  className={clx(
+                    'flex items-center justify-between rounded-lg border p-4',
                     status === 'success'
                       ? 'border-success/30 bg-success/10'
                       : status === 'error'
                         ? 'border-danger/30 bg-danger/10'
                         : 'border-gray-200 bg-gray-50'
-                  }`}
+                  )}
                 >
                   <div className='flex items-center gap-3'>
                     <div
-                      className={`rounded-md p-2 ${
+                      className={clx(
+                        'rounded-md p-2',
                         status === 'success'
                           ? 'bg-success/20'
                           : status === 'error'
                             ? 'bg-danger/20'
                             : 'bg-primary/15'
-                      }`}
+                      )}
                     >
                       <op.icon
-                        className={`size-5 ${
+                        className={clx(
+                          'size-5',
                           status === 'success'
                             ? 'text-success'
                             : status === 'error'
                               ? 'text-danger'
                               : 'text-primary'
-                        }`}
+                        )}
                       />
                     </div>
                     <div className='flex-1'>
@@ -156,7 +160,10 @@ export function RepairOperationsCard({
                       <Text className='text-muted text-xs'>{op.summary}</Text>
                       {result && (
                         <Text
-                          className={`mt-1 text-xs ${result.success ? 'text-success' : 'text-danger'}`}
+                          className={clx(
+                            'mt-1 text-xs',
+                            result.success ? 'text-success' : 'text-danger'
+                          )}
                         >
                           {result.message}
                         </Text>
@@ -250,9 +257,10 @@ export function RepairOperationsCard({
               return (
                 <div
                   key={`result-${op.name}`}
-                  className={`mt-2 rounded-md px-3 py-2 text-xs ${
+                  className={clx(
+                    'mt-2 rounded-md px-3 py-2 text-xs',
                     result.success ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'
-                  }`}
+                  )}
                 >
                   {result.message}
                 </div>

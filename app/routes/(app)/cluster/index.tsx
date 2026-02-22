@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader, CardTitle } from '~/app/components/card'
 import { Text, TextLink } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 import clusterService from '~/app/services/cluster.service'
+import { clx } from '~/app/utils'
 
 export const Route = createFileRoute('/(app)/cluster/')({
   component: RouteComponent,
@@ -78,25 +79,25 @@ function RouteComponent() {
   return (
     <div className='mx-auto w-full max-w-7xl space-y-6'>
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        <Card className={`${statusColor.bg} ${statusColor.border}`}>
+        <Card className={clx(statusColor.bg, statusColor.border)}>
           <CardBody>
             <div className='flex items-center justify-between'>
               <div>
                 <Text className='text-muted'>Overall Status</Text>
-                <Text className={`mt-1 text-lg font-semibold ${statusColor.text}`}>
+                <Text className={clx('mt-1 text-lg font-semibold', statusColor.text)}>
                   {health?.status || 'Unknown'}
                 </Text>
               </div>
               {health?.status === 'healthy' && (
-                <Lucide.CheckCircle2 className={`size-6 ${statusColor.icon}`} />
+                <Lucide.CheckCircle2 className={clx('size-6', statusColor.icon)} />
               )}
               {health?.status === 'degraded' && (
-                <Lucide.AlertTriangle className={`size-6 ${statusColor.icon}`} />
+                <Lucide.AlertTriangle className={clx('size-6', statusColor.icon)} />
               )}
               {health?.status === 'unavailable' && (
-                <Lucide.XCircle className={`size-6 ${statusColor.icon}`} />
+                <Lucide.XCircle className={clx('size-6', statusColor.icon)} />
               )}
-              {!health?.status && <Lucide.HelpCircle className={`size-6 ${statusColor.icon}`} />}
+              {!health?.status && <Lucide.HelpCircle className={clx('size-6', statusColor.icon)} />}
             </div>
           </CardBody>
         </Card>

@@ -17,6 +17,7 @@ import {
 import { Spinner } from '~/app/components/spinner'
 import { Text } from '~/app/components/typography'
 import layoutService from '~/app/services/layout.service'
+import { clx } from '~/app/utils'
 
 interface LayoutManagementProps {
   layoutVersion?: number
@@ -396,11 +397,12 @@ export function LayoutManagement({ layoutVersion, queryClient }: LayoutManagemen
               {history.versions.map((version: { version: number }) => (
                 <div
                   key={version.version}
-                  className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
+                  className={clx(
+                    'flex items-center justify-between rounded-lg border px-4 py-3',
                     version.version === history.currentVersion
                       ? 'border-primary/30 bg-primary/10'
                       : 'border-gray-200 bg-white'
-                  }`}
+                  )}
                 >
                   <div className='flex items-center gap-3'>
                     <Text className='font-medium'>v{version.version}</Text>
