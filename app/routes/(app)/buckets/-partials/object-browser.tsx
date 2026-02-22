@@ -183,6 +183,16 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
     setActiveDropdown(null)
   }
 
+  const handleBatchDownload = () => {
+    const selectedItemsList = Array.from(selectedItems)
+    console.log('Batch download', selectedItemsList)
+  }
+
+  const handleBatchDelete = () => {
+    const selectedItemsList = Array.from(selectedItems)
+    console.log('Batch delete', selectedItemsList)
+  }
+
   const handleToggleSelect = (itemId: string) => {
     setSelectedItems((prev) => {
       const newSet = new Set(prev)
@@ -320,6 +330,34 @@ export function ObjectBrowser({ queryClient, bucket, prefix, key, bucketId }: Ob
           </>
         )}
       </div>
+
+      {selectedItems.size > 0 && (
+        <div className='border-border bg-dimmed/10 flex items-center justify-between gap-3 rounded-lg border py-2.5 pr-4 pl-5'>
+          <div className='flex items-center gap-3'>
+            <Checkbox
+              checked={
+                filteredFiles.length > 0 &&
+                selectedItems.size ===
+                  [...folders.map((f) => f.id), ...files.map((f) => f.id)].length
+              }
+              onClick={handleSelectAll}
+            />
+            <Text className='text-sm font-medium'>
+              {selectedItems.size} {selectedItems.size === 1 ? 'item' : 'items'} selected
+            </Text>
+          </div>
+          <div className='flex items-center gap-2'>
+            <Button variant='tertiary' size='xs' onClick={handleBatchDownload}>
+              <Lucide.Download className='size-3' />
+              Download
+            </Button>
+            <Button variant='danger' size='xs' onClick={handleBatchDelete}>
+              <Lucide.Trash2 className='size-3' />
+              Delete
+            </Button>
+          </div>
+        </div>
+      )}
 
       <TableContainer className='border-border rounded-lg border border-t-transparent'>
         <Table className='rounded-lg'>
