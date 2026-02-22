@@ -6,6 +6,7 @@ import { Button } from '~/app/components/button'
 import { Checkbox } from '~/app/components/checkbox'
 import { IconBox } from '~/app/components/icon-box'
 import { InputGroup, InputGroupAddon } from '~/app/components/input-group'
+import { Menu, MenuPopup, MenuItem, MenuTrigger, MenuSeparator } from '~/app/components/menu'
 import { Spinner } from '~/app/components/spinner'
 import { Stack } from '~/app/components/stack'
 import {
@@ -22,7 +23,6 @@ import objectsService from '~/app/services/objects.service'
 import { clx } from '~/app/utils'
 import type { GetBucketInfoResponse } from '~/shared/schemas/bucket.schema'
 import { CreateFolderDialog } from './create-folder-dialog'
-import { DropdownItem, DropdownMenu, MenuSeparator } from './dropdown-menu'
 import { UploadFileDialog } from './upload-file-dialog'
 
 interface FileItem {
@@ -97,7 +97,6 @@ export function ObjectBrowser({
   const [filterText, setFilterText] = React.useState('')
   const [showCreateFolderDialog, setShowCreateFolderDialog] = React.useState(false)
   const [showUploadFileDialog, setShowUploadFileDialog] = React.useState(false)
-  const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null)
   const [isCreatingFolder, setIsCreatingFolder] = React.useState(false)
   const [isUploadingFile, setIsUploadingFile] = React.useState(false)
   const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set())
@@ -168,27 +167,18 @@ export function ObjectBrowser({
 
   const handleCopyUrl = (item: FileItem) => {
     console.log('Copy URL', item)
-    setActiveDropdown(null)
-  }
-
-  const handleCopyPresignedUrl = (item: FileItem) => {
-    console.log('Copy Pre-signed URL', item)
-    setActiveDropdown(null)
   }
 
   const handleRename = (item: FileItem) => {
     console.log('Rename', item)
-    setActiveDropdown(null)
   }
 
   const handleDownload = (item: FileItem) => {
     console.log('Download', item)
-    setActiveDropdown(null)
   }
 
   const handleDelete = (item: FileItem) => {
     console.log('Delete', item)
-    setActiveDropdown(null)
   }
 
   const handleBatchDownload = () => {
@@ -485,25 +475,24 @@ export function ObjectBrowser({
                       </div>
                     </TableCell>
                     <TableCell className='text-right'>
-                      <DropdownMenu
-                        isOpen={activeDropdown === folder.id}
-                        onClose={() => setActiveDropdown(null)}
-                      >
-                        <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(folder)}>
-                          Copy URL
-                        </DropdownItem>
-                        <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(folder)}>
-                          Rename
-                        </DropdownItem>
-                        <MenuSeparator />
-                        <DropdownItem
-                          icon={Lucide.Trash2}
-                          onClick={() => handleDelete(folder)}
-                          danger
-                        >
-                          Delete
-                        </DropdownItem>
-                      </DropdownMenu>
+                      <Menu>
+                        <MenuTrigger render={<Button variant='plain' />}>
+                          <Lucide.MoreVertical className='size-4' />
+                          <span className='sr-only'>Menu</span>
+                        </MenuTrigger>
+                        <MenuPopup className='w-32' align='end' size='compact'>
+                          <MenuItem className='text-sm' onClick={() => handleCopyUrl(folder)}>
+                            Copy URL
+                          </MenuItem>
+                          <MenuItem className='text-sm' onClick={() => handleRename(folder)}>
+                            Rename
+                          </MenuItem>
+                          <MenuSeparator />
+                          <MenuItem className='text-sm' onClick={() => handleDelete(folder)}>
+                            Delete
+                          </MenuItem>
+                        </MenuPopup>
+                      </Menu>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -568,34 +557,27 @@ export function ObjectBrowser({
                       </div>
                     </TableCell>
                     <TableCell className='text-right'>
-                      <DropdownMenu
-                        isOpen={activeDropdown === file.id}
-                        onClose={() => setActiveDropdown(null)}
-                      >
-                        <DropdownItem icon={Lucide.Link2} onClick={() => handleCopyUrl(file)}>
-                          Copy URL
-                        </DropdownItem>
-                        <DropdownItem
-                          icon={Lucide.Clock}
-                          onClick={() => handleCopyPresignedUrl(file)}
-                        >
-                          Copy Pre-signed URL
-                        </DropdownItem>
-                        <DropdownItem icon={Lucide.Pencil} onClick={() => handleRename(file)}>
-                          Rename
-                        </DropdownItem>
-                        <DropdownItem icon={Lucide.Download} onClick={() => handleDownload(file)}>
-                          Download
-                        </DropdownItem>
-                        <MenuSeparator />
-                        <DropdownItem
-                          icon={Lucide.Trash2}
-                          onClick={() => handleDelete(file)}
-                          danger
-                        >
-                          Delete
-                        </DropdownItem>
-                      </DropdownMenu>
+                      <Menu>
+                        <MenuTrigger render={<Button variant='plain' />}>
+                          <Lucide.MoreVertical className='size-4' />
+                          <span className='sr-only'>Menu</span>
+                        </MenuTrigger>
+                        <MenuPopup className='w-32' align='end' size='compact'>
+                          <MenuItem className='text-sm' onClick={() => handleCopyUrl(file)}>
+                            Copy URL
+                          </MenuItem>
+                          <MenuItem className='text-sm' onClick={() => handleDownload(file)}>
+                            Download
+                          </MenuItem>
+                          <MenuItem className='text-sm' onClick={() => handleRename(file)}>
+                            Rename
+                          </MenuItem>
+                          <MenuSeparator />
+                          <MenuItem className='text-sm' onClick={() => handleDelete(file)}>
+                            Delete
+                          </MenuItem>
+                        </MenuPopup>
+                      </Menu>
                     </TableCell>
                   </TableRow>
                 ))}

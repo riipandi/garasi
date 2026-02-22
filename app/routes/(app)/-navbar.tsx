@@ -1,6 +1,7 @@
 import { Link, useLocation } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { Button } from '~/app/components/button'
+import { ScrollArea } from '~/app/components/scroll-area'
 import {
   Sidebar,
   SidebarContent,
@@ -40,9 +41,7 @@ interface NavbarProps {
   isLoading?: boolean
 }
 
-function renderNavItem(item: NavItem) {
-  const location = useLocation()
-
+function renderNavItem(item: NavItem, location: string) {
   return (
     <SidebarItem key={item.label}>
       <SidebarItemButton
@@ -58,7 +57,7 @@ function renderNavItem(item: NavItem) {
             <Link to={item.to} activeOptions={{ exact: item.exact }} />
           )
         }
-        active={location.pathname === item.to}
+        active={location === item.to}
       >
         {item.icon ? <item.icon /> : null}
         {item.label}
@@ -67,13 +66,13 @@ function renderNavItem(item: NavItem) {
   )
 }
 
-function renderNavGroup(group: NavGroup, index: number) {
+function renderNavGroup(group: NavGroup, index: number, location: string) {
   return (
     <SidebarGroup key={`${index}-${group.title}`}>
       {group.title ? (
         <SidebarGroupTitle className='text-sm'>{group.title}</SidebarGroupTitle>
       ) : null}
-      <SidebarList>{group.items.map((item) => renderNavItem(item))}</SidebarList>
+      <SidebarList>{group.items.map((item) => renderNavItem(item, location))}</SidebarList>
     </SidebarGroup>
   )
 }
@@ -124,9 +123,9 @@ function BucketQuickAccess({
   }
 
   return (
-    <SidebarGroup className='mt-2'>
+    <SidebarGroup className='mt-2 flex min-h-0 flex-1 flex-col'>
       <SidebarGroupTitle className='text-sm'>Quick Access</SidebarGroupTitle>
-      <SidebarList>
+      <ScrollArea scrollbar='vertical' render={<SidebarList className='min-h-0 flex-1' />}>
         {bucketItems.map((item) => (
           <SidebarItem key={item.label}>
             <SidebarItemButton
@@ -143,7 +142,7 @@ function BucketQuickAccess({
             </SidebarItemButton>
           </SidebarItem>
         ))}
-      </SidebarList>
+      </ScrollArea>
     </SidebarGroup>
   )
 }
@@ -156,6 +155,8 @@ export function Navbar({
   buckets,
   isLoading
 }: NavbarProps) {
+  const location = useLocation()
+
   const mainMenu: NavGroup = {
     items: [
       { to: '/', label: 'Overview', icon: Lucide.Warehouse, exact: true },
@@ -187,8 +188,10 @@ export function Navbar({
           {sidebarOpen ? <Lucide.SidebarCloseIcon /> : <Lucide.SidebarOpenIcon />}
         </Button>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu>{navGroups.map((group, index) => renderNavGroup(group, index))}</SidebarMenu>
+      <SidebarContent className='overflow-hidden'>
+        <SidebarMenu>
+          {navGroups.map((group, index) => renderNavGroup(group, index, location.pathname))}
+        </SidebarMenu>
         <BucketQuickAccess buckets={buckets} isLoading={isLoading} />
       </SidebarContent>
       <SidebarFooter>

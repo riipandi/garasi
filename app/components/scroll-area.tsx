@@ -53,7 +53,7 @@ function ScrollAreaScrollbar({
       {...props}
       data-slot='scroll-area-scrollbar'
       className={clx(
-        'm-1 flex touch-none select-none',
+        'z-20 m-1 flex touch-none select-none',
         'pointer-events-none opacity-0 transition-opacity delay-300',
         'data-hovering:opacity-100 data-hovering:delay-0',
         'data-hovering:pointer-events-auto data-hovering:duration-75',
