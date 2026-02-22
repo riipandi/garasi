@@ -226,13 +226,10 @@ export function SidebarItemButton({
       'data-slot': 'sidebar-item-button',
       'data-active': active ? true : undefined,
       className: clx(
-        'relative z-10 flex w-full items-center gap-2.5',
-        'text-foreground cursor-pointer text-left',
-        'hover:not-[[disabled],[data-disabled]]:bg-accent transition-colors duration-75',
-        '**:[svg]:text-muted **:[svg]:size-4',
-        'outline-primary focus-visible:outline-2 focus-visible:outline-offset-2',
+        'text-foreground relative z-10 flex w-full cursor-pointer items-center gap-2.5 text-left text-sm',
+        'hover:not-[[disabled],[data-disabled]]:bg-accent **:[svg]:text-muted transition-colors duration-75 **:[svg]:size-4',
+        'outline-primary focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-70',
         'data-popup-open:bg-accent data-active:bg-accent',
-        'disabled:cursor-not-allowed disabled:opacity-70',
         expandableIndicator && [
           'data-expandable:after:bg-chevron-down-dark dark:data-expandable:after:bg-chevron-down data-expandable:after:ml-auto data-expandable:after:size-4',
           'data-expandable:after:transition-transform data-expandable:after:duration-100',
@@ -263,7 +260,7 @@ export function SidebarGroupTitle({ className, children, ...props }: React.Compo
     <span
       data-slot='sidebar-group-title'
       className={clx(
-        'text-dimmed mb-1 inline-flex items-center text-base font-medium',
+        'text-dimmed mb-1 inline-flex items-center text-sm font-medium',
         '**:[svg]:size-3.5',
         className
       )}

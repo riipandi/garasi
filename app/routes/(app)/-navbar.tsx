@@ -67,7 +67,8 @@ export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) 
   const mainMenu: NavGroup = {
     items: [
       { to: '/', label: 'Overview', icon: Lucide.Warehouse, exact: true },
-      { to: '/keys', label: 'Access Keys', icon: Lucide.KeyRound, exact: true },
+      { to: '/nodes', label: 'Nodes', icon: Lucide.KeyRound, exact: false },
+      { to: '/keys', label: 'Keys', icon: Lucide.KeyRound, exact: false },
       { to: '/buckets', label: 'Buckets', icon: Lucide.Box, exact: false },
       { to: '/profile', label: 'Account', icon: Lucide.UserCircle, exact: false }
     ]
@@ -75,11 +76,7 @@ export function Navbar({ user, logoutFn, sidebarOpen, sidebarFn }: NavbarProps) 
 
   const bucketList: NavGroup = {
     title: 'Quick Access',
-    items: [
-      // { to: '/cluster', label: 'Cluster', icon: Lucide.ServerCog },
-      // { to: '/buckets', label: 'Buckets', icon: Lucide.Box, exact: true },
-      // { to: '/keys', label: 'Access Keys', icon: Lucide.KeyRound }
-    ]
+    items: [{ to: '/buckets/$id', label: 'bucket-name' }]
   }
 
   const navGroups = [mainMenu, bucketList]

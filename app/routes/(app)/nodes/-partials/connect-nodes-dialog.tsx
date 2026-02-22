@@ -124,7 +124,7 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogPopup className='w-lg'>
+      <DialogPopup className='w-xl'>
         <DialogHeader>
           <IconBox variant='primary' size='sm'>
             <Lucide.Network className='size-4' />
@@ -140,13 +140,13 @@ export function ConnectNodesDialog({ isOpen, onClose, queryClient }: ConnectNode
               <Lucide.Info className='text-primary mt-1.5 size-4 shrink-0' />
               <Text className='text-sm leading-relaxed'>
                 Enter node addresses in the format:{' '}
-                <Badge variant='primary' size='sm'>
-                  node_id@net_address
+                <Badge variant='primary' size='sm' className='font-mono text-xs'>
+                  node_id@net_address:port
                 </Badge>
                 <br />
                 Example:{' '}
-                <Badge variant='primary' size='sm'>
-                  node1@192.168.1.10:3901
+                <Badge variant='primary' size='sm' className='font-mono text-xs'>
+                  abcdefghijklmnopqrstuvwxyz1234567890@192.168.1.10:3901
                 </Badge>
               </Text>
             </div>
