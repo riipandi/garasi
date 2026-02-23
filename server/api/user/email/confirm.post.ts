@@ -1,9 +1,9 @@
-import { HTTPError, getQuery, defineEventHandler } from 'h3'
+import { HTTPError, getQuery, defineHandler } from 'nitro/h3'
 import { sendMail } from '~/server/platform/mailer'
 import { createErrorResonse, createResponse } from '~/server/platform/responder'
 import { deactivateAllSessions } from '~/server/services/session.service'
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   const { db, logger } = event.context
 
   try {

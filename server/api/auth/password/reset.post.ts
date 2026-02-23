@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, HTTPError } from 'h3'
+import { defineHandler, readBody, HTTPError } from 'nitro/h3'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
 import { deactivateAllSessions } from '~/server/services/session.service'
 
@@ -7,7 +7,7 @@ interface ResetPasswordBody {
   password: string
 }
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   const { db, logger } = event.context
 
   try {

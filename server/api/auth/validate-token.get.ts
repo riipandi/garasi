@@ -1,7 +1,7 @@
-import { defineEventHandler, getQuery, HTTPError } from 'h3'
+import { defineHandler, getQuery, HTTPError } from 'nitro/h3'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   const { db } = event.context
 
   try {

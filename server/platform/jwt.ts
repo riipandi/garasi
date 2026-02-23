@@ -1,5 +1,5 @@
-import { HTTPError } from 'h3'
 import { SignJWT, jwtVerify } from 'jose'
+import { HTTPError } from 'nitro/h3'
 import { UAParser, type IResult } from 'ua-parser-js'
 import { logger } from '~/server/platform/logger'
 import { parseUserAgentHash } from '~/server/utils/parser'

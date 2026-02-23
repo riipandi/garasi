@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, HTTPError } from 'h3'
+import { defineHandler, readBody, HTTPError } from 'nitro/h3'
 import { typeid } from 'typeid-js'
 import { sendMail } from '~/server/platform/mailer'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
@@ -8,7 +8,7 @@ interface ForgotPasswordBody {
   email: string
 }
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   const { db, baseURL, logger } = event.context
 
   try {
