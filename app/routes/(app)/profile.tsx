@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import { useQueryState } from 'nuqs'
 import * as React from 'react'
+import { z } from 'zod'
 import { Alert } from '~/app/components/alert'
 import { Avatar, AvatarFallbackInitial } from '~/app/components/avatar'
 import { Tabs, TabsItem, TabsList, TabsPanel } from '~/app/components/tabs'
@@ -44,15 +44,20 @@ interface NotificationState {
   message: string | null
 }
 
+const searchSchema = z.object({
+  tab: z.enum(['general', 'security', 'sessions']).optional()
+})
+
 export const Route = createFileRoute('/(app)/profile')({
   component: RouteComponent,
+  validateSearch: searchSchema,
   loader: ({ context }) => {
     // Prefetch user profile data before render
     context.queryClient.ensureQueryData(userProfileQueryOptions)
   }
 })
 
-export function useNotification() {
+function useNotification() {
   const [notification, setNotification] = React.useState<NotificationState>({
     type: null,
     message: null
@@ -69,8 +74,13 @@ export function useNotification() {
 function RouteComponent() {
   const { user } = useAuth()
   const { notification, showNotification } = useNotification()
-  const [activeTab, setActiveTab] = useQueryState('activeTab')
-  const defaultActiveTab = activeTab || 'general'
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
+  const activeTab = search.tab || 'general'
+
+  const handleTabChange = (value: 'general' | 'security' | 'sessions') => {
+    navigate({ search: (prev) => ({ ...prev, tab: value }) })
+  }
 
   // Fetch user profile data using TanStack Query
   const { data: profileData } = useSuspenseQuery(userProfileQueryOptions)
@@ -95,7 +105,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <Tabs value={defaultActiveTab} onValueChange={(value) => setActiveTab(value)}>
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList>
           <TabsItem value='general'>General</TabsItem>
           <TabsItem value='security'>Security</TabsItem>

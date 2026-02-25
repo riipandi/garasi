@@ -1,6 +1,6 @@
 import { useQueryErrorResetBoundary } from '@tanstack/react-query'
 import { useCanGoBack, useRouter, type ErrorComponentProps } from '@tanstack/react-router'
-import { Component, useEffect, type ReactNode } from 'react'
+import { Activity, Component, useEffect, type ReactNode } from 'react'
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -212,9 +212,14 @@ export function ErrorGeneral({ error, reset }: ErrorComponentProps) {
           <h1 className='text-foreground mt-4 text-3xl font-bold tracking-tight sm:text-5xl'>
             Something went wrong
           </h1>
-          <p className='text-dimmed mt-6 text-base leading-7 font-medium'>
+          <p className='text-danger mt-6 text-base leading-7 font-medium'>
             {error.message || 'An unexpected error occurred. Please try again.'}
           </p>
+          <Activity mode={import.meta.env.DEV && error.stack ? 'visible' : 'hidden'}>
+            <pre className='debug bg-background/60 border-border text-danger mt-8 w-full max-w-5xl overflow-auto rounded-lg border p-4 text-left'>
+              <code className='font-mono text-sm'>{error.stack}</code>
+            </pre>
+          </Activity>
           <div className='mt-10 flex items-center justify-center gap-x-4'>
             <button
               type='button'

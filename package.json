@@ -65,7 +65,6 @@
     "loglayer": "^9.1.0",
     "lucide-react": "^0.575.0",
     "nanostores": "^1.1.1",
-    "nuqs": "^2.8.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "serialize-error": "^13.0.1",

@@ -15,7 +15,6 @@ export const Route = createRootRouteWithContext<GlobalContext>()({
   notFoundComponent: NotFound,
   errorComponent: ErrorGeneral,
   loader({ context }) {
-    // Always return current auth and ui state from context
     const { queryClient, auth, ui } = context
     return { queryClient, auth, ui }
   }

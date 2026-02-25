@@ -27,7 +27,7 @@ bun run check              # Check formatting and linting
 ## Tech Stack
 - **Frontend:** React 19 + TypeScript + Vite
 - **Routing:** TanStack Router (file-based in `app/routes/`)
-- **State:** TanStack Query + Nanostores + nuqs
+- **State:** TanStack Query + Nanostores
 - **Backend:** Nitro (API in `server/api/`)
 - **Database:** SQLite with Kysely
 - **Runtime:** Bun
