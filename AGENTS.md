@@ -152,3 +152,4 @@ bun run format && bun run typecheck && bun run lint && bun run check
 - **Run `bun run format`** before committing code
 - Don't use `try catch` with `defineProtectedHandler` - errors are handled automatically
 - Access `event.context.db`, `event.context.auth`, `event.context.logger` in handlers
+- Log only actionable information.

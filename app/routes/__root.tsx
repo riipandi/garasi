@@ -1,7 +1,7 @@
+import { ThemeProvider } from '@lonik/themer'
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
-import { ThemeProvider } from 'tan-themer'
-import { NotFound } from '~/app/errors'
+import { ErrorGeneral, NotFound } from '~/app/errors'
 import type { AuthStore, UIStore } from '~/app/stores'
 
 export interface GlobalContext {
@@ -13,6 +13,7 @@ export interface GlobalContext {
 export const Route = createRootRouteWithContext<GlobalContext>()({
   component: RootComponent,
   notFoundComponent: NotFound,
+  errorComponent: ErrorGeneral,
   loader({ context }) {
     // Always return current auth and ui state from context
     const { queryClient, auth, ui } = context
