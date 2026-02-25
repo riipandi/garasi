@@ -20,7 +20,8 @@ export const Route = createFileRoute('/(app)/nodes/')({
   component: RouteComponent,
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(clusterStatusQuery)
-  }
+  },
+  staticData: { breadcrumb: 'Nodes' }
 })
 
 function RouteComponent() {

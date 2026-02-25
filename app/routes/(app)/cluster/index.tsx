@@ -13,7 +13,8 @@ export const Route = createFileRoute('/(app)/cluster/')({
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(clusterHealthQuery)
     context.queryClient.ensureQueryData(clusterStatusQuery)
-  }
+  },
+  staticData: { breadcrumb: 'Cluster' }
 })
 
 const clusterHealthQuery = queryOptions({

@@ -46,7 +46,8 @@ export const Route = createFileRoute('/(app)/keys/$id')({
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(keyDetailsQuery(params.id))
     context.queryClient.ensureQueryData(bucketsQuery)
-  }
+  },
+  staticData: { breadcrumb: ['Access Keys', 'Details'] }
 })
 
 const keyDetailsQuery = (keyId: string) =>

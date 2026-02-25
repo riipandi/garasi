@@ -7,6 +7,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { routeTree } from '~/app/routes.gen'
+import type { BreadcrumbValue } from '~/app/routes/(app)/-breadcrumb'
 import App from './app'
 
 // Create root element and ensure exists.
@@ -35,6 +36,9 @@ const appRoutes = createRouter({
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof appRoutes
+  }
+  interface StaticDataRouteOption {
+    breadcrumb?: BreadcrumbValue
   }
 }
 

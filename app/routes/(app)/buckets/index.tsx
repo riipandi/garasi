@@ -31,7 +31,8 @@ export const Route = createFileRoute('/(app)/buckets/')({
   component: RouteComponent,
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(bucketsQueryOpts)
-  }
+  },
+  staticData: { breadcrumb: 'Buckets' }
 })
 
 function RouteComponent() {

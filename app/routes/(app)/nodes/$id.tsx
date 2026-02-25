@@ -42,7 +42,8 @@ export const Route = createFileRoute('/(app)/nodes/$id')({
   component: RouteComponent,
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(nodeInfoQuery(params.id))
-  }
+  },
+  staticData: { breadcrumb: ['Nodes', 'Details'] }
 })
 
 const nodeInfoQuery = (nodeId: string) =>

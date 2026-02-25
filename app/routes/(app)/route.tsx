@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Button } from '~/app/components/button'
 import { NotFound } from '~/app/errors'
 import { requireAuthentication, useAuth } from '~/app/guards'
+import { AppBreadcrumb } from '~/app/routes/(app)/-breadcrumb'
 import bucketService from '~/app/services/bucket.service'
 import { clx } from '~/app/utils'
 import { Navbar } from './-navbar'
@@ -90,6 +91,8 @@ function RouteComponent() {
               {sidebarOpen ? <Lucide.SidebarCloseIcon /> : <Lucide.SidebarOpenIcon />}
             </Button>
           </React.Activity>
+          {/* TODO: temporary disable */}
+          <AppBreadcrumb className='sr-only w-full px-4' />
         </nav>
         <div className='min-h-[calc(100vh-4rem)] lg:-mt-12'>
           <div

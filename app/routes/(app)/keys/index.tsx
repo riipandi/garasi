@@ -32,7 +32,8 @@ export const Route = createFileRoute('/(app)/keys/')({
   component: RouteComponent,
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(keysQueryOpts)
-  }
+  },
+  staticData: { breadcrumb: 'Access Keys' }
 })
 
 function RouteComponent() {

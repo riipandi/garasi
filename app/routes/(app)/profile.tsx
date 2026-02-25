@@ -54,7 +54,8 @@ export const Route = createFileRoute('/(app)/profile')({
   loader: ({ context }) => {
     // Prefetch user profile data before render
     context.queryClient.ensureQueryData(userProfileQueryOptions)
-  }
+  },
+  staticData: { breadcrumb: 'User Account' }
 })
 
 function useNotification() {

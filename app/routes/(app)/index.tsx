@@ -21,7 +21,8 @@ export const Route = createFileRoute('/(app)/')({
     context.queryClient.ensureQueryData(bucketsQuery)
     context.queryClient.ensureQueryData(keysQuery)
   },
-  errorComponent: ({ error }) => <DashboardError error={error} />
+  errorComponent: ({ error }) => <DashboardError error={error} />,
+  staticData: { breadcrumb: 'Overview' }
 })
 
 const whoamiQuery = queryOptions({

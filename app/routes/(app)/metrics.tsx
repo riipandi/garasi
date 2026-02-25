@@ -3,7 +3,8 @@ import { Text } from '~/app/components/typography'
 import { Heading } from '~/app/components/typography'
 
 export const Route = createFileRoute('/(app)/metrics')({
-  component: RouteComponent
+  component: RouteComponent,
+  staticData: { breadcrumb: 'Metrics' }
 })
 
 function RouteComponent() {

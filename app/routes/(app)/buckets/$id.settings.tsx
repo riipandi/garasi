@@ -80,7 +80,8 @@ export const Route = createFileRoute('/(app)/buckets/$id/settings')({
   loader: ({ context, params }) => {
     context.queryClient.ensureQueryData(bucketQuery(params.id))
     context.queryClient.ensureQueryData(keysQuery())
-  }
+  },
+  staticData: { breadcrumb: ['Buckets', 'Details', 'Settings'] }
 })
 
 function bucketQuery(bucketId: string) {
