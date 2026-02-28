@@ -1,6 +1,6 @@
 import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-import { createS3ClientFromBucket } from '~/server/platform/s3client'
+import { S3Service } from '~/server/platform/s3client'
 
 export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
@@ -16,31 +16,23 @@ export default defineProtectedHandler(async (event) => {
   log.withMetadata({ bucket, prefix }).debug('Listing bucket objects')
 
   // Retrieve bucket objects
-  const s3Client = await createS3ClientFromBucket(event, bucket)
+  const s3Client = await S3Service.fromBucket(event, bucket)
 
   // Use delimiter to properly separate folders from files
   // This will return folders in commonPrefixes and files in contents
   // If prefix is provided, list objects under that prefix
-  const listOptions: any = {
-    maxKeys: 100,
-    fetchOwner: true,
-    delimiter: '/'
-  }
-
-  // Add prefix if provided
-  if (prefix) {
-    listOptions.prefix = prefix
-  }
-
-  const data = await s3Client.list(listOptions, { bucket })
+  const data = await s3Client.list(prefix, {
+    delimiter: '/',
+    maxKeys: 100
+  })
 
   // Log detailed information for debugging folder recognition
   log
     .withMetadata({
       bucket,
       prefix,
-      objectCount: data?.contents?.length || 0,
-      folderCount: data?.commonPrefixes?.length || 0
+      objectCount: data?.Contents?.length || 0,
+      folderCount: data?.CommonPrefixes?.length || 0
     })
     .debug('Bucket objects listed successfully')
 

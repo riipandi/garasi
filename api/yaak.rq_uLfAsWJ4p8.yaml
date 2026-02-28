@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_EnU568g9No
-createdAt: 2026-01-22T18:55:44.502862
-updatedAt: 2026-02-28T15:45:46.815181
+id: rq_uLfAsWJ4p8
+createdAt: 2026-02-28T15:45:49.856363
+updatedAt: 2026-02-28T15:59:09.997875
 workspaceId: wk_YrPa97TLKc
 folderId: fl_36BcPxBP88
 authentication: {}
@@ -10,7 +10,8 @@ authenticationType: null
 body:
   text: |-
     {
-      "name": "dualupaa"
+      "keys": [],
+      "force": false
     }
 bodyType: application/json
 description: ''
@@ -18,9 +19,9 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: vJA7ISaVRe
-method: POST
-name: Create a directory
-sortPriority: 111.1111111111111
-url: ${[ baseURL ]}/api/objects/folder?bucket=demo&prefix=/
+  id: Nbi4BZYpZQ
+method: DELETE
+name: Delete an object
+sortPriority: 333.3343333333333
+url: ${[ baseURL ]}/api/objects?bucket=demo&prefix=
 urlParameters: []

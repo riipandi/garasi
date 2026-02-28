@@ -249,3 +249,28 @@ export const parseObject = <T extends Record<string, unknown> = Record<string, u
     return {} as T
   }
 }
+
+/**
+ * Convert PascalCase to snake_case
+ * e.g., CommonPrefixes -> common_prefixes, Contents -> contents
+ */
+export function toSnakeCase(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(toSnakeCase)
+  }
+
+  if (typeof obj !== 'object') {
+    return obj
+  }
+
+  const result: Record<string, any> = {}
+  for (const key of Object.keys(obj)) {
+    const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase()
+    result[snakeKey] = toSnakeCase(obj[key])
+  }
+  return result
+}

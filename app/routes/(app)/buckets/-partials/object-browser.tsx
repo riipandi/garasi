@@ -61,7 +61,7 @@ export function ObjectBrowser({
     queryKey: ['objects', bucket.id, prefix, key],
     queryFn: async () => {
       if (!hasAccessKeys) {
-        return { data: { commonPrefixes: [], contents: [] } }
+        return { data: { common_prefixes: [], contents: [] } }
       }
       return objectsService.listBucketObjects({ bucket: bucketParam, prefix: prefix || undefined })
     }
@@ -102,7 +102,7 @@ export function ObjectBrowser({
   const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set())
 
   const fileItems: FileItem[] = React.useMemo(() => {
-    const commonPrefixes = objectsQuery.data?.data?.commonPrefixes || []
+    const commonPrefixes = objectsQuery.data?.data?.common_prefixes || []
     const contents = objectsQuery.data?.data?.contents || []
 
     const folderItemsFromPrefixes = commonPrefixes

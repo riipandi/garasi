@@ -1,6 +1,6 @@
 import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
-import { createS3ClientFromBucket } from '~/server/platform/s3client'
+import { S3Service } from '~/server/platform/s3client'
 import { parseBoolean } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
 import { prettyBytes } from '~/shared/utils/humanize'
@@ -65,19 +65,20 @@ export default defineProtectedHandler(async (event) => {
   const contentType = (fileEntry.type as string) ?? 'application/octet-stream'
 
   // Upload the file to bucket
-  const s3Client = await createS3ClientFromBucket(event, bucket)
+  const s3Client = await S3Service.fromBucket(event, bucket)
 
   // Build the full key with prefix if provided
   const fullKey = prefix ? `${prefix}${filename}` : filename
 
   const forceUpload = parseBoolean(overwrite ?? null)
-  const fileExists = await s3Client.exists(fullKey, { bucket })
+  const fileExists = await s3Client.exists(fullKey)
   if (!forceUpload && fileExists) {
     log.withMetadata({ filename: fullKey }).warn('File already exists')
     throw new HTTPError({ status: 401, statusText: `File '${fullKey}' already exists` })
   }
 
-  const bytesWritten = await s3Client.write(fullKey, buffer, { bucket, type: contentType })
+  // Write uses multipart upload for large files (>100MB)
+  const bytesWritten = await s3Client.write(fullKey, buffer, { contentType })
   log
     .withMetadata({ filename: fullKey, fileSize: prettyBytes(bytesWritten) })
     .debug('File uploaded successfully')

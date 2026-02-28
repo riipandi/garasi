@@ -2,28 +2,28 @@ type: http_request
 model: http_request
 id: rq_zG9ZxpWfea
 createdAt: 2026-01-21T16:30:38.725741
-updatedAt: 2026-01-23T12:34:03.932972
+updatedAt: 2026-02-28T15:20:01.109275
 workspaceId: wk_YrPa97TLKc
 folderId: fl_36BcPxBP88
 authentication: {}
 authenticationType: null
 body:
   form:
-    - enabled: true
-      file: /Users/ariss/Downloads/Crabby Craft Square.png
-      id: CiVe34KDHI
-      name: file
-    - enabled: true
-      id: ka7hYhMWXW
-      name: ''
-      value: ''
+  - enabled: true
+    file: /Users/ariss/Downloads/_TRUNK_/15 fakta pahit karir IT.pdf
+    id: CiVe34KDHI
+    name: file
+  - enabled: true
+    id: j5pBQxPqBR
+    name: ''
+    value: ''
 bodyType: multipart/form-data
 description: ''
 headers:
-  - enabled: true
-    name: Content-Type
-    value: multipart/form-data
-    id: pwvRgvIVN8
+- enabled: true
+  name: Content-Type
+  value: multipart/form-data
+  id: pwvRgvIVN8
 method: POST
 name: Upload file to bucket
 sortPriority: 333.3333333333333

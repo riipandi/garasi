@@ -1,31 +1,108 @@
-import type { S3ListObjectsResponse } from 'bun'
-
 export interface ListBucketObjectsParams {
-  bucket: string // Bucket name (not the bucket id)
-  prefix?: string // Optional key prefix
+  bucket: string
+  prefix?: string
 }
 
-// TODO: reconfigure the output schema
-export interface ListBucketObjectsResponse extends S3ListObjectsResponse {}
+export interface S3Object {
+  key: string
+  last_modified?: string
+  e_tag?: string
+  size?: number
+  storage_class?: string
+  owner?: {
+    id: string
+    display_name?: string
+  }
+}
+
+export interface CommonPrefix {
+  prefix: string
+}
+
+export interface ListBucketObjectsResponse {
+  is_truncated?: boolean
+  marker?: string
+  next_marker?: string
+  contents?: S3Object[]
+  common_prefixes?: CommonPrefix[]
+  name?: string
+  prefix?: string
+  delimiter?: string
+  max_keys?: number
+  common_prefixes_count?: number
+  keys_count?: number
+}
 
 export interface UploadFileParams {
-  bucket: string // Bucket name (not the bucket id)
-  overwrite?: boolean // Overwrite existing object
+  bucket: string
+  overwrite?: boolean
 }
 
 export interface UploadFileRequest {
   file: File | Blob | FormData
 }
 
-export interface UploadFileResponse {}
+export interface UploadFileResponse {
+  filename: string
+  contentType: string
+  fileSize: string
+  forceUpload: boolean
+}
 
 export interface CreateFolderParams {
-  bucket: string // Bucket name (not the bucket id)
-  prefix?: string // Optional key prefix
+  bucket: string
+  prefix?: string
 }
 
 export interface CreateFolderRequest {
-  name: string // Folder name
+  name: string
 }
 
-export interface CreateFolderResponse {}
+export interface CreateFolderResponse {
+  name: string
+  folder_key: string
+  bucket: string
+}
+
+export interface PresignUrlParams {
+  bucket: string
+  key: string
+  operation: 'get' | 'put'
+  contentType?: string
+  expiresIn?: number
+}
+
+export interface PresignUrlResponse {
+  url: string
+  key: string
+  operation: 'get' | 'put'
+  expires_in: number
+  expires_at: string
+}
+
+export interface DeleteObjectParams {
+  bucket: string
+  key: string
+  force?: boolean
+}
+
+export interface DeleteObjectResponse {
+  key: string
+  type: 'file' | 'folder'
+  deleted_count: number
+}
+
+export interface DeleteObjectsParams {
+  bucket: string
+  keys: string[]
+  force?: boolean
+}
+
+export interface DeleteObjectsResponse {
+  deleted: string[]
+  deleted_count: number
+  errors?: Array<{
+    key: string
+    error: string
+  }>
+}
