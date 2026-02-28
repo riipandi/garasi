@@ -106,3 +106,28 @@ export interface DeleteObjectsResponse {
     error: string
   }>
 }
+
+export interface GetObjectDetailParams {
+  bucket: string
+  key: string
+}
+
+export interface ObjectDetailFile {
+  key: string
+  type: 'file'
+  size: number
+  content_type?: string
+  last_modified?: string
+  e_tag?: string
+  storage_class?: string
+}
+
+export interface ObjectDetailFolder {
+  key: string
+  type: 'folder'
+  object_count: number
+  total_size: number
+  last_modified?: string
+}
+
+export type GetObjectDetailResponse = ObjectDetailFile | ObjectDetailFolder

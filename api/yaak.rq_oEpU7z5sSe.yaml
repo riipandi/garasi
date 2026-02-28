@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_DhBpvEQMk8
-createdAt: 2026-01-21T15:25:47.802418
-updatedAt: 2026-02-28T16:10:56.979587
+id: rq_oEpU7z5sSe
+createdAt: 2026-02-28T16:04:34.407921
+updatedAt: 2026-02-28T16:11:09.012966
 workspaceId: wk_YrPa97TLKc
 folderId: fl_36BcPxBP88
 authentication: {}
@@ -13,7 +13,7 @@ bodyType: null
 description: ''
 headers: []
 method: GET
-name: List bucket objects
-sortPriority: 0.0
-url: ${[ baseURL ]}/api/objects?bucket=demo&prefix=
+name: Get objects details
+sortPriority: 0.001
+url: ${[ baseURL ]}/api/objects/info?bucket=demo&key=dummy/default-avatar.png
 urlParameters: []

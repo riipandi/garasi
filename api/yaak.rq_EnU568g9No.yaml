@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_EnU568g9No
 createdAt: 2026-01-22T18:55:44.502862
-updatedAt: 2026-02-28T15:45:46.815181
+updatedAt: 2026-02-28T16:07:28.438745
 workspaceId: wk_YrPa97TLKc
 folderId: fl_36BcPxBP88
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "name": "dualupaa"
+      "name": "dummy"
     }
 bodyType: application/json
 description: ''
