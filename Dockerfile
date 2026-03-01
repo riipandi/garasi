@@ -62,6 +62,11 @@ RUN chmod -R 0775 /srv/public && chmod +x /srv/server/index.mjs
 # Production image, copy build output files and run the application.
 # ------------------------------------------------------------------------------
 FROM dhi.io/bun:${BUN_VERSION} AS runner
+LABEL org.opencontainers.image.source="https://github.com/riipandi/garasi"
+LABEL org.opencontainers.image.documentation="https://github.com/riipandi/garasi"
+LABEL org.opencontainers.image.description="Graphical User Interface for Garage S3"
+LABEL org.opencontainers.image.authors="Aris Ripandi"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 # Read application environment variables
 ARG APP_BASE_URL=http://localhost:3990
