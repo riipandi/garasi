@@ -1,6 +1,7 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
 import { getUserSessions } from '~/server/services/session.service'
+import type { ListSessionsResponse } from '~/shared/schemas/user.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { db, auth, logger } = event.context
@@ -11,17 +12,17 @@ export default defineProtectedHandler(async (event) => {
     .withMetadata({ userId: auth.userId, sessionCount: sessions.length })
     .debug('User sessions retrieved')
 
-  return createResponse(event, 'Sessions retrieved successfully', {
+  return createResponse<ListSessionsResponse>(event, 'Sessions retrieved successfully', {
     statusCode: 200,
     data: {
       sessions: sessions.map((session) => ({
         id: session.id,
-        ip_address: session.ipAddress,
-        device_info: session.deviceInfo,
-        last_activity_at: session.lastActivityAt,
-        expires_at: session.expiresAt,
-        created_at: session.createdAt,
-        is_current: session.id === auth.sessionId
+        userId: session.userId,
+        ipAddress: session.ipAddress,
+        userAgent: session.userAgent,
+        createdAt: new Date((session.createdAt ?? Date.now() / 1000) * 1000).toISOString(),
+        expiresAt: new Date(session.expiresAt * 1000).toISOString(),
+        isCurrent: session.id === auth.sessionId
       }))
     }
   })

@@ -1,16 +1,15 @@
 import { HTTPError, getRouterParam, getQuery } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
-
-interface GetAdminTokenInfoParams {
-  search?: string // Partial token ID or name to search for
-}
+import type {
+  GetAdminTokenInfoParams,
+  GetAdminTokenInfoResponse
+} from '~/shared/schemas/admin-token.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
   const log = logger.withPrefix('GetAdminTokenInfo')
 
-  // Get information from router and query params
   const id = getRouterParam(event, 'id')
 
   if (!id) {
@@ -21,12 +20,14 @@ export default defineProtectedHandler(async (event) => {
   const { search } = getQuery<GetAdminTokenInfoParams>(event)
 
   log.withMetadata({ id, search }).debug('Getting admin token information')
-  const data = await gfetch('/v2/GetAdminTokenInfo', { params: { id, search } })
+  const data = await gfetch<GetAdminTokenInfoResponse>('/v2/GetAdminTokenInfo', {
+    params: { id, search }
+  })
 
   if (!data) {
     log.withMetadata({ id }).warn('Admin token not found')
-    return createResponse(event, 'Admin token not found', { data: null })
+    return createResponse<GetAdminTokenInfoResponse>(event, 'Admin token not found', { data: null })
   }
 
-  return createResponse(event, 'Get Admin Token Info', { data })
+  return createResponse<GetAdminTokenInfoResponse>(event, 'Get Admin Token Info', { data })
 })

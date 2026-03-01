@@ -1,6 +1,7 @@
 import { getRouterParam, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
+import type { DeleteBucketResponse } from '~/shared/schemas/bucket.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
@@ -13,7 +14,7 @@ export default defineProtectedHandler(async (event) => {
   }
 
   log.withMetadata({ bucketId: id }).debug('Deleting bucket')
-  const data = await gfetch('/v2/DeleteBucket', { method: 'POST', params: { id } })
+  await gfetch('/v2/DeleteBucket', { method: 'POST', params: { id } })
 
-  return createResponse(event, 'Delete Bucket', { data })
+  return createResponse<DeleteBucketResponse>(event, 'Delete Bucket', { data: { id } })
 })

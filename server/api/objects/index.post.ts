@@ -4,13 +4,13 @@ import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
 import { parseBoolean } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
+import type { UploadFileResponse } from '~/shared/schemas/objects.schema'
 import { prettyBytes } from '~/shared/utils/humanize'
 
 export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
   const log = logger.withPrefix('UploadFile')
 
-  // Validate required parameter
   const { bucket, prefix, overwrite } = getQuery<{
     bucket: string
     prefix?: string
@@ -25,7 +25,6 @@ export default defineProtectedHandler(async (event) => {
 
   const form: FormData = await event.req.formData()
 
-  // Enforce single-file upload: collect file-like entries and fail if more than one
   const files: any[] = []
   for (const [, val] of form.entries()) {
     if (val && typeof (val as any).arrayBuffer === 'function' && (val as any).name) {
@@ -44,7 +43,6 @@ export default defineProtectedHandler(async (event) => {
 
   const fileEntry = files[0]
 
-  // read file into buffer (H3 returns Web File/Blob-like)
   let arrayBuf: ArrayBuffer
   arrayBuf = await fileEntry.arrayBuffer()
 
@@ -65,10 +63,8 @@ export default defineProtectedHandler(async (event) => {
   const filename = (fileEntry.name as string) ?? `file-${Date.now()}`
   const contentType = (fileEntry.type as string) ?? 'application/octet-stream'
 
-  // Upload the file to bucket
   const s3Client = await S3Service.fromBucket(event, bucket)
 
-  // Build the full key with prefix if provided
   const fullKey = prefix ? `${prefix}${filename}` : filename
 
   const forceUpload = parseBoolean(overwrite ?? null)
@@ -78,13 +74,17 @@ export default defineProtectedHandler(async (event) => {
     throw new HTTPError({ status: 401, statusText: `File '${fullKey}' already exists` })
   }
 
-  // Write uses multipart upload for large files (>100MB)
   const bytesWritten = await s3Client.write(fullKey, buffer, { contentType })
   log
     .withMetadata({ filename: fullKey, fileSize: prettyBytes(bytesWritten) })
     .debug('File uploaded successfully')
 
-  const data = { filename, contentType, fileSize: prettyBytes(bytesWritten), forceUpload }
-
-  return createResponse(event, 'Upload file to bucket', { data })
+  return createResponse<UploadFileResponse>(event, 'Upload file to bucket', {
+    data: {
+      filename,
+      contentType,
+      fileSize: prettyBytes(bytesWritten),
+      forceUpload
+    }
+  })
 })

@@ -4,6 +4,7 @@ import { createResponse, createErrorResonse } from '~/server/platform/responder'
 import { createSession } from '~/server/services/session.service'
 import { cleanupExpiredSessions } from '~/server/services/session.service'
 import { parseUserAgent } from '~/server/utils/parser'
+import type { SigninData } from '~/shared/schemas/user.schema'
 
 export default defineHandler(async (event) => {
   const { db, logger } = event.context
@@ -55,7 +56,7 @@ export default defineHandler(async (event) => {
 
     logger.withMetadata({ userId: user.id, sessionId }).info('User signed in successfully')
 
-    return createResponse(event, 'Signed in successfully', {
+    return createResponse<SigninData>(event, 'Signed in successfully', {
       statusCode: 200,
       data: {
         user_id: user.id,

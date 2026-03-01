@@ -2,6 +2,7 @@ import { getQuery, HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
+import type { DeleteObjectResponse, DeleteObjectsResponse } from '~/shared/schemas/objects.schema'
 
 interface DeleteRequestBody {
   key?: string
@@ -9,16 +10,10 @@ interface DeleteRequestBody {
   force?: boolean
 }
 
-/**
- * Delete object(s) from S3 bucket
- * Supports single key (key) or batch (keys) delete from request body
- * For folders: checks if empty before deletion (unless force=true)
- */
 export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
   const log = logger.withPrefix('DeleteObject')
 
-  // Query parameters
   const { bucket, prefix } = getQuery<{
     bucket: string
     prefix?: string
@@ -29,11 +24,9 @@ export default defineProtectedHandler(async (event) => {
     throw new HTTPError({ status: 400, statusText: 'Missing bucket parameter' })
   }
 
-  // Request body
   const body = await readBody<DeleteRequestBody | undefined>(event)
   const { key, keys, force: forceDelete } = body ?? {}
 
-  // Determine if single or batch delete
   const hasSingleKey = key !== undefined && key !== ''
   const hasKeys = keys !== undefined && Array.isArray(keys) && keys.length > 0
 
@@ -48,10 +41,8 @@ export default defineProtectedHandler(async (event) => {
   const isBatch = hasKeys
   log.withMetadata({ bucket, prefix, isBatch, forceDelete }).debug('Processing delete request')
 
-  // Create S3 service
   const s3Client = await S3Service.fromBucket(event, bucket)
 
-  // Parse keys
   let keysToDelete: string[]
   if (isBatch) {
     keysToDelete = keys!
@@ -59,7 +50,6 @@ export default defineProtectedHandler(async (event) => {
     keysToDelete = [key!]
   }
 
-  // Validate no empty keys
   if (keysToDelete.some((k) => !k || k.trim() === '')) {
     throw new HTTPError({ status: 400, statusText: 'Key cannot be empty' })
   }
@@ -67,14 +57,12 @@ export default defineProtectedHandler(async (event) => {
   const deletedKeys: string[] = []
   const errors: Array<{ key: string; error: string }> = []
 
-  // Process each key
   for (const keyToDelete of keysToDelete) {
     const sanitizedKey = keyToDelete.trim()
     const isFolder = sanitizedKey.endsWith('/')
 
     log.withMetadata({ key: sanitizedKey, isFolder }).debug('Processing delete for key')
 
-    // Check if object exists
     const exists = await s3Client.exists(sanitizedKey)
     if (!exists) {
       log.withMetadata({ key: sanitizedKey }).warn('Object not found')
@@ -82,7 +70,6 @@ export default defineProtectedHandler(async (event) => {
       continue
     }
 
-    // If folder, check if empty
     if (isFolder) {
       const objectCount = await s3Client.listUnderPrefix(sanitizedKey)
       if (objectCount > 0 && !forceDelete) {
@@ -99,7 +86,6 @@ export default defineProtectedHandler(async (event) => {
       }
     }
 
-    // Delete the object
     try {
       await s3Client.delete(sanitizedKey)
       deletedKeys.push(sanitizedKey)
@@ -110,7 +96,6 @@ export default defineProtectedHandler(async (event) => {
     }
   }
 
-  // Handle results
   if (deletedKeys.length === 0) {
     throw new HTTPError({
       status: 400,
@@ -120,12 +105,6 @@ export default defineProtectedHandler(async (event) => {
   }
 
   const deletedCount = deletedKeys.length
-  const data = {
-    deleted: deletedKeys,
-    deleted_count: deletedCount,
-    ...(errors.length > 0 && { errors })
-  }
-
   const message =
     errors.length > 0
       ? `Deleted ${deletedCount} objects with ${errors.length} errors`
@@ -135,5 +114,18 @@ export default defineProtectedHandler(async (event) => {
     throw new HTTPError({ status: 400, statusText: message })
   }
 
-  return createResponse(event, message, { data })
+  if (isBatch) {
+    return createResponse<DeleteObjectsResponse>(event, message, {
+      data: {
+        deleted: deletedKeys,
+        deleted_count: deletedCount,
+        errors
+      }
+    })
+  }
+
+  const firstKey = deletedKeys[0] ?? ''
+  return createResponse<DeleteObjectResponse>(event, message, {
+    data: { key: firstKey, type: 'file', deleted_count: deletedCount }
+  })
 })

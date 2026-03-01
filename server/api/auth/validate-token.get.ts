@@ -1,5 +1,6 @@
 import { defineHandler, getQuery, HTTPError } from 'nitro/h3'
 import { createResponse, createErrorResonse } from '~/server/platform/responder'
+import type { ValidateTokenResponse } from '~/shared/schemas/user.schema'
 
 export default defineHandler(async (event) => {
   const { db } = event.context
@@ -30,9 +31,9 @@ export default defineHandler(async (event) => {
       throw new HTTPError({ status: 401, statusText: 'Token has already been used' })
     }
 
-    return createResponse(event, 'Token valid', {
+    return createResponse<ValidateTokenResponse>(event, 'Token valid', {
       statusCode: 200,
-      data: { is_token_valid: true }
+      data: { valid: true }
     })
   } catch (error) {
     return createErrorResonse(event, error)

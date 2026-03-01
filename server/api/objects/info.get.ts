@@ -2,6 +2,7 @@ import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
+import type { GetObjectDetailResponse } from '~/shared/schemas/objects.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { logger } = event.context
@@ -40,37 +41,39 @@ export default defineProtectedHandler(async (event) => {
 
     if (listResult.contents) {
       for (const obj of listResult.contents) {
-        totalSize += obj.size || 0
-        if (!lastModified || (obj.last_modified && obj.last_modified > lastModified)) {
-          lastModified = obj.last_modified
+        totalSize += obj.Size || 0
+        const objLastModified = obj.LastModified?.toISOString()
+        if (!lastModified || (objLastModified && objLastModified > lastModified)) {
+          lastModified = objLastModified
         }
       }
     }
 
-    const data = {
-      key,
-      type: 'folder' as const,
-      object_count: objectCount,
-      total_size: totalSize,
-      last_modified: lastModified
-    }
+    log.info('Folder info retrieved successfully')
 
-    log.withMetadata(data).info('Folder info retrieved successfully')
-    return createResponse(event, 'Folder info retrieved successfully', { data })
+    return createResponse<GetObjectDetailResponse>(event, 'Folder info retrieved successfully', {
+      data: {
+        key,
+        type: 'folder',
+        object_count: objectCount,
+        total_size: totalSize,
+        last_modified: lastModified
+      }
+    })
   }
 
   const metadata = await s3Client.head(key)
 
-  const data = {
-    key,
-    type: 'file' as const,
-    size: metadata.ContentLength || 0,
-    content_type: metadata.ContentType,
-    last_modified: metadata.LastModified?.toISOString(),
-    e_tag: metadata.ETag,
-    storage_class: metadata.StorageClass
-  }
-
-  log.withMetadata(data).info('File info retrieved successfully')
-  return createResponse(event, 'File info retrieved successfully', { data })
+  log.info('File info retrieved successfully')
+  return createResponse<GetObjectDetailResponse>(event, 'File info retrieved successfully', {
+    data: {
+      key,
+      type: 'file',
+      size: metadata.ContentLength || 0,
+      content_type: metadata.ContentType,
+      last_modified: metadata.LastModified?.toISOString(),
+      e_tag: metadata.ETag,
+      storage_class: metadata.StorageClass
+    }
+  })
 })

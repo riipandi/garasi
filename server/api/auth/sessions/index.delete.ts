@@ -2,6 +2,7 @@ import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
 import { deactivateSession } from '~/server/services/session.service'
+import type { RevokeSessionResponse } from '~/shared/schemas/user.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { db, logger } = event.context
@@ -24,8 +25,8 @@ export default defineProtectedHandler(async (event) => {
 
   logger.withMetadata({ sessionId: body.session_id }).info('Session revoked successfully')
 
-  return createResponse(event, 'Session revoked successfully', {
+  return createResponse<RevokeSessionResponse>(event, 'Session revoked successfully', {
     statusCode: 200,
-    data: null
+    data: { session_id: body.session_id }
   })
 })

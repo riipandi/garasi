@@ -1,8 +1,7 @@
 import { HTTPError, getQuery, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
-import type { PurgeBlocksParams } from '~/shared/schemas/block.schema'
-import type { PurgeBlocksResponse } from '~/shared/schemas/block.schema'
+import type { PurgeBlocksParams, PurgeBlocksResponse } from '~/shared/schemas/block.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
@@ -31,5 +30,5 @@ export default defineProtectedHandler(async (event) => {
     body
   })
 
-  return createResponse(event, 'Purge Blocks', { data })
+  return createResponse<PurgeBlocksResponse>(event, 'Purge Blocks', { data })
 })

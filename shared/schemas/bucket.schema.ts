@@ -123,6 +123,10 @@ export interface DeleteBucketParams {
   id: string // ID of the bucket to delete
 }
 
+export interface DeleteBucketResponse {
+  id: string
+}
+
 /**
  * All fields (`websiteAccess` and `quotas`) are optional. If they are present,
  * the corresponding modifications are applied to the bucket, otherwise

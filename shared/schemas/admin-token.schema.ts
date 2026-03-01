@@ -45,6 +45,10 @@ export interface DeleteAdminTokenParams {
   id: string // Admin API token ID
 }
 
+export interface DeleteAdminTokenResponse {
+  id: string
+}
+
 /**
  * Return information about a specific admin API token.
  * You can search by specifying the exact token identifier

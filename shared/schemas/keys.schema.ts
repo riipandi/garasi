@@ -107,6 +107,10 @@ export interface DeleteAccessKeyParams {
   id: string // Access key ID
 }
 
+export interface DeleteAccessKeyResponse {
+  accessKeyId: string
+}
+
 /**
  * Imports an existing API key. This feature must only be used
  * for migrations and backup restore.

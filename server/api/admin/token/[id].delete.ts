@@ -1,6 +1,7 @@
 import { getRouterParam, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
+import type { DeleteAdminTokenResponse } from '~/shared/schemas/admin-token.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { gfetch, logger } = event.context
@@ -13,7 +14,7 @@ export default defineProtectedHandler(async (event) => {
   }
 
   log.withMetadata({ id }).debug('Deleting admin token')
-  const resp = await gfetch('/v2/DeleteAdminToken', { method: 'POST', params: { id } })
+  await gfetch('/v2/DeleteAdminToken', { method: 'POST', params: { id } })
 
-  return createResponse(event, 'Delete Admin Token', { data: { id, ...resp } })
+  return createResponse<DeleteAdminTokenResponse>(event, 'Delete Admin Token', { data: { id } })
 })

@@ -1,6 +1,7 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
 import { createResponse } from '~/server/platform/responder'
 import { deactivateOtherSessions } from '~/server/services/session.service'
+import type { RevokeOtherSessionsResponse } from '~/shared/schemas/user.schema'
 
 export default defineProtectedHandler(async (event) => {
   const { db, auth, logger } = event.context
@@ -15,10 +16,12 @@ export default defineProtectedHandler(async (event) => {
     .withMetadata({ userId: auth.userId, deactivatedCount })
     .info('Signed out from other devices')
 
-  return createResponse(event, `Signed out from ${deactivatedCount} other device(s)`, {
-    statusCode: 200,
-    data: {
-      deactivated_count: deactivatedCount
+  return createResponse<RevokeOtherSessionsResponse>(
+    event,
+    `Signed out from ${deactivatedCount} other device(s)`,
+    {
+      statusCode: 200,
+      data: { deactivated_count: deactivatedCount }
     }
-  })
+  )
 })
