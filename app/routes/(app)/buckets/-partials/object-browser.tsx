@@ -84,13 +84,41 @@ export function ObjectBrowser({
 
   const uploadFileMutation = useMutation({
     mutationFn: async (file: File) => {
-      return objectsService.uploadFile({ bucket: bucketParam }, { file })
+      return objectsService.uploadFile(
+        { bucket: bucketParam, prefix: prefix || undefined },
+        { file }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })
     },
     onError: (error) => {
       console.error('Failed to upload file:', error)
+    }
+  })
+
+  const deleteObjectMutation = useMutation({
+    mutationFn: async ({ key, force = false }: { key: string; force?: boolean }) => {
+      return objectsService.deleteObject({ bucket: bucketParam }, { key, force })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })
+    },
+    onError: (error) => {
+      console.error('Failed to delete object:', error)
+    }
+  })
+
+  const deleteObjectsMutation = useMutation({
+    mutationFn: async ({ keys, force = false }: { keys: string[]; force?: boolean }) => {
+      return objectsService.deleteObjects({ bucket: bucketParam }, { keys, force })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['objects', bucket.id, prefix, key] })
+      setSelectedItems(new Set())
+    },
+    onError: (error) => {
+      console.error('Failed to delete objects:', error)
     }
   })
 
@@ -122,7 +150,7 @@ export function ObjectBrowser({
         name: obj.key.replace(/\/$/, '').replace(prefix || '', ''),
         type: 'folder' as const,
         size: 0,
-        modified: obj.lastModified || new Date().toISOString()
+        modified: obj.last_modified || new Date().toISOString()
       }))
 
     const fileItems = contents
@@ -132,7 +160,7 @@ export function ObjectBrowser({
         name: obj.key.replace(prefix || '', ''),
         type: 'file' as const,
         size: obj.size,
-        modified: obj.lastModified
+        modified: obj.last_modified
       }))
 
     return [...folderItemsFromPrefixes, ...emptyFolders, ...fileItems]
@@ -165,30 +193,103 @@ export function ObjectBrowser({
     })
   }
 
-  const handleCopyUrl = (item: FileItem) => {
-    console.log('Copy URL', item)
+  const handleCopyUrl = async (item: FileItem) => {
+    try {
+      const response = await objectsService.getPresignedUrl({
+        bucket: bucketParam,
+        key: item.id,
+        operation: 'get'
+      })
+      if (response.data?.url) {
+        await navigator.clipboard.writeText(response.data.url)
+        alert('URL copied to clipboard!')
+      }
+    } catch (error) {
+      console.error('Failed to copy URL:', error)
+      alert('Failed to copy URL')
+    }
   }
 
   const handleRename = (item: FileItem) => {
     console.log('Rename', item)
   }
 
-  const handleDownload = (item: FileItem) => {
-    console.log('Download', item)
+  const handleDownload = async (item: FileItem) => {
+    try {
+      const response = await objectsService.getPresignedUrl({
+        bucket: bucketParam,
+        key: item.id,
+        operation: 'get'
+      })
+      if (response.data?.url) {
+        const link = document.createElement('a')
+        link.href = response.data.url
+        link.download = item.name
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch (error) {
+      console.error('Failed to download:', error)
+      alert('Failed to download file')
+    }
   }
 
-  const handleDelete = (item: FileItem) => {
-    console.log('Delete', item)
+  const handleDelete = async (item: FileItem) => {
+    const confirmMessage =
+      item.type === 'folder'
+        ? `Are you sure you want to delete folder "${item.name}"?`
+        : `Are you sure you want to delete "${item.name}"?`
+
+    if (!confirm(confirmMessage)) return
+
+    try {
+      await deleteObjectMutation.mutateAsync({ key: item.id })
+    } catch (error: any) {
+      if (error?.data?.object_count && !error?.data?.hint?.includes('force=true')) {
+        const forceDelete = confirm(
+          `Folder is not empty (${error.data.object_count} objects). Delete anyway?`
+        )
+        if (forceDelete) {
+          try {
+            await deleteObjectMutation.mutateAsync({ key: item.id, force: true })
+          } catch (retryError) {
+            console.error('Failed to delete folder:', retryError)
+            alert('Failed to delete folder')
+          }
+        }
+      } else {
+        console.error('Failed to delete:', error)
+        alert(error?.message || 'Failed to delete')
+      }
+    }
   }
 
-  const handleBatchDownload = () => {
+  const handleBatchDownload = async () => {
     const selectedItemsList = Array.from(selectedItems)
-    console.log('Batch download', selectedItemsList)
+    for (const itemId of selectedItemsList) {
+      const item = fileItems.find((f) => f.id === itemId)
+      if (item && item.type === 'file') {
+        await handleDownload(item)
+      }
+    }
   }
 
-  const handleBatchDelete = () => {
+  const handleBatchDelete = async () => {
     const selectedItemsList = Array.from(selectedItems)
-    console.log('Batch delete', selectedItemsList)
+    const confirmMessage =
+      selectedItemsList.length === 1
+        ? 'Are you sure you want to delete this item?'
+        : `Are you sure you want to delete ${selectedItemsList.length} items?`
+
+    if (!confirm(confirmMessage)) return
+
+    try {
+      await deleteObjectsMutation.mutateAsync({ keys: selectedItemsList })
+    } catch (error: any) {
+      console.error('Failed to delete objects:', error)
+      alert(error?.message || 'Failed to delete objects')
+    }
   }
 
   const handleToggleSelect = (itemId: string) => {

@@ -101,6 +101,8 @@ Access the application at: [`http://localhost:3990`](http://localhost:3990)
 - Default user: `admin@example.com`
 - Default pass: `P@ssw0rd!`
 
+For detailed documentation how to setup Garage, check out [Garage Quick Start](https://garagehq.deuxfleurs.fr/documentation/quick-start).
+
 ## Configuration
 
 Generate required secrets using the built-in script:
@@ -171,11 +173,40 @@ bun run compose:cleanup   # Cleanup volumes
 - **Validation:** Zod schema validation
 - **Styling:** Tailwind CSS v4 with Base UI components
 
-## Documentation
+## Garage Features
 
-- [Garage Quick Start](https://garagehq.deuxfleurs.fr/documentation/quick-start)
-- [Garage Admin API](https://garagehq.deuxfleurs.fr/documentation/reference-manual/admin-api)
-- [S3 Compatibility](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility)
+### Supported features
+- Signature v4
+- URL path-style
+- URL vhost-style
+- Presigned URLs
+- SSE-C encryption
+
+### Unsupported Features
+- Signature v2 (deprecated)
+- Bucket versioning
+
+### Implemented Endpoints
+```
+CreateBucket, DeleteBucket, GetBucketLocation, HeadBucket, ListBuckets, HeadObject, CopyObject, DeleteObject,
+DeleteObjects, GetObject, ListObjects, ListObjectsV2, PostObject, PutObject, AbortMultipartUpload,
+CompleteMultipartUpload, CreateMultipartUpload, ListMultipartUpload, ListParts, UploadPart, UploadPartCopy,
+DeleteBucketWebsite, GetBucketWebsite, PutBucketWebsite (partially implemented), DeleteBucketCors, GetBucketCors, PutBucketCors, DeleteBucketLifecycle,
+GetBucketLifecycleConfiguration, PutBucketLifecycleConfiguration (partially implemented)
+```
+
+### Unimplemented Endpoints
+```
+DeleteBucketPolicy, GetBucketPolicy, GetBucketPolicyStatus, PutBucketPolicy, GetBucketAcl, PutBucketAcl,
+GetObjectAcl, PutObjectAcl, GetBucketVersioning, ListObjectVersions, PutBucketVersioning, DeleteBucketReplication,
+GetBucketReplication, PutBucketReplication, GetObjectLegalHold, PutObjectLegalHold, GetObjectRetention,
+PutObjectRetention, GetObjectLockConfiguration, PutObjectLockConfiguration, DeleteBucketEncryption,
+GetBucketEncryption, PutBucketEncryption, GetBucketNotificationConfiguration, PutBucketNotificationConfiguration,
+DeleteBucketTagging, GetBucketTagging, PutBucketTagging, DeleteObjectTagging, GetObjectTagging, PutObjectTagging,
+GetObjectTorrent
+```
+
+For more detailed information read the [Garage S3 Compatibility status documentation](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility).
 
 ## API Endpoints
 | Endpoint         | Description                                    |
@@ -190,6 +221,9 @@ bun run compose:cleanup   # Cleanup volumes
 | `/api/worker/*`  | Worker variables and information               |
 | `/api/objects/*` | Object and folder operations                   |
 | `/api/metrics/*` | Cluster metrics endpoint                       |
+
+Read the [Garage Admin API docs](https://garagehq.deuxfleurs.fr/documentation/reference-manual/admin-api) for more
+detailed information about Garage API Reference.
 
 ## License
 

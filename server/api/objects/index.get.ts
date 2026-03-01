@@ -31,8 +31,8 @@ export default defineProtectedHandler(async (event) => {
     .withMetadata({
       bucket,
       prefix,
-      objectCount: data?.Contents?.length || 0,
-      folderCount: data?.CommonPrefixes?.length || 0
+      objectCount: data?.contents?.length || 0,
+      folderCount: data?.common_prefixes?.length || 0
     })
     .debug('Bucket objects listed successfully')
 

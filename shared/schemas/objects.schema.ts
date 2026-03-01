@@ -35,6 +35,7 @@ export interface ListBucketObjectsResponse {
 
 export interface UploadFileParams {
   bucket: string
+  prefix?: string
   overwrite?: boolean
 }
 

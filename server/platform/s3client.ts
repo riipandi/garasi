@@ -98,10 +98,15 @@ export class S3Service {
   static async fromBucket(event: H3Event, bucket: string): Promise<S3Service> {
     const { gfetch, logger } = event.context
 
+    // Determine if bucket is a UUID or an alias
+    // UUID pattern: 8-4-4-4-12 hex characters
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bucket)
+
+    // Build params based on bucket type
+    const params = isUUID ? { id: bucket } : { globalAlias: bucket }
+
     // Get bucket info from Garage API
-    const bucketInfo = await gfetch<GetBucketInfoResponse>('/v2/GetBucketInfo', {
-      params: { search: bucket }
-    })
+    const bucketInfo = await gfetch<GetBucketInfoResponse>('/v2/GetBucketInfo', { params })
 
     if (!bucketInfo) {
       logger.withMetadata(bucketInfo).debug('Failed to retrieve bucket information')
