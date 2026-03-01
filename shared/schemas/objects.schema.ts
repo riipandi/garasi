@@ -1,36 +1,23 @@
+import type { _Object, CommonPrefix, EncodingType } from '@aws-sdk/client-s3'
+
 export interface ListBucketObjectsParams {
   bucket: string
   prefix?: string
 }
 
-export interface S3Object {
-  key: string
-  last_modified?: string
-  e_tag?: string
-  size?: number
-  storage_class?: string
-  owner?: {
-    id: string
-    display_name?: string
-  }
-}
-
-export interface CommonPrefix {
-  prefix: string
-}
-
 export interface ListBucketObjectsResponse {
-  is_truncated?: boolean
-  marker?: string
-  next_marker?: string
-  contents?: S3Object[]
-  common_prefixes?: CommonPrefix[]
-  name?: string
-  prefix?: string
-  delimiter?: string
-  max_keys?: number
-  common_prefixes_count?: number
-  keys_count?: number
+  name?: string | undefined
+  prefix?: string | undefined
+  delimiter?: string | undefined
+  is_truncated?: boolean | undefined
+  contents?: _Object[] | undefined
+  max_keys?: number | undefined
+  common_prefixes?: CommonPrefix[] | undefined
+  encoding_type?: EncodingType | undefined
+  key_count?: number | undefined
+  continuation_token?: string | undefined
+  next_continuation_token?: string | undefined
+  start_after?: string | undefined
 }
 
 export interface UploadFileParams {

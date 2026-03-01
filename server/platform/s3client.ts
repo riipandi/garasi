@@ -6,14 +6,13 @@ import {
   ListObjectsV2Command,
   type PutObjectCommandInput,
   type ListObjectsV2CommandInput,
-  type HeadObjectCommandOutput,
-  type _Object
+  type HeadObjectCommandOutput
 } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { H3Event, HTTPError } from 'nitro/h3'
-import { toSnakeCase } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
+import type { ListBucketObjectsResponse } from '~/shared/schemas/objects.schema'
 
 /**
  * S3 multipart upload configuration
@@ -247,7 +246,7 @@ export class S3Service {
       maxKeys?: number
       continuationToken?: string
     }
-  ): Promise<ReturnType<typeof toSnakeCase>> {
+  ): Promise<ListBucketObjectsResponse> {
     const params: ListObjectsV2CommandInput = {
       Bucket: this.bucket,
       Prefix: prefix,
@@ -258,7 +257,21 @@ export class S3Service {
 
     const command = new ListObjectsV2Command(params)
     const result = await this.client.send(command)
-    return toSnakeCase(result)
+
+    return {
+      name: result.Name,
+      prefix: result.Prefix,
+      delimiter: result.Delimiter,
+      is_truncated: result.IsTruncated,
+      contents: result.Contents,
+      max_keys: result.MaxKeys,
+      common_prefixes: result.CommonPrefixes,
+      encoding_type: result.EncodingType,
+      key_count: result.KeyCount,
+      continuation_token: result.ContinuationToken,
+      next_continuation_token: result.NextContinuationToken,
+      start_after: result.StartAfter
+    }
   }
 
   /**
