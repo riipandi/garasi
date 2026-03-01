@@ -19,7 +19,7 @@
 
 > [!CAUTION]
 > Garage development is still in an experimental stage, so you may encounter bugs and see changes over time.
-> <br/>Use it in production only if you’re willing to accept that risk. However, most features are already usable.
+> <br/>Use it in production only if you're willing to accept that risk. However, most features are already usable.
 
 A modern web-based management interface for [Garage S3](https://garagehq.deuxfleurs.fr/), a distributed
 object storage system. Garasi provides an intuitive GUI to manage your Garage cluster, buckets, access keys,
