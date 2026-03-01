@@ -17,6 +17,10 @@
 
 ---
 
+> [!CAUTION]
+> Garage development is still in an experimental stage, so you may encounter bugs and see changes over time.
+> <br/>Use it in production only if you’re willing to accept that risk. However, most features are already usable.
+
 A modern web-based management interface for [Garage S3](https://garagehq.deuxfleurs.fr/), a distributed
 object storage system. Garasi provides an intuitive GUI to manage your Garage cluster, buckets, access keys,
 and objects with full-stack type-safe operations.
@@ -188,22 +192,24 @@ bun run compose:cleanup   # Cleanup volumes
 
 ### Implemented Endpoints
 ```
-CreateBucket, DeleteBucket, GetBucketLocation, HeadBucket, ListBuckets, HeadObject, CopyObject, DeleteObject,
-DeleteObjects, GetObject, ListObjects, ListObjectsV2, PostObject, PutObject, AbortMultipartUpload,
-CompleteMultipartUpload, CreateMultipartUpload, ListMultipartUpload, ListParts, UploadPart, UploadPartCopy,
-DeleteBucketWebsite, GetBucketWebsite, PutBucketWebsite (partially implemented), DeleteBucketCors, GetBucketCors, PutBucketCors, DeleteBucketLifecycle,
-GetBucketLifecycleConfiguration, PutBucketLifecycleConfiguration (partially implemented)
+CreateBucket, DeleteBucket, GetBucketLocation, HeadBucket, ListBuckets, HeadObject, CopyObject,
+DeleteObject, DeleteObjects, GetObject, ListObjects, ListObjectsV2, PostObject, PutObject,
+AbortMultipartUpload, CompleteMultipartUpload, CreateMultipartUpload, ListMultipartUpload,
+ListParts, UploadPart, UploadPartCopy, DeleteBucketWebsite, GetBucketWebsite, DeleteBucketCors,
+GetBucketCors, PutBucketCors, DeleteBucketLifecycle, PutBucketWebsite (partial),
+GetBucketLifecycleConfiguration, PutBucketLifecycleConfiguration (partial)
 ```
 
 ### Unimplemented Endpoints
 ```
-DeleteBucketPolicy, GetBucketPolicy, GetBucketPolicyStatus, PutBucketPolicy, GetBucketAcl, PutBucketAcl,
-GetObjectAcl, PutObjectAcl, GetBucketVersioning, ListObjectVersions, PutBucketVersioning, DeleteBucketReplication,
-GetBucketReplication, PutBucketReplication, GetObjectLegalHold, PutObjectLegalHold, GetObjectRetention,
-PutObjectRetention, GetObjectLockConfiguration, PutObjectLockConfiguration, DeleteBucketEncryption,
-GetBucketEncryption, PutBucketEncryption, GetBucketNotificationConfiguration, PutBucketNotificationConfiguration,
-DeleteBucketTagging, GetBucketTagging, PutBucketTagging, DeleteObjectTagging, GetObjectTagging, PutObjectTagging,
-GetObjectTorrent
+DeleteBucketPolicy, GetBucketPolicy, GetBucketPolicyStatus, PutBucketPolicy, GetBucketAcl,
+PutBucketAcl, GetObjectAcl, PutObjectAcl, GetBucketVersioning, ListObjectVersions,
+PutBucketVersioning, DeleteBucketReplication, GetBucketReplication, PutBucketReplication,
+GetObjectLegalHold, PutObjectLegalHold, GetObjectRetention, PutObjectRetention,
+GetObjectLockConfiguration, PutObjectLockConfiguration, DeleteBucketEncryption,
+GetBucketEncryption, PutBucketEncryption, GetBucketNotificationConfiguration,
+PutBucketNotificationConfiguration, DeleteBucketTagging, GetBucketTagging, PutBucketTagging,
+DeleteObjectTagging, GetObjectTagging, PutObjectTagging, GetObjectTorrent
 ```
 
 For more detailed information read the [Garage S3 Compatibility status documentation](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility).
@@ -229,12 +235,6 @@ detailed information about Garage API Reference.
 
 Garasi is licensed under the [Apache License 2.0](https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0).
 See the [LICENSE](./LICENSE) file for more information.
-
-> Unless you explicitly state otherwise, any contribution intentionally submitted
-> for inclusion in this project by you shall be licensed under the Apache License 2.0,
-> without any additional terms or conditions.
-
-Copyrights in this project are retained by their contributors.
 
 ---
 
