@@ -131,8 +131,9 @@ export default defineProtectedHandler(async (event) => {
       ? `Deleted ${deletedCount} objects with ${errors.length} errors`
       : 'Objects deleted successfully'
 
-  // If there are errors, return error status; otherwise success
-  const status: 'success' | 'error' = errors.length > 0 ? 'error' : 'success'
+  if (errors.length > 0) {
+    throw new HTTPError({ status: 400, statusText: message })
+  }
 
-  return createResponse(event, message, { data, status })
+  return createResponse(event, message, { data })
 })

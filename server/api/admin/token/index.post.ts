@@ -1,5 +1,6 @@
 import { HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 
 interface UpdateAdminTokenRequestBody {
   name: string | null // Name of the admin API token
@@ -38,5 +39,5 @@ export default defineProtectedHandler(async (event) => {
     body
   })
 
-  return { status: 'success', message: 'Create Admin Token', data: resp }
+  return createResponse(event, 'Create Admin Token', { data: resp })
 })

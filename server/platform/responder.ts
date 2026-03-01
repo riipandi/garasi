@@ -15,14 +15,12 @@ interface CreateResponseOpts<T = unknown, E = unknown> {
 export function createResponse<T = unknown, E = unknown>(
   event: H3Event,
   message: string,
-  opts?: CreateResponseOpts<T, E>
+  opts?: Omit<CreateResponseOpts<T, E>, 'status'>
 ): ApiResponse {
   event.res.status = opts?.statusCode ?? 200
-  const status = opts?.status ?? 'success'
   const data = opts?.data ?? null
   const error = opts?.error ?? null
-
-  return { status, message, data, error }
+  return { status: 'success', message, data, error }
 }
 
 export function createErrorResonse<R = EventHandlerResponse>(

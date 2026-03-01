@@ -1,5 +1,6 @@
 import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
 
 const DEFAULT_EXPIRY = 3600 // 1 hour
@@ -74,5 +75,5 @@ export default defineProtectedHandler(async (event) => {
     expires_at: new Date(Date.now() + expiry * 1000).toISOString()
   }
 
-  return { status: 'success', message: 'Presigned URL generated', data }
+  return createResponse(event, 'Presigned URL generated', { data })
 })

@@ -1,5 +1,6 @@
 import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
 import { parseBoolean } from '~/server/utils/parser'
 import { protectedEnv } from '~/shared/envars'
@@ -85,5 +86,5 @@ export default defineProtectedHandler(async (event) => {
 
   const data = { filename, contentType, fileSize: prettyBytes(bytesWritten), forceUpload }
 
-  return { status: 'success', message: 'Upload file to bucket', data }
+  return createResponse(event, 'Upload file to bucket', { data })
 })

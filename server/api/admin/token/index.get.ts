@@ -1,4 +1,5 @@
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 
 interface GetAdminTokenInfoResp {
   id: string | null
@@ -15,5 +16,5 @@ export default defineProtectedHandler(async (event) => {
   log.debug('Listing admin tokens')
   const data = await gfetch<GetAdminTokenInfoResp[]>('/v2/ListAdminTokens')
   log.withMetadata(data).debug('Admin tokens listed successfully')
-  return { status: 'success', message: 'List Admin Tokens', data }
+  return createResponse(event, 'List Admin Tokens', { data })
 })

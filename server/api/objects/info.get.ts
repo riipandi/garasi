@@ -1,5 +1,6 @@
 import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
 
 export default defineProtectedHandler(async (event) => {
@@ -55,7 +56,7 @@ export default defineProtectedHandler(async (event) => {
     }
 
     log.withMetadata(data).info('Folder info retrieved successfully')
-    return { status: 'success', message: 'Folder info retrieved successfully', data }
+    return createResponse(event, 'Folder info retrieved successfully', { data })
   }
 
   const metadata = await s3Client.head(key)
@@ -71,5 +72,5 @@ export default defineProtectedHandler(async (event) => {
   }
 
   log.withMetadata(data).info('File info retrieved successfully')
-  return { status: 'success', message: 'File info retrieved successfully', data }
+  return createResponse(event, 'File info retrieved successfully', { data })
 })

@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_BKuNjHajpy
+createdAt: 2026-03-01T09:09:19.278478
+updatedAt: 2026-03-01T09:10:35.940904
+workspaceId: wk_YrPa97TLKc
+folderId: fl_36BcPxBP88
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get presigned URL
+sortPriority: 0.002
+url: ${[ baseURL ]}/api/objects/presign?operation=get&bucket=demo&key=dummy/default-avatar.png
+urlParameters: []

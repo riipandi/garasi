@@ -1,5 +1,6 @@
 import { getQuery, HTTPError, readBody } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
 
 interface CreateFolderRequestBody {
@@ -70,5 +71,5 @@ export default defineProtectedHandler(async (event) => {
   log.withMetadata({ bucket, folderKey }).info('Folder created successfully')
   const data = { name: sanitizedFolderName, folder_key: folderKey, bucket }
 
-  return { status: 'success', message: 'Folder created successfully', data }
+  return createResponse(event, 'Folder created successfully', { data })
 })

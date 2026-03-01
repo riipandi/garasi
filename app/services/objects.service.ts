@@ -29,9 +29,7 @@ export interface ObjectsService {
     params: CreateFolderParams,
     data: CreateFolderRequest
   ) => Promise<ApiResponse<CreateFolderResponse>>
-  getObjectDetail: (
-    params: GetObjectDetailParams
-  ) => Promise<ApiResponse<GetObjectDetailResponse>>
+  getObjectDetail: (params: GetObjectDetailParams) => Promise<ApiResponse<GetObjectDetailResponse>>
   deleteObject: (
     params: Pick<DeleteObjectParams, 'bucket'>,
     data: Omit<DeleteObjectParams, 'bucket'>
@@ -40,9 +38,7 @@ export interface ObjectsService {
     params: Pick<DeleteObjectsParams, 'bucket'>,
     data: Omit<DeleteObjectsParams, 'bucket'>
   ) => Promise<ApiResponse<DeleteObjectsResponse>>
-  getPresignedUrl: (
-    params: PresignUrlParams
-  ) => Promise<ApiResponse<PresignUrlResponse>>
+  getPresignedUrl: (params: PresignUrlParams) => Promise<ApiResponse<PresignUrlResponse>>
 }
 
 function defineObjectsService(): ObjectsService {

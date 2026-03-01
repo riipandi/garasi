@@ -1,5 +1,6 @@
 import { getQuery, HTTPError } from 'nitro/h3'
 import { defineProtectedHandler } from '~/server/platform/guards'
+import { createResponse } from '~/server/platform/responder'
 import { S3Service } from '~/server/platform/s3client'
 
 export default defineProtectedHandler(async (event) => {
@@ -36,5 +37,5 @@ export default defineProtectedHandler(async (event) => {
     })
     .debug('Bucket objects listed successfully')
 
-  return { status: 'success', message: 'List of bucket objects', data }
+  return createResponse(event, 'List of bucket objects', { data })
 })
