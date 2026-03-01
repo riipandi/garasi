@@ -15,7 +15,7 @@ export const publicEnv = {
   PUBLIC_BASE_URL: setEnv(Bun.env.PUBLIC_BASE_URL, 'http://localhost:3990'),
   PUBLIC_CORS_ORIGINS: setEnvArray(Bun.env.PUBLIC_CORS_ORIGINS, ['*']),
   PUBLIC_TOKEN_EXPIRY: setEnv(Bun.env.PUBLIC_TOKEN_EXPIRY, 900), // default: 15 minutes
-  S3_MAX_UPLOAD_SIZE: setEnv(Bun.env.S3_MAX_UPLOAD_SIZE, 1_048_576 * 5) // default 5MB
+  S3_MAX_UPLOAD_SIZE: setEnv(Bun.env.S3_MAX_UPLOAD_SIZE, 1_048_576 * 100) // default 100MB
 }
 
 /**
